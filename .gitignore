@@ -1,0 +1,5 @@
+node_modules/
+scratch/
+__pycache__/
+*.log
+.DS_Store

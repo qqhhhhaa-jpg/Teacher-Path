@@ -31,7 +31,7 @@ if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
         pass
 
 # Configuration
-PORT = 8080
+PORT = int(os.environ.get('PORT', 8080))
 HOST = '0.0.0.0' # Allows local network access (PC, Mobile, Tablet)
 WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 START_TIME = time.time()
@@ -125,6 +125,29 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             self.wfile.write(res.encode('utf-8'))
             return
 
+        # Active Session Check GET endpoint: /api/active_session?userId=...
+        if clean_path == '/api/active_session':
+            query = parse_qs(urlparse(self.path).query)
+            user_id = query.get('userId', [''])[0].strip().lower()
+            clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) or 'default'
+            data_dir = os.path.join(WORKSPACE_DIR, 'data')
+            session_file = os.path.join(data_dir, f'session_{clean_uid}.json')
+            if os.path.exists(session_file):
+                try:
+                    with open(session_file, 'r', encoding='utf-8') as f:
+                        session_data = json.load(f)
+                    res = json.dumps({"success": True, "active": True, "session": session_data}, ensure_ascii=False)
+                except Exception as e:
+                    res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+            else:
+                res = json.dumps({"success": True, "active": False, "session": None}, ensure_ascii=False)
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(res.encode('utf-8'))
+            return
+
         return super().do_GET()
 
     def do_POST(self):
@@ -151,6 +174,33 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                     "questions_count": len(payload.get('questionsBank', [])),
                     "exams_count": len(payload.get('examsArchive', []))
                 }, ensure_ascii=False)
+                self.send_response(200)
+            except Exception as e:
+                res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+                self.send_response(500)
+
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(res.encode('utf-8'))
+            return
+
+        # Active Session Registration POST endpoint: /api/active_session
+        if clean_path == '/api/active_session':
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                body = self.rfile.read(length).decode('utf-8')
+                payload = json.loads(body)
+                user_id = payload.get('userId', '').strip().lower()
+                clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) or 'default'
+                data_dir = os.path.join(WORKSPACE_DIR, 'data')
+                os.makedirs(data_dir, exist_ok=True)
+                session_file = os.path.join(data_dir, f'session_{clean_uid}.json')
+                
+                payload['registered_at'] = datetime.now().isoformat()
+                with open(session_file, 'w', encoding='utf-8') as f:
+                    json.dump(payload, f, ensure_ascii=False, indent=2)
+
+                res = json.dumps({"success": True, "message": "Session registered successfully"}, ensure_ascii=False)
                 self.send_response(200)
             except Exception as e:
                 res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)

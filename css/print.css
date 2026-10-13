@@ -1,0 +1,498 @@
+/* Print Stylesheet for Official A4 Exam Papers with Dynamic Margins */
+
+@page {
+  size: A4 portrait;
+  margin: var(--paper-print-margin, 8mm 10mm);
+}
+
+@media print {
+  /* Hide all dashboard chrome, controls, toolbars, side drawer, and modals */
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Completely hide all UI controls, builders, toolbars, mobile tabs, modals, and portals */
+  .app-navbar,
+  .stats-banner,
+  .builder-pane,
+  .main-container .builder-pane,
+  .main-container[data-mobile-mode="builder"] .builder-pane,
+  .main-container[data-mobile-mode="preview"] .builder-pane,
+  .mobile-view-tabs,
+  #mobileViewTabs,
+  .preview-toolbar,
+  .side-drawer,
+  .drawer-backdrop,
+  .fullscreen-auth-portal,
+  .modal-overlay,
+  .toast-container,
+  .paper-q-font-tools,
+  .view-only-mode-banner,
+  #viewOnlyModeBanner,
+  .no-print {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+  }
+
+  /* Always guarantee all containers expand to display all pages without viewport clipping */
+  .app-workstation,
+  #appWorkstation,
+  #appWorkstation.portal-locked,
+  .main-container,
+  .main-container[data-mobile-mode],
+  .main-container[data-mobile-mode="builder"],
+  .main-container[data-mobile-mode="preview"],
+  .main-container.preview-hidden {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    float: none !important;
+  }
+
+  /* When printing single copy (normal paper doc): PREVIEW PANE MUST BE 100% VISIBLE */
+  body:not(.dual-print-active) .preview-pane,
+  body:not(.dual-print-active) .main-container .preview-pane,
+  body:not(.dual-print-active) .main-container[data-mobile-mode] .preview-pane,
+  body:not(.dual-print-active) .main-container[data-mobile-mode="builder"] .preview-pane,
+  body:not(.dual-print-active) .main-container[data-mobile-mode="preview"] .preview-pane,
+  body:not(.dual-print-active) .main-container.preview-hidden .preview-pane,
+  body:not(.dual-print-active) .paper-wrapper,
+  body:not(.dual-print-active) #examPaperDoc.exam-paper-container,
+  body:not(.dual-print-active) #examPaperDoc {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    float: none !important;
+  }
+
+  .paper-page-separator,
+  .paper-pages-ctrl,
+  .btn-paper-break-ctrl,
+  .paper-q-font-tools {
+    display: none !important;
+  }
+
+  .exam-paper-page,
+  .exam-paper {
+    width: 100% !important;
+    min-height: 265mm !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    overflow: visible !important;
+  }
+
+  .exam-paper-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .paper-content {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    flex-grow: 1 !important;
+    overflow: visible !important;
+  }
+
+  .paper-question {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .grading-table-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .exam-continuation-header {
+    border: 1.5px solid #000000 !important;
+    background: transparent !important;
+    color: #000000 !important;
+    padding: 5px 8px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .exam-header {
+    border: 2px solid #000000 !important;
+    padding: 6px 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .header-meta-col, 
+  .exam-title-badge, 
+  .student-bar, 
+  .instructions-box,
+  .paper-q-text,
+  .paper-mcq-opt,
+  .paper-match-table th,
+  .paper-match-table td,
+  .grading-table th,
+  .grading-table td {
+    color: #000000 !important;
+  }
+
+  .instructions-box {
+    border: none !important;
+    background: transparent !important;
+    padding: 3px 0 !important;
+    margin: 4px auto 10px auto !important;
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  .instructions-box .instructions-text-content {
+    border-bottom: 2px solid #000000 !important;
+    color: #000000 !important;
+    font-weight: 800 !important;
+    display: inline-block !important;
+    padding-bottom: 2px !important;
+  }
+
+  .paper-question {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-bottom: 6px !important;
+  }
+
+  /* Solid Black Separator Line at the end of each question in Print */
+  .paper-q-separator-line {
+    display: block !important;
+    width: 100% !important;
+    height: 0 !important;
+    border: none !important;
+    border-bottom: 1.5px solid #000000 !important;
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Sub-branches styling in print */
+  .paper-q-branches {
+    margin-top: 6px;
+    padding-right: 12px;
+    border-right: 2px solid #94a3b8;
+  }
+
+  .paper-q-branch {
+    margin-bottom: 8px;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .branch-pill {
+    font-weight: 800;
+    color: #000000;
+    margin-left: 4px;
+  }
+
+  /* Definitions & Comparisons in print */
+  .paper-term-list {
+    margin-top: 4px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 4px 24px !important;
+    align-items: baseline !important;
+    line-height: 1.8 !important;
+  }
+
+  .paper-term-item {
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 4px !important;
+    margin-bottom: 2px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .paper-term-num {
+    font-weight: 800 !important;
+    color: #000000 !important;
+    font-family: inherit !important;
+  }
+
+  .paper-term-name {
+    font-weight: 700 !important;
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+
+  .paper-term-definition {
+    color: #14532d !important;
+    background-color: #dcfce7 !important;
+    padding: 2px 6px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .paper-compare-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 6px 0 !important;
+  }
+
+  .paper-compare-table th,
+  .paper-compare-table td {
+    border: 1px solid #000000 !important;
+    padding: 5px 8px !important;
+  }
+
+  .grading-table-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    padding-top: 10px !important;
+  }
+
+  .writing-line {
+    border-bottom: 1px dotted #555555 !important;
+  }
+
+  .paper-watermark {
+    opacity: 0.08 !important;
+  }
+
+  /* Page break when printing both student and committee copies */
+  .print-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+    margin-top: 20mm !important;
+    display: block !important;
+  }
+
+  /* Hide committee banner & model answers on student copy in print */
+  .student-sheet-copy .paper-model-answer-banner,
+  .student-sheet-copy #paperAnswerKeyBadge,
+  .student-sheet-copy .paper-model-answer,
+  .student-sheet-copy .model-answer-badge-header,
+  .student-sheet-copy .model-answer-explanation,
+  body:not(.answer-key-mode) .student-sheet-copy .paper-model-answer-banner,
+  body:not(.answer-key-mode) #paperAnswerKeyBadge:not(.show-in-print),
+  body:not(.answer-key-mode) .paper-model-answer-banner:not(.show-in-print) {
+    display: none !important;
+  }
+
+  /* Student copy: never highlight correct MCQ */
+  .student-sheet-copy .paper-mcq-opt.highlight-correct,
+  body:not(.answer-key-mode) .paper-mcq-opt.highlight-correct {
+    background: transparent !important;
+    border-color: #000000 !important;
+    color: #000000 !important;
+  }
+
+  .student-sheet-copy .paper-mcq-opt strong,
+  body:not(.answer-key-mode) .paper-mcq-opt strong {
+    display: none !important;
+  }
+
+  /* Show committee banner & model answers ONLY on committee copy */
+  .committee-sheet-copy .paper-model-answer-banner,
+  .committee-sheet-copy #paperAnswerKeyBadge,
+  body.answer-key-mode #paperAnswerKeyBadge,
+  body.answer-key-mode .paper-model-answer-banner,
+  #paperAnswerKeyBadge.show-in-print {
+    display: block !important;
+    background-color: #fef3c7 !important;
+    border: 2px solid #b45309 !important;
+    color: #78350f !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    margin: 6px 0 10px 0 !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    text-align: center !important;
+    max-width: 98% !important;
+    overflow: hidden !important;
+  }
+
+  .model-badge-top {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    color: #78350f !important;
+    white-space: nowrap !important;
+  }
+
+  .model-badge-tag-official {
+    background-color: #b45309 !important;
+    color: #ffffff !important;
+    font-size: 8.5px !important;
+    padding: 1px 5px !important;
+    border-radius: 3px !important;
+    font-weight: 800 !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .model-badge-note {
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    color: #92400e !important;
+    margin-top: 2px !important;
+    white-space: nowrap !important;
+  }
+
+  .paper-model-answer {
+    background-color: #fef9c3 !important;
+    border: 1.5px solid #ca8a04 !important;
+    border-right: 5px solid #b45309 !important;
+    color: #713f12 !important;
+    padding: 6px 10px !important;
+    margin: 6px 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .committee-sheet-copy .paper-mcq-opt.highlight-correct,
+  body.answer-key-mode .paper-mcq-opt.highlight-correct {
+    background-color: #dcfce7 !important;
+    border: 1px solid #16a34a !important;
+    color: #14532d !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Dual Print Container Isolation Rules */
+  body.dual-print-active .preview-pane,
+  body.dual-print-active .paper-wrapper,
+  body.dual-print-active #examPaperDoc {
+    display: none !important;
+  }
+
+  body.dual-print-active #dualPrintContainer {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body.dual-print-active #dualPrintContainer .dual-copy-section,
+  body.dual-print-active #dualPrintContainer .dual-copy-paper {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  body.dual-print-active #dualPrintContainer .student-copy .exam-paper-page:last-child {
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  body.dual-print-active #dualPrintContainer .committee-copy .exam-paper-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+
+  .exam-paper[dir="ltr"],
+  .dual-copy-section[dir="ltr"],
+  .dual-copy-paper[dir="ltr"],
+  .paper-ltr {
+    direction: ltr !important;
+    text-align: left !important;
+  }
+
+  .exam-paper[dir="ltr"] .paper-model-answer,
+  .dual-copy-section[dir="ltr"] .paper-model-answer,
+  .dual-copy-paper[dir="ltr"] .paper-model-answer {
+    border-right: none !important;
+    border-left: 5px solid #b45309 !important;
+  }
+
+  .print-page-break {
+    page-break-before: always !important;
+    break-before: page !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    display: block !important;
+  }
+
+  /* Iraqi Ministerial Mathematics Print Optimization */
+  .iraqi-math-katex-wrapper,
+  .iraqi-math-katex-wrapper .katex,
+  .iraqi-math-katex-wrapper .katex-html,
+  .iq-math-fallback {
+    color: #000000 !important;
+    text-shadow: none !important;
+    font-size: 1.04em !important;
+  }
+  .iq-math-frac .iq-math-num {
+    border-bottom: 1.5px solid #000000 !important;
+  }
+  .iq-math-root .iq-radicand {
+    border-top: 1.5px solid #000000 !important;
+  }
+}
+
+/* Screen Mode Isolation */
+#dualPrintContainer {
+  display: none !important;
+}
+

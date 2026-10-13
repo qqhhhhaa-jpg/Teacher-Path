@@ -2669,6 +2669,44 @@
         <button type="button" class="btn btn-outline" onclick="window.closeAdminControlPanel()">إغلاق</button>
       </div>
     </div>
+  <!-- Single Device Concurrency Alert Modal (تسجيل خروج فوري وتلقائي عند الفتح بجهاز آخر) -->
+  <div class="modal-overlay" id="deviceSessionKickedModal" style="z-index: 99999999; backdrop-filter: blur(12px);">
+    <div class="modal-container" style="max-width: 480px; width: 92%; border: 1.5px solid rgba(239, 68, 68, 0.45); box-shadow: 0 25px 70px rgba(239, 68, 68, 0.25);">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(245, 158, 11, 0.1)); border-bottom: 1px solid rgba(239, 68, 68, 0.25); padding: 1rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #ef4444, #dc2626); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.25rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: #ef4444; display: flex; align-items: center; gap: 6px;">
+              تنبيه أمني: تسجيل خروج فوري
+            </h3>
+            <small style="color: var(--text-muted); font-size: 0.76rem;">تم فتح هذا الحساب على جهاز آخر</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" style="padding: 1.35rem 1.25rem; text-align: center;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(239, 68, 68, 0.1); border: 2px dashed rgba(239, 68, 68, 0.35); margin: 0 auto 1rem auto; display: flex; align-items: center; justify-content: center; font-size: 1.85rem; color: #ef4444;">
+          <i class="fa-solid fa-mobile-screen-button"></i>
+        </div>
+        <h4 style="margin: 0 0 0.5rem 0; font-size: 1rem; font-weight: 800; color: var(--text-main);">
+          تم إنهاء الجلسة على هذا الجهاز تلقائياً
+        </h4>
+        <p style="font-size: 0.83rem; line-height: 1.6; color: var(--text-muted); margin: 0 0 1rem 0;">
+          تم تسجيل الدخول إلى حسابك من: <strong id="kickedByDeviceName" style="color: var(--primary);">جهاز آخر</strong> في <span id="kickedAtTime">الآن</span>.<br>
+          تنفيذاً لسياسة الأمان والسرية، <strong>تسمح المنصة بجهاز نشط واحد فقط في نفس الوقت</strong> (حاسبة واحدة أو هاتف واحد).
+        </p>
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.76rem; color: #10b981; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>تم حفظ مسودة عملك الأخيرة بأمان في الأرشيف الداخلي قبل الخروج.</span>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.85rem 1.25rem; background: var(--bg-surface); border-top: 1px solid var(--border-color); display: flex; justify-content: center;">
+        <button type="button" class="btn btn-primary" style="width: 100%; font-weight: 800; padding: 0.65rem 1rem;" onclick="window.dismissDeviceKickedModal()">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> الانتقال لواجهة تسجيل الدخول مجدداً
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Toast Container -->
