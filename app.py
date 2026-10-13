@@ -7,11 +7,12 @@ Serves static frontend, assets, API endpoints, and health check.
 import os
 from flask import Flask, send_from_directory, jsonify
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(BASE_DIR, 'index.html')
 
 @app.route('/health')
 def health():
@@ -24,14 +25,15 @@ def health():
 @app.route('/<path:path>')
 def serve_file(path):
     # Security: do not serve sensitive files
-    forbidden = ['.git', '.env', 'server_bot.log', '.system_generated']
+    forbidden = ['.git', '.env', 'server_bot.log', '.system_generated', 'scratch']
     if any(path.startswith(f) for f in forbidden):
         return 'Forbidden', 403
 
-    if os.path.exists(path) and os.path.isfile(path):
-        return send_from_directory('.', path)
+    target_file = os.path.join(BASE_DIR, path)
+    if os.path.exists(target_file) and os.path.isfile(target_file):
+        return send_from_directory(BASE_DIR, path)
     # SPA fallback to index.html
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(BASE_DIR, 'index.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
