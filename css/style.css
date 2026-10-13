@@ -929,6 +929,19 @@ body {
   border-color: rgba(56, 189, 248, 0.35);
 }
 
+.drawer-item-btn.highlight-admin-permissions {
+  border-color: rgba(56, 189, 248, 0.45);
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(37, 99, 235, 0.05));
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.12);
+}
+
+.drawer-item-btn.highlight-admin-permissions:hover {
+  border-color: rgba(56, 189, 248, 0.8) !important;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(37, 99, 235, 0.12)) !important;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.25) !important;
+  transform: translateX(-3px);
+}
+
 .drawer-item-btn.highlight-admin-grant {
   border-color: rgba(245, 158, 11, 0.45);
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(217, 119, 6, 0.05));
@@ -955,6 +968,20 @@ body {
   background: rgba(245, 158, 11, 0.15);
   color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.badge-permissions-tag {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  font-weight: 800 !important;
+}
+
+.badge-subscribers-tag {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  font-weight: 800 !important;
 }
 
 .drawer-theme-switch-row {
@@ -2367,7 +2394,7 @@ textarea.form-control {
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  z-index: 1000;
+  z-index: 9999999;
   display: flex;
   align-items: center;
   justify-content: center;

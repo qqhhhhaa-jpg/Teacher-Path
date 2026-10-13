@@ -79,16 +79,22 @@
             <span>قسم الأدوات والاختبارات</span>
           </div>
           <div class="drawer-buttons-list">
-            <!-- Grant Subscriptions Button (خاص بالآدمن فقط مع عدد المشتركين) -->
-            <button class="drawer-item-btn highlight-admin-grant admin-only-hidden" id="drawerAdminGrantVipBtn" onclick="window.closeSideDrawer(); window.openSubscriptionManagementModal();" title="إدارة الاشتراكات وتفعيل الصلاحيات السنوية (خاص بالمدير العام فقط)" data-tooltip="إدارة الاشتراكات 👑" style="display: none !important;">
+            <!-- 1. Manage Permissions Button (زر إدارة الصلاحيات) -->
+            <button class="drawer-item-btn highlight-admin-permissions" id="drawerAdminPermissionsBtn" onclick="window.closeSideDrawer(); window.openAdminControlPanel();" title="لوحة تحكم المدير العام وإدارة صلاحيات المعلمين" data-tooltip="إدارة الصلاحيات 🛡️">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-shield-halved" style="color: #38bdf8; font-size: 1.05rem;"></i>
+                <span>إدارة الصلاحيات</span>
+              </div>
+              <span class="drawer-badge-tag badge-permissions-tag">المدير 🛡️</span>
+            </button>
+
+            <!-- 2. Manage Subscriptions Button (زر إدارة الاشتراكات بتصميم منسق وأنيق) -->
+            <button class="drawer-item-btn highlight-admin-grant" id="drawerAdminGrantVipBtn" onclick="window.closeSideDrawer(); window.openSubscriptionManagementModal();" title="إدارة الاشتراكات السنوية وتفعيل الحسابات" data-tooltip="إدارة الاشتراكات 👑">
               <div class="drawer-item-main">
                 <i class="fa-solid fa-crown text-warning" style="font-size: 1.05rem;"></i>
-                <div style="text-align: right; line-height: 1.25;">
-                  <span style="font-weight: 800; font-size: 0.85rem; color: #fbbf24;">إدارة الاشتراكات</span>
-                  <small style="display: block; font-size: 0.68rem; color: var(--text-muted);">تفعيل الحسابات لمدة سنة واحدة وعرض المشتركين</small>
-                </div>
+                <span>إدارة الاشتراكات</span>
               </div>
-              <span class="drawer-badge-tag" id="drawerSubscribersCountBadge" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 0.72rem; padding: 2px 7px; border-radius: 999px;">0 مشترك 👑</span>
+              <span class="drawer-badge-tag badge-subscribers-tag" id="drawerSubscribersCountBadge">0 مشترك 👑</span>
             </button>
 
             <!-- Daily Report & Questions Bank in Drawer (التقرير اليومي في قسم الأدوات) -->
@@ -1857,12 +1863,13 @@
             <i class="fa-solid fa-chevron-left print-arrow"></i>
         </div>
       </div>
+    </div>
 
-      <div class="modal-footer" style="justify-content: flex-end;">
-        <button class="btn btn-outline" id="closePrintModalFooterBtn">إغلاق</button>
-      </div>
+    <div class="modal-footer" style="justify-content: flex-end;">
+      <button class="btn btn-outline" id="closePrintModalFooterBtn">إغلاق</button>
     </div>
   </div>
+</div>
 
   <!-- Daily Report & Questions Bank Filter Modal (التقرير اليومي وفلتر الأسئلة المنشأة) -->
   <div class="modal-backdrop" id="dailyReportModal" style="display: none;">
