@@ -1032,7 +1032,7 @@ function applyPaperMargins() {
   // Apply to print stylesheet dynamically
   const printStyleEl = document.getElementById('dynamicPrintMarginStyle');
   if (printStyleEl) {
-    printStyleEl.innerHTML = `@page { margin: ${v}mm ${h}mm !important; }`;
+    printStyleEl.innerHTML = `@page { size: A4 portrait; margin: ${v}mm ${h}mm !important; }`;
   }
 }
 

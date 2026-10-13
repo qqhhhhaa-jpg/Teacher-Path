@@ -2,10 +2,15 @@
 
 @page {
   size: A4 portrait;
-  margin: var(--paper-print-margin, 8mm 10mm);
+  margin: 8mm 10mm;
 }
 
 @media print {
+  /* Box sizing reset for all printable elements */
+  *, *::before, *::after {
+    box-sizing: border-box !important;
+  }
+
   /* Hide all dashboard chrome, controls, toolbars, side drawer, and modals */
   html, body {
     background: #ffffff !important;
@@ -14,9 +19,12 @@
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
+    max-height: none !important;
     overflow: visible !important;
+    position: static !important;
   }
 
   /* Completely hide all UI controls, builders, toolbars, mobile tabs, modals, and portals */
@@ -37,6 +45,9 @@
   .paper-q-font-tools,
   .view-only-mode-banner,
   #viewOnlyModeBanner,
+  .paper-page-separator,
+  .paper-pages-ctrl,
+  .btn-paper-break-ctrl,
   .no-print {
     display: none !important;
     visibility: hidden !important;
@@ -47,43 +58,43 @@
     overflow: hidden !important;
   }
 
-  /* Always guarantee all containers expand to display all pages without viewport clipping */
-  .app-workstation,
-  #appWorkstation,
-  #appWorkstation.portal-locked,
-  .main-container,
-  .main-container[data-mobile-mode],
-  .main-container[data-mobile-mode="builder"],
-  .main-container[data-mobile-mode="preview"],
-  .main-container.preview-hidden {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-    position: static !important;
-    padding: 0 !important;
+  /* Reports Isolation: When printing academic or daily reports, hide workstation & exam paper completely */
+  body.printing-academic-report #appWorkstation,
+  body.printing-academic-report .main-container,
+  body.printing-academic-report .preview-pane,
+  body.printing-academic-report #examPaperDoc,
+  body.printing-daily-report #appWorkstation,
+  body.printing-daily-report .main-container,
+  body.printing-daily-report .preview-pane,
+  body.printing-daily-report #examPaperDoc {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
     margin: 0 !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    float: none !important;
+    padding: 0 !important;
+    overflow: hidden !important;
   }
 
-  /* When printing single copy (normal paper doc): PREVIEW PANE MUST BE 100% VISIBLE */
-  body:not(.dual-print-active) .preview-pane,
-  body:not(.dual-print-active) .main-container .preview-pane,
-  body:not(.dual-print-active) .main-container[data-mobile-mode] .preview-pane,
-  body:not(.dual-print-active) .main-container[data-mobile-mode="builder"] .preview-pane,
-  body:not(.dual-print-active) .main-container[data-mobile-mode="preview"] .preview-pane,
-  body:not(.dual-print-active) .main-container.preview-hidden .preview-pane,
-  body:not(.dual-print-active) .paper-wrapper,
-  body:not(.dual-print-active) #examPaperDoc.exam-paper-container,
-  body:not(.dual-print-active) #examPaperDoc {
+  /* Always guarantee all containers expand to 100% full printable width without clipping or offset */
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .app-workstation,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #appWorkstation,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #appWorkstation.portal-locked,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode],
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode="builder"],
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode="preview"],
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container.preview-hidden,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .preview-pane,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container .preview-pane,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .paper-wrapper,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #examPaperDoc.exam-paper-container,
+  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #examPaperDoc {
     display: block !important;
     visibility: visible !important;
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
@@ -95,23 +106,19 @@
     box-shadow: none !important;
     border: none !important;
     float: none !important;
-  }
-
-  .paper-page-separator,
-  .paper-pages-ctrl,
-  .btn-paper-break-ctrl,
-  .paper-q-font-tools {
-    display: none !important;
+    transform: none !important;
   }
 
   .exam-paper-page,
   .exam-paper {
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
     min-height: 265mm !important;
     height: auto !important;
     max-height: none !important;
     padding: 0 !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
@@ -138,6 +145,9 @@
     height: auto !important;
     flex-grow: 1 !important;
     overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .paper-question {
@@ -416,6 +426,7 @@
   body.dual-print-active #dualPrintContainer {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
@@ -428,6 +439,7 @@
   body.dual-print-active #dualPrintContainer .dual-copy-paper {
     display: block !important;
     width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: auto !important;
     margin: 0 !important;
@@ -437,6 +449,11 @@
     overflow: visible !important;
     page-break-inside: auto !important;
     break-inside: auto !important;
+  }
+
+  body.dual-print-active #dualPrintContainer .exam-paper-page {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   body.dual-print-active #dualPrintContainer .student-copy .exam-paper-page:last-child {
