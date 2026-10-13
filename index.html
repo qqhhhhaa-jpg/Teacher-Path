@@ -1,0 +1,2686 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light" data-accent="blue">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مسار المعلم | المنصة الذكية لإعداد وتصميم الاختبارات الاحترافية</title>
+  <link rel="icon" type="image/png" href="assets/masar_moallem_logo.png">
+  <meta name="description" content="مسار المعلم - المنصة المتقدمة لمساعدة المعلمين والأساتذة في العراق على صياغة الأسئلة وإعداد الاختبارات الوزارية والمدرسية بأعلى المعايير.">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- KaTeX CSS for Iraqi Ministerial Math Typography -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="css/style.css?v=5.5">
+  <link rel="stylesheet" href="css/print.css?v=5.5" media="print">
+  
+  <style id="dynamicPrintMarginStyle">
+    @page { margin: 8mm 10mm !important; }
+  </style>
+  <style id="dynamicPrintFontStyle">
+    @media print { .exam-paper { font-family: 'Cairo', sans-serif !important; } }
+  </style>
+</head>
+<body>
+
+  <!-- Main Application Workstation (استوديو ومنصة الاختبارات) -->
+  <div id="appWorkstation" class="app-workstation">
+
+    <!-- Top Application Navbar -->
+    <!-- Right Slide-Out Sidebar Drawer (شريط جانبي يظهر ويختفي من جهة اليمين) -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="side-drawer" id="sideDrawer" aria-label="شريط الأدوات والإعدادات">
+      <div class="side-drawer-header">
+        <div class="drawer-title" style="display: flex; align-items: center; gap: 9px;">
+          <div class="drawer-brand-logo-wrapper" style="position: relative; flex-shrink: 0;">
+            <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="drawer-brand-logo" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.45); display: block;">
+            <span style="position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: #10b981; border: 1.5px solid var(--bg-surface); border-radius: 50%;" title="نشط"></span>
+          </div>
+          <div style="line-height: 1.25;">
+            <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+              <span>مسار المعلم</span>
+              <span class="badge-pro" style="font-size: 0.62rem; padding: 1px 5px;">PRO</span>
+            </span>
+            <small style="font-size: 0.68rem; color: var(--text-muted); display: block;">لوحة الأدوات والخيارات</small>
+          </div>
+        </div>
+        <div class="drawer-header-actions" style="display: flex; align-items: center; gap: 5px;">
+          <button class="btn-drawer-collapse" id="toggleSideDrawerCollapseBtn" onclick="window.toggleSideDrawerCollapse()" title="تصغير القائمة لإظهار الأيقونات فقط / توسيع" data-tooltip="تصغير / توسيع الشريط">
+            <i class="fa-solid fa-angles-right" id="drawerCollapseIcon"></i>
+          </button>
+          <button class="btn-drawer-close" id="closeSideDrawerBtn" title="إغلاق الشريط الجانبي">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="side-drawer-body">
+        <!-- 1. New Exam Action (إنشاء اختبار جديد وبدء الأسئلة فوراً في أول الشريط) -->
+        <div class="drawer-section">
+          <button class="drawer-btn-cta-new" id="drawerNewExamBtn" onclick="window.startNewExamFromDrawer()" title="تفريغ الورقة وبدء إنشاء أسئلة لاختبار جديد" data-tooltip="إنشاء اختبار جديد">
+            <div class="drawer-item-main">
+              <i class="fa-solid fa-file-circle-plus" style="font-size: 1.25rem;"></i>
+              <div style="text-align: right;">
+                <div style="font-weight: 800; font-size: 0.95rem;">إنشاء اختبار جديد</div>
+                <small style="font-size: 0.72rem; opacity: 0.85;">تفريغ وبدء كتابة الأسئلة فوراً</small>
+              </div>
+            </div>
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+        </div>
+
+        <!-- 2. قسم الأدوات والاختبارات -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">
+            <i class="fa-solid fa-toolbox text-warning"></i>
+            <span>قسم الأدوات والاختبارات</span>
+          </div>
+          <div class="drawer-buttons-list">
+            <!-- Grant Subscriptions Button (خاص بالآدمن فقط مع عدد المشتركين) -->
+            <button class="drawer-item-btn highlight-admin-grant admin-only-hidden" id="drawerAdminGrantVipBtn" onclick="window.closeSideDrawer(); window.openSubscriptionManagementModal();" title="إدارة الاشتراكات وتفعيل الصلاحيات السنوية (خاص بالمدير العام فقط)" data-tooltip="إدارة الاشتراكات 👑" style="display: none !important;">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-crown text-warning" style="font-size: 1.05rem;"></i>
+                <div style="text-align: right; line-height: 1.25;">
+                  <span style="font-weight: 800; font-size: 0.85rem; color: #fbbf24;">إدارة الاشتراكات</span>
+                  <small style="display: block; font-size: 0.68rem; color: var(--text-muted);">تفعيل الحسابات لمدة سنة واحدة وعرض المشتركين</small>
+                </div>
+              </div>
+              <span class="drawer-badge-tag" id="drawerSubscribersCountBadge" style="background: rgba(245, 158, 11, 0.25); color: #fbbf24; font-weight: 800; border: 1px solid rgba(245, 158, 11, 0.45); font-size: 0.72rem; padding: 2px 7px; border-radius: 999px;">0 مشترك 👑</span>
+            </button>
+
+            <!-- Daily Report & Questions Bank in Drawer (التقرير اليومي في قسم الأدوات) -->
+            <button class="drawer-item-btn highlight" id="drawerOpenReportBtn" onclick="window.closeSideDrawer(); window.switchToReportTab();" title="فتح الواجهة المتكاملة للتقرير اليومي وبنك الأسئلة" data-tooltip="التقرير وبنك الأسئلة">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-chart-pie" style="color: #f59e0b;"></i>
+                <span>التقرير اليومي وبنك الأسئلة</span>
+              </div>
+              <span class="drawer-badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b;">واجهة متكاملة</span>
+            </button>
+
+            <!-- Saved Exams Archive Button -->
+            <button class="drawer-item-btn highlight" id="openArchiveBtn" title="مكتبة وأرشيف الاختبارات السابقة المحفوظة والمسودات" data-tooltip="أرشيف اختباراتي">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-folder-open" style="color: #38bdf8;"></i>
+                <span>أرشيف اختباراتي</span>
+              </div>
+              <span class="nav-counter-badge" id="archiveCountBadge">0</span>
+            </button>
+
+            <!-- Shuffled Model B -->
+            <button class="drawer-item-btn" id="generateModelBBtn" title="توليد نموذج (ب) بخلط الأسئلة والخيارات لمنع الغش" data-tooltip="توليد نموذج (ب) البديل">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-shuffle" style="color: #fbbf24;"></i>
+                <span>توليد نموذج (ب) البديل</span>
+              </div>
+              <span class="drawer-badge-tag">منع الغش</span>
+            </button>
+
+            <!-- Print Exam Option in Drawer -->
+            <button class="drawer-item-btn" id="drawerPrintBtn" onclick="window.closeSideDrawer(); window.triggerPrintExam();" title="طباعة الامتحان وفرز النسخ" data-tooltip="طباعة الامتحان / PDF">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-print" style="color: #10b981;"></i>
+                <span>طباعة الامتحان / PDF</span>
+              </div>
+              <span class="drawer-badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">فرز نسختين</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Appearance & Theme Customization -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">
+            <i class="fa-solid fa-palette text-accent"></i>
+            <span>المظهر والسمات (6 ألوان)</span>
+          </div>
+
+          <!-- Dark/Light Theme Button -->
+          <div class="drawer-theme-switch-row">
+            <span style="font-size: 0.82rem; font-weight: 600;">وضع الإضاءة:</span>
+            <button class="btn-drawer-mode" id="themeToggleBtn" title="التبديل بين الوضع الفاتح والداكن" data-tooltip="تبديل الوضع الفاتح / الداكن">
+              <i class="fa-solid fa-moon" id="themeIcon"></i>
+              <span id="themeToggleLabel">الوضع الفاتح</span>
+            </button>
+          </div>
+
+          <!-- Color Palette Picker -->
+          <div class="drawer-palette-box">
+            <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.45rem;">
+              🎨 اختر سمة الألوان (6 ألوان):
+            </div>
+            <div class="drawer-palette-grid">
+              <button type="button" class="palette-chip active" data-color="blue" onclick="setAccentColor('blue')">
+                <span class="chip-color-dot" style="background: #2563eb;"></span>
+                <span>أزرق ملكي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="emerald" onclick="setAccentColor('emerald')">
+                <span class="chip-color-dot" style="background: #059669;"></span>
+                <span>زمردي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="purple" onclick="setAccentColor('purple')">
+                <span class="chip-color-dot" style="background: #7c3aed;"></span>
+                <span>بنفسجي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="crimson" onclick="setAccentColor('crimson')">
+                <span class="chip-color-dot" style="background: #dc2626;"></span>
+                <span>عنابي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="amber" onclick="setAccentColor('amber')">
+                <span class="chip-color-dot" style="background: #d97706;"></span>
+                <span>عنبر ذهبي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="teal" onclick="setAccentColor('teal')">
+                <span class="chip-color-dot" style="background: #0891b2;"></span>
+                <span>فيروزي</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Teacher Profile & Account Widget (في نهاية الشريط الجانبي) -->
+        <div class="drawer-section" style="margin-top: auto; padding-top: 0.5rem;">
+          <div class="drawer-section-title">
+            <i class="fa-solid fa-circle-user text-primary"></i>
+            <span>حساب المعلم والمصادقة</span>
+          </div>
+          <div class="drawer-teacher-card">
+            <div class="user-auth-widget" id="userAuthWidget">
+              <button class="btn btn-primary" id="openAuthModalBtn" onclick="window.openGoogleAccountModal()" style="display: none; width: 100%;" data-tooltip="تسجيل الدخول للمنصة">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>تسجيل الدخول للمنصة</span>
+              </button>
+
+              <div class="teacher-profile-card-content" id="profilePillBtn" onclick="openProfileModal()" title="بيانات حساب الأستاذ" data-tooltip="الملف الشخصي للأستاذ">
+                <div class="profile-avatar-circle" id="navAvatarInitials">ح</div>
+                <div class="profile-text-info">
+                  <span class="profile-name" id="navTeacherName">أستاذ حسين علي</span>
+                  <span class="profile-sub" id="navTeacherSchool"><i class="fa-solid fa-circle-check text-success"></i> معلم معتمد</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Actions -->
+            <div class="drawer-actions-stack">
+              <button class="drawer-action-btn" id="menuApplyHeaderBtn" title="تعبئة ترويسة الاختبار ببياناتي" data-tooltip="تعبئة الترويسة ببياناتي">
+                <i class="fa-solid fa-file-signature text-primary"></i>
+                <span>تعبئة الترويسة ببياناتي</span>
+              </button>
+              <button class="drawer-action-btn btn-save-archive" onclick="window.saveCurrentExamToArchive(false)" title="حفظ الاختبار في الأرشيف وتصفير ورقة العمل والانتقال للتقرير" data-tooltip="حفظ وتصفير الورقة">
+                <i class="fa-solid fa-floppy-disk text-success"></i>
+                <span>حفظ الاختبار وتصفير الورقة ➔ التقرير</span>
+              </button>
+              <!-- Google Cloud Sync & Multi-Device Actions -->
+              <button class="drawer-action-btn highlight-google" id="drawerGoogleSyncBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول السريع بحساب Google وحفظ الأسئلة سحابياً" data-tooltip="تسجيل دخول Google والمزامنة">
+                <i class="fa-brands fa-google text-danger"></i>
+                <span>تسجيل دخول Google السحابي</span>
+              </button>
+              <button class="drawer-action-btn" id="drawerCloudCenterBtn" onclick="window.openCloudTransferModal()" title="مركز المزامنة السحابية ونقل الأسئلة لأي جهاز" data-tooltip="مركز المزامنة السحابية">
+                <i class="fa-solid fa-cloud-arrow-up text-info"></i>
+                <span>مزامنة ونقل الأسئلة سحابياً</span>
+              </button>
+              <!-- VIP Annual Subscription Button (باقة الاشتراك السنوي 50 ألف دينار) -->
+              <button class="drawer-action-btn highlight-vip" id="drawerSubscriptionBtn" onclick="window.openSubscriptionModal()" title="باقة الاشتراك السنوي الذهبية (50,000 د.ع)" data-tooltip="الباقة السنوية (50,000 د.ع)">
+                <i class="fa-solid fa-crown text-warning"></i>
+                <span>الباقة السنوية (50,000 د.ع) 👑</span>
+              </button>
+              <button class="drawer-action-btn" id="menuOpenProfileBtn" title="تعديل الملف الشخصي للمعلم" data-tooltip="تعديل الملف الشخصي">
+                <i class="fa-solid fa-user-pen text-accent"></i>
+                <span>تعديل الملف الشخصي</span>
+              </button>
+              <button class="drawer-action-btn" id="menuSwitchAccountBtn" title="التبديل إلى حساب آخر" data-tooltip="تبديل الحساب">
+                <i class="fa-solid fa-users-gear text-info"></i>
+                <span>تبديل الحساب</span>
+              </button>
+              <div id="drawerPrivacyBadge" class="drawer-privacy-pill" style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0.65rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); margin-bottom: 0.35rem; font-size: 0.75rem; color: #10b981; font-weight: 700;">
+                <span style="display: flex; align-items: center; gap: 5px;"><i class="fa-solid fa-shield-halved"></i> خصوصية المدرس: قفل عند الخروج</span>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-size: 0.68rem; font-weight: 800; padding: 2px 6px;">مُفَعّل ✔</span>
+              </div>
+              <button class="drawer-action-btn text-danger" id="navQuickLogoutBtn" title="تسجيل الخروج وقفل المنصة فوراً" data-tooltip="تسجيل الخروج الآن">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>تسجيل الخروج الآن</span>
+              </button>
+              <!-- Hidden compatibility nodes for dropdown references -->
+              <span id="dropdownTeacherName" style="display: none;">أستاذ حسين علي</span>
+              <span id="dropdownTeacherEmail" style="display: none;">hussein@moallem.edu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-drawer-footer">
+        <small style="color: var(--text-dim); font-size: 0.72rem;">منصة مُعَلِّم برو © الإصدار 4.0</small>
+      </div>
+    </aside>
+
+    <!-- Top Application Navbar (الشريط العلوي المقتصر على المعاينة والطباعة وزر القائمة) -->
+    <header class="app-navbar">
+      <div class="nav-brand-cluster">
+        <button class="btn-drawer-toggle" id="toggleSideDrawerBtn" title="فتح شريط الأدوات الجانبي (من جهة اليمين)">
+          <i class="fa-solid fa-bars"></i>
+          <span>القائمة والأدوات</span>
+        </button>
+        <div class="brand-wrapper">
+          <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-logo-img" id="appLogo" style="border-radius: 50%; box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); border: 1.5px solid rgba(56, 189, 248, 0.6);">
+          <div class="brand-info">
+            <h1>مسار المعلم <span class="badge-pro">PRO</span></h1>
+            <p>المنصة الذكية لإعداد وتصميم الاختبارات</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Google Cloud Linked Indicator (شعار الاتصال بحساب Google) -->
+        <button class="btn-nav" id="navGoogleSyncStatusBtn" onclick="window.openCloudTransferModal()" title="حالة الربط بحساب Google والمزامنة السحابية" style="display: none; border-color: rgba(66, 133, 244, 0.35); background: rgba(66, 133, 244, 0.08);">
+          <i class="fa-brands fa-google" style="color: #ea4335;"></i>
+          <span id="navGoogleSyncText" style="color: #60a5fa; font-weight: 700; font-size: 0.8rem;">Google سحابي</span>
+        </button>
+
+        <!-- Toggle Live Preview Button (زر المعاينة) -->
+        <button class="btn-nav-preview preview-active" id="togglePreviewBtn" title="إظهار أو إخفاء ورقة المعاينة المباشرة A4">
+          <span class="preview-btn-pulse"></span>
+          <i class="fa-solid fa-eye" id="togglePreviewIcon"></i>
+          <span id="togglePreviewText">المعاينة المباشرة</span>
+        </button>
+
+        <!-- Primary Print / PDF Button (زر الطباعة) -->
+        <button class="btn-nav-cta" id="printExamBtn" onclick="window.triggerPrintExam()" title="طباعة فورية للاختبار أو تصدير بصيغة PDF عالية الدقة">
+          <i class="fa-solid fa-print"></i>
+          <span>طباعة الامتحان / PDF</span>
+        </button>
+      </div>
+    </header>
+
+  <!-- Live Stats Ribbon -->
+  <aside class="stats-banner" aria-label="شريط الإحصائيات">
+    <div class="stats-group">
+      <div class="stat-item">
+        <i class="fa-solid fa-file-lines text-muted"></i>
+        <span>الأسئلة:</span>
+        <span class="stat-badge" id="statQuestionsCount">0</span>
+      </div>
+      <div class="stat-item">
+        <i class="fa-solid fa-award text-muted"></i>
+        <span>مجموع الدرجات:</span>
+        <span class="stat-badge grade" id="statTotalScore">0</span>
+      </div>
+      <div class="stat-item">
+        <i class="fa-solid fa-stopwatch text-muted"></i>
+        <span>الزمن:</span>
+        <span class="stat-badge time" id="statEstimatedTime">3 ساعات</span>
+      </div>
+      <div class="stat-item">
+        <i class="fa-solid fa-brain text-muted"></i>
+        <span>مؤشر بلوم:</span>
+        <span class="tag-pill" id="statBloomSummary">متوازن تربوياً</span>
+      </div>
+    </div>
+
+    <div class="stats-group">
+      <button class="btn btn-success btn-save-archive" style="padding: 0.35rem 0.95rem; font-size: 0.82rem;" id="saveExamToArchiveBtn" onclick="window.saveCurrentExamToArchive(false)" title="حفظ الاختبار في الأرشيف وتصفير ورقة العمل والانتقال للتقرير">
+        <i class="fa-solid fa-floppy-disk"></i>
+        <span>حفظ في الأرشيف</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- View-Only Restriction Banner for Non-Subscribed Accounts -->
+  <div id="viewOnlyModeBanner" class="view-only-mode-banner no-print" style="display: none;" onclick="window.openSubscriptionModal()">
+    <div class="view-banner-inner">
+      <div class="view-banner-text">
+        <span class="view-banner-badge"><i class="fa-solid fa-lock"></i> وضع المشاهدة فقط</span>
+        <span>حسابك في وضع المشاهدة — <strong>اشترك لتتيح لك جميع الصلاحيات</strong> (الباقة السنوية 50,000 د.ع)</span>
+      </div>
+      <button type="button" class="view-banner-btn">
+        <i class="fa-solid fa-crown text-warning"></i> اشترك لتفعيل الصلاحيات 👑
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Workstation View Switcher (شريط التبديل على الهاتف بين محرر الأسئلة وورقة الامتحان A4) -->
+  <div class="mobile-view-tabs" id="mobileViewTabs">
+    <button type="button" class="mobile-tab-btn active" id="mobileTabBuilderBtn" onclick="window.setMobileWorkstationMode('builder')">
+      <i class="fa-solid fa-pen-to-square"></i>
+      <span>محرر وبنك الأسئلة</span>
+    </button>
+    <button type="button" class="mobile-tab-btn" id="mobileTabPreviewBtn" onclick="window.setMobileWorkstationMode('preview')">
+      <i class="fa-solid fa-file-lines"></i>
+      <span>ورقة الامتحان A4</span>
+    </button>
+  </div>
+
+  <!-- Main Workstation Layout -->
+  <main class="main-container" data-mobile-mode="builder">
+    
+    <!-- Left Pane: Builder Controls -->
+    <section class="pane builder-pane" aria-label="لوحة التحكم وبناء الأسئلة">
+      
+      <!-- Permanently Pinned & Fixed Tabs Header (أزرار التبويبات الثابتة باستمرار) -->
+      <div class="tabs-nav-sticky-wrapper" id="tabsNavStickyWrapper">
+        <div class="tabs-nav" id="mainTabsNav">
+          <button class="tab-btn active" data-tab="tab-questions">
+            <i class="fa-solid fa-list-check"></i>
+            <span>الأسئلة وبناء الاختبار</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-header">
+            <i class="fa-solid fa-heading"></i>
+            <span>الترويسة والبيانات</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-settings">
+            <i class="fa-solid fa-sliders"></i>
+            <span>تنسيقات الورقة واللغة</span>
+          </button>
+          <button class="tab-btn" data-tab="tab-report" id="mainTabReportBtn">
+            <i class="fa-solid fa-chart-pie" style="color: #f59e0b;"></i>
+            <span>التقرير وبنك الأسئلة</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Tab Content Body (مساحة التمرير للمحتوى تحت الأزرار الثابتة) -->
+      <div class="builder-body-scrollable">
+
+      <!-- Tab 1: Questions Management -->
+      <div class="tab-content" id="tab-questions">
+        <div class="questions-workspace-layout">
+          
+          <!-- Small Right-Side Question Types Toolbar (شريط جانبي متحرك وقابل للطي/التوسيع) -->
+          <aside class="side-qtype-bar" id="sideQTypeBar" aria-label="شريط إضافة الأسئلة السريع">
+            <!-- Header with Drag Handle & Position Up/Down Controls + Collapse Toggle (أزرار صعود ونزول وتصغير الشريط) -->
+            <div class="side-qtype-header" id="sideQTypeHeader" title="اسحب بالماوس للتحريك أو اضغط زر التصغير/التوسيع">
+              <div class="side-qtype-title">
+                <i class="fa-solid fa-arrows-up-down text-primary drag-handle-icon" id="sideQTypeDragIcon"></i>
+                <span class="side-bar-title-text">إضافة سؤال</span>
+              </div>
+              <div class="side-qtype-pos-ctrls" title="تحريك موضع الشريط للأعلى أو للأسفل أو تصغيره">
+                <button type="button" class="side-pos-btn" id="sideQTypeNudgeUp" title="تحريك الشريط للأعلى (صعود)">
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button type="button" class="side-pos-btn" id="sideQTypeNudgeDown" title="تحريك الشريط للأسفل (نزول)">
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <button type="button" class="side-pos-btn side-collapse-btn" id="toggleSideQTypeCollapse" title="تصغير الشريط لإظهار الأيقونات فقط / توسيع الشريط" onclick="window.toggleSideQTypeCollapse()">
+                  <i class="fa-solid fa-angles-right" id="sideCollapseIcon"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Subject Mode Switcher: عربي / انكليزي / رياضيات -->
+            <div class="side-subject-switcher" id="sideSubjectSwitcher" title="تخصيص نمط الأسئلة والمادة">
+              <button type="button" class="side-sub-btn active" data-sub-mode="arabic" title="أسئلة اللغة العربية (RTL)">
+                <i class="fa-solid fa-feather-pointed"></i>
+                <span>عربي</span>
+              </button>
+              <button type="button" class="side-sub-btn" data-sub-mode="english" title="English Exam (LTR)">
+                <i class="fa-solid fa-globe"></i>
+                <span>English</span>
+              </button>
+              <button type="button" class="side-sub-btn" data-sub-mode="math" title="أسئلة الرياضيات والمعادلات">
+                <i class="fa-solid fa-calculator"></i>
+                <span>رياضيات</span>
+              </button>
+            </div>
+
+            <!-- Page Fast Scroll Up Button (صعود سريع لأعلى الأسئلة) -->
+            <button type="button" class="side-qnav-btn side-qnav-top" id="scrollQuestionsTopBtn" title="صعود لأعلى قائمة الأسئلة">
+              <i class="fa-solid fa-arrow-up"></i>
+              <span>أعلى الأسئلة</span>
+            </button>
+
+            <div class="side-qtype-buttons" id="sideQTypeButtonsContainer">
+              <button class="side-qtype-btn qtype-mcq" data-add-type="mcq" title="إضافة سؤال اختيار من متعدد">
+                <i class="fa-solid fa-list-check"></i>
+                <span>اختيار متعدد</span>
+              </button>
+              <button class="side-qtype-btn qtype-tf" data-add-type="true_false" title="إضافة سؤال صح أو خطأ">
+                <i class="fa-solid fa-square-check"></i>
+                <span>صح أو خطأ</span>
+              </button>
+              <button class="side-qtype-btn qtype-def" data-add-type="definitions" title="إضافة سؤال تعاريف ومصطلحات">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>تعاريف</span>
+              </button>
+              <button class="side-qtype-btn qtype-compare" data-add-type="comparisons" title="إضافة سؤال مقارنة وأوجه الاختلاف">
+                <i class="fa-solid fa-code-compare"></i>
+                <span>مقارنات</span>
+              </button>
+              <button class="side-qtype-btn qtype-fill" data-add-type="fill_blanks" title="إضافة سؤال أكمل الفراغات">
+                <i class="fa-solid fa-pen-ruler"></i>
+                <span>أكمل الفراغات</span>
+              </button>
+              <button class="side-qtype-btn qtype-match" data-add-type="matching" title="إضافة سؤال صل بين العمودين">
+                <i class="fa-solid fa-shuffle"></i>
+                <span>صل عمودين</span>
+              </button>
+              <button class="side-qtype-btn qtype-essay" data-add-type="essay" title="إضافة سؤال مقالي أو شرح">
+                <i class="fa-solid fa-align-right"></i>
+                <span>سؤال مقالي</span>
+              </button>
+              <button class="side-qtype-btn qtype-reason" data-add-type="reasoning" title="إضافة سؤال علل واذكر السبب">
+                <i class="fa-solid fa-circle-question"></i>
+                <span>علل واذكر السبب</span>
+              </button>
+              <button class="side-qtype-btn qtype-math" data-add-type="math_problem" title="إضافة مسألة حسابية أو علمية">
+                <i class="fa-solid fa-square-root-variable"></i>
+                <span>مسألة رياضية</span>
+              </button>
+            </div>
+
+            <!-- Page Fast Scroll Down Button (نزول سريع لأسفل الأسئلة) -->
+            <button type="button" class="side-qnav-btn side-qnav-bottom" id="scrollQuestionsBottomBtn" title="نزول لأسفل قائمة الأسئلة">
+              <i class="fa-solid fa-arrow-down"></i>
+              <span>أسفل الأسئلة</span>
+            </button>
+          </aside>
+
+          <!-- Main Questions List Area (بجانب الشريط بجهة اليسار) -->
+          <div class="questions-main-content">
+            <div class="card-box" style="margin-top: 0;">
+              <div class="card-header">
+                <div class="card-title">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>أسئلة الاختبار الحالية</span>
+                  <span class="badge-tag" id="currentQuestionsBadge">0</span>
+                </div>
+                <div style="display: flex; gap: 0.45rem; align-items: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-success btn-save-archive" style="padding: 0.28rem 0.75rem; font-size: 0.78rem;" onclick="window.saveCurrentExamToArchive(false)" title="حفظ الاختبار في الأرشيف وتصفير ورقة العمل والانتقال للتقرير">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>حفظ وتصفير ➔ التقرير</span>
+                  </button>
+                  <button class="btn btn-outline" style="padding: 0.28rem 0.65rem; font-size: 0.78rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.35);" id="resetExamSheetBtn" title="تصفير الورقة بالكامل ومسح كافة الأسئلة للبدء بورقة جديدة فارغة">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>تصفير الورقة</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Questions Quick Filter Bar (فلتر الأسئلة المباشر في لوحة العمل) -->
+              <div class="questions-quick-filter-bar">
+                <span class="filter-label"><i class="fa-solid fa-filter text-primary"></i> تصفية:</span>
+                <button type="button" class="qfilter-chip active" data-qfilter="all">الكل (<span id="countFilterAll">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-arabic" data-qfilter="arabic"><i class="fa-solid fa-feather-pointed"></i> عربي (<span id="countFilterArabic">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-english" data-qfilter="english"><i class="fa-solid fa-globe"></i> English (<span id="countFilterEnglish">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-math" data-qfilter="math"><i class="fa-solid fa-calculator"></i> رياضيات (<span id="countFilterMath">0</span>)</button>
+              </div>
+
+              <div id="questionsContainer" class="questions-list">
+                <!-- Dynamically populated question cards -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tab 2: Header & Official Metadata -->
+      <div class="tab-content" id="tab-header" style="display: none;">
+        <div class="card-box">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-landmark"></i>
+              <span>بيانات الترويسة الرسمية للاختبار</span>
+            </div>
+          </div>
+
+          <form id="headerForm" class="form-grid">
+            <div class="form-group">
+              <label class="form-label">الدولة</label>
+              <input type="text" class="form-control" id="hdrCountry" value="جمهورية العراق" placeholder="الدولة">
+            </div>
+            <div class="form-group">
+              <label class="form-label">الوزارة أو المديرية التعليمية</label>
+              <input type="text" class="form-control" id="hdrMinistry" placeholder="وزارة التربية / المديرية العامة للتربية...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">اسم المدرسة أو الكلية</label>
+              <input type="text" class="form-control" id="hdrSchool" placeholder="اسم المدرسة أو المعهد...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">عنوان الاختبار الرئيسي</label>
+              <input type="text" class="form-control" id="hdrExamTitle" placeholder="مثال: امتحان نصف السنة / اختبار نهاية الفصل...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">المادة الدراسية</label>
+              <input type="text" class="form-control" id="hdrSubject" placeholder="مثال: الرياضيات / الكيمياء / اللغة العربية...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">الصف الدراسي / المرحلة</label>
+              <input type="text" class="form-control" id="hdrGrade" placeholder="مثال: الأول المتوسط / الرابع العلمي...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">العام الدراسي</label>
+              <input type="text" class="form-control" id="hdrYear" value="2025 - 2026 م" placeholder="العام الدراسي">
+            </div>
+            <div class="form-group">
+              <label class="form-label">الدور / الفصل الدراسي</label>
+              <input type="text" class="form-control" id="hdrTerm" placeholder="مثال: الفصل الأول / نصف السنة / الدور الأول...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">الزمن المتاح</label>
+              <input type="text" class="form-control" id="hdrTime" placeholder="مثال: ساعتان / 90 دقيقة...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">اسم المعلم / واضع الامتحان</label>
+              <input type="text" class="form-control" id="hdrTeacher" placeholder="اسم الأستاذ واضع الاختبار...">
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label"><i class="fa-solid fa-stamp text-primary"></i> الشعار في وسط الترويسة</label>
+              <select class="form-control" id="hdrSealSelect">
+                <option value="assets/iraq_moe_seal.png" selected>🇮🇶 شعار وزارة التربية العراقية الرسمي (المعتمد)</option>
+                <option value="assets/iraq_seal.jpg">🦅 شعار جمهورية العراق (النسر الجمهوري)</option>
+                <option value="assets/logo.jpg">🎓 شعار الأكاديمية العام</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label">الملاحظة الرسمية وإرشادات الاختبار للطلاب</label>
+              <textarea class="form-control" id="hdrInstructions" rows="3" placeholder="ملاحظات وتوجيهات الاختبار للطلاب (مثال: الإجابة عن جميع الأسئلة، ولكل سؤال درجاته المحددة)..."></textarea>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Tab 3: Smart AI Generator & Text Extractor -->
+      <div class="tab-content" id="tab-generator" style="display: none;">
+        <div class="card-box">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color: #fbbf24;"></i>
+              <span>المولد الذكي: استخراج وتوليد أسئلة من نص الدرس</span>
+            </div>
+          </div>
+          
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label class="form-label">الصق محتوى الدرس أو الملخص هنا:</label>
+            <textarea class="form-control" id="aiInputText" rows="6" placeholder="اكتب أو الصق فقرة من المنهج، على سبيل المثال:
+«الميزان الصرفي هو مقياس لمعرفة بنية الكلمة وأحرفها الأصلية والزائدة. اسم الفاعل هو اسم مشتق يدل على من قام بالفعل أو اتصف به، ويصاغ من الفعل الثلاثي على وزن فاعل مثل كاتب وقارئ. يتكون أسلوب الشرط من أداة الشرط وجملة فعل الشرط وجملة جواب الشرط...»"></textarea>
+          </div>
+
+          <div class="form-grid" style="margin-bottom: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label">أنواع الأسئلة المراد توليدها:</label>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem;">
+                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenMCQ" checked> اختيار من متعدد</label>
+                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenTF" checked> صح أو خطأ</label>
+                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenFill" checked> أكمل فراغات</label>
+                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenEssay" checked> أسئلة مقالية</label>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="runAiGeneratorBtn" style="width: 100%;">
+            <i class="fa-solid fa-bolt"></i>
+            <span>توليد وصياغة الأسئلة تلقائياً وإضافتها للاختبار</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 4: Paper Margins & Layout Settings -->
+      <div class="tab-content" id="tab-settings" style="display: none;">
+        
+        <!-- Color Themes Customizer Card (6 Vibrant Themes) -->
+        <div class="card-box" style="margin-bottom: 1.25rem;">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-palette" style="color: var(--primary);"></i>
+              <span>ألوان وسمات المنصة (6 ألوان متجددة لكسر الروتين)</span>
+            </div>
+            <span class="badge-tag" style="background: rgba(37, 99, 235, 0.12); color: var(--primary); font-weight: 700;">
+              اللون الأساسي: أبيض ناصع ⚪
+            </span>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
+            الواجهة الأساسية معتمدة على <strong>اللون الأبيض النقي</strong>. يمكنك التبديل بين <strong>6 ألوان حيوية متجددة</strong> لتغيير ألوان الأزرار والأيقونات والتدرجات:
+          </p>
+
+          <div class="color-palette-cards-grid">
+            <!-- 1. Royal Blue -->
+            <button type="button" class="color-theme-card active" data-color="blue" onclick="setAccentColor('blue')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #2563eb, #3b82f6);"></span>
+              <div class="color-info">
+                <strong>الأزرق الأكاديمي</strong>
+                <span>الرسمي المعتمد</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 2. Emerald Green -->
+            <button type="button" class="color-theme-card" data-color="emerald" onclick="setAccentColor('emerald')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #059669, #10b981);"></span>
+              <div class="color-info">
+                <strong>الزمردي الإسلامي</strong>
+                <span>هادئ ومريح للعين</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 3. Royal Purple -->
+            <button type="button" class="color-theme-card" data-color="purple" onclick="setAccentColor('purple')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #7c3aed, #a855f7);"></span>
+              <div class="color-info">
+                <strong>البنفسجي الإبداعي</strong>
+                <span>أنيق وعصري</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 4. Crimson Ruby -->
+            <button type="button" class="color-theme-card" data-color="crimson" onclick="setAccentColor('crimson')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #dc2626, #ef4444);"></span>
+              <div class="color-info">
+                <strong>الياقوتي العنابي</strong>
+                <span>حيوي ووزاري</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 5. Amber Gold -->
+            <button type="button" class="color-theme-card" data-color="amber" onclick="setAccentColor('amber')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #d97706, #fbbf24);"></span>
+              <div class="color-info">
+                <strong>العنبر الذهبي</strong>
+                <span>دافئ ومحفز للتركيز</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 6. Ocean Teal -->
+            <button type="button" class="color-theme-card" data-color="teal" onclick="setAccentColor('teal')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #0891b2, #06b6d4);"></span>
+              <div class="color-info">
+                <strong>الفيروزي البحري</strong>
+                <span>منعش ومتوازن</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Paper Direction & Language Controller (عربي RTL / إنجليزي LTR) -->
+        <div class="card-box" style="margin-bottom: 1.25rem; border: 2px solid rgba(37, 99, 235, 0.28); background: var(--bg-card);">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-arrows-left-right text-primary"></i>
+              <span>اتجاه ولغة ورقة الاختبار (Direction & Language)</span>
+            </div>
+            <span class="badge-tag" id="currentDirectionBadge" style="background: rgba(37, 99, 235, 0.15); color: var(--primary); font-weight: 800;">
+              الاتجاه الحالي: من اليمين لليسار (RTL) 🇸🇦
+            </span>
+          </div>
+
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem; line-height: 1.55;">
+            تتيح لك هذه الميزة كتابة وصياغة الأسئلة <strong>باللغة الإنجليزية أو العربية</strong> بكل سهولة. عند اختيار <strong>اللغة الإنجليزية (LTR)</strong>، يتم قلب اتجاه الورقة بالكامل من اليسار إلى اليمين مع تحويل ترقيم وترتيب الأسئلة والخيارات والفروع تلقائياً إلى النمط الإنجليزي (Q1, A, B, C, D):
+          </p>
+
+          <div class="direction-switch-grid">
+            <!-- 1. RTL Option (Arabic) -->
+            <button type="button" class="direction-card-btn active" id="btnDirRTL" onclick="window.setPaperDirection('rtl')">
+              <div class="direction-card-icon">
+                <i class="fa-solid fa-align-right"></i>
+              </div>
+              <div class="direction-card-info">
+                <div class="direction-card-title">
+                  <span>عربي (من اليمين إلى اليسار - RTL)</span>
+                  <span class="direction-flag">🇸🇦</span>
+                </div>
+                <div class="direction-card-desc">النمط المعتمد للامتحانات الوزارية والعربية (السؤال 1، أ، ب، ج، د) لجميع المواد باللغة العربية</div>
+              </div>
+              <i class="fa-solid fa-circle-check direction-check-icon"></i>
+            </button>
+
+            <!-- 2. LTR Option (English) -->
+            <button type="button" class="direction-card-btn" id="btnDirLTR" onclick="window.setPaperDirection('ltr')">
+              <div class="direction-card-icon">
+                <i class="fa-solid fa-align-left"></i>
+              </div>
+              <div class="direction-card-info">
+                <div class="direction-card-title">
+                  <span>English (من اليسار إلى اليمين - LTR)</span>
+                  <span class="direction-flag">🇬🇧</span>
+                </div>
+                <div class="direction-card-desc">مخصص لأسئلة اللغة الإنجليزية والمدارس الأهلية والمتميزة (Q1, A, B, C, D)</div>
+              </div>
+              <i class="fa-solid fa-circle-check direction-check-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-box">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fa-solid fa-ruler-combined"></i>
+              <span>ضبط هوامش ورقة الاختبار بدقة (Page Margins)</span>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div>
+              <label class="form-label">خيارات الهوامش السريعة:</label>
+              <div style="display: flex; gap: 0.5rem; margin-top: 0.35rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" onclick="setPaperMarginPreset('compact')">
+                  <i class="fa-solid fa-compress"></i> ضيق واقتصادي (8×10 مم) - مُثبَّت 🔒
+                </button>
+                <button type="button" class="btn btn-outline" onclick="setPaperMarginPreset('standard')">
+                  <i class="fa-solid fa-check"></i> قياسي وزاري (12 مم)
+                </button>
+                <button type="button" class="btn btn-outline" onclick="setPaperMarginPreset('comfortable')">
+                  <i class="fa-solid fa-expand"></i> عريض مريح (18 مم)
+                </button>
+              </div>
+            </div>
+
+            <div style="margin: 0.6rem 0; padding: 0.55rem 0.85rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); font-size: 0.82rem; color: #38bdf8; display: flex; align-items: center; gap: 0.5rem;">
+              <i class="fa-solid fa-circle-check"></i>
+              <span><strong>تم تثبيت الهامش تلقائياً على النمط الضيق:</strong> (8 مم عمودي × 10 مم أفقي) لاستيعاب كامل الأسئلة الوزارية وتوفير الورق.</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">الهامش الأفقي (يمين ويسار): <span id="marginHDisplay" style="color: var(--primary); font-weight: bold;">10mm</span></label>
+                <input type="range" id="marginHSlider" min="5" max="30" value="10" step="1" style="cursor: pointer;">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">الهامش الرأسي (أعلى وأسفل): <span id="marginVDisplay" style="color: var(--primary); font-weight: bold;">8mm</span></label>
+                <input type="range" id="marginVSlider" min="5" max="30" value="8" step="1" style="cursor: pointer;">
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 0.5rem 0;">
+
+            <!-- Typography & Font Formatting Controls (تنسيق واختيار خطوط ورقة الاختبار) -->
+            <div style="background: var(--bg-surface); padding: 0.95rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 0.85rem;">
+              <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.65rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-font text-primary"></i>
+                <span>خطوط ورقة الاختبار (خطوط رسمية ومريحة جداً للعين):</span>
+              </div>
+
+              <!-- 6 Eye-Friendly Official Fonts Selection Grid -->
+              <div class="paper-font-selector-grid">
+                <button type="button" class="paper-font-btn active" data-font="Cairo" onclick="setPaperFontFamily('Cairo')">
+                  <span class="font-preview-name" style="font-family: 'Cairo', sans-serif;">خط القاهرة (Cairo)</span>
+                  <span class="font-preview-desc">الخط الوزاري المعتمد (واضح ومتوازن)</span>
+                </button>
+                <button type="button" class="paper-font-btn" data-font="Amiri" onclick="setPaperFontFamily('Amiri')">
+                  <span class="font-preview-name" style="font-family: 'Amiri', serif; font-size: 1.05rem;">خط الأميري (Amiri)</span>
+                  <span class="font-preview-desc">خط نسخ تقليدي أصيل فخم ومريح للعين</span>
+                </button>
+                <button type="button" class="paper-font-btn" data-font="Tajawal" onclick="setPaperFontFamily('Tajawal')">
+                  <span class="font-preview-name" style="font-family: 'Tajawal', sans-serif;">خط تجوال (Tajawal)</span>
+                  <span class="font-preview-desc">خط ناعم وعصري يريح البصر أثناء القراءة</span>
+                </button>
+                <button type="button" class="paper-font-btn" data-font="Noto Naskh Arabic" onclick="setPaperFontFamily('Noto Naskh Arabic')">
+                  <span class="font-preview-name" style="font-family: 'Noto Naskh Arabic', serif;">خط نوتو نسخ (Noto Naskh)</span>
+                  <span class="font-preview-desc">خط الكتب المدرسية والطباعة الأكاديمية</span>
+                </button>
+                <button type="button" class="paper-font-btn" data-font="Almarai" onclick="setPaperFontFamily('Almarai')">
+                  <span class="font-preview-name" style="font-family: 'Almarai', sans-serif;">خط المراعي (Almarai)</span>
+                  <span class="font-preview-desc">خط متناسق ومريح جداً لأسئلة الطلاب</span>
+                </button>
+                <button type="button" class="paper-font-btn" data-font="Alexandria" onclick="setPaperFontFamily('Alexandria')">
+                  <span class="font-preview-name" style="font-family: 'Alexandria', sans-serif;">خط الإسكندرية (Alexandria)</span>
+                  <span class="font-preview-desc">خط هندسي فائق الوضوح والدقة</span>
+                </button>
+              </div>
+
+              <!-- Paper Font Size & Line Spacing Steppers -->
+              <div class="form-grid" style="margin-top: 0.85rem;">
+                <div class="form-group">
+                  <label class="form-label">حجم خط ورقة الاختبار العام:</label>
+                  <div style="display: flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="btn btn-outline" style="padding: 0.42rem 0.75rem;" onclick="stepPaperFontSize(-1)" title="تصغير حجم خط الورقة">
+                      <i class="fa-solid fa-minus"></i>A
+                    </button>
+                    <select class="form-control" id="fontSizeSelect" onchange="setPaperFontSize(this.value)" style="flex: 1;">
+                      <option value="small">صغير مضغوط (11.5px - أسئلة أكثر)</option>
+                      <option value="medium" selected>متوسط قياسي (13px - المعتمد)</option>
+                      <option value="large">كبير مقروء (14.5px - مريح للعين)</option>
+                      <option value="xlarge">كبير جداً (16px - للمراحل الابتدائية)</option>
+                    </select>
+                    <button type="button" class="btn btn-outline" style="padding: 0.42rem 0.75rem;" onclick="stepPaperFontSize(1)" title="تكبير حجم خط الورقة">
+                      <i class="fa-solid fa-plus"></i>A
+                    </button>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">تباعد أسطر النصوص:</label>
+                  <select class="form-control" id="lineHeightSelect" onchange="setPaperLineHeight(this.value)">
+                    <option value="1.35">مضغوط (1.35 - توفير الورق)</option>
+                    <option value="1.55" selected>طبيعي مريح (1.55 - القياسي)</option>
+                    <option value="1.75">متباعد واسع (1.75 - راحة للعين)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-grid">
+
+              <div class="form-group">
+                <label class="form-label">تخطيط الورقة</label>
+                <select class="form-control" id="columnsSelect">
+                  <option value="1" selected>عمود واحد (النمط الوزاري التقليدي)</option>
+                  <option value="2">عمودين (توفير 50% من الورق المطبوع)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1;">
+                <label class="form-label">نص العلامة المائية (Watermark)</label>
+                <input type="text" class="form-control" id="watermarkInput" placeholder="مثال: الامتحانات الوزارية - سري للغاية">
+              </div>
+
+              <div class="form-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.5rem;">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowAnswerLines" checked> إظهار أسطر الإجابة المنقطة للأسئلة في ورقة الاختبار (يمكنك إزالتها لتوفير مساحة الورقة إذا كان الحل في دفتر امتحاني)</label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowGradingTable" checked> إظهار جدول رصد وتفقيط الدرجات للمصحح في نهاية الاختبار</label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowStudentBar" checked> إظهار شريط بيانات الطالب (الاسم الرباعي، رقم الجلوس، القاعة)</label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowInstructions" checked> إظهار صندوق تعليمات وملاحظة الاختبار</label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowSeal" checked> إظهار الشعار الأكاديمي/النسر الجمهوري في الترويسة</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 5: Academic Reports & Examination Command Center (المركز الشامل للتقارير وإدارة الاختبارات المنشأة) -->
+      <div class="tab-content" id="tab-report" style="display: none;">
+        <div class="card-box" style="margin-top: 0;">
+          
+          <!-- Command Center Header -->
+          <div class="card-header report-center-header" style="flex-wrap: wrap; gap: 0.75rem;">
+            <div class="card-title">
+              <div class="daily-modal-icon-badge" style="width: 42px; height: 42px; font-size: 1.25rem; background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(14, 165, 233, 0.25)); color: #38bdf8;">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <div>
+                <span style="font-size: 1.05rem; font-weight: 800; color: var(--text-main);">المركز الأكاديمي الشامل للتقارير وإدارة الاختبارات</span>
+                <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0; font-weight: normal;">استعراض وبحث متقدم في الاختبارات المنشأة، فلترة المراحل والصفوف الدراسية، وبنك الأسئلة التفاعلي</p>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;" onclick="window.startNewExamFromDrawer()" title="تفريغ وبدء كتابة اختبار جديد فوراً">
+                <i class="fa-solid fa-file-circle-plus"></i> <span>إنشاء اختبار جديد</span>
+              </button>
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;" onclick="window.printAcademicReport()" title="طباعة تقرير أكاديمي رسمي بالاختبارات والأسئلة">
+                <i class="fa-solid fa-print text-warning"></i> <span>طباعة تقرير شامل</span>
+              </button>
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.82rem;" onclick="window.reseedDefaultArchiveModels()" title="تحديث واسترجاع النماذج الوزارية الخمسة المعتمدة">
+                <i class="fa-solid fa-rotate text-info"></i> <span>تحديث النماذج</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sub-View Navigation Switcher (التبديل بين سجل الاختبارات المنشأة وبنك الأسئلة) -->
+          <div class="report-view-switcher-bar">
+            <button type="button" class="report-view-btn active" id="btnReportViewExams" onclick="window.switchReportSubView('exams')" title="عرض والبحث في كافة الاختبارات والنماذج التي تم إنشاؤها">
+              <i class="fa-solid fa-file-signature"></i>
+              <span>سجل الاختبارات المنشأة والنماذج</span>
+              <span class="report-counter-chip" id="repCounterExams">0</span>
+            </button>
+            <button type="button" class="report-view-btn" id="btnReportViewQuestions" onclick="window.switchReportSubView('questions')" title="عرض والبحث في بنك مفردات الأسئلة التفاعلية">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>بنك مفردات الأسئلة</span>
+              <span class="report-counter-chip" id="repCounterQuestions">0</span>
+            </button>
+          </div>
+
+          <!-- Executive KPI Metrics Dashboard -->
+          <div class="daily-metrics-dashboard" style="margin-bottom: 1rem;">
+            <div class="daily-metric-card metric-exams" style="border-right: 3px solid #3b82f6;">
+              <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i class="fa-solid fa-file-lines"></i></div>
+              <div class="metric-info">
+                <span class="metric-label">الاختبارات المنشأة</span>
+                <span class="metric-value" id="tabReportStatTotalExams">0</span>
+              </div>
+            </div>
+            <div class="daily-metric-card metric-grades" style="border-right: 3px solid #10b981;">
+              <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i class="fa-solid fa-graduation-cap"></i></div>
+              <div class="metric-info">
+                <span class="metric-label">المراحل والصفوف</span>
+                <span class="metric-value" id="tabReportStatGrades">0</span>
+              </div>
+            </div>
+            <div class="daily-metric-card metric-models" style="border-right: 3px solid #f59e0b;">
+              <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i class="fa-solid fa-award"></i></div>
+              <div class="metric-info">
+                <span class="metric-label">نماذج وزارية معتمدة</span>
+                <span class="metric-value" id="tabReportStatModels">0</span>
+              </div>
+            </div>
+            <div class="daily-metric-card metric-total" style="border-right: 3px solid #8b5cf6;">
+              <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;"><i class="fa-solid fa-database"></i></div>
+              <div class="metric-info">
+                <span class="metric-label">مفردات الأسئلة بالبنك</span>
+                <span class="metric-value" id="tabReportStatTotalQuestions">0</span>
+              </div>
+            </div>
+            <div class="daily-metric-card metric-today" style="border-right: 3px solid #06b6d4;">
+              <div class="metric-icon" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;"><i class="fa-solid fa-calendar-day"></i></div>
+              <div class="metric-info">
+                <span class="metric-label">نشاط حديث / اليوم</span>
+                <span class="metric-value" id="tabReportStatRecent">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Executive Search & Filter Toolbar (شريط البحث الموحد مع زر تفريغ الفلتر الاحترافي) -->
+          <div class="report-pro-toolbar">
+            <div class="report-search-group">
+              <div class="report-search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass report-search-icon"></i>
+                <input type="text" id="tabReportSearchInput" placeholder="🔍 ابحث في اسم الاختبار، المرحلة الدراسية (مثال: الثالث المتوسط)، المادة، أو نصوص الأسئلة..." autocomplete="off">
+                <button type="button" class="report-search-clear-btn" id="tabReportClearSearchBtn" title="تفريغ نص البحث" style="display: none;" onclick="window.clearReportSearch()">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <button type="button" class="btn-pro-reset-filter" id="tabReportResetBtn" onclick="window.resetReportFilters()" title="تفريغ الفلتر والبحث وإعادة عرض كافة الاختبارات">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>تفريغ الفلتر</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Results Header Bar -->
+          <div class="daily-results-header" style="margin-bottom: 0.85rem;">
+            <div class="daily-results-count">
+              <i class="fa-solid fa-list-check text-primary"></i>
+              <span id="tabReportResultsLabel">الاختبارات المعروضة: </span>
+              <strong id="tabReportFilteredCount">0</strong>
+              <span> من أصل </span>
+              <strong id="tabReportTotalCount">0</strong>
+              <span id="tabReportActiveFilterTag" style="display: none; margin-right: 8px;" class="badge-tag"></span>
+            </div>
+            <div style="font-size: 0.76rem; color: var(--text-muted);" id="tabReportHelpHint">
+              💡 انقر على <strong>فتح في ورقة الامتحان A4</strong> لاستعراض الاختبار فوراً أو <strong>طباعة</strong> للفرز والطباعة
+            </div>
+          </div>
+
+          <!-- Section 1: Created Exams List (سجل الاختبارات المنشأة) -->
+          <div id="tabReportExamsListRender" class="report-exams-grid">
+            <!-- Dynamic Exam Cards Loaded Here -->
+          </div>
+
+          <!-- Section 2: Questions Bank Container (بنك مفردات الأسئلة) -->
+          <div id="tabReportQuestionsListRender" class="daily-questions-list" style="display: none;">
+            <!-- Questions rendered here -->
+          </div>
+
+        </div>
+      </div>
+      </div> <!-- End .builder-body-scrollable -->
+
+    </section>
+
+    <!-- Right Pane: Live A4 Exam Preview -->
+    <section class="pane preview-pane" aria-label="معاينة الورقة الامتحانية المباشرة A4">
+      
+      <!-- Preview Controls Toolbar with Margin Quick Selector -->
+      <div class="preview-toolbar">
+        <div class="toolbar-controls">
+          <button class="btn btn-outline" id="viewStudentPaperBtn" style="background: var(--primary); color: #fff;">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <span>ورقة الطالب (للطباعة)</span>
+          </button>
+          <button class="btn btn-outline" id="viewAnswerKeyBtn">
+            <i class="fa-solid fa-check-double"></i>
+            <span>نموذج الإجابة الرسمي</span>
+          </button>
+        </div>
+
+        <!-- Margin Quick Controller in Toolbar -->
+        <div class="margin-control-group" title="الهامش مثبت على النمط الضيق (8مم عمودي × 10مم أفقي)">
+          <span style="font-size: 0.74rem; color: var(--text-muted);"><i class="fa-solid fa-ruler-combined"></i> الهامش:</span>
+          <button type="button" class="margin-chip active" id="chipMarginCompact" onclick="setPaperMarginPreset('compact')">
+            <i class="fa-solid fa-lock" style="font-size: 0.68rem; margin-left: 2px;"></i> ضيّق (مُثبَّت 8×10 مم)
+          </button>
+          <button type="button" class="margin-chip" id="chipMarginStandard" onclick="setPaperMarginPreset('standard')">قياسي (12 مم)</button>
+          <button type="button" class="margin-chip" id="chipMarginComfortable" onclick="setPaperMarginPreset('comfortable')">عريض (16 مم)</button>
+        </div>
+
+        <div class="toolbar-controls">
+          <button class="btn btn-outline" id="toggleDirectionQuickBtn" onclick="window.togglePaperDirection()" title="تحويل سريع لاتجاه الورقة (RTL عربي / LTR إنجليزي)" style="padding: 0.35rem 0.65rem; font-size: 0.76rem;">
+            <i class="fa-solid fa-arrows-left-right" style="color: var(--primary);"></i>
+            <span id="quickDirectionLabel">الاتجاه: عربي (RTL)</span>
+          </button>
+          <button class="btn btn-outline" id="toggleAnswerLinesToolbarBtn" title="إظهار أو إخفاء أسطر الإجابة المنقطة للأسئلة في ورقة الامتحان" style="padding: 0.35rem 0.65rem; font-size: 0.76rem;" onclick="window.toggleGlobalAnswerLines()">
+            <i class="fa-solid fa-pen-nib" id="toggleAnswerLinesIcon" style="color: var(--primary);"></i>
+            <span id="toggleAnswerLinesText">أسطر الإجابة: ظاهرة</span>
+          </button>
+          <button class="btn btn-outline" id="toolbarResetBtn" title="تصفير ورقة الاختبار بالكامل للبدء بورقة جديدة فارغة" style="padding: 0.35rem 0.65rem; font-size: 0.76rem; color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>تصفير الورقة</span>
+          </button>
+          <div class="paper-pages-ctrl" id="paperPagesCtrl">
+            <span class="paper-page-badge" id="paperPagesSummaryBadge" title="عدد صفحات الاختبار A4 الحالية">
+              <i class="fa-solid fa-file-lines"></i>
+              <span id="paperPagesCountText">صفحة 1 من 1</span>
+            </span>
+            <div class="paper-page-jump-buttons" id="paperPageJumpButtons" style="display: none;"></div>
+            <select id="paperPageModeSelect" class="paper-page-mode-dropdown" onchange="window.setPaperPageMode(this.value)" title="نمط توزيع وتدفق الصفحات">
+              <option value="1_page" selected>📃 صفحة واحدة (مضغوطة) - مثبت</option>
+              <option value="auto">📄 تقسيم تلقائي (A4 ذكي)</option>
+              <option value="2_pages">📑 صفحتان (وجه وقفا)</option>
+              <option value="3_pages">📚 3 صفحات (موسعة)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paper Sheet Container (Strict A4 Multi-Page Simulator) -->
+      <div class="paper-wrapper">
+        <div class="exam-paper-container" id="examPaperDoc">
+          <article class="exam-paper exam-paper-page" id="examPaperPage_1" data-page="1">
+          
+          <!-- Watermark -->
+          <div class="paper-watermark" id="paperWatermarkEl" style="display: none;"></div>
+
+          <div class="paper-content" id="paperContentWrapper">
+            
+            <!-- Exam Official Header -->
+            <header class="exam-header">
+              <div class="header-grid">
+                
+                <!-- Right Meta Column (Start in RTL / Left in LTR) -->
+                <div class="header-meta-col header-col-start" id="paperHeaderMetaStart" style="text-align: right;">
+                  <div id="paperCountry">جمهورية العراق</div>
+                  <div id="paperMinistry">وزارة التربية - المديرية العامة لتربية بغداد</div>
+                  <div id="paperSchool">ثانوية المتميزين للبنين</div>
+                </div>
+
+                <!-- Center Column: Seal & Exam Title -->
+                <div class="header-center-col">
+                  <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" class="school-seal" id="paperSealImg">
+                  <div class="exam-title-badge" id="paperExamTitle">الامتحانات العامة للدراسة المتوسطة</div>
+                  <div class="exam-subtitle">
+                    <span id="paperTerm">الدور الأول</span> - للعام الدراسي <span id="paperYear">2025 - 2026 م</span>
+                  </div>
+                  <div id="paperAnswerKeyBadge" class="paper-model-answer-banner" style="display: none;">
+                    <div class="model-badge-top">
+                      <i class="fa-solid fa-certificate" style="font-size: 0.85em; color: #b45309;"></i>
+                      <span>نسخة الأجوبة النموذجية الرسمية المعتمدة وتوزيع الدرجات</span>
+                      <span class="model-badge-tag-official">خاص بلجنة الفحص والتصحيح</span>
+                    </div>
+                    <div class="model-badge-note">
+                      ★ سري للغاية: تتضمن عناصر الإجابة والحلول النموذجية المعتمدة وسلّم توزيع الدرجات ★
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Left Meta Column (End in RTL / Right in LTR) -->
+                <div class="header-meta-col header-col-end" id="paperHeaderMetaEnd" style="text-align: left; direction: rtl;">
+                  <div>المادة: <span id="paperSubject">اللغة العربية</span></div>
+                  <div>الصف: <span id="paperGrade">الصف الثالث المتوسط</span></div>
+                  <div>الزمن: <span id="paperTime">ثلاث ساعات</span></div>
+                  <div>واضع الأسئلة: <span id="paperTeacher">أستاذ المادة</span></div>
+                </div>
+
+              </div>
+            </header>
+
+            <!-- Student Bar -->
+            <div class="student-bar" id="paperStudentBar">
+              <div id="paperStudentBarName">اسم الطالب الرباعي: <span class="field-fill" style="min-width: 180px;"></span></div>
+              <div id="paperStudentBarId">الرقم الامتحاني: <span class="field-fill" style="min-width: 70px;"></span></div>
+              <div id="paperStudentBarHall">القاعة / المدرسة: <span class="field-fill" style="min-width: 60px;"></span></div>
+            </div>
+
+            <!-- Instructions Box (Centered text with solid black line underneath) -->
+            <div class="instructions-box" id="paperInstructionsBox">
+              <span class="instructions-text-content" id="paperInstructionsText">ملاحظة: الإجابة عن خمسة أسئلة فقط، ولكل سؤال (20) درجة. (يُسمح بترك سؤال واحد كاملاً، والترك الضمني موضح داخل فروع الأسئلة).</span>
+            </div>
+
+            <!-- Dynamic Rendered Questions Area -->
+            <div class="questions-container" id="paperQuestionsRender">
+              <!-- Rendered Questions will appear here -->
+            </div>
+
+            <!-- Official Grading Table -->
+            <div class="grading-table-container" id="paperGradingSection">
+              <table class="grading-table">
+                <thead>
+                  <tr>
+                    <th>السؤال</th>
+                    <th>س1</th>
+                    <th>س2</th>
+                    <th>س3</th>
+                    <th>س4</th>
+                    <th>س5</th>
+                    <th>س6</th>
+                    <th>المجموع رقماً</th>
+                    <th>المجموع كتابةً</th>
+                    <th>المصحح</th>
+                    <th>المدقق</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="font-weight: 700;">الدرجة المستحقة</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td style="font-weight: 700;">الدرجة العظمى</td>
+                    <td id="gtQ1">20</td>
+                    <td id="gtQ2">20</td>
+                    <td id="gtQ3">20</td>
+                    <td id="gtQ4">20</td>
+                    <td id="gtQ5">20</td>
+                    <td id="gtQ6">20</td>
+                    <td id="gtTotal" style="font-weight: 800; color: #1e3a8a;">100 درجة</td>
+                    <td colspan="3" style="font-size: 11px;">توقيع اللجنة الامتحانية / الكنترول</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="exam-footer-msg">
+                — انتـهت الأسـئـلة، مـع أطـيـب التـمـنيـات بـالـنـجـاح والـتـفـوق —
+              </div>
+              <div class="exam-footer-rights" id="paperFooterRights" style="font-size: 8.5pt; color: #64748b; margin-top: 5px; text-align: center; font-weight: 600;"></div>
+            </div>
+
+          </div>
+            <!-- Page Footer -->
+            <footer class="exam-page-footer">
+              <span class="page-footer-num"><i class="fa-solid fa-book-open"></i> الصفحة (1) من (1)</span>
+              <span class="page-footer-note">— انتـهـت الأسـئـلـة —</span>
+            </footer>
+          </article>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+  
+  <!-- Mobile Floating Quick Preview & Print Bar (شريط التبديل والطباعة السريع للهواتف) -->
+  <div class="mobile-floating-preview-cta no-print" id="mobileFloatingPreviewCta">
+    <button type="button" class="cta-btn-preview" id="mobileFloatPreviewBtn" onclick="window.togglePreviewPane()" title="تبديل العرض بين محرر الأسئلة وورقة الامتحان A4">
+      <i class="fa-solid fa-eye"></i>
+      <span>معاينة ورقة الامتحان A4</span>
+    </button>
+    <button type="button" class="cta-btn-print" onclick="window.triggerPrintExam()" title="طباعة ورقة الامتحان فوراً">
+      <i class="fa-solid fa-print"></i>
+      <span>طباعة</span>
+    </button>
+  </div>
+
+  </div> <!-- End #appWorkstation -->
+
+  <!-- Saved Exams Archive Modal -->
+  <div class="modal-overlay" id="archiveModal">
+    <div class="modal-container" style="max-width: 850px;">
+      <div class="modal-header">
+        <div class="card-title">
+          <i class="fa-solid fa-folder-open" style="color: #38bdf8;"></i>
+          <span>أرشيف ومكتبة اختباراتي المحفوظة</span>
+        </div>
+        <button class="btn btn-outline btn-icon-only" id="closeArchiveModalBtn" style="border: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 220px;">
+            <input type="text" class="form-control" id="archiveSearchInput" placeholder="🔍 ابحث في الاختبارات والنماذج حسب الاسم أو المادة...">
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" id="reseedArchiveModelsBtn" onclick="window.reseedDefaultArchiveModels()" style="color: #10b981; border-color: rgba(16, 185, 129, 0.4); font-weight: 700;" title="إعادة استيراد وتحديث النماذج الوزارية الخمسة (إسلامية، إنكليزي، رياضيات، فيزياء، عربي)">
+              <i class="fa-solid fa-cloud-arrow-down"></i> استيراد النماذج الوزارية (5)
+            </button>
+            <button class="btn btn-success" id="saveCurrentAsNewBtn">
+              <i class="fa-solid fa-plus"></i> حفظ الحالي كنسخة جديدة
+            </button>
+          </div>
+        </div>
+
+        <!-- Subject Filter Pills for Archive -->
+        <div class="archive-filter-bar" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.85rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border-color);">
+          <button type="button" class="btn btn-sm archive-subject-pill active" data-subject="all" onclick="window.filterArchiveBySubject('all')">
+            <i class="fa-solid fa-layer-group"></i> الكل
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="التربية الإسلامية" onclick="window.filterArchiveBySubject('التربية الإسلامية')">
+            🕌 إسلامية
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="English Language" onclick="window.filterArchiveBySubject('English Language')">
+            🇬🇧 إنكليزي
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="الرياضيات" onclick="window.filterArchiveBySubject('الرياضيات')">
+            📐 رياضيات
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="الفيزياء" onclick="window.filterArchiveBySubject('الفيزياء')">
+            ⚡ فيزياء
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="اللغة العربية" onclick="window.filterArchiveBySubject('اللغة العربية')">
+            📖 عربي
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="models" onclick="window.filterArchiveBySubject('models')">
+            🎖️ النماذج الوزارية
+          </button>
+          <button type="button" class="btn btn-sm archive-subject-pill" data-subject="drafts" onclick="window.filterArchiveBySubject('drafts')">
+            📝 مسوداتي
+          </button>
+        </div>
+
+        <div id="savedExamsList" class="saved-exams-grid" style="margin-top: 1rem;">
+          <!-- Dynamically populated saved exams -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="closeArchiveModalFooterBtn">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full-Screen Dedicated Authentication Portal (الواجهة الكاملة لتسجيل الدخول وقفل المنصة) -->
+  <div id="fullscreenAuthPortal" class="fullscreen-auth-portal portal-hidden">
+    <!-- Ambient Background Lighting & Effects -->
+    <div class="portal-ambient-glow glow-1"></div>
+    <div class="portal-ambient-glow glow-2"></div>
+    
+    <!-- Portal Top Bar -->
+    <header class="portal-topbar">
+      <div class="portal-topbar-brand">
+        <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="portal-topbar-seal" style="border-radius: 50%; box-shadow: 0 0 10px rgba(56, 189, 248, 0.45); border: 1.5px solid rgba(56, 189, 248, 0.6);">
+        <div class="portal-topbar-title">
+          <span>جمهورية العراق | منصة مسار المعلم</span>
+          <small>بوابة المعلم المعتمدة المركزية — استوديو مسار المعلم الأكاديمي</small>
+        </div>
+      </div>
+      
+      <div class="portal-topbar-actions">
+        <!-- Palette & Theme controls on portal screen -->
+        <div class="palette-dots-row" style="background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 20px; border: 1px solid var(--border-color);">
+          <button type="button" class="palette-dot-btn active" data-color="blue" title="الأزرق الأكاديمي" style="background: #2563eb;" onclick="setAccentColor('blue')"></button>
+          <button type="button" class="palette-dot-btn" data-color="emerald" title="الزمردي" style="background: #059669;" onclick="setAccentColor('emerald')"></button>
+          <button type="button" class="palette-dot-btn" data-color="purple" title="البنفسجي" style="background: #7c3aed;" onclick="setAccentColor('purple')"></button>
+          <button type="button" class="palette-dot-btn" data-color="crimson" title="الياقوتي" style="background: #dc2626;" onclick="setAccentColor('crimson')"></button>
+          <button type="button" class="palette-dot-btn" data-color="amber" title="العنبر" style="background: #d97706;" onclick="setAccentColor('amber')"></button>
+          <button type="button" class="palette-dot-btn" data-color="teal" title="الفيروزي" style="background: #0891b2;" onclick="setAccentColor('teal')"></button>
+        </div>
+        <button class="btn btn-outline btn-icon-only" onclick="toggleTheme()" title="التبديل بين الوضع الليلي والنهاري">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Ambient Floating Particles (مؤثرات بصرية أكاديمية عائمة ومريحة للعين) -->
+    <div class="portal-floating-elements" aria-hidden="true">
+      <span class="float-item item-1"><i class="fa-solid fa-graduation-cap"></i></span>
+      <span class="float-item item-2"><i class="fa-solid fa-atom"></i></span>
+      <span class="float-item item-3"><i class="fa-solid fa-book-open"></i></span>
+      <span class="float-item item-4"><i class="fa-solid fa-calculator"></i></span>
+      <span class="float-item item-5"><i class="fa-solid fa-feather-pointed"></i></span>
+    </div>
+
+    <!-- Central Interactive Portal Workspace (عرض ترحيبي شامل + بطاقة تسجيل الدخول) -->
+    <main class="portal-main-wrapper">
+      <div class="portal-showcase-container">
+        
+        <!-- Right Column: Interactive Auth Card (واجهة تسجيل الدخول على اليمين) -->
+        <section class="portal-auth-section" aria-label="بوابة تسجيل الدخول وتوثيق الحساب">
+          <div class="portal-auth-card">
+            
+            <!-- Card Header with Masar Al-Moallem Interactive Welcoming Emblem -->
+            <div class="portal-card-header">
+              
+              <!-- Interactive Welcoming Logo Hero (شعار مسار المعلم التفاعلي) -->
+              <div class="masar-interactive-hero" id="masarInteractiveHero" onclick="window.triggerMasarLogoWelcome(event)" title="انقر على الشعار للتفاعل والترحيب! ✨">
+                <div class="masar-aura-ambient"></div>
+                <div class="masar-orbit-ring ring-outer"></div>
+                <div class="masar-orbit-ring ring-inner"></div>
+                
+                <div class="masar-logo-core-badge" id="masarLogoCoreBadge">
+                  <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="masar-main-logo-img" id="masarLoginLogoImg">
+                  <span class="masar-badge-live-pulse" title="متصل بنظام مسار المعلم"></span>
+                </div>
+
+                <div class="masar-click-hint-tag">
+                  <i class="fa-solid fa-hand-pointer text-warning"></i>
+                  <span>انقر للشعار للترحيب ✨</span>
+                </div>
+
+                <div class="masar-welcome-speech-bubble" id="masarSpeechBubble">
+                  <span class="bubble-icon">👋</span>
+                  <span class="bubble-text" id="masarSpeechText">أهلاً بك أستاذنا في منصة <strong>مسار المعلم</strong>! 🎓✨</span>
+                </div>
+              </div>
+
+              <div class="portal-badge-label">
+                <i class="fa-solid fa-certificate text-warning"></i>
+                <span>بوابة الدخول المعتمدة — مسار المعلم</span>
+              </div>
+              <h2 class="portal-card-title" id="authPortalHeading">تسجيل الدخول للمنصة</h2>
+              <p class="portal-card-desc">سجل دخولك بحسابك المعتمد للمتابعة إلى استوديو الاختبارات.</p>
+              
+              <div class="portal-privacy-notice" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 0.45rem 0.75rem; margin: 0.75rem 0 0.25rem 0; font-size: 0.78rem; color: #10b981; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-align: center;">
+                <i class="fa-solid fa-shield-halved" style="font-size: 0.95rem;"></i>
+                <span><strong>نظام الخصوصية المستقل:</strong> كل حساب معزول تماماً ومحمي بأعلى درجات الخصوصية.</span>
+              </div>
+            </div>
+
+            <div class="portal-card-body" style="padding-top: 1.15rem;">
+              <!-- Login Form -->
+              <form id="loginForm">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                  <label class="form-label"><i class="fa-solid fa-user-check text-primary"></i> اسم المستخدم (اليوزر) أو البريد الإلكتروني</label>
+                  <div style="position: relative;">
+                    <input type="text" class="form-control" id="loginEmail" placeholder="اسم المستخدم أو البريد الإلكتروني" required style="padding-right: 2.2rem;">
+                    <i class="fa-solid fa-user" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+                  </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.25rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label class="form-label" style="margin: 0;"><i class="fa-solid fa-key text-accent"></i> كلمة المرور</label>
+                  </div>
+                  <div style="position: relative; margin-top: 0.35rem;">
+                    <input type="password" class="form-control" id="loginPassword" placeholder="كلمة المرور الخاصة بحسابك" required style="padding-right: 2.2rem;">
+                    <i class="fa-solid fa-lock" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+                    <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="إظهار/إخفاء كلمة المرور">
+                      <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; font-size: 0.82rem;">
+                  <label style="cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+                    <input type="checkbox" id="loginRememberMe" checked> تذكرني على هذا الجهاز
+                  </label>
+                  <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #34d399; font-weight: 700;">
+                    <i class="fa-solid fa-shield-halved"></i> اتصال مشفر 256-bit
+                  </span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; font-size: 1rem; font-weight: 700; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);">
+                  <i class="fa-solid fa-lock-open"></i> تسجيل الدخول وفتح المنصة
+                </button>
+              </form>
+
+              <!-- Divider line -->
+              <div class="auth-divider-line" style="margin: 1.35rem 0 1rem 0;">
+                <span>أو تسجيل الدخول السريع عبر حساب Google</span>
+              </div>
+
+              <!-- Google 1-Tap Quick Sign-In Button -->
+              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول السريع باستخدام حساب Google">
+                <svg class="google-logo-svg" viewBox="0 0 48 48">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <div class="google-btn-text">
+                  <strong>تسجيل الدخول السريع عبر Google</strong>
+                  <small>حفظ كافة أسئلتك واختباراتك سحابياً والوصول إليها من أي جهاز</small>
+                </div>
+                <i class="fa-solid fa-arrow-left google-btn-arrow"></i>
+              </button>
+            </div>
+
+            <!-- Portal Card Footer -->
+            <div class="portal-card-footer">
+              <div class="portal-features-row">
+                <div class="portal-feature-item">
+                  <i class="fa-solid fa-flag" style="color: #ef4444;"></i>
+                  <span>مطابق لضوابط وزارة التربية العراقية</span>
+                </div>
+                <div class="portal-feature-item">
+                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i>
+                  <span>طباعة وتصدير PDF فوري A4</span>
+                </div>
+                <div class="portal-feature-item">
+                  <i class="fa-solid fa-box-archive" style="color: #059669;"></i>
+                  <span>أرشيف سحابي ومحلي دائم للاختبارات</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Left Column: Welcome & Educational Platform Features Showcase (المميزات والمعلومات على اليسار) -->
+        <section class="portal-welcome-showcase" aria-label="لوحة الترحيب واستعراض مميزات المنصة">
+          
+          <!-- Top Badges Row -->
+          <div class="welcome-top-row">
+            <div class="welcome-top-badge">
+              <span class="badge-pulsing-dot"></span>
+              <i class="fa-solid fa-certificate text-warning"></i>
+              <span>المنصة المعتمدة الأولى لأساتذة ومعلمي العراق 🇮🇶</span>
+            </div>
+            <div class="welcome-trust-rating">
+              <span class="stars-gold"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></span>
+              <span class="rating-val">4.9/5</span>
+              <span class="rating-count">(+12,000 معلم ومدرس)</span>
+            </div>
+          </div>
+
+          <!-- Hero Greeting Headline -->
+          <div class="welcome-hero-header">
+            <h1 class="welcome-hero-title">
+              استوديو <span class="gradient-text">مسار المعلم</span> الأكاديمي
+            </h1>
+            <p class="welcome-hero-subtitle">
+              المنظومة الاحترافية الأولى في العراق لإعداد، فرز، وأرشفة الاختبارات المدرسية والوزارية بأعلى معايير الرصانة التربوية والسرعة الفائقة.
+            </p>
+          </div>
+
+          <!-- Subjects Ribbon (شريط المواد الدراسية المتحرك والتفاعلي) -->
+          <div class="welcome-subjects-box">
+            <div class="welcome-subjects-title">
+              <i class="fa-solid fa-book-bookmark text-primary"></i>
+              <span>مجهزة خصيصاً لكافة المناهج والمواد الدراسية في العراق:</span>
+            </div>
+            <div class="welcome-subjects-pills">
+              <span class="subject-pill sub-arabic"><i class="fa-solid fa-feather-pointed"></i> اللغة العربية وقواعدها</span>
+              <span class="subject-pill sub-math"><i class="fa-solid fa-calculator"></i> الرياضيات والمعادلات</span>
+              <span class="subject-pill sub-physics"><i class="fa-solid fa-atom"></i> الفيزياء والتجارب</span>
+              <span class="subject-pill sub-chem"><i class="fa-solid fa-flask-vial"></i> الكيمياء والمسائل</span>
+              <span class="subject-pill sub-bio"><i class="fa-solid fa-dna"></i> علم الأحياء</span>
+              <span class="subject-pill sub-english"><i class="fa-solid fa-globe"></i> English (الإنكليزية)</span>
+              <span class="subject-pill sub-islamic"><i class="fa-solid fa-mosque"></i> التربية الإسلامية</span>
+              <span class="subject-pill sub-social"><i class="fa-solid fa-landmark"></i> الاجتماعيات والتاريخ</span>
+              <span class="subject-pill sub-cs"><i class="fa-solid fa-laptop-code"></i> الحاسوب وتكنولوجيا المعلومات</span>
+            </div>
+          </div>
+
+          <!-- Interactive Feature Category Filter Bar -->
+          <div class="welcome-feat-filter-bar">
+            <span class="feat-filter-label"><i class="fa-solid fa-wand-magic-sparkles text-primary"></i> أبرز المميزات:</span>
+            <div class="feat-filter-chips">
+              <button type="button" class="feat-chip-btn active" onclick="window.filterPortalFeaturesShowcase('all', this)">الكل 🌟</button>
+              <button type="button" class="feat-chip-btn" onclick="window.filterPortalFeaturesShowcase('math', this)">الرياضيات والرموز 📐</button>
+              <button type="button" class="feat-chip-btn" onclick="window.filterPortalFeaturesShowcase('ai', this)">المولد الذكي AI 🧠</button>
+              <button type="button" class="feat-chip-btn" onclick="window.filterPortalFeaturesShowcase('print', this)">الفرز والطباعة 🖨️</button>
+              <button type="button" class="feat-chip-btn" onclick="window.filterPortalFeaturesShowcase('security', this)">الأمان والسحابة 🔒</button>
+            </div>
+          </div>
+
+          <!-- 6 Core Platform Killer Features Grid -->
+          <div class="welcome-features-grid" id="portalWelcomeFeaturesGrid">
+            
+            <!-- Feature 1: Math Studio Pro -->
+            <div class="welcome-feature-card feat-math-card" data-cat="math">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-gold"><i class="fa-solid fa-bolt"></i> حصري ومطابق للمناهج</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-math">
+                  <i class="fa-solid fa-calculator"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>استوديو الرياضيات والرموز الكسرية</h4>
+                  <span class="feat-subtext">Math Studio & KaTeX Typography</span>
+                </div>
+              </div>
+              <p>تحكم كامل بكتابة الأس والأساس، الجذور التكعيبية والتربيعية، الكسور الاعتيادية، والمصفوفات بدقة مطبعية تطابق النماذج الوزارية العراقية.</p>
+              <div class="feat-micro-tags">
+                <span>أسس وأساس</span>
+                <span>كسور وجذور</span>
+                <span>مصفوفات</span>
+                <span>تكاملات</span>
+              </div>
+            </div>
+
+            <!-- Feature 2: Smart AI Engine -->
+            <div class="welcome-feature-card feat-ai-card" data-cat="ai">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-purple"><i class="fa-solid fa-brain"></i> ذكاء اصطناعي تربوي</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-ai">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>المولد الذكي ومؤشر بلوم</h4>
+                  <span class="feat-subtext">AI Smart Generation & Bloom KPI</span>
+                </div>
+              </div>
+              <p>صياغة فورية للأسئلة مع توزيع الأهداف السلوكية (تذكر، فهم، تطبيق، تحليل)، مع توليد نموذج (ب) البديل بنقرة زر واحدة دون عناء.</p>
+              <div class="feat-micro-tags">
+                <span>صياغة ذكية</span>
+                <span>تصنيف بلوم</span>
+                <span>توليد نموذج (ب)</span>
+                <span>خلط بدائل</span>
+              </div>
+            </div>
+
+            <!-- Feature 3: Dual Print & Export Engine -->
+            <div class="welcome-feature-card feat-print-card" data-cat="print">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-blue"><i class="fa-solid fa-print"></i> فرز تلقائي ليزري</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-print">
+                  <i class="fa-solid fa-print"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>الفرز الطباعي الذكي A4 المزدوج</h4>
+                  <span class="feat-subtext">Student Sheet & Answer Key</span>
+                </div>
+              </div>
+              <p>استخراج فوري لنسخة الطالب المنسقة والجاهزة للامتحان + نموذج الحل المعتمد وسلم توزيع الدرجات الرسمي للمصحح ولجنة الامتحانات.</p>
+              <div class="feat-micro-tags">
+                <span>نسخة الطالب</span>
+                <span>نموذج الإجابة</span>
+                <span>سلم الدرجات</span>
+                <span>دقة 300DPI</span>
+              </div>
+            </div>
+
+            <!-- Feature 4: Ministerial Archive Models -->
+            <div class="welcome-feature-card feat-ministry-card" data-cat="print">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-emerald"><i class="fa-solid fa-landmark"></i> ضوابط وزارة التربية</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-types">
+                  <i class="fa-solid fa-landmark"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>بنك النماذج الوزارية الشامل</h4>
+                  <span class="feat-subtext">5 Official Iraqi Archive Models</span>
+                </div>
+              </div>
+              <p>نماذج وزارية جاهزة وموثقة لـ (التربية الإسلامية، الإنكليزي، الرياضيات، الفيزياء، العربي) مجهزة بالترويسة الرسمية وشعار النسر المعتمد.</p>
+              <div class="feat-micro-tags">
+                <span>9 أنماط أسئلة</span>
+                <span>ترويسة معتمدة</span>
+                <span>شعار النسر</span>
+                <span>تنسيق جاهز</span>
+              </div>
+            </div>
+
+            <!-- Feature 5: Academic Analytics & Daily Report -->
+            <div class="welcome-feature-card feat-analytics-card" data-cat="ai">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-cyan"><i class="fa-solid fa-chart-pie"></i> تقارير وتحليلات</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-lang">
+                  <i class="fa-solid fa-chart-pie"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>المركز الأكاديمي والتقرير الشامل</h4>
+                  <span class="feat-subtext">Advanced Exam Analytics Center</span>
+                </div>
+              </div>
+              <p>لوحة تحكم ذكية لمتابعة بنك الأسئلة، فلترة المراحل والصفوف، وإحصاءات دقيقة للاختبارات المنشأة مع إمكانية طباعة تقرير أكاديمي كامل.</p>
+              <div class="feat-micro-tags">
+                <span>إحصاءات حية</span>
+                <span>تصفية المراحل</span>
+                <span>بنك الأسئلة</span>
+                <span>تقرير رسمي</span>
+              </div>
+            </div>
+
+            <!-- Feature 6: Privacy Guard & Cloud Sync -->
+            <div class="welcome-feature-card feat-security-card" data-cat="security">
+              <div class="feat-card-glow"></div>
+              <span class="feat-badge-chip badge-rose"><i class="fa-solid fa-shield-halved"></i> حماية وتشفير 256-bit</span>
+              <div class="feature-card-header-row">
+                <div class="feature-card-icon feat-privacy">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="feature-card-title-wrap">
+                  <h4>درع الخصوصية ومزامنة Google</h4>
+                  <span class="feat-subtext">Cloud Sync & Exam Confidentiality</span>
+                </div>
+              </div>
+              <p>ربط سريع بحساب Google لنقل ومزامنة أسئلتك بين الحاسوب والهاتف، مع نظام قفل فوري عند إغلاق المتصفح لحماية سرية الأسئلة والامتحانات.</p>
+              <div class="feat-micro-tags">
+                <span>مزامنة سحابية</span>
+                <span>تسجيل Google</span>
+                <span>قفل عند الخروج</span>
+                <span>سرية تامة</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Live Platform Metrics -->
+          <div class="welcome-metrics-bar">
+            <div class="metric-item">
+              <div class="metric-icon-wrap"><i class="fa-solid fa-file-signature text-primary"></i></div>
+              <div class="metric-text-wrap">
+                <strong>+50,000</strong>
+                <span>اختبار ونموذج مدرسي</span>
+              </div>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <div class="metric-icon-wrap"><i class="fa-solid fa-school-flag text-success"></i></div>
+              <div class="metric-text-wrap">
+                <strong>18</strong>
+                <span>محافظة ومديرية تربية</span>
+              </div>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <div class="metric-icon-wrap"><i class="fa-solid fa-circle-check text-warning"></i></div>
+              <div class="metric-text-wrap">
+                <strong>100%</strong>
+                <span>مطابقة للضوابط الوزارية</span>
+              </div>
+            </div>
+            <div class="metric-divider"></div>
+            <div class="metric-item">
+              <div class="metric-icon-wrap"><i class="fa-solid fa-stopwatch text-info"></i></div>
+              <div class="metric-text-wrap">
+                <strong>⚡ 80%</strong>
+                <span>توفير الوقت والجهد</span>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Teacher Login / Profile Modal -->
+  <div class="modal-overlay" id="profileModal">
+    <div class="modal-container" style="max-width: 550px;">
+      <div class="modal-header">
+        <div class="card-title">
+          <i class="fa-solid fa-user-graduate" style="color: #38bdf8;"></i>
+          <span>الملف الشخصي للأستاذ / تسجيل الدخول</span>
+        </div>
+        <button class="btn btn-outline btn-icon-only" id="closeProfileModalBtn" style="border: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="profileForm" class="form-grid">
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label class="form-label">الاسم الكامل للأستاذ / المعلم</label>
+            <input type="text" class="form-control" id="profName" value="أستاذ حسين" placeholder="مثال: أ. حسين علي الشمري">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المحافظة / الإدارة التعليمية</label>
+            <input type="text" class="form-control" id="profGov" value="بغداد - الكرخ الثانية" placeholder="مثال: البصرة / النجف الأشرف">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المدرسة أو الكلية</label>
+            <input type="text" class="form-control" id="profSchool" value="ثانوية المتميزين" placeholder="مثال: ثانوية الأمل للبنين">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المادة الدراسية التخصصية</label>
+            <input type="text" class="form-control" id="profSubject" value="اللغة العربية" placeholder="مثال: الرياضيات">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف أو البريد الإلكتروني</label>
+            <input type="text" class="form-control" id="profContact" placeholder="لأغراض التواصل والتوثيق">
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1; margin-top: 0.5rem;">
+            <div style="background: rgba(30, 41, 59, 0.4); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-md); padding: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.65rem;">
+                <div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); display: flex; align-items: center; justify-content: center; color: #10b981; font-size: 1.1rem; flex-shrink: 0;">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                  <strong style="font-size: 0.86rem; color: var(--text-main); display: block;">درع خصوصية المعلم (تسجيل خروج تلقائي)</strong>
+                  <span style="font-size: 0.75rem; color: var(--text-muted);">تسجيل الخروج وقفل الحساب تلقائياً فور إغلاق المتصفح أو مغادرة الموقع</span>
+                </div>
+              </div>
+              <label class="switch-toggle" title="تفعيل أو تعطيل تسجيل الخروج التلقائي عند إغلاق المتصفح">
+                <input type="checkbox" id="chkAutoLogoutOnExit" checked onchange="setAutoLogoutOnExitEnabled(this.checked)">
+                <span class="slider-round"></span>
+              </label>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+        <button type="button" class="btn btn-outline" style="border-color: rgba(234, 67, 53, 0.4); color: #ea4335; background: rgba(234, 67, 53, 0.05);" onclick="document.getElementById('profileModal').classList.remove('open'); window.openGoogleAccountModal();" title="ربط حساب Google لحفظ ومزامنة الأسئلة سحابياً">
+          <i class="fa-brands fa-google"></i> ربط بحساب Google
+        </button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-outline" id="applyProfileToHeaderBtn" title="تطبيق هذه البيانات في ترويسة الاختبار المفتوح">
+            <i class="fa-solid fa-file-import"></i> تطبيق في الترويسة
+          </button>
+          <button class="btn btn-primary" id="saveProfileBtn">
+            <i class="fa-solid fa-check"></i> حفظ بيانات الحساب
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Edit / Create Modal -->
+  <div class="modal-overlay" id="questionModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="card-title" id="modalTitle">
+          <i class="fa-solid fa-pen-to-square"></i>
+          <span>تحرير السؤال</span>
+        </div>
+        <button class="btn btn-outline btn-icon-only" id="closeModalBtn" style="border: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" id="modalFormBody">
+        <!-- Dynamic Form Fields according to Question Type -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="cancelModalBtn">إلغاء</button>
+        <button class="btn btn-primary" id="saveQuestionModalBtn">
+          <i class="fa-solid fa-check"></i>
+          <span>حفظ وتحديث السؤال</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print & Export Options Modal (طباعة وفرز النسختين أو نسخة منفردة) -->
+  <div class="modal-overlay" id="printOptionsModal">
+    <div class="modal-container" style="max-width: 620px;">
+      <div class="modal-header">
+        <div class="card-title">
+          <i class="fa-solid fa-print text-primary"></i>
+          <span>خيارات الطباعة وفرز النسخ (نسخة الطالب واللجنة)</span>
+        </div>
+        <button class="btn btn-outline btn-icon-only" id="closePrintModalBtn" style="border: none;">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem;">
+        <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+          اختر نوع النسخة المراد طباعتها أو تصديرها. يمكنك طباعة <strong>النسختين معاً في أمر واحد</strong> مفروزتين بفاصل صفحة تلقائي:
+        </p>
+
+        <div class="print-options-grid">
+          <!-- 1. Dual Print (Both copies separated) -->
+          <div class="print-option-card dual-option" onclick="ExamExporter.printBothCopiesSeparated()">
+            <div class="print-card-icon">
+              <i class="fa-solid fa-copy"></i>
+            </div>
+            <div class="print-card-info">
+              <div class="print-card-title">
+                <span>طباعة النسختين معاً (مفروزتين)</span>
+                <span class="badge-tag" style="background: rgba(37, 99, 235, 0.2); color: var(--primary); font-weight: 800;">مُوصى به ⭐</span>
+              </div>
+              <p class="print-card-desc">
+                أمر طباعة واحد يطبع أولاً <strong>نسخة الطالب</strong>، ثم يفرز تلقائياً في صفحة جديدة <strong>نسخة اللجنة الامتحانية والأجوبة النموذجية</strong>.
+              </p>
+            </div>
+            <i class="fa-solid fa-chevron-left print-arrow"></i>
+          </div>
+
+          <!-- 2. Student Copy Only -->
+          <div class="print-option-card" onclick="ExamExporter.printStudentCopy()">
+            <div class="print-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+              <i class="fa-solid fa-user-graduate"></i>
+            </div>
+            <div class="print-card-info">
+              <div class="print-card-title">
+                <span>طباعة نسخة الطالب فقط</span>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">أسئلة بيضاء</span>
+              </div>
+              <p class="print-card-desc">
+                ورقة الأسئلة مع خانة اسم الطالب، الرقم الامتحاني، وتنبيهات الاختبار بدون أي إجابات أو حلول.
+              </p>
+            </div>
+            <i class="fa-solid fa-chevron-left print-arrow"></i>
+          </div>
+
+          <!-- 3. Committee / Model Answer Copy Only -->
+          <div class="print-option-card" onclick="ExamExporter.printCommitteeCopy()">
+            <div class="print-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+              <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div class="print-card-info">
+              <div class="print-card-title">
+                <span>طباعة نسخة اللجنة الامتحانية فقط</span>
+                <span class="badge-tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">أجوبة نموذجية</span>
+              </div>
+              <p class="print-card-desc">
+                نسخة مخصصة للمصححين ولجنة الامتحانات مع شريط الإجابة النموذجية المظلل وسلّم توزيع الدرجات.
+              </p>
+            </div>
+            <i class="fa-solid fa-chevron-left print-arrow"></i>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="justify-content: flex-end;">
+        <button class="btn btn-outline" id="closePrintModalFooterBtn">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Report & Questions Bank Filter Modal (التقرير اليومي وفلتر الأسئلة المنشأة) -->
+  <div class="modal-backdrop" id="dailyReportModal" style="display: none;">
+    <div class="modal-box modal-xl daily-report-modal-box">
+      <div class="modal-header">
+        <div class="modal-header-title">
+          <div class="daily-modal-icon-badge">
+            <i class="fa-solid fa-chart-pie"></i>
+          </div>
+          <div>
+            <h3>التقرير اليومي وبنك الأسئلة المنشأة</h3>
+            <p>سجل تفصيلي وإحصائي لجميع الأسئلة التي تم إنشاؤها عبر النظام مع فلترة متقدمة وإمكانية الإدراج المباشر في الاختبار</p>
+          </div>
+        </div>
+        <button type="button" class="btn-close" id="closeDailyReportModalBtn" onclick="closeDailyReportModal()" title="إغلاق">&times;</button>
+      </div>
+
+      <div class="modal-body daily-report-modal-body">
+        <!-- Daily KPI Metrics Dashboard -->
+        <div class="daily-metrics-dashboard">
+          <div class="daily-metric-card metric-today">
+            <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="metric-info">
+              <span class="metric-label">أسئلة أنشئت اليوم</span>
+              <span class="metric-value" id="dailyStatToday">0</span>
+            </div>
+          </div>
+          <div class="daily-metric-card metric-arabic">
+            <div class="metric-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div class="metric-info">
+              <span class="metric-label">لغة عربية</span>
+              <span class="metric-value" id="dailyStatArabic">0</span>
+            </div>
+          </div>
+          <div class="daily-metric-card metric-english">
+            <div class="metric-icon"><i class="fa-solid fa-globe"></i></div>
+            <div class="metric-info">
+              <span class="metric-label">English</span>
+              <span class="metric-value" id="dailyStatEnglish">0</span>
+            </div>
+          </div>
+          <div class="daily-metric-card metric-math">
+            <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div class="metric-info">
+              <span class="metric-label">رياضيات</span>
+              <span class="metric-value" id="dailyStatMath">0</span>
+            </div>
+          </div>
+          <div class="daily-metric-card metric-total">
+            <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="metric-info">
+              <span class="metric-label">إجمالي بنك الأسئلة</span>
+              <span class="metric-value" id="dailyStatTotal">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Filter Toolbar -->
+        <div class="daily-filter-toolbar">
+          <div class="daily-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="dailySearchInput" placeholder="ابحث في نص السؤال، الكلمات المفتاحية، أو الإجابة النموذجية..." autocomplete="off">
+            <button type="button" class="daily-clear-search-btn" id="dailyClearSearchBtn" title="مسح البحث" style="display: none;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="daily-filters-row">
+            <!-- Filter by Subject -->
+            <div class="daily-filter-item">
+              <label for="dailySubjectFilter"><i class="fa-solid fa-book-open"></i> المادة الدراسية:</label>
+              <select id="dailySubjectFilter" class="form-control">
+                <option value="all">جميع المواد (الكل)</option>
+                <option value="arabic">اللغة العربية</option>
+                <option value="english">English (الإنكليزي)</option>
+                <option value="math">الرياضيات</option>
+              </select>
+            </div>
+
+            <!-- Filter by Question Type -->
+            <div class="daily-filter-item">
+              <label for="dailyTypeFilter"><i class="fa-solid fa-shapes"></i> نوع السؤال:</label>
+              <select id="dailyTypeFilter" class="form-control">
+                <option value="all">جميع أنواع الأسئلة</option>
+                <option value="mcq">اختيار من متعدد</option>
+                <option value="true_false">صح أو خطأ</option>
+                <option value="definitions">تعاريف ومصطلحات</option>
+                <option value="comparisons">مقارنات</option>
+                <option value="fill_blanks">أكمل الفراغات</option>
+                <option value="matching">صل بين العمودين</option>
+                <option value="essay">مقالي وشرح</option>
+                <option value="reasoning">علل واذكر السبب</option>
+                <option value="math_problem">مسائل ومعادلات</option>
+              </select>
+            </div>
+
+            <!-- Filter by Date / Timeline -->
+            <div class="daily-filter-item">
+              <label for="dailyDateFilter"><i class="fa-regular fa-clock"></i> النطاق الزمني:</label>
+              <select id="dailyDateFilter" class="form-control">
+                <option value="today">اليوم فقط</option>
+                <option value="last3days">آخر 3 أيام</option>
+                <option value="lastWeek">آخر 7 أيام (الأسبوع)</option>
+                <option value="lastMonth">آخر 30 يوماً</option>
+                <option value="all">كافة التواريخ السابقة</option>
+              </select>
+            </div>
+
+            <!-- Action buttons inside filter toolbar -->
+            <div class="daily-filter-actions">
+              <button type="button" class="btn btn-outline" id="dailyResetFiltersBtn" title="إعادة ضبط الفلاتر">
+                <i class="fa-solid fa-rotate-left"></i> <span>تفريغ الفلتر</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter stats and multi-action row -->
+        <div class="daily-results-header">
+          <div class="daily-results-count">
+            <i class="fa-solid fa-list-ol text-primary"></i>
+            <span>النتائج المعروضة: </span>
+            <strong id="dailyFilteredCount">0</strong>
+            <span> سؤال من أصل </span>
+            <strong id="dailyTotalBankCount">0</strong>
+          </div>
+          <div class="daily-results-actions">
+            <button type="button" class="btn btn-primary btn-sm" id="addAllFilteredToExamBtn" title="إدراج جميع الأسئلة المعروضة حالياً بالفلتر إلى ورقة الاختبار الحالية">
+              <i class="fa-solid fa-file-import"></i>
+              <span>إدراج المعروض في الاختبار الحالي</span>
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" id="printDailyReportBtn" onclick="printDailyReport()" title="طباعة تقرير شامل بالأسئلة المعروضة">
+              <i class="fa-solid fa-print text-warning"></i>
+              <span>طباعة التقرير اليومي</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Questions List Render Container -->
+        <div class="daily-questions-container" id="dailyQuestionsContainer">
+          <div class="daily-questions-list" id="dailyQuestionsListRender">
+            <!-- Questions dynamically rendered here -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer daily-report-modal-footer">
+        <div class="daily-footer-legend">
+          <span class="legend-item"><span class="legend-dot dot-arabic"></span> عربي</span>
+          <span class="legend-item"><span class="legend-dot dot-english"></span> English</span>
+          <span class="legend-item"><span class="legend-dot dot-math"></span> رياضيات</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeDailyReportModal()">إغلاق</button>
+          <button type="button" class="btn btn-primary" onclick="printDailyReport()">
+            <i class="fa-solid fa-print"></i> طباعة التقرير
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Account Selector Modal (معالج تسجيل الدخول والربط عبر Google - خطوتين) -->
+  <div class="modal-overlay google-auth-overlay" id="googleAuthModal">
+    <div class="modal-container google-auth-container" style="max-width: 530px;">
+      <div class="modal-header" style="border-bottom: none; padding-bottom: 0.35rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <svg viewBox="0 0 48 48" width="28" height="28">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">تسجيل الدخول وربط حساب Google</span>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeGoogleAccountModal()">✖</button>
+      </div>
+
+      <!-- Stepper Progress Header (مؤشر الخطوتين) -->
+      <div class="auth-stepper-header" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 1.25rem 0.85rem 1.25rem; border-bottom: 1px solid var(--border-color);">
+        <div class="stepper-step active" id="stepIndicator1" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #4285f4;">
+          <span class="step-num-badge" id="step1Badge" style="width: 24px; height: 24px; border-radius: 50%; background: #4285f4; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">1</span>
+          <span>الخطوة 1: حساب Google</span>
+        </div>
+        <div style="flex: 1; height: 2px; background: var(--border-color); max-width: 45px;"></div>
+        <div class="stepper-step" id="stepIndicator2" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">
+          <span class="step-num-badge" id="step2Badge" style="width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">2</span>
+          <span>الخطوة 2: معلومات المدرس</span>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding-top: 0.85rem;">
+        
+        <!-- STEP 1: Strict Google Account Selection (الخطوة الأولى: التحقق والربط عبر Google) -->
+        <!-- STEP 1: Strict Google Account Selection (تسجيل الدخول المباشر والآمن عبر Google) -->
+        <div id="googleAuthStep1">
+          <div id="googleStep1SelectionView">
+            <div style="text-align: center; margin-bottom: 1.15rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-color);">
+              <div style="width: 50px; height: 50px; border-radius: 50%; background: #ffffff; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.65rem auto;">
+                <svg viewBox="0 0 48 48" width="30" height="30">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+              </div>
+              <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.3rem;">
+                تسجيل الدخول المباشر عبر Google
+              </h3>
+              <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
+                أدخل عنوان بريد Google (Gmail) أو اسم المستخدم للمتابعة إلى المنصة الإلكترونية مباشرة.
+              </p>
+            </div>
+
+            <!-- Single Clean Secure Input Card (لا تظهر أي حسابات شخصية على الشاشة لحماية الخصوصية) -->
+            <div style="background: var(--bg-surface); border: 1.5px solid rgba(66, 133, 244, 0.3); border-radius: var(--radius-md); padding: 1rem 1.15rem; margin-bottom: 1rem;">
+              <label style="font-size: 0.82rem; color: var(--text-main); font-weight: 800; display: block; margin-bottom: 0.5rem;">
+                <i class="fa-brands fa-google text-danger"></i> بريد Google الشخصي (Gmail) أو اسم المستخدم:
+              </label>
+              <div style="position: relative; margin-bottom: 0.85rem;">
+                <input type="text" id="customGoogleEmailInput" class="form-control" placeholder="أدخل بريدك مثال: user@gmail.com أو اسم المستخدم..." dir="ltr" style="font-size: 0.95rem; font-weight: 600; padding: 0.65rem 0.85rem; padding-left: 2.2rem;" onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.submitGoogleLoginAction(); }">
+                <i class="fa-solid fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.9rem;"></i>
+              </div>
+              
+              <button type="button" class="btn btn-primary" onclick="window.submitGoogleLoginAction()" style="width: 100%; padding: 0.8rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, #1a73e8, #1557b0); border: none; box-shadow: 0 4px 14px rgba(26, 115, 232, 0.35);">
+                <i class="fa-brands fa-google"></i>
+                <span>تسجيل الدخول والمتابعة بالمنصة الإلكترونية</span>
+              </button>
+            </div>
+
+            <!-- Privacy Guarantee Message -->
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; font-size: 0.76rem; color: #10b981; line-height: 1.5; display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-shield-halved" style="font-size: 1.1rem; flex-shrink: 0;"></i>
+              <span><strong>حماية الخصوصية:</strong> لا تظهر أي حسابات أو إيميلات مسبقة على الشاشة عند فتح الهاتف من قبل أي شخص آخر. إذا كان الحساب مسجلاً مسبقاً، يتم تسجيل الدخول مباشرة دون الحاجة لإعادة الخطوتين.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Teacher Personal Info & Credentials (الخطوة الثانية: معلومات المدرس واليوزر وكلمة المرور والحقوق) -->
+        <div id="googleAuthStep2" style="display: none;">
+          <!-- Account Linked Ribbon -->
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <svg viewBox="0 0 48 48" width="22" height="22">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <div>
+                <strong style="font-size: 0.82rem; color: #10b981; display: block;">تم التحقق من حساب Google الشخصي ✔</strong>
+                <small id="step2LinkedEmail" style="font-size: 0.72rem; color: var(--text-muted);" dir="ltr">hussein.teacher@gmail.com</small>
+              </div>
+            </div>
+            <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;" onclick="window.backToGoogleStep1()">
+              تغيير الحساب
+            </button>
+          </div>
+
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            الخطوة الثانية: عيّن اسم المستخدم وكلمة المرور واكتب معلوماتك وحقوقك لتثبيتها في حسابك والترويسة:
+          </p>
+
+          <div style="display: flex; flex-direction: column; gap: 0.7rem;">
+            <!-- Teacher Full Name -->
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-user text-primary"></i> الاسم الكامل للأستاذ / المعلم (كتابة يدوية):
+              </label>
+              <input type="text" class="form-control" id="step2TeacherName" placeholder="مثال: أستاذ حسين علي الشمري" required>
+            </div>
+
+            <!-- Username & Password Row for Quick Credentials Login -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                  <i class="fa-solid fa-id-badge text-info"></i> اسم المستخدم (اليوزر):
+                </label>
+                <input type="text" class="form-control" id="step2TeacherUsername" placeholder="مثال: hussein_ali" dir="ltr" required>
+                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">للدخول السريع لاحقاً باليوزر</small>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                  <i class="fa-solid fa-key text-warning"></i> كلمة المرور (الباسورد):
+                </label>
+                <div style="position: relative;">
+                  <input type="password" class="form-control" id="step2TeacherPassword" placeholder="اكتب كلمة مرورك" required style="padding-right: 2rem;">
+                  <button type="button" onclick="togglePasswordVisibility('step2TeacherPassword', this)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="إظهار/إخفاء">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
+                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">لفتح الحساب من أي جهاز</small>
+              </div>
+            </div>
+
+            <!-- Subject (Full Manual Input - NOT select) -->
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-book-open text-warning"></i> المادة الدراسية التخصصية (كتابة يدوية):
+              </label>
+              <input type="text" class="form-control" id="step2TeacherSubject" placeholder="اكتب مادتك (مثال: الرياضيات / الكيمياء / فيزياء السادس العلمي / اللغة العربية)" required>
+            </div>
+
+            <!-- School & Governorate (Full Manual Input) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                  <i class="fa-solid fa-school text-info"></i> المدرسة أو المعهد (كتابة يدوية):
+                </label>
+                <input type="text" class="form-control" id="step2TeacherSchool" placeholder="مثال: ثانوية المتميزين للبنين" required>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                  <i class="fa-solid fa-location-dot text-danger"></i> المحافظة / المديرية (كتابة يدوية):
+                </label>
+                <input type="text" class="form-control" id="step2TeacherGov" placeholder="مثال: بغداد - الكرخ الثانية" required>
+              </div>
+            </div>
+
+            <!-- Custom Rights & Copyright (Full Manual Input) -->
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-copyright text-success"></i> حقوق الطبع والترويسة المخصصة (كتابة يدوية يمليها المدرس):
+              </label>
+              <input type="text" class="form-control" id="step2TeacherRights" placeholder="مثال: إعداد وتنظيم الأستاذ حسين علي - جميع الحقوق محفوظة">
+              <small style="font-size: 0.69rem; color: var(--text-muted); display: block; margin-top: 2px;">ستُطبع هذه الحقوق تلقائياً في ترويسة وأسفل كل نموذج اختبار تنشئه.</small>
+            </div>
+
+            <!-- Contact Phone / Telegram -->
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <i class="fa-solid fa-phone text-primary"></i> رقم الهاتف أو وسيلة التواصل (اختياري):
+              </label>
+              <input type="text" class="form-control" id="step2TeacherContact" placeholder="مثال: 0770xxxxxxx أو معرف التليغرام" dir="ltr">
+            </div>
+
+            <!-- Navigation Buttons for Step 2 -->
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
+              <button type="button" class="btn btn-outline" style="flex: 1;" onclick="window.backToGoogleStep1()">
+                <i class="fa-solid fa-arrow-right"></i> رجوع
+              </button>
+              <button type="button" class="btn btn-primary" style="flex: 2; font-weight: 800;" onclick="window.completeGoogleLoginWithProfile()">
+                <i class="fa-solid fa-circle-check"></i> تأكيد البيانات وحفظ حسابي 🚀
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Cloud Sync & Multi-Device Transfer Modal (مركز المزامنة ونقل الأسئلة السحابي) -->
+  <div class="modal-overlay cloud-sync-overlay" id="cloudSyncModal">
+    <div class="modal-container cloud-sync-container" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-cloud-arrow-up text-info" style="font-size: 1.25rem;"></i>
+          <span>مركز المزامنة السحابية ونقل الأسئلة</span>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeCloudTransferModal()">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Status Box -->
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+          <div>
+            <div style="font-weight: 800; color: #10b981; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-circle-check"></i> متصل بحساب: <span id="cloudAccountEmailDisplay">hussein.teacher@gmail.com</span>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+              الأسئلة المحفوظة سحابياً: (<span id="cloudQuestionsCount">0</span> سؤال) | الاختبارات: (<span id="cloudExamsCount">0</span> اختبار)
+            </div>
+          </div>
+          <button type="button" class="btn btn-success" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;" onclick="window.syncCurrentDataToCloud()">
+            <i class="fa-solid fa-rotate"></i> مزامنة وحفظ الآن
+          </button>
+        </div>
+
+        <p style="font-size: 0.84rem; color: var(--text-main); margin-bottom: 0.85rem; line-height: 1.5;">
+          يمكنك نقل كافة أسئلتك واختباراتك بسهولة إلى أي جهاز آخر (هاتف، لابتوب، أو حاسوب المدرسة) بإحدى الطرق التالية:
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <!-- Option 1: 1-Click Server Sync (When connecting to the same server/Wi-Fi) -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
+            <div style="font-weight: 800; font-size: 0.86rem; color: #38bdf8; margin-bottom: 4px;">
+              <i class="fa-solid fa-wifi"></i> 1. المزامنة التلقائية عبر السيرفر
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
+              إذا كنت تفتح المنصة من هاتفك أو كمبيوترك، اضغط زر الاسترجاع السحابي لسحب كل الأسئلة فوراً:
+            </p>
+            <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.restoreDataFromCloudServer()">
+              <i class="fa-solid fa-cloud-arrow-down text-primary"></i> استرجاع أسئلتي من السحابة الآن ☁️
+            </button>
+          </div>
+
+          <!-- Option 2: Copy Cloud Token (رمز المزامنة السحابي) -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
+            <div style="font-weight: 800; font-size: 0.86rem; color: #fbbf24; margin-bottom: 4px;">
+              <i class="fa-solid fa-key"></i> 2. رمز المزامنة السحابي (نسخ ولصق فوري)
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
+              انسخ رمز بياناتك السحابية والصقه في أي متصفح في أي مكان لاسترجاع كل أسئلتك في ثانية:
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.copyCloudSyncToken()">
+                <i class="fa-solid fa-copy"></i> نسخ رمز المزامنة للحافظة
+              </button>
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.pasteAndImportCloudToken()">
+                <i class="fa-solid fa-paste"></i> استيراد من رمز منسوخ
+              </button>
+            </div>
+          </div>
+
+          <!-- Option 3: Download Complete Offline Backup File (.json) -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
+            <div style="font-weight: 800; font-size: 0.86rem; color: #10b981; margin-bottom: 4px;">
+              <i class="fa-solid fa-floppy-disk"></i> 3. ملف النسخة الاحتياطية الشامل (Google Drive / Flash)
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
+              تنزيل ملف يحتوي على كل أسئلتك واختباراتك لتخزينه في Google Drive أو فلاش ميموري:
+            </p>
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.downloadFullCloudBackupFile()">
+                <i class="fa-solid fa-download"></i> تنزيل ملف السحابة (.json)
+              </button>
+              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="document.getElementById('cloudBackupFileInput').click()">
+                <i class="fa-solid fa-upload"></i> استيراد ملف سحابي
+              </button>
+              <input type="file" id="cloudBackupFileInput" accept=".json" style="display: none;" onchange="window.handleUploadCloudBackup(event)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="window.closeCloudTransferModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIP Annual Subscription Modal (باقة الاشتراك السنوي الذهبية 50,000 د.ع) -->
+  <div class="modal-overlay vip-subscription-overlay" id="subscriptionModal">
+    <div class="modal-container vip-subscription-container" style="max-width: 680px;">
+      <div class="modal-header vip-header-gradient" style="border-bottom: none; padding-bottom: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div class="vip-crown-badge">
+            <i class="fa-solid fa-crown text-warning"></i>
+          </div>
+          <div>
+            <span style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">باقة المعلم الذهبية السنوية PRO</span>
+            <small style="display: block; font-size: 0.75rem; color: #f59e0b; font-weight: 700;">الترقية الشاملة للعام الدراسي الكامل 2026</small>
+          </div>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeSubscriptionModal()">✖</button>
+      </div>
+
+      <div class="modal-body" style="padding-top: 0.5rem;">
+        
+        <!-- Pricing Hero Card -->
+        <div class="vip-pricing-hero">
+          <div class="vip-hero-left">
+            <span class="vip-savings-badge">خصم 60% — الباقة الأكثر طلباً وتوفيراً للمعلمين 🇮🇶</span>
+            <div class="vip-price-display">
+              <span class="vip-amount">50,000</span>
+              <span class="vip-currency">ألف دينار عراقي</span>
+              <span class="vip-period">/ سنوياً (عام دراسي كامل)</span>
+            </div>
+            <p class="vip-sub-price">فقط ما يُعادل <strong>~4,100 د.ع</strong> شهرياً مع كافة التحديثات السحابية المجانية</p>
+          </div>
+          <div class="vip-hero-right">
+            <div class="vip-seal-ring">
+              <i class="fa-solid fa-award"></i>
+              <span>ترخيص معتمد</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 Core Features Grid -->
+        <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin: 1rem 0 0.65rem 0; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
+          <span>جميع المميزات الحصرية التي تتيحها الباقة الإلكترونية السنوية:</span>
+        </h4>
+
+        <div class="vip-features-grid">
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #38bdf8;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <div class="vip-feat-text">
+              <strong>1. بنوك أسئلة سحابية غير محدودة</strong>
+              <small>حفظ وأرشفة آلاف الأسئلة في سحابتك الخاصة دون أي قيود على المساحة.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #10b981;"><i class="fa-solid fa-laptop-mobile"></i></div>
+            <div class="vip-feat-text">
+              <strong>2. مزامنة فورية على جميع الأجهزة</strong>
+              <small>افتح حسابك من الهاتف أو اللابتوب أو حاسوب المدرسة بحساب Google المعتمد.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #ef4444;"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="vip-feat-text">
+              <strong>3. طباعة وتصدير PDF عالي الدقة</strong>
+              <small>طباعة فورية وتصدير PDF منسق ومعتمد جاهز للتوزيع على الطلاب واللجان الامتحانية.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #f59e0b;"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="vip-feat-text">
+              <strong>4. مطابقة تامة لضوابط وزارة التربية</strong>
+              <small>قوالب وزارية رسمية لجميع المديريات والمحافظات مع أختام الوزارة المعتمدة.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #a855f7;"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="vip-feat-text">
+              <strong>5. نظام التقرير اليومي الشامل</strong>
+              <small>فلاتر ذكية وإحصائيات دقيقة وطباعة تقارير بنك الأسئلة وتصديرها بنقرة زر.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #ec4899;"><i class="fa-solid fa-square-check"></i></div>
+            <div class="vip-feat-text">
+              <strong>6. الأجوبة النموذجية وسلالم التصحيح</strong>
+              <small>توليد أوراق الأجوبة النموذجية وسلالم توزيع الدرجات المعتمدة للجان الفحص.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #14b8a6;"><i class="fa-solid fa-signature"></i></div>
+            <div class="vip-feat-text">
+              <strong>7. حقوق طبع وترويسة خاصة للأستاذ</strong>
+              <small>كتابة وحفظ حقوقك ومدرستك وتجريد نماذج الأسئلة من أي علامات خارجية.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #ef4444;"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="vip-feat-text">
+              <strong>8. درع خصوصية المعلم والأمان السحابي</strong>
+              <small>تشفير 256-bit وقفل تلقائي لحسابك فور إغلاق المتصفح لضمان سرية الامتحانات.</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #8b5cf6;"><i class="fa-solid fa-book-bookmark"></i></div>
+            <div class="vip-feat-text">
+              <strong>9. مكتبة نماذج وزارية جاهزة (5 مواد كبرى)</strong>
+              <small>نماذج أسئلة متكاملة مع الأجوبة (عربي، إنكليزي، رياضيات، فيزياء، إسلامية).</small>
+            </div>
+          </div>
+
+          <div class="vip-feature-card">
+            <div class="vip-feat-icon" style="color: #f97316;"><i class="fa-solid fa-headset"></i></div>
+            <div class="vip-feat-text">
+              <strong>10. أولوية الدعم الفني وتحديثات المناهج</strong>
+              <small>تحديثات مستمرة لكل المناهج والقرارات الوزارية طوال العام مع دعم مباشر.</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Iraqi Payment Methods Box -->
+        <div class="vip-payment-methods-box">
+          <div style="font-weight: 800; font-size: 0.82rem; color: var(--text-main); margin-bottom: 0.45rem; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-wallet text-success"></i> طرق الدفع المحلية المعتمدة في العراق:
+          </div>
+          <div class="vip-pay-chips">
+            <span class="pay-chip"><i class="fa-solid fa-mobile-screen-button text-danger"></i> زين كاش (Zain Cash)</span>
+            <span class="pay-chip"><i class="fa-solid fa-credit-card text-primary"></i> كي كارد / ماستركارد</span>
+            <span class="pay-chip"><i class="fa-solid fa-money-bill-transfer text-warning"></i> آسيا حوالة (AsiaHawala)</span>
+            <span class="pay-chip"><i class="fa-solid fa-bolt text-info"></i> فاست بي (FastPay)</span>
+          </div>
+        </div>
+
+        <!-- Call to Action Buttons -->
+        <div style="display: flex; gap: 0.65rem; margin-top: 1rem; flex-wrap: wrap;">
+          <a href="https://wa.me/9647700000000?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83%20%D8%A7%D9%84%D8%B3%D9%86%D9%88%D9%8A%20%D8%A7%D9%84%D8%B0%D9%87%D8%A8%D9%8A%D8%A9%20(50%20%D8%A3%D9%84%D9%81%20%D8%AF%D9%8A%D9%86%D8%A7%D8%B1)%20%D9%84%D9%85%D9%86%D8%B5%D8%A9%20%D9%85%D8%B9%D9%84%D9%85%20%D8%A8%D8%B1%D9%88" target="_blank" class="btn btn-primary btn-vip-cta" style="flex: 2; min-width: 200px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem; color: #25d366;"></i>
+            <span>طلب التفعيل الفوري وسداد الرسوم (50,000 د.ع) 🚀</span>
+          </a>
+          <button type="button" class="btn btn-outline" style="flex: 1; min-width: 140px; font-weight: 700;" onclick="window.toggleVipSubscriptionDemo()">
+            <i class="fa-solid fa-credit-card text-warning"></i>
+            <span id="vipToggleBtnText">إشعار تسديد الرسوم 💳</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Management Modal (إدارة الاشتراكات وتفعيل الصلاحيات لمدة سنة واحدة فقط وعرض عدد المشتركين) -->
+  <div class="modal-overlay" id="subscriptionManagementModal">
+    <div class="modal-container" style="max-width: 720px; width: 95%;">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(16, 185, 129, 0.12)); border-bottom: 1.5px solid rgba(245, 158, 11, 0.35); padding: 0.95rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);">
+            <i class="fa-solid fa-crown"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              إدارة الاشتراكات
+              <span class="badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; font-size: 0.72rem; padding: 2px 8px; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800;">خاص بالمدير العام 👑</span>
+            </h3>
+            <small style="color: var(--text-muted); font-size: 0.78rem;">تفعيل حسابات المعلمين لمدة سنة كاملة (365 يوماً) وإدارة المشتركين</small>
+          </div>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeSubscriptionManagementModal()">✖</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem; max-height: calc(85vh - 120px); overflow-y: auto;">
+
+        <!-- 1. عداد وإحصائية عدد المشتركين -->
+        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 41, 59, 0.6)); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fbbf24;">
+              <i class="fa-solid fa-users"></i>
+            </div>
+            <div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">عدد المشتركين المفعلين حالياً:</div>
+              <div style="font-size: 1.7rem; font-weight: 900; color: #fbbf24; line-height: 1.2;">
+                <span id="subscribersManagementCount">0</span> <small style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">مشترك مفعل 👑</small>
+              </div>
+            </div>
+          </div>
+          <div style="text-align: left; font-size: 0.76rem; color: var(--text-muted); background: var(--bg-surface); padding: 0.5rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="color: #10b981; font-weight: 800; display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-calendar-check"></i> مدة التفعيل: سنة واحدة فقط (365 يوماً)
+            </div>
+            <div style="margin-top: 2px;">يتم احتساب الصلاحية تلقائياً من تاريخ الموافقة</div>
+          </div>
+        </div>
+
+        <!-- 2. حقل التفعيل وزر الموافقة على منح التفعيل لشخص -->
+        <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.25rem;">
+          <label for="subActivationQueryInput" style="display: block; font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.4rem;">
+            <i class="fa-solid fa-user-check text-warning"></i> حقل التفعيل عن طريق الإيميل أو اسم المستخدم:
+          </label>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">
+            أدخل البريد الإلكتروني أو اسم المستخدم (اليوزر) الخاص بالشخص المسدد للاشتراك، ثم اضغط على زر الموافقة أدناه لتفعيل حسابه لمدة سنة واحدة:
+          </p>
+
+          <div style="margin-bottom: 0.85rem;">
+            <input type="text" id="subActivationQueryInput" class="admin-activate-input" style="width: 100%; padding: 0.7rem 0.95rem; font-size: 0.92rem; border-radius: var(--radius-sm);" placeholder="أدخل البريد الإلكتروني أو اسم المستخدم (مثال: teacher1 أو user@gmail.com)..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.manageApproveGrantSubscription(); }">
+          </div>
+
+          <!-- زر الموافقة على منح التفعيل ل شخص -->
+          <button type="button" id="manageApproveGrantSubscriptionBtn" class="btn btn-success" style="width: 100%; padding: 0.78rem 1rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-sm); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; cursor: pointer;" onclick="window.manageApproveGrantSubscription()">
+            <i class="fa-solid fa-circle-check" style="font-size: 1.15rem;"></i>
+            <span>الموافقة على منح التفعيل للشخص (لمدة سنة واحدة)</span>
+          </button>
+        </div>
+
+        <!-- 3. جدول وقائمة المشتركين المفعلين -->
+        <div>
+          <h4 style="margin: 0 0 0.65rem 0; font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-list-check text-primary"></i>
+            <span>سجل المشتركين وتفاصيل الصلاحية السنوية:</span>
+          </h4>
+
+          <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow-x: auto; background: var(--bg-surface);">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: right;">
+              <thead>
+                <tr style="background: rgba(30, 41, 59, 0.4); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                  <th style="padding: 0.65rem 0.85rem;">المعلم المشترك</th>
+                  <th style="padding: 0.65rem 0.85rem;">اليوزر / البريد</th>
+                  <th style="padding: 0.65rem 0.85rem;">تاريخ التفعيل</th>
+                  <th style="padding: 0.65rem 0.85rem;">انتهاء الصلاحية (سنة واحدة)</th>
+                  <th style="padding: 0.65rem 0.85rem; text-align: center;">إدارة التفعيل</th>
+                </tr>
+              </thead>
+              <tbody id="subscribersListTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.74rem; color: var(--text-muted);">نظام الاشتراكات السنوية — منصة مسار المعلم</span>
+        <button type="button" class="btn btn-outline" onclick="window.closeSubscriptionManagementModal()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Super Admin Control Panel Modal (لوحة تحكم المدير العام - كافة الصلاحيات وإدارة الحسابات) -->
+  <div class="modal-overlay" id="adminControlPanelModal">
+    <div class="modal-container" style="max-width: 840px; width: 95%;">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(14, 165, 233, 0.1)); border-bottom: 1.5px solid rgba(245, 158, 11, 0.3); padding: 0.85rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+              لوحة تحكم المدير العام (Super Admin)
+              <span class="badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-size: 0.72rem; padding: 2px 8px; border: 1px solid rgba(245, 158, 11, 0.4);">صلاحيات كاملة 👑</span>
+            </h3>
+            <small style="color: var(--text-muted); font-size: 0.75rem;">إدارة المعلمين والحسابات، مراقبة المنصة، وفصل خصوصية البيانات</small>
+          </div>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeAdminControlPanel()">✖</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem; max-height: calc(85vh - 120px); overflow-y: auto;">
+        
+        <!-- Admin KPI Stats Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem;">
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center;">
+            <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
+              <i class="fa-solid fa-users text-primary"></i> الحسابات المسجلة
+            </div>
+            <div id="adminStatAccountsCount" style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);">0</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center;">
+            <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
+              <i class="fa-solid fa-database text-warning"></i> إجمالي بنك الأسئلة
+            </div>
+            <div id="adminStatQuestionsCount" style="font-size: 1.4rem; font-weight: 800; color: #f59e0b;">0</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center;">
+            <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
+              <i class="fa-solid fa-box-archive text-success"></i> الاختبارات المحفوظة
+            </div>
+            <div id="adminStatExamsCount" style="font-size: 1.4rem; font-weight: 800; color: #10b981;">0</div>
+          </div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center;">
+            <div style="font-size: 0.76rem; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">
+              <i class="fa-solid fa-shield-halved text-info"></i> عزل البيانات والخصوصية
+            </div>
+            <div style="font-size: 0.95rem; font-weight: 800; color: #38bdf8; margin-top: 4px;">100% معزول ومحمي ✔</div>
+          </div>
+        </div>
+
+        <!-- Section: Quick VIP Activation Card (Exclusive for Admin) -->
+        <div class="admin-activate-card">
+          <div class="admin-activate-card-title">
+            <i class="fa-solid fa-crown text-warning"></i>
+            <span>تفعيل اشتراك سنوي ومنح كافة الصلاحيات (VIP) فورياً</span>
+            <span style="font-size: 0.72rem; padding: 2px 8px; border-radius: 999px; background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800;">خاص بالآدمن فقط ⚡</span>
+          </div>
+          <p style="margin: 0 0 0.75rem 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            إذا سدد شخص سعر الاشتراك (50,000 د.ع)، أدخل اسم المستخدم أو البريد الإلكتروني هنا واضغط "موافق وتفعيل" لفتح جميع الميزات والصلاحيات لحسابه فوراً:
+          </p>
+          <div class="admin-activate-form">
+            <input type="text" id="adminQuickActivateInput" class="admin-activate-input" placeholder="أدخل اسم المستخدم أو البريد الإلكتروني للحساب (مثال: teacher1 أو user@gmail.com)..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.adminSubmitQuickActivate(); }">
+            <button type="button" id="adminSubmitQuickActivateBtn" class="btn-admin-activate-submit" onclick="window.adminSubmitQuickActivate()">
+              <i class="fa-solid fa-check-circle"></i>
+              <span>موافق وتفعيل الاشتراك السنوي</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Section: Accounts Management Table -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <h4 style="margin: 0; font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-users-gear text-primary"></i>
+            <span>إدارة حسابات المعلمين والاشتراكات:</span>
+          </h4>
+          <button type="button" class="btn-admin-tool" onclick="window.adminPromptAddTeacher()" style="font-size: 0.76rem; padding: 0.35rem 0.75rem;">
+            <i class="fa-solid fa-user-plus text-success"></i> إضافة حساب معلم جديد
+          </button>
+        </div>
+
+        <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow-x: auto; background: var(--bg-surface); margin-bottom: 1.25rem;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: right;">
+            <thead>
+              <tr style="background: rgba(30, 41, 59, 0.4); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                <th style="padding: 0.65rem 0.85rem;">المعلم / المستخدم</th>
+                <th style="padding: 0.65rem 0.85rem;">اليوزر / البريد</th>
+                <th style="padding: 0.65rem 0.85rem;">المادة والمدرسة</th>
+                <th style="padding: 0.65rem 0.85rem;">حالة الاشتراك والصلاحية</th>
+                <th style="padding: 0.65rem 0.85rem; text-align: center;">التحكم وتفعيل الصلاحيات</th>
+              </tr>
+            </thead>
+            <tbody id="adminAccountsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Section: System Maintenance Tools -->
+        <h4 style="margin: 0 0 0.65rem 0; font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-wrench text-warning"></i>
+          <span>أدوات النظام المتقدمة الخاصة بالآدمن:</span>
+        </h4>
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+          <button type="button" class="btn-admin-tool" onclick="window.adminExportAllSystemData()">
+            <i class="fa-solid fa-file-export text-primary"></i> تصدير نسخة احتياطية لكافة الحسابات
+          </button>
+          <button type="button" class="btn-admin-tool" onclick="window.adminPurgeGuestCache()">
+            <i class="fa-solid fa-broom text-warning"></i> تنظيف ذاكرة التخزين المؤقتة
+          </button>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="font-size: 0.74rem; color: var(--text-muted);">منصة مُعَلِّم برو — لوحة الإدارة المشفرة</span>
+        <button type="button" class="btn btn-outline" onclick="window.closeAdminControlPanel()">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- KaTeX Math Engine for Iraqi Ministerial Equations -->
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+  <!-- Script Modules -->
+  <script src="js/question-types.js?v=5.5"></script>
+  <script src="js/smart-generator.js?v=5.5"></script>
+  <script src="js/exporter.js?v=5.5"></script>
+  <script src="js/app.js?v=5.5"></script>
+</body>
+</html>
