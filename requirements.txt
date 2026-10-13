@@ -1,2 +1,5 @@
-# Moallem Pro Web Application & Server Watchdog
-# Built with Python standard library (no external pip dependencies needed)
+Flask>=3.0.0
+gunicorn>=21.2.0
+werkzeug>=3.0.0
+requests>=2.31.0
+urllib3>=2.0.0
