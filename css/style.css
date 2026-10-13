@@ -2387,8 +2387,8 @@ textarea.form-control {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   width: 100%;
-  max-width: 760px;
-  max-height: 90vh;
+  max-width: 860px;
+  max-height: 92vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
@@ -8415,4 +8415,412 @@ body.printing-academic-report #academicReportPrintContainer {
   vertical-align: sub;
   line-height: 0;
   font-weight: 700;
+}
+
+/* ==========================================================================
+   ستوديو الكيمياء والجدول الدوري والمعادلات الوزارية العراقية (CSS Styling)
+   Emerald / Teal Modern Laboratory Theme
+   ========================================================================== */
+
+/* Toggle pill button in question modal */
+.btn-chem-studio-toggle-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--text-main);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-chem-studio-toggle-pill:hover,
+.btn-chem-studio-toggle-pill.active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(20, 184, 166, 0.25));
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+}
+
+.badge-chem-pro {
+  background: linear-gradient(135deg, #10b981, #0d9488);
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 10px;
+  letter-spacing: 0.3px;
+}
+
+/* Chemistry Studio Container */
+.chem-studio-container {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1.5px solid rgba(16, 185, 129, 0.38);
+  border-radius: var(--radius-md);
+  margin-bottom: 0.85rem;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: chemStudioFadeIn 0.25s ease-out;
+}
+
+@keyframes chemStudioFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chem-studio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  background: rgba(6, 78, 59, 0.4);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chem-studio-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #6ee7b7;
+}
+
+.badge-chem-iq {
+  background: #059669;
+  color: #ffffff;
+  font-size: 0.64rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* Chemistry Studio Tabs */
+.chem-studio-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  background: rgba(6, 78, 59, 0.2);
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.chem-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.chem-tab-btn:hover {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--text-main);
+}
+
+.chem-tab-btn.active {
+  background: rgba(16, 185, 129, 0.22);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.chem-tab-btn.btn-chem-highlight {
+  background: rgba(20, 184, 166, 0.18);
+  border-color: rgba(20, 184, 166, 0.35);
+  color: #2dd4bf;
+}
+
+.chem-tab-btn.btn-chem-highlight.active {
+  background: rgba(20, 184, 166, 0.32);
+  border-color: #14b8a6;
+  color: #5eead4;
+}
+
+/* Tab Panes */
+.chem-tab-pane {
+  display: none;
+  padding: 8px 10px;
+}
+
+.chem-tab-pane.active {
+  display: block;
+}
+
+/* Periodic Table Filter & Search Toolbar */
+.chem-elements-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chem-search-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  padding: 3px 8px;
+  flex: 1;
+  min-width: 170px;
+}
+
+.chem-search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-size: 0.78rem;
+  width: 100%;
+}
+
+.chem-filter-pills-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.chem-filter-pill {
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chem-filter-pill:hover,
+.chem-filter-pill.active {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: #10b981;
+  color: #6ee7b7;
+}
+
+/* Elements Grid */
+.chem-elements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 6px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Element Card */
+.chem-element-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 4px;
+  min-height: 78px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.chem-element-card:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  border-color: #10b981;
+  background: rgba(6, 78, 59, 0.35);
+  z-index: 2;
+}
+
+.chem-element-card .el-z {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.chem-element-card .el-mass {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.chem-element-card .el-symbol {
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #f1f5f9;
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+  margin-top: 10px;
+  line-height: 1;
+}
+
+.chem-element-card .el-name {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+  margin-top: 2px;
+}
+
+.chem-element-card .el-ox {
+  font-size: 0.58rem;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 3px;
+  border-radius: 3px;
+  margin-top: 2px;
+}
+
+/* Category Colors for Element Cards */
+.chem-element-card.cat-alkali { border-color: rgba(239, 68, 68, 0.5); }
+.chem-element-card.cat-alkaline { border-color: rgba(249, 115, 22, 0.5); }
+.chem-element-card.cat-transition { border-color: rgba(59, 130, 246, 0.5); }
+.chem-element-card.cat-nonmetal { border-color: rgba(16, 185, 129, 0.5); }
+.chem-element-card.cat-halogen { border-color: rgba(168, 85, 247, 0.5); }
+.chem-element-card.cat-noble { border-color: rgba(236, 72, 153, 0.5); }
+.chem-element-card.cat-metalloid { border-color: rgba(234, 179, 8, 0.5); }
+.chem-element-card.cat-post-transition { border-color: rgba(14, 165, 233, 0.5); }
+
+/* Compounds & Formulas Grid */
+.chem-compounds-section {
+  margin-bottom: 8px;
+}
+
+.chem-compounds-title {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #34d399;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chem-compounds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+  gap: 5px;
+}
+
+.chem-compound-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: right;
+}
+
+.chem-compound-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+  transform: translateY(-1px);
+}
+
+.chem-compound-formula {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  font-family: 'Cambria Math', 'Times New Roman', serif;
+  direction: ltr;
+}
+
+.chem-compound-name {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* Reactions & Thermodynamics Grid */
+.chem-reactions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chem-equation-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  gap: 10px;
+}
+
+.chem-equation-pill-btn:hover {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: #10b981;
+}
+
+.chem-equation-formula {
+  direction: ltr;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.chem-equation-desc {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Visual Builder Cards */
+.chem-builder-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 8px;
+}
+
+.chem-builder-card {
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.chem-builder-card-title {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #6ee7b7;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }

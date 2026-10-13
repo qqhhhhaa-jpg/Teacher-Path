@@ -3093,7 +3093,7 @@ function renderMathFallback(latex, isDisplay = false) {
   s = s.replace(/_{([^{}]+)}/g, '<sub class="iq-math-sub">$1</sub>');
   s = s.replace(/_([0-9a-zA-Z\+\-]+)/g, '<sub class="iq-math-sub">$1</sub>');
 
-  // 6. Common LaTeX ministerial math symbols
+  // 6. Common LaTeX ministerial math & chemistry symbols
   const symMap = {
     '\\pm': '±', '\\mp': '∓', '\\times': '×', '\\div': '÷',
     '\\neq': '≠', '\\le': '≤', '\\ge': '≥', '\\approx': '≈',
@@ -3101,6 +3101,8 @@ function renderMathFallback(latex, isDisplay = false) {
     '\\beta': 'β', '\\Delta': 'Δ', '\\in': '∈', '\\notin': '∉',
     '\\subset': '⊂', '\\cup': '∪', '\\cap': '∩', '\\to': '→',
     '\\leftarrow': '←', '\\rightarrow': '→', '\\leftrightarrow': '↔',
+    '\\rightleftharpoons': '⇌', '\\xrightleftharpoons': '⇌',
+    '\\uparrow': '↑', '\\downarrow': '↓', '\\xrightarrow': '→',
     '\\int': '∫', '\\sum': '∑', '\\partial': '∂', '\\nabla': '∇',
     '\\angle': '∠', '\\perp': '⊥', '\\parallel': '∥', '\\degree': '°',
     '\\cdot': '·', '\\emptyset': '∅', '\\quad': ' &nbsp; ', '\\qquad': ' &nbsp;&nbsp; '
@@ -3116,12 +3118,12 @@ function renderMathFallback(latex, isDisplay = false) {
 }
 
 /**
- * Universal text formatter for Iraqi mathematical questions
+ * Universal text formatter for Iraqi mathematical & chemistry questions
  */
 function formatMathText(rawText) {
   if (!rawText || typeof rawText !== 'string') return rawText || '';
 
-  // Quick check: if string has no math indicators, return as-is
+  // Quick check: if string has no math/chem indicators, return as-is
   if (!rawText.includes('$') && !rawText.includes('\\') && !rawText.includes('^') && !rawText.includes('_')) {
     return rawText;
   }
@@ -3134,8 +3136,8 @@ function formatMathText(rawText) {
   // 2. Process inline math $...$
   result = result.replace(/\$([^\$\n]+?)\$/g, (m, formula) => renderLatexBlock(formula, false));
 
-  // 3. Process direct common LaTeX commands written without dollar signs
-  if (/\\(frac|sqrt|lim|int|sum|sin|cos|tan|log|ln|bmatrix|vmatrix|pm|times|div|neq|le|ge)|(\b[a-zA-Z0-9\)]+[\^_][0-9a-zA-Z{}]+)/.test(result)) {
+  // 3. Process direct common LaTeX / Chemistry commands written without dollar signs
+  if (/\\(frac|sqrt|lim|int|sum|sin|cos|tan|log|ln|bmatrix|vmatrix|pm|times|div|neq|le|ge|rightleftharpoons|rightarrow|uparrow|downarrow|Delta)|(\b[a-zA-Z0-9\)]+[\^_][0-9a-zA-Z{}]+)/.test(result)) {
     result = result.replace(/\\frac\{[^{}]+\}\{[^{}]+\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\\sqrt(\[[^{}]+\])?\{[^{}]+\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\b([a-zA-Z0-9\)]+)\^\{([^{}]+)\}/g, (m) => renderLatexBlock(m, false));
@@ -3231,11 +3233,22 @@ window.updateModalMathPreview = function() {
 
 window.handleModalSubjectChange = function(newSub) {
   const mathStudio = document.getElementById('modalMathStudioContainer');
-  const toggleBtn = document.getElementById('btnToggleMathStudio');
+  const toggleMathBtn = document.getElementById('btnToggleMathStudio');
+  const chemStudio = document.getElementById('modalChemStudioContainer');
+  const toggleChemBtn = document.getElementById('btnToggleChemStudio');
+
   if (newSub === 'math') {
     if (mathStudio) mathStudio.style.display = 'block';
-    if (toggleBtn) toggleBtn.classList.add('active');
+    if (toggleMathBtn) toggleMathBtn.classList.add('active');
+    if (chemStudio) chemStudio.style.display = 'none';
+    if (toggleChemBtn) toggleChemBtn.classList.remove('active');
     showToast('تم تفعيل ستوديو الرياضيات والمعادلات الوزارية 📐', 'info');
+  } else if (newSub === 'chemistry') {
+    if (chemStudio) chemStudio.style.display = 'block';
+    if (toggleChemBtn) toggleChemBtn.classList.add('active');
+    if (mathStudio) mathStudio.style.display = 'none';
+    if (toggleMathBtn) toggleMathBtn.classList.remove('active');
+    showToast('تم تفعيل ستوديو الكيمياء والجدول الدوري والمعادلات ⚗️🧪', 'info');
   }
 };
 
@@ -3607,6 +3620,674 @@ function buildMathStudioHTML(isOpen = false) {
   `;
 }
 
+/* ==========================================================================
+   ستوديو الكيمياء والجدول الدوري والمعادلات الوزارية العراقية
+   (Chemistry Studio: Periodic Table, Formulas, Reactions, Electron Config)
+   ========================================================================== */
+
+const CHEM_ELEMENTS_DB = [
+  { z: 1, s: 'H', n: 'هيدروجين', m: '1.008', g: 'nonmetal', gName: 'لافلز', ox: '+1, -1', p: 1, gr: 1, c: '1s^1' },
+  { z: 2, s: 'He', n: 'هيليوم', m: '4.003', g: 'noble', gName: 'غاز نبيل', ox: '0', p: 1, gr: 8, c: '1s^2' },
+  { z: 3, s: 'Li', n: 'ليثيوم', m: '6.94', g: 'alkali', gName: 'فلز قلوي', ox: '+1', p: 2, gr: 1, c: '[He] 2s^1' },
+  { z: 4, s: 'Be', n: 'بريليوم', m: '9.012', g: 'alkaline', gName: 'قلوي ترابي', ox: '+2', p: 2, gr: 2, c: '[He] 2s^2' },
+  { z: 5, s: 'B', n: 'بورون', m: '10.81', g: 'metalloid', gName: 'شبه فلز', ox: '+3', p: 2, gr: 3, c: '[He] 2s^2 2p^1' },
+  { z: 6, s: 'C', n: 'كربون', m: '12.01', g: 'nonmetal', gName: 'لافلز', ox: '+4, -4, +2', p: 2, gr: 4, c: '[He] 2s^2 2p^2' },
+  { z: 7, s: 'N', n: 'نيتروجين', m: '14.01', g: 'nonmetal', gName: 'لافلز', ox: '-3, +3, +5', p: 2, gr: 5, c: '[He] 2s^2 2p^3' },
+  { z: 8, s: 'O', n: 'أوكسجين', m: '16.00', g: 'nonmetal', gName: 'لافلز', ox: '-2, -1', p: 2, gr: 6, c: '[He] 2s^2 2p^4' },
+  { z: 9, s: 'F', n: 'فلور', m: '19.00', g: 'halogen', gName: 'هالوجين', ox: '-1', p: 2, gr: 7, c: '[He] 2s^2 2p^5' },
+  { z: 10, s: 'Ne', n: 'نيون', m: '20.18', g: 'noble', gName: 'غاز نبيل', ox: '0', p: 2, gr: 8, c: '[He] 2s^2 2p^6' },
+  { z: 11, s: 'Na', n: 'صوديوم', m: '22.99', g: 'alkali', gName: 'فلز قلوي', ox: '+1', p: 3, gr: 1, c: '[Ne] 3s^1' },
+  { z: 12, s: 'Mg', n: 'مغنيسيوم', m: '24.31', g: 'alkaline', gName: 'قلوي ترابي', ox: '+2', p: 3, gr: 2, c: '[Ne] 3s^2' },
+  { z: 13, s: 'Al', n: 'ألمنيوم', m: '26.98', g: 'post-transition', gName: 'فلز ضعيف', ox: '+3', p: 3, gr: 3, c: '[Ne] 3s^2 3p^1' },
+  { z: 14, s: 'Si', n: 'سيليكون', m: '28.09', g: 'metalloid', gName: 'شبه فلز', ox: '+4, -4', p: 3, gr: 4, c: '[Ne] 3s^2 3p^2' },
+  { z: 15, s: 'P', n: 'فسفور', m: '30.97', g: 'nonmetal', gName: 'لافلز', ox: '-3, +3, +5', p: 3, gr: 5, c: '[Ne] 3s^2 3p^3' },
+  { z: 16, s: 'S', n: 'كبريت', m: '32.06', g: 'nonmetal', gName: 'لافلز', ox: '-2, +4, +6', p: 3, gr: 6, c: '[Ne] 3s^2 3p^4' },
+  { z: 17, s: 'Cl', n: 'كلور', m: '35.45', g: 'halogen', gName: 'هالوجين', ox: '-1, +1, +5, +7', p: 3, gr: 7, c: '[Ne] 3s^2 3p^5' },
+  { z: 18, s: 'Ar', n: 'أرغون', m: '39.95', g: 'noble', gName: 'غاز نبيل', ox: '0', p: 3, gr: 8, c: '[Ne] 3s^2 3p^6' },
+  { z: 19, s: 'K', n: 'بوتاسيوم', m: '39.10', g: 'alkali', gName: 'فلز قلوي', ox: '+1', p: 4, gr: 1, c: '[Ar] 4s^1' },
+  { z: 20, s: 'Ca', n: 'كالسيوم', m: '40.08', g: 'alkaline', gName: 'قلوي ترابي', ox: '+2', p: 4, gr: 2, c: '[Ar] 4s^2' },
+  { z: 21, s: 'Sc', n: 'سكانديوم', m: '44.96', g: 'transition', gName: 'فلز انتقالي', ox: '+3', p: 4, gr: 3, c: '[Ar] 3d^1 4s^2' },
+  { z: 22, s: 'Ti', n: 'تيتانيوم', m: '47.87', g: 'transition', gName: 'فلز انتقالي', ox: '+4, +3', p: 4, gr: 4, c: '[Ar] 3d^2 4s^2' },
+  { z: 23, s: 'V', n: 'فاناديوم', m: '50.94', g: 'transition', gName: 'فلز انتقالي', ox: '+5, +4, +3, +2', p: 4, gr: 5, c: '[Ar] 3d^3 4s^2' },
+  { z: 24, s: 'Cr', n: 'كروم', m: '52.00', g: 'transition', gName: 'فلز انتقالي', ox: '+3, +6', p: 4, gr: 6, c: '[Ar] 3d^5 4s^1' },
+  { z: 25, s: 'Mn', n: 'منغنيز', m: '54.94', g: 'transition', gName: 'فلز انتقالي', ox: '+2, +4, +7', p: 4, gr: 7, c: '[Ar] 3d^5 4s^2' },
+  { z: 26, s: 'Fe', n: 'حديد', m: '55.85', g: 'transition', gName: 'فلز انتقالي', ox: '+2, +3', p: 4, gr: 8, c: '[Ar] 3d^6 4s^2' },
+  { z: 27, s: 'Co', n: 'كوبالت', m: '58.93', g: 'transition', gName: 'فلز انتقالي', ox: '+2, +3', p: 4, gr: 8, c: '[Ar] 3d^7 4s^2' },
+  { z: 28, s: 'Ni', n: 'نيكل', m: '58.69', g: 'transition', gName: 'فلز انتقالي', ox: '+2, +3', p: 4, gr: 8, c: '[Ar] 3d^8 4s^2' },
+  { z: 29, s: 'Cu', n: 'نحاس', m: '63.55', g: 'transition', gName: 'فلز انتقالي', ox: '+1, +2', p: 4, gr: 1, c: '[Ar] 3d^{10} 4s^1' },
+  { z: 30, s: 'Zn', n: 'خارصين (زنك)', m: '65.38', g: 'transition', gName: 'فلز انتقالي', ox: '+2', p: 4, gr: 2, c: '[Ar] 3d^{10} 4s^2' },
+  { z: 31, s: 'Ga', n: 'غاليوم', m: '69.72', g: 'post-transition', gName: 'فلز ضعيف', ox: '+3', p: 4, gr: 3, c: '[Ar] 3d^{10} 4s^2 4p^1' },
+  { z: 32, s: 'Ge', n: 'جرمانيوم', m: '72.63', g: 'metalloid', gName: 'شبه فلز', ox: '+4, +2', p: 4, gr: 4, c: '[Ar] 3d^{10} 4s^2 4p^2' },
+  { z: 33, s: 'As', n: 'زرنيخ', m: '74.92', g: 'metalloid', gName: 'شبه فلز', ox: '+3, +5, -3', p: 4, gr: 5, c: '[Ar] 3d^{10} 4s^2 4p^3' },
+  { z: 34, s: 'Se', n: 'سيلينيوم', m: '78.97', g: 'nonmetal', gName: 'لافلز', ox: '-2, +4, +6', p: 4, gr: 6, c: '[Ar] 3d^{10} 4s^2 4p^4' },
+  { z: 35, s: 'Br', n: 'بروم', m: '79.90', g: 'halogen', gName: 'هالوجين', ox: '-1, +1, +5', p: 4, gr: 7, c: '[Ar] 3d^{10} 4s^2 4p^5' },
+  { z: 36, s: 'Kr', n: 'كريبتون', m: '83.80', g: 'noble', gName: 'غاز نبيل', ox: '0', p: 4, gr: 8, c: '[Ar] 3d^{10} 4s^2 4p^6' },
+  { z: 37, s: 'Rb', n: 'روبيديوم', m: '85.47', g: 'alkali', gName: 'فلز قلوي', ox: '+1', p: 5, gr: 1, c: '[Kr] 5s^1' },
+  { z: 38, s: 'Sr', n: 'سترونشيوم', m: '87.62', g: 'alkaline', gName: 'قلوي ترابي', ox: '+2', p: 5, gr: 2, c: '[Kr] 5s^2' },
+  { z: 47, s: 'Ag', n: 'فضة', m: '107.87', g: 'transition', gName: 'فلز انتقالي', ox: '+1', p: 5, gr: 1, c: '[Kr] 4d^{10} 5s^1' },
+  { z: 48, s: 'Cd', n: 'كادميوم', m: '112.41', g: 'transition', gName: 'فلز انتقالي', ox: '+2', p: 5, gr: 2, c: '[Kr] 4d^{10} 5s^2' },
+  { z: 50, s: 'Sn', n: 'قصدير', m: '118.71', g: 'post-transition', gName: 'فلز ضعيف', ox: '+2, +4', p: 5, gr: 4, c: '[Kr] 4d^{10} 5s^2 5p^2' },
+  { z: 51, s: 'Sb', n: 'أنتيمون', m: '121.76', g: 'metalloid', gName: 'شبه فلز', ox: '+3, +5', p: 5, gr: 5, c: '[Kr] 4d^{10} 5s^2 5p^3' },
+  { z: 53, s: 'I', n: 'يود', m: '126.90', g: 'halogen', gName: 'هالوجين', ox: '-1, +1, +5, +7', p: 5, gr: 7, c: '[Kr] 4d^{10} 5s^2 5p^5' },
+  { z: 54, s: 'Xe', n: 'زينون', m: '131.29', g: 'noble', gName: 'غاز نبيل', ox: '0', p: 5, gr: 8, c: '[Kr] 4d^{10} 5s^2 5p^6' },
+  { z: 55, s: 'Cs', n: 'سيزيوم', m: '132.91', g: 'alkali', gName: 'فلز قلوي', ox: '+1', p: 6, gr: 1, c: '[Xe] 6s^1' },
+  { z: 56, s: 'Ba', n: 'باريوم', m: '137.33', g: 'alkaline', gName: 'قلوي ترابي', ox: '+2', p: 6, gr: 2, c: '[Xe] 6s^2' },
+  { z: 78, s: 'Pt', n: 'بلاتين', m: '195.08', g: 'transition', gName: 'فلز انتقالي', ox: '+2, +4', p: 6, gr: 8, c: '[Xe] 4f^{14} 5d^9 6s^1' },
+  { z: 79, s: 'Au', n: 'ذهب', m: '196.97', g: 'transition', gName: 'فلز انتقالي', ox: '+1, +3', p: 6, gr: 1, c: '[Xe] 4f^{14} 5d^{10} 6s^1' },
+  { z: 80, s: 'Hg', n: 'زئبق', m: '200.59', g: 'transition', gName: 'فلز انتقالي', ox: '+1, +2', p: 6, gr: 2, c: '[Xe] 4f^{14} 5d^{10} 6s^2' },
+  { z: 82, s: 'Pb', n: 'رصاص', m: '207.2', g: 'post-transition', gName: 'فلز ضعيف', ox: '+2, +4', p: 6, gr: 4, c: '[Xe] 4f^{14} 5d^{10} 6s^2 6p^2' },
+  { z: 83, s: 'Bi', n: 'بزموث', m: '208.98', g: 'post-transition', gName: 'فلز ضعيف', ox: '+3, +5', p: 6, gr: 5, c: '[Xe] 4f^{14} 5d^{10} 6s^2 6p^3' },
+  { z: 92, s: 'U', n: 'يورانيوم', m: '238.03', g: 'transition', gName: 'أكتينيد مشع', ox: '+3, +4, +5, +6', p: 7, gr: 3, c: '[Rn] 5f^3 6d^1 7s^2' }
+];
+
+const CHEM_COMPOUNDS_DB = {
+  acids: [
+    { formula: 'HCl', nameAr: 'حامض الهيدروكلوريك' },
+    { formula: 'H_2SO_4', nameAr: 'حامض الكبريتيك' },
+    { formula: 'HNO_3', nameAr: 'حامض النتريك' },
+    { formula: 'CH_3COOH', nameAr: 'حامض الخليك' },
+    { formula: 'H_3PO_4', nameAr: 'حامض الفوسفوريك' },
+    { formula: 'HCN', nameAr: 'حامض الهيدروسيانيك' },
+    { formula: 'H_2CO_3', nameAr: 'حامض الكاربونيك' },
+    { formula: 'HBr', nameAr: 'حامض الهيدروبروميك' },
+    { formula: 'HI', nameAr: 'حامض الهيدرويوديك' },
+    { formula: 'HF', nameAr: 'حامض الهيدروفلوريك' }
+  ],
+  bases: [
+    { formula: 'NaOH', nameAr: 'هيدروكسيد الصوديوم (الصودا الكاوية)' },
+    { formula: 'KOH', nameAr: 'هيدروكسيد البوتاسيوم' },
+    { formula: 'Ca(OH)_2', nameAr: 'هيدروكسيد الكالسيوم (ماء الكلس)' },
+    { formula: 'Ba(OH)_2', nameAr: 'هيدروكسيد الباريوم' },
+    { formula: 'NH_3', nameAr: 'غاز الأمونيا' },
+    { formula: 'NH_4OH', nameAr: 'محلول هيدروكسيد الأمونيوم' },
+    { formula: 'Mg(OH)_2', nameAr: 'هيدروكسيد المغنيسيوم (حليب المغنيسيا)' },
+    { formula: 'Al(OH)_3', nameAr: 'هيدروكسيد الألمنيوم' }
+  ],
+  salts: [
+    { formula: 'NaCl', nameAr: 'كلوريد الصوديوم (ملح الطعام)' },
+    { formula: 'CaCO_3', nameAr: 'كاربونات الكالسيوم (كلس / رخام)' },
+    { formula: 'CuSO_4', nameAr: 'كبريتات النحاس (الزاج الأزرق)' },
+    { formula: 'KMnO_4', nameAr: 'برمنغنات البوتاسيوم' },
+    { formula: 'K_2Cr_2O_7', nameAr: 'ثنائي كرومات البوتاسيوم' },
+    { formula: 'AgNO_3', nameAr: 'نترات الفضة (حجر جهنم)' },
+    { formula: 'BaSO_4', nameAr: 'كبريتات الباريوم' },
+    { formula: 'NH_4Cl', nameAr: 'كلوريد الأمونيوم (ملح النوشادر)' },
+    { formula: 'NaHCO_3', nameAr: 'بيكربونات الصوديوم (صودا الخبز)' },
+    { formula: 'Na_2CO_3', nameAr: 'كربونات الصوديوم (صودا الغسيل)' },
+    { formula: 'KI', nameAr: 'يوديد البوتاسيوم' },
+    { formula: 'FeSO_4', nameAr: 'كبريتات الحديد الثنائي' }
+  ],
+  oxides: [
+    { formula: 'CO_2', nameAr: 'ثنائي أوكسيد الكاربون' },
+    { formula: 'CO', nameAr: 'أحادي أوكسيد الكاربون' },
+    { formula: 'SO_2', nameAr: 'ثنائي أوكسيد الكبريت' },
+    { formula: 'SO_3', nameAr: 'ثلاثي أوكسيد الكبريت' },
+    { formula: 'NO_2', nameAr: 'ثنائي أوكسيد النيتروجين' },
+    { formula: 'Fe_2O_3', nameAr: 'أوكسيد الحديد الثلاثي (الهيماتيت)' },
+    { formula: 'Al_2O_3', nameAr: 'أوكسيد الألمنيوم (الألومينا)' },
+    { formula: 'CaO', nameAr: 'أوكسيد الكالسيوم (الجير الحي)' },
+    { formula: 'MgO', nameAr: 'أوكسيد المغنيسيوم' },
+    { formula: 'SiO_2', nameAr: 'ثنائي أوكسيد السيليكون (السيليكا)' }
+  ],
+  organics: [
+    { formula: 'CH_4', nameAr: 'الميثان (أبسط هيدروكربون)' },
+    { formula: 'C_2H_6', nameAr: 'الإيثان' },
+    { formula: 'C_2H_4', nameAr: 'الإيثيلين (ألكين)' },
+    { formula: 'C_2H_2', nameAr: 'الأسيتيلين (ألكاين)' },
+    { formula: 'C_6H_6', nameAr: 'البنزين العطري (أروماتي)' },
+    { formula: 'C_2H_5OH', nameAr: 'الكحول الإيثيلي (الإيثانول)' },
+    { formula: 'CH_3OH', nameAr: 'الميثانول (كحول الخشب)' },
+    { formula: 'CH_3CHO', nameAr: 'الأسيتالدهيد (الإيثانال)' },
+    { formula: 'CH_3COCH_3', nameAr: 'الأسيتون (البروبانون)' },
+    { formula: 'C_6H_{12}O_6', nameAr: 'الكلوكوز (سكر العنب)' },
+    { formula: 'C_{12}H_{22}O_{11}', nameAr: 'السكروز (سكر القصب)' },
+    { formula: 'HCOOH', nameAr: 'حامض الفورميك (النمليك)' }
+  ]
+};
+
+window.insertChemFormula = function(snippet) {
+  if (typeof window.insertMathFormula === 'function') {
+    window.insertMathFormula(snippet);
+  } else {
+    let target = window.lastActiveMathInput || document.getElementById('modalQText');
+    if (!target) return;
+    const start = target.selectionStart ?? target.value.length;
+    const end = target.selectionEnd ?? target.value.length;
+    target.value = target.value.substring(0, start) + snippet + target.value.substring(end);
+    target.focus();
+    if (typeof window.updateModalMathPreview === 'function') window.updateModalMathPreview();
+  }
+};
+
+window.toggleChemStudio = function() {
+  const container = document.getElementById('modalChemStudioContainer');
+  if (!container) return;
+  const isHidden = (container.style.display === 'none' || !container.style.display);
+  container.style.display = isHidden ? 'block' : 'none';
+  const toggleBtn = document.getElementById('btnToggleChemStudio');
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('active', isHidden);
+  }
+};
+
+window.switchChemStudioTab = function(tabId) {
+  document.querySelectorAll('#chemStudioTabs .chem-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.chem-tab-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === `chemPane_${tabId}`);
+  });
+};
+
+window.filterChemElements = function(category = null) {
+  const activePill = document.querySelector('.chem-filter-pill.active');
+  let cat = category !== null ? category : (activePill ? activePill.getAttribute('data-cat') : 'all');
+  if (category !== null) {
+    document.querySelectorAll('.chem-filter-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.getAttribute('data-cat') === category);
+    });
+  }
+  const searchInput = document.getElementById('chemElementSearchInput');
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+  document.querySelectorAll('#chemElementsGrid .chem-element-card').forEach(card => {
+    const elCat = card.getAttribute('data-category');
+    const symbol = (card.getAttribute('data-symbol') || '').toLowerCase();
+    const name = (card.getAttribute('data-name') || '').toLowerCase();
+    const z = card.getAttribute('data-z') || '';
+
+    const matchesCat = (cat === 'all' || elCat === cat);
+    const matchesSearch = (!query || symbol.includes(query) || name.includes(query) || z === query);
+
+    card.style.display = (matchesCat && matchesSearch) ? 'flex' : 'none';
+  });
+};
+
+window.insertBuiltElementIsotope = function() {
+  const sym = (document.getElementById('chemBldSym')?.value || '').trim() || 'X';
+  const mass = (document.getElementById('chemBldMass')?.value || '').trim();
+  const atomic = (document.getElementById('chemBldAtomic')?.value || '').trim();
+  const charge = (document.getElementById('chemBldCharge')?.value || '').trim();
+
+  let snippet = `\\text{${sym}}`;
+  if (atomic && mass) {
+    snippet = `^{${mass}}_{${atomic}}\\text{${sym}}`;
+  } else if (mass) {
+    snippet = `^{${mass}}\\text{${sym}}`;
+  } else if (atomic) {
+    snippet = `_{${atomic}}\\text{${sym}}`;
+  }
+  if (charge) {
+    snippet += `^{${charge}}`;
+  }
+  window.insertChemFormula(`$${snippet}$`);
+};
+
+window.insertBuiltChemEquation = function() {
+  const reactants = (document.getElementById('chemBldReactants')?.value || '').trim() || '2H_2 + O_2';
+  const arrow = (document.getElementById('chemBldArrow')?.value || '').trim() || '\\rightarrow';
+  const products = (document.getElementById('chemBldProducts')?.value || '').trim() || '2H_2O';
+  const note = (document.getElementById('chemBldNote')?.value || '').trim();
+
+  let snippet = `${reactants} ${arrow} ${products}`;
+  if (note) snippet += ` \\quad (${note})`;
+  window.insertChemFormula(`$${snippet}$`);
+};
+
+function getElectronConfig(z) {
+  const arabicPeriods = ['', 'الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة'];
+  const arabicGroups = ['', 'الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة', 'السابعة', 'الثامنة (الغازات النبيلة)'];
+  const subshells = [
+    { name: '1s', n: 1, cap: 2 },
+    { name: '2s', n: 2, cap: 2 },
+    { name: '2p', n: 2, cap: 6 },
+    { name: '3s', n: 3, cap: 2 },
+    { name: '3p', n: 3, cap: 6 },
+    { name: '4s', n: 4, cap: 2 },
+    { name: '3d', n: 3, cap: 10 },
+    { name: '4p', n: 4, cap: 6 }
+  ];
+  let rem = z;
+  let parts = [];
+  if (z === 24) {
+    parts = ['1s^2', '2s^2', '2p^6', '3s^2', '3p^6', '4s^1', '3d^5'];
+  } else if (z === 29) {
+    parts = ['1s^2', '2s^2', '2p^6', '3s^2', '3p^6', '4s^1', '3d^{10}'];
+  } else {
+    for (const sub of subshells) {
+      if (rem <= 0) break;
+      const take = Math.min(rem, sub.cap);
+      parts.push(`${sub.name}^{${take}}`);
+      rem -= take;
+    }
+  }
+  const configStr = parts.join('\\ ');
+  let maxN = 1;
+  if (z > 2) maxN = 2;
+  if (z > 10) maxN = 3;
+  if (z > 18) maxN = 4;
+
+  let valenceElectrons = 1;
+  let group = 1;
+  if (z === 1) { valenceElectrons = 1; group = 1; }
+  else if (z === 2) { valenceElectrons = 2; group = 8; }
+  else if (z >= 3 && z <= 10) { valenceElectrons = z - 2; group = valenceElectrons; }
+  else if (z >= 11 && z <= 18) { valenceElectrons = z - 10; group = valenceElectrons; }
+  else if (z === 19) { valenceElectrons = 1; group = 1; }
+  else if (z === 20) { valenceElectrons = 2; group = 2; }
+  else if (z >= 21 && z <= 30) { valenceElectrons = 2; group = 2; }
+  else if (z >= 31 && z <= 36) { valenceElectrons = z - 28; group = valenceElectrons; }
+
+  const dots = ['•', '••', '•••', '••••', '•••••', '••••••', '•••••••', '••••••••'];
+  const lewisDots = dots[valenceElectrons - 1] || '•';
+
+  return {
+    configStr: `$${configStr}$`,
+    periodText: `الدورة: ${arabicPeriods[maxN]}`,
+    groupText: `الزمرة: ${arabicGroups[group] || group}`,
+    valenceText: `إلكترونات التكافؤ: ${valenceElectrons}`,
+    lewisSymbol: `رمز لويس: [ ${lewisDots} ]`
+  };
+}
+
+window.calculateAndInsertElectronConfig = function() {
+  const zInput = document.getElementById('chemBldCalcZ');
+  const z = parseInt(zInput ? zInput.value : '0', 10);
+  if (!z || isNaN(z) || z < 1 || z > 36) {
+    showToast('يرجى إدخال عدد ذري صحيح بين 1 و 36', 'warning');
+    return;
+  }
+  const info = getElectronConfig(z);
+  const element = CHEM_ELEMENTS_DB.find(e => e.z === z);
+  const nameStr = element ? `عنصر ${element.n} ($_{${z}}\\text{${element.s}}$): ` : `العنصر (Z = ${z}): `;
+  const fullText = `${nameStr} الترتيب الإلكتروني: ${info.configStr} | ${info.periodText} | ${info.groupText} | ${info.valenceText} | ${info.lewisSymbol}`;
+  window.insertChemFormula(fullText);
+  showToast(`تم إدراج الترتيب الإلكتروني لعنصر ${element ? element.n : z} بنجاح ✨`, 'success');
+};
+
+/**
+ * Builds the HTML layout of the Iraqi Chemistry Studio
+ */
+function buildChemStudioHTML(isOpen = false) {
+  const elementsHTML = CHEM_ELEMENTS_DB.map(el => `
+    <div class="chem-element-card cat-${el.g}" data-category="${el.g}" data-symbol="${el.s}" data-name="${el.n}" data-z="${el.z}" onclick="window.insertChemFormula('$\\\\text{${el.s}}$')" title="${el.n} (${el.s}) - العدد الذري: ${el.z} | الكتلة: ${el.m} | ${el.gName} | أعداد التأكسد: ${el.ox}">
+      <span class="el-z">${el.z}</span>
+      <span class="el-mass">${el.m}</span>
+      <span class="el-symbol">${el.s}</span>
+      <span class="el-name">${el.n}</span>
+      <span class="el-ox">${el.ox}</span>
+    </div>
+  `).join('');
+
+  return `
+    <!-- ستوديو الكيمياء والجدول الدوري والمعادلات الوزارية العراقية -->
+    <div class="chem-studio-container" id="modalChemStudioContainer" style="display: ${isOpen ? 'block' : 'none'};">
+      <div class="chem-studio-header">
+        <div class="chem-studio-title">
+          <i class="fa-solid fa-flask-vial" style="color: #10b981;"></i>
+          <span>ستوديو الكيمياء والجدول الدوري والمعادلات</span>
+          <span class="badge-chem-iq">المنهج العراقي الوزاري</span>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span style="font-size: 0.72rem; color: var(--text-muted);">انقر على أي عنصر أو مركب أو معادلة لإدراجها فوراً في موضع المؤشر</span>
+        </div>
+      </div>
+
+      <!-- تبويبات أقسام الكيمياء -->
+      <div class="chem-studio-tabs" id="chemStudioTabs">
+        <button type="button" class="chem-tab-btn active" data-tab="chem_elements" onclick="window.switchChemStudioTab('chem_elements')">
+          <i class="fa-solid fa-table-cells-large"></i> الجدول الدوري والعناصر
+        </button>
+        <button type="button" class="chem-tab-btn" data-tab="chem_compounds" onclick="window.switchChemStudioTab('chem_compounds')">
+          <i class="fa-solid fa-vial"></i> المركبات والصيغ
+        </button>
+        <button type="button" class="chem-tab-btn" data-tab="chem_reactions" onclick="window.switchChemStudioTab('chem_reactions')">
+          <i class="fa-solid fa-arrow-right-arrow-left"></i> التفاعلات والاتزان
+        </button>
+        <button type="button" class="chem-tab-btn" data-tab="chem_ions" onclick="window.switchChemStudioTab('chem_ions')">
+          <i class="fa-solid fa-bolt"></i> الأيونات والجذور
+        </button>
+        <button type="button" class="chem-tab-btn" data-tab="chem_electrons" onclick="window.switchChemStudioTab('chem_electrons')">
+          <i class="fa-solid fa-atom"></i> الترتيب الإلكتروني وأعداد الكم
+        </button>
+        <button type="button" class="chem-tab-btn btn-chem-highlight" data-tab="chem_builder" onclick="window.switchChemStudioTab('chem_builder')">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> المولد البصري والحاسبة الذكية
+        </button>
+      </div>
+
+      <!-- محتويات تبويبات الكيمياء -->
+      <div class="chem-tab-content-wrapper">
+        <!-- 1. الجدول الدوري والعناصر -->
+        <div class="chem-tab-pane active" id="chemPane_chem_elements">
+          <div class="chem-elements-toolbar">
+            <div class="chem-search-box">
+              <i class="fa-solid fa-magnifying-glass" style="color: #10b981; font-size: 0.75rem;"></i>
+              <input type="text" id="chemElementSearchInput" placeholder="بحث بالاسم العربي (مثال: صوديوم)، الرمز (Na)، أو العدد الذري (11)..." oninput="window.filterChemElements()">
+            </div>
+            <div class="chem-filter-pills-row">
+              <button type="button" class="chem-filter-pill active" data-cat="all" onclick="window.filterChemElements('all')">الكل (${CHEM_ELEMENTS_DB.length})</button>
+              <button type="button" class="chem-filter-pill" data-cat="alkali" onclick="window.filterChemElements('alkali')">فلزات قلوية</button>
+              <button type="button" class="chem-filter-pill" data-cat="alkaline" onclick="window.filterChemElements('alkaline')">قلويات ترابية</button>
+              <button type="button" class="chem-filter-pill" data-cat="transition" onclick="window.filterChemElements('transition')">فلزات انتقالية</button>
+              <button type="button" class="chem-filter-pill" data-cat="nonmetal" onclick="window.filterChemElements('nonmetal')">لافلزات</button>
+              <button type="button" class="chem-filter-pill" data-cat="halogen" onclick="window.filterChemElements('halogen')">هالوجينات</button>
+              <button type="button" class="chem-filter-pill" data-cat="noble" onclick="window.filterChemElements('noble')">غازات نبيلة</button>
+              <button type="button" class="chem-filter-pill" data-cat="metalloid" onclick="window.filterChemElements('metalloid')">أشباه فلزات</button>
+              <button type="button" class="chem-filter-pill" data-cat="post-transition" onclick="window.filterChemElements('post-transition')">فلزات ضعيفة</button>
+            </div>
+          </div>
+          <div class="chem-elements-grid" id="chemElementsGrid">
+            ${elementsHTML}
+          </div>
+        </div>
+
+        <!-- 2. المركبات والصيغ الكيميائية -->
+        <div class="chem-tab-pane" id="chemPane_chem_compounds">
+          <div class="chem-compounds-section">
+            <div class="chem-compounds-title"><i class="fa-solid fa-droplet text-primary"></i> أحماض وزارية شائعة:</div>
+            <div class="chem-compounds-grid">
+              ${CHEM_COMPOUNDS_DB.acids.map(c => `
+                <button type="button" class="chem-compound-btn" onclick="window.insertChemFormula('$\\\\text{${c.formula}}$')" title="${c.nameAr}">
+                  <span class="chem-compound-formula">${c.formula.replace(/_/g, '')}</span>
+                  <span class="chem-compound-name">${c.nameAr}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="chem-compounds-section">
+            <div class="chem-compounds-title"><i class="fa-solid fa-vial text-emerald"></i> قواعد وهيدروكسيدات:</div>
+            <div class="chem-compounds-grid">
+              ${CHEM_COMPOUNDS_DB.bases.map(c => `
+                <button type="button" class="chem-compound-btn" onclick="window.insertChemFormula('$\\\\text{${c.formula}}$')" title="${c.nameAr}">
+                  <span class="chem-compound-formula">${c.formula.replace(/_/g, '')}</span>
+                  <span class="chem-compound-name">${c.nameAr}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="chem-compounds-section">
+            <div class="chem-compounds-title"><i class="fa-solid fa-cubes-stacked text-warning"></i> أملاح ومحاليل:</div>
+            <div class="chem-compounds-grid">
+              ${CHEM_COMPOUNDS_DB.salts.map(c => `
+                <button type="button" class="chem-compound-btn" onclick="window.insertChemFormula('$\\\\text{${c.formula}}$')" title="${c.nameAr}">
+                  <span class="chem-compound-formula">${c.formula.replace(/_/g, '')}</span>
+                  <span class="chem-compound-name">${c.nameAr}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="chem-compounds-section">
+            <div class="chem-compounds-title"><i class="fa-solid fa-cloud-arrow-up text-secondary"></i> أكاسيد وهيدروكربونات وكيمياء عضوية:</div>
+            <div class="chem-compounds-grid">
+              ${CHEM_COMPOUNDS_DB.oxides.concat(CHEM_COMPOUNDS_DB.organics).map(c => `
+                <button type="button" class="chem-compound-btn" onclick="window.insertChemFormula('$\\\\text{${c.formula}}$')" title="${c.nameAr}">
+                  <span class="chem-compound-formula">${c.formula.replace(/_/g, '').replace(/\{/g, '').replace(/\}/g, '')}</span>
+                  <span class="chem-compound-name">${c.nameAr}</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. التفاعلات والثرموداينمك والاتزان الكيميائي -->
+        <div class="chem-tab-pane" id="chemPane_chem_reactions">
+          <div style="margin-bottom: 8px;">
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">أسهم التفاعل والحالات الفيزيائية والثرموداينمك:</small>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\rightarrow$')" title="سهم تفاعل تام">
+                <span class="math-tool-render">→</span>
+                <span class="math-tool-label">سهم تام</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\rightleftharpoons$')" title="سهم تفاعل انعكاسي متزن">
+                <span class="math-tool-render">⇌</span>
+                <span class="math-tool-label">انعكاسي متزن</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\xrightarrow{\\\\Delta}$')" title="سهم تسخين وحرارة">
+                <span class="math-tool-render">→ᐩ</span>
+                <span class="math-tool-label">حرارة وتسخين</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\uparrow$')" title="تصاعد غاز">
+                <span class="math-tool-render">↑</span>
+                <span class="math-tool-label">غاز متصاعد</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\downarrow$')" title="تكون راسب">
+                <span class="math-tool-render">↓</span>
+                <span class="math-tool-label">راسب</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{(s)}$')" title="حالة صلبة">
+                <span class="math-tool-render">(s)</span>
+                <span class="math-tool-label">صلب</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{(l)}$')" title="حالة سائلة">
+                <span class="math-tool-render">(l)</span>
+                <span class="math-tool-label">سائل</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{(g)}$')" title="حالة غازية">
+                <span class="math-tool-render">(g)</span>
+                <span class="math-tool-label">غاز</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{(aq)}$')" title="محلول مائي">
+                <span class="math-tool-render">(aq)</span>
+                <span class="math-tool-label">مائي</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\Delta H^{\\\\circ}_{\\\\text{r}}$')" title="إنثالبي التفاعل القياسية">
+                <span class="math-tool-render">ΔH°ᵣ</span>
+                <span class="math-tool-label">إنثالبي</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\Delta G^{\\\\circ}_{\\\\text{r}}$')" title="طاقة كبس الحرة القياسية">
+                <span class="math-tool-render">ΔG°ᵣ</span>
+                <span class="math-tool-label">طاقة كبس</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\Delta S^{\\\\circ}_{\\\\text{r}}$')" title="إنتروبي التفاعل القياسية">
+                <span class="math-tool-render">ΔS°ᵣ</span>
+                <span class="math-tool-label">إنتروبي</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$K_c$')" title="ثابت الاتزان تراكيز">
+                <span class="math-tool-render">Kc</span>
+                <span class="math-tool-label">ثابت تراكيز</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$K_p$')" title="ثابت الاتزان ضغوط">
+                <span class="math-tool-render">Kp</span>
+                <span class="math-tool-label">ثابت ضغوط</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$K_{sp}$')" title="ثابت حاصل الإذابة">
+                <span class="math-tool-render">Ksp</span>
+                <span class="math-tool-label">حاصل الإذابة</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{pH}$')" title="الدالة الحامضية">
+                <span class="math-tool-render">pH</span>
+                <span class="math-tool-label">الأس الهيدروجيني</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{pOH}$')" title="الدالة القاعدية">
+                <span class="math-tool-render">pOH</span>
+                <span class="math-tool-label">الدالة القاعدية</span>
+              </button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$E^{\\\\circ}_{\\\\text{cell}}$')" title="جهد الخلية القياسي">
+                <span class="math-tool-render">E°cell</span>
+                <span class="math-tool-label">جهد الخلية</span>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">معادلات كيميائية وزارية نموذجية شائعة:</small>
+            <div class="chem-reactions-grid">
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$\\\\text{N}_2\\\\text{(g)} + 3\\\\text{H}_2\\\\text{(g)} \\\\rightleftharpoons 2\\\\text{NH}_3\\\\text{(g)} \\\\quad (\\\\Delta H < 0)$')">
+                <span class="chem-equation-formula">N₂(g) + 3H₂(g) ⇌ 2NH₃(g)</span>
+                <span class="chem-equation-desc">تكوين الأمونيا (طريقة هابر)</span>
+              </button>
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$\\\\text{Ca(OH)}_2 + \\\\text{CO}_2 \\\\rightarrow \\\\text{CaCO}_3\\\\downarrow + \\\\text{H}_2\\\\text{O}$')">
+                <span class="chem-equation-formula">Ca(OH)₂ + CO₂ → CaCO₃↓ + H₂O</span>
+                <span class="chem-equation-desc">كشف ماء الكلس الرائق</span>
+              </button>
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$2\\\\text{Al} + \\\\text{Fe}_2\\\\text{O}_3 \\\\xrightarrow{\\\\Delta} \\\\text{Al}_2\\\\text{O}_3 + 2\\\\text{Fe} + \\\\text{حرارة}$')">
+                <span class="chem-equation-formula">2Al + Fe₂O₃ → Al₂O₃ + 2Fe + حرارة</span>
+                <span class="chem-equation-desc">تفاعل الثرميت (استخلاص الحديد)</span>
+              </button>
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$\\\\text{CH}_4\\\\text{(g)} + 2\\\\text{O}_2\\\\text{(g)} \\\\rightarrow \\\\text{CO}_2\\\\text{(g)} + 2\\\\text{H}_2\\\\text{O(g)} + \\\\text{طاقة}$')">
+                <span class="chem-equation-formula">CH₄(g) + 2O₂(g) → CO₂(g) + 2H₂O(g)</span>
+                <span class="chem-equation-desc">احتراق غاز الميثان التام</span>
+              </button>
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$\\\\text{CaCO}_3\\\\text{(s)} \\\\xrightarrow{\\\\Delta} \\\\text{CaO(s)} + \\\\text{CO}_2\\\\text{(g)}\\\\uparrow$')">
+                <span class="chem-equation-formula">CaCO₃(s) → CaO(s) + CO₂(g)↑</span>
+                <span class="chem-equation-desc">تفكك كاربونات الكالسيوم بالحرارة</span>
+              </button>
+              <button type="button" class="chem-equation-pill-btn" onclick="window.insertChemFormula('$\\\\text{Zn(s)} + \\\\text{Cu}^{2+}\\\\text{(aq)} \\\\rightarrow \\\\text{Zn}^{2+}\\\\text{(aq)} + \\\\text{Cu(s)}$')">
+                <span class="chem-equation-formula">Zn(s) + Cu²⁺(aq) → Zn²⁺(aq) + Cu(s)</span>
+                <span class="chem-equation-desc">تفاعل خلية دانيال (أكسدة واختزال)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. الأيونات والجذور والمجموعات الذرية -->
+        <div class="chem-tab-pane" id="chemPane_chem_ions">
+          <div style="margin-bottom: 8px;">
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">الأيونات الموجبة (الكاتيونات Cations):</small>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{H}^+$')"><span class="math-tool-render">H⁺</span><span class="math-tool-label">هيدروجين (+1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Na}^+$')"><span class="math-tool-render">Na⁺</span><span class="math-tool-label">صوديوم (+1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{K}^+$')"><span class="math-tool-render">K⁺</span><span class="math-tool-label">بوتاسيوم (+1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Ag}^+$')"><span class="math-tool-render">Ag⁺</span><span class="math-tool-label">فضة (+1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{NH}_4^+$')"><span class="math-tool-render">NH₄⁺</span><span class="math-tool-label">أمونيوم (+1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Mg}^{2+}$')"><span class="math-tool-render">Mg²⁺</span><span class="math-tool-label">مغنيسيوم (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Ca}^{2+}$')"><span class="math-tool-render">Ca²⁺</span><span class="math-tool-label">كالسيوم (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Ba}^{2+}$')"><span class="math-tool-render">Ba²⁺</span><span class="math-tool-label">باريوم (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Fe}^{2+}$')"><span class="math-tool-render">Fe²⁺</span><span class="math-tool-label">حديدوز (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Cu}^{2+}$')"><span class="math-tool-render">Cu²⁺</span><span class="math-tool-label">نحاس (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Zn}^{2+}$')"><span class="math-tool-render">Zn²⁺</span><span class="math-tool-label">خارصين (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Pb}^{2+}$')"><span class="math-tool-render">Pb²⁺</span><span class="math-tool-label">رصاص (+2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Al}^{3+}$')"><span class="math-tool-render">Al³⁺</span><span class="math-tool-label">ألمنيوم (+3)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Fe}^{3+}$')"><span class="math-tool-render">Fe³⁺</span><span class="math-tool-label">حديديك (+3)</span></button>
+            </div>
+          </div>
+
+          <div>
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">الأيونات السالبة والجذور الذرية (الأنيونات Anions):</small>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Cl}^-$')"><span class="math-tool-render">Cl⁻</span><span class="math-tool-label">كلوريد (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Br}^-$')"><span class="math-tool-render">Br⁻</span><span class="math-tool-label">بروميد (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{I}^-$')"><span class="math-tool-render">I⁻</span><span class="math-tool-label">يوديد (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{F}^-$')"><span class="math-tool-render">F⁻</span><span class="math-tool-label">فلوريد (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{OH}^-$')"><span class="math-tool-render">OH⁻</span><span class="math-tool-label">هيدروكسيد (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{NO}_3^-$')"><span class="math-tool-render">NO₃⁻</span><span class="math-tool-label">نترات (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{NO}_2^-$')"><span class="math-tool-render">NO₂⁻</span><span class="math-tool-label">نتريت (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{CH}_3\\\\text{COO}^-$')"><span class="math-tool-render">CH₃COO⁻</span><span class="math-tool-label">خلات (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{MnO}_4^-$')"><span class="math-tool-render">MnO₄⁻</span><span class="math-tool-label">برمنغنات (-1)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{O}^{2-}$')"><span class="math-tool-render">O²⁻</span><span class="math-tool-label">أوكسيد (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{S}^{2-}$')"><span class="math-tool-render">S²⁻</span><span class="math-tool-label">كبريتيد (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{SO}_4^{2-}$')"><span class="math-tool-render">SO₄²⁻</span><span class="math-tool-label">كبريتات (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{SO}_3^{2-}$')"><span class="math-tool-render">SO₃²⁻</span><span class="math-tool-label">كبريتيت (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{CO}_3^{2-}$')"><span class="math-tool-render">CO₃²⁻</span><span class="math-tool-label">كاربونات (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{Cr}_2\\\\text{O}_7^{2-}$')"><span class="math-tool-render">Cr₂O₇²⁻</span><span class="math-tool-label">ثنائي كرومات (-2)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\text{PO}_4^{3-}$')"><span class="math-tool-render">PO₄³⁻</span><span class="math-tool-label">فوسفات (-3)</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. الترتيب الإلكتروني وأعداد الكم -->
+        <div class="chem-tab-pane" id="chemPane_chem_electrons">
+          <div style="margin-bottom: 8px;">
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">المستويات الثانوية وتوزيع الإلكترونات:</small>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$1s^2$')"><span class="math-tool-render">1s²</span><span class="math-tool-label">غلاف 1</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$2s^2$')"><span class="math-tool-render">2s²</span><span class="math-tool-label">غلاف 2</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$2p^6$')"><span class="math-tool-render">2p⁶</span><span class="math-tool-label">غلاف 2</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$3s^2$')"><span class="math-tool-render">3s²</span><span class="math-tool-label">غلاف 3</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$3p^6$')"><span class="math-tool-render">3p⁶</span><span class="math-tool-label">غلاف 3</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$4s^2$')"><span class="math-tool-render">4s²</span><span class="math-tool-label">غلاف 4</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$3d^{10}$')"><span class="math-tool-render">3d¹⁰</span><span class="math-tool-label">انتقالي d</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$4p^6$')"><span class="math-tool-render">4p⁶</span><span class="math-tool-label">غلاف 4</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$[\\\\text{Ne}]_{10}$')"><span class="math-tool-render">[Ne]₁₀</span><span class="math-tool-label">غاز خامل</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$[\\\\text{Ar}]_{18}$')"><span class="math-tool-render">[Ar]₁₈</span><span class="math-tool-label">غاز خامل</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$[\\\\text{Kr}]_{36}$')"><span class="math-tool-render">[Kr]₃₆</span><span class="math-tool-label">غاز خامل</span></button>
+            </div>
+          </div>
+
+          <div>
+            <small style="font-size: 0.72rem; font-weight: 800; color: #6ee7b7; display: block; margin-bottom: 4px;">أعداد الكم الأربعة ورمز لويس:</small>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$n = 3$')"><span class="math-tool-render">n</span><span class="math-tool-label">الكم الرئيسي</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$l = 1$')"><span class="math-tool-render">l</span><span class="math-tool-label">الكم الثانوي</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$m_l = 0$')"><span class="math-tool-render">mₗ</span><span class="math-tool-label">الكم المغناطيسي</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$m_s = +\\\\frac{1}{2}$')"><span class="math-tool-render">+½</span><span class="math-tool-label">برم للأعلى</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$m_s = -\\\\frac{1}{2}$')"><span class="math-tool-render">-½</span><span class="math-tool-label">برم للأسفل</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\cdot\\\\text{X}\\\\cdot$')"><span class="math-tool-render">·X·</span><span class="math-tool-label">لويس (إلكترونان)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$\\\\cdot\\\\ddot{\\\\text{X}}\\\\cdot$')"><span class="math-tool-render">·Ẍ·</span><span class="math-tool-label">لويس (4 إلكترونات)</span></button>
+              <button type="button" class="math-tool-btn" onclick="window.insertChemFormula('$:\\\\ddot{\\\\text{X}}:$')"><span class="math-tool-render">:Ẍ:</span><span class="math-tool-label">لويس (مكتمل 8)</span></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. المولد البصري التفاعلي والحاسبة الذكية -->
+        <div class="chem-tab-pane" id="chemPane_chem_builder">
+          <div class="chem-builder-grid">
+            <!-- كارت 1: مولد النظائر والأعداد الذرية والكتلية -->
+            <div class="chem-builder-card">
+              <div class="chem-builder-card-title">
+                <i class="fa-solid fa-square-root-variable" style="color: #10b981;"></i>
+                <span>مولد رمز النظير والشحنة ($^{A}_{Z}\\text{X}^{\\pm}$)</span>
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center; margin-bottom: 6px;">
+                <input type="text" id="chemBldSym" placeholder="الرمز (Na)" value="Na" style="width: 50px; text-align: center; font-weight: bold; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.8rem; padding: 3px;">
+                <input type="text" id="chemBldMass" placeholder="الكتلي A" value="23" style="width: 50px; text-align: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.8rem; padding: 3px;">
+                <input type="text" id="chemBldAtomic" placeholder="الذري Z" value="11" style="width: 50px; text-align: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.8rem; padding: 3px;">
+                <input type="text" id="chemBldCharge" placeholder="الشحنة (+1)" value="" style="width: 55px; text-align: center; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.8rem; padding: 3px;">
+              </div>
+              <button type="button" class="btn btn-outline" style="width: 100%; font-size: 0.72rem; padding: 3px 6px; font-weight: bold; color: #10b981; border-color: rgba(16,185,129,0.4);" onclick="window.insertBuiltElementIsotope()">
+                <i class="fa-solid fa-plus"></i> إدراج النظير بالصيغة الوزارية
+              </button>
+            </div>
+
+            <!-- كارت 2: مولد معادلة التفاعل المتزنة -->
+            <div class="chem-builder-card">
+              <div class="chem-builder-card-title">
+                <i class="fa-solid fa-arrow-right-arrow-left" style="color: #10b981;"></i>
+                <span>مولد معادلة التفاعل الكيميائي</span>
+              </div>
+              <div style="display: flex; gap: 4px; margin-bottom: 5px;">
+                <input type="text" id="chemBldReactants" placeholder="المتفاعلات (2H_2 + O_2)" value="2H_2 + O_2" style="flex: 1; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.78rem; padding: 3px 6px;">
+                <select id="chemBldArrow" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.78rem; padding: 3px;">
+                  <option value="\\rightarrow">→</option>
+                  <option value="\\rightleftharpoons">⇌</option>
+                  <option value="\\xrightarrow{\\Delta}">→ᐩ</option>
+                  <option value="\\xrightarrow{\\text{Pt}}">→(Pt)</option>
+                </select>
+                <input type="text" id="chemBldProducts" placeholder="النواتج (2H_2O)" value="2H_2O" style="flex: 1; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.78rem; padding: 3px 6px;">
+              </div>
+              <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+                <input type="text" id="chemBldNote" placeholder="ملاحظة أو حرارة (اختياري، مثلاً: \\Delta H < 0)" style="width: 100%; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-main); font-size: 0.75rem; padding: 3px 6px;">
+              </div>
+              <button type="button" class="btn btn-outline" style="width: 100%; font-size: 0.72rem; padding: 3px 6px; font-weight: bold; color: #10b981; border-color: rgba(16,185,129,0.4);" onclick="window.insertBuiltChemEquation()">
+                <i class="fa-solid fa-plus"></i> إدراج المعادلة في السؤال
+              </button>
+            </div>
+
+            <!-- كارت 3: حاسبة الترتيب الإلكتروني والدورة والزمرة الوزارية الذكية -->
+            <div class="chem-builder-card" style="grid-column: 1 / -1; background: rgba(6, 78, 59, 0.25); border-color: rgba(16, 185, 129, 0.4);">
+              <div class="chem-builder-card-title">
+                <i class="fa-solid fa-brain" style="color: #34d399;"></i>
+                <span>الحاسبة الذكية: توليد الترتيب الإلكتروني والدورة والزمرة ورمز لويس آلياً</span>
+              </div>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <label style="font-size: 0.76rem; color: var(--text-main); font-weight: 700;">أدخل العدد الذري (Z):</label>
+                <input type="number" id="chemBldCalcZ" min="1" max="36" value="12" style="width: 70px; text-align: center; font-weight: 900; background: var(--bg-surface); border: 1px solid #10b981; border-radius: 4px; color: #34d399; font-size: 0.9rem; padding: 3px;">
+                <button type="button" class="btn" style="background: #059669; color: #ffffff; font-size: 0.76rem; padding: 4px 12px; font-weight: bold; border: none; border-radius: 4px;" onclick="window.calculateAndInsertElectronConfig()">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i> حساب وتوليد الترتيب الإلكتروني والإدراج فوراً
+                </button>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">(يحسب الترتيب، الدورة، الزمرة، إلكترونات التكافؤ، ورمز لويس طبقاً للمنهج الوزاري)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 /**
  * Question Modal (Create / Edit)
  */
@@ -3664,6 +4345,7 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           <option value="arabic" ${qSubject === 'arabic' ? 'selected' : ''}>عربي (اللغة العربية)</option>
           <option value="english" ${qSubject === 'english' ? 'selected' : ''}>English (اللغة الإنكليزية)</option>
           <option value="math" ${qSubject === 'math' ? 'selected' : ''}>رياضيات (الرياضيات والمعادلات)</option>
+          <option value="chemistry" ${qSubject === 'chemistry' ? 'selected' : ''}>كيمياء (الكيمياء والجدول الدوري والمعادلات)</option>
         </select>
       </div>
 
@@ -3717,22 +4399,30 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 6px;">
           <label class="form-label" style="margin: 0;"><i class="fa-solid fa-align-right text-accent"></i> نص السؤال / صيغة المسألة <span class="badge-optional">(اختياري)</span></label>
 
-          <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
-            <i class="fa-solid fa-square-root-variable text-accent"></i>
-            <span>ستوديو الرياضيات والمعادلات الوزارية</span>
-            <span class="badge-math-pro">الأس والأساس والكسور والجذور</span>
-          </button>
+          <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
+              <i class="fa-solid fa-square-root-variable text-accent"></i>
+              <span>ستوديو الرياضيات</span>
+              <span class="badge-math-pro">الأس والكسور والجذور</span>
+            </button>
+            <button type="button" class="btn-chem-studio-toggle-pill ${(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem') ? 'active' : ''}" id="btnToggleChemStudio" onclick="window.toggleChemStudio()" title="فتح / إغلاق ستوديو الكيمياء والجدول الدوري والمعادلات الوزارية">
+              <i class="fa-solid fa-flask-vial" style="color: #10b981;"></i>
+              <span>ستوديو الكيمياء</span>
+              <span class="badge-chem-pro">عناصر، مركبات، معادلات</span>
+            </button>
+          </div>
         </div>
 
         ${buildMathStudioHTML(qSubject === 'math' || currentQuestion.type === 'math_problem')}
+        ${buildChemStudioHTML(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem')}
 
         <textarea class="form-control" id="modalQText" dir="${isEnMode ? 'ltr' : 'rtl'}" style="text-align: ${isEnMode ? 'left' : 'right'}; font-family: ${isEnMode ? 'Inter, Roboto, sans-serif' : 'inherit'}; font-size: 0.95rem;" rows="3" placeholder="${isEnMode ? 'Write the question text or problem here...' : 'اكتب نص السؤال، المسألة، أو الفقرة هنا (أو اتركه فارغاً)...'}">${currentQuestion.text || ''}</textarea>
 
-        <!-- المعاينة الوزارية الحية الفورية للمسألة والمعادلة الرياضية -->
+        <!-- المعاينة الوزارية الحية الفورية للمسألة والمعادلة الرياضية أو الكيميائية -->
         <div class="math-live-preview-box" id="modalMathPreviewWrapper">
           <div class="math-preview-badge">
             <i class="fa-solid fa-eye text-primary"></i>
-            <span>المعاينة الوزارية الفورية للمسألة (كما ستظهر تماماً في ورقة الامتحان):</span>
+            <span>المعاينة الوزارية الفورية للمسألة / المعادلة (كما ستظهر تماماً في ورقة الامتحان):</span>
           </div>
           <div class="math-preview-content" id="modalMathLivePreview">
             <!-- Rendered Live via KaTeX -->
@@ -5663,6 +6353,22 @@ const SUBJECT_PRESETS = {
       reasoning: 'علل النتيجة الرياضية',
       math_problem: 'مسألة ومعادلة'
     }
+  },
+  chemistry: {
+    name: 'الكيمياء',
+    direction: 'rtl',
+    badgeClass: 'sub-chemistry',
+    btnLabels: {
+      mcq: 'اختر الإجابة الصحيحة',
+      true_false: 'صح أو خطأ علمي',
+      definitions: 'تعاريف ومصطلحات كيميائية',
+      comparisons: 'مقارنات وتفاعلات',
+      fill_blanks: 'أكمل المعادلات والرموز',
+      matching: 'صل العنصر بالتكافؤ/المركب',
+      essay: 'شرح وتجربة مختبرية',
+      reasoning: 'علل كيميائياً (لوشاتليه)',
+      math_problem: 'مسألة وحسابات كيميائية'
+    }
   }
 };
 
@@ -5723,6 +6429,11 @@ function setSubjectMode(mode, userInitiated = false) {
       applyPaperSettings();
       renderAll();
       showToast('تم تفعيل نمط الرياضيات والمعادلات والحساب 📐', 'info');
+    } else if (mode === 'chemistry') {
+      appState.settings.direction = 'rtl';
+      applyPaperSettings();
+      renderAll();
+      showToast('تم تفعيل نمط الكيمياء والجدول الدوري والمعادلات ⚗️🧪', 'info');
     } else {
       appState.settings.direction = 'rtl';
       applyPaperSettings();
