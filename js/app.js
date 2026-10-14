@@ -1255,6 +1255,18 @@ function syncHeaderFromInputs() {
   }
 }
 
+window.setQuickGrade = function(gradeName) {
+  const inp = document.getElementById('hdrGrade');
+  if (inp) {
+    inp.value = gradeName;
+  }
+  appState.header.grade = gradeName;
+  if (typeof syncHeaderInputs === 'function') syncHeaderInputs();
+  if (typeof renderPaperHeader === 'function') renderPaperHeader();
+  if (typeof autoSaveDraft === 'function') autoSaveDraft();
+  showToast(`تم تعيين المرحلة: ${gradeName} 🎓`, 'info');
+};
+
 /**
  * Saved Exams Archive Management
  */
@@ -1333,7 +1345,7 @@ function getSavedExamsArchive() {
 window.reseedDefaultArchiveModels = function() {
   initDefaultArchiveModels(true);
   renderArchiveList();
-  showToast('تم استيراد وتحديث النماذج الوزارية الخمسة (إسلامية، إنكليزي، رياضيات، فيزياء، عربي) بنجاح في الأرشيف! 🏛️', 'success');
+  showToast('تم استيراد وتحديث النماذج الوزارية الـ 12 المعتمدة (الثالث متوسط والسادس إعدادي لجميع المواد) بنجاح في الأرشيف! 🏛️', 'success');
 };
 
 function saveExamsArchive(list) {
@@ -1514,6 +1526,16 @@ function renderArchiveList(filterQuery = '') {
       list = list.filter(item => item.isModelPreset);
     } else if (subj === 'drafts') {
       list = list.filter(item => item.isDraft);
+    } else if (subj === 'grade_3rd') {
+      list = list.filter(item => {
+        const g = (item.grade || (item.data && item.data.header && item.data.header.grade) || item.title || '').toLowerCase();
+        return g.includes('ثالث') || g.includes('3rd');
+      });
+    } else if (subj === 'grade_6th') {
+      list = list.filter(item => {
+        const g = (item.grade || (item.data && item.data.header && item.data.header.grade) || item.title || '').toLowerCase();
+        return g.includes('سادس') || g.includes('6th');
+      });
     } else {
       const sLower = subj.toLowerCase();
       list = list.filter(item => {
@@ -1538,7 +1560,7 @@ function renderArchiveList(filterQuery = '') {
       <div style="grid-column: 1 / -1; text-align: center; padding: 2.5rem; color: var(--text-muted);">
         <i class="fa-solid fa-folder-open" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--text-dim);"></i>
         <p style="font-weight: 700;">لا توجد اختبارات أو نماذج مطابقة للبحث أو الفلتر المختار.</p>
-        <p style="font-size: 0.85rem; margin-top: 4px;">يمكنك النقر على زر "الكل" أو "استيراد النماذج الوزارية (5)" لاسترجاع جميع النماذج الرسمية.</p>
+        <p style="font-size: 0.85rem; margin-top: 4px;">يمكنك النقر على زر "الكل" أو "استيراد النماذج الوزارية (12 نموذج)" لاسترجاع جميع النماذج الرسمية.</p>
       </div>
     `;
     return;

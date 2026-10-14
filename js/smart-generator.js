@@ -897,6 +897,592 @@ const OFFICIAL_MINISTERIAL_ARCHIVE_MODELS = [
       ]
     }
   }
+  ,
+  /* ==========================================================================
+     نماذج الامتحانات الوزارية المعتمدة - الصف السادس الإعدادي (العلمي والأدبي)
+     ========================================================================== */
+  {
+    "id": "preset_model_islamic_6th",
+    "title": "🕌 الامتحان الوزاري لمادة التربية الإسلامية (الصف السادس الإعدادي)",
+    "subject": "التربية الإسلامية",
+    "grade": "الصف السادس الإعدادي",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "جمهورية العراق",
+        "ministry": "وزارة التربية - اللجنة الدائمة للامتحانات العامة",
+        "school": "الامتحانات العامة للدراسة الإعدادية",
+        "examTitle": "الامتحان الوزاري النهائي لمادة التربية الإسلامية",
+        "subject": "التربية الإسلامية والقرآن الكريم",
+        "grade": "الصف السادس الإعدادي",
+        "term": "الدور الأول",
+        "year": "2025 - 2026 م",
+        "time": "ثلاث ساعات",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "اللجنة الوزارية المركزية",
+        "instructions": "ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. الترك الضمني موضح داخل فروع الأسئلة."
+      },
+      "settings": {
+        "direction": "rtl",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "is6_q1",
+          "type": "essay",
+          "title": "س1 / أحكام التلاوة والتجويد",
+          "text": "(أ) عرّف لام التعريف، ثم بيّن حكم لام (ال) في خمس من الكلمات القرآنية الآتية موضحاً السبب: (الْقَمَر، الشَّمْس، الْغَفُور، النَّاس، الْبَصِير، الرَّحْمَٰن).\n\n(ب) بيّن حكم الراء (تفخيماً أو ترقيقاً) في أربع من الكلمات الآتية مع ذكر السبب: (قُرْآن، فِرْعَوْن، رَحْمَة، نَذِير، مِرْيَة).",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "islamic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) لام التعريف: هي لام ساكنة تدخل على الأسماء النكرة لتعريفها، وحكمها الإظهار القمري إذا جاء بعدها أحد حروف (ابغ حجك وخف عقيمه)، والإدغام الشمسي فيما عداها.\n1. الْقَمَر: إظهار قمري (القاف حرف قمري).\n2. الشَّمْس: إدغام شمسي (الشين حرف شمسي).\n3. الْغَفُور: إظهار قمري (الغين حرف قمري).\n4. النَّاس: إدغام شمسي (النون حرف شمسي).\n5. الْبَصِير: إظهار قمري (الباء حرف قمري).\n\n(ب) أحكام الراء:\n1. قُرْآن: تفخيم (الراء ساكنة بعد ضم).\n2. فِرْعَوْن: ترقيق (الراء ساكنة بعد كسر أصلي).\n3. رَحْمَة: تفخيم (الراء مفتوحة).\n4. نَذِير: ترقيق عند الوقف (الراء متطرفة مسبوقة بياء ساكنة مدية)."
+        },
+        {
+          "id": "is6_q2",
+          "type": "essay",
+          "title": "س2 / الحفظ (النصوص القرآنية المقررة)",
+          "text": "اكتب من سورة النجم من قوله تعالى: ﴿وَالنَّجْمِ إِذَا هَوَىٰ﴾ إلى قوله تعالى: ﴿عِندَهَا جَنَّةُ الْمَأْوَىٰ﴾ مضبوطاً بالشكل التام مع مراعاة الرسم القرآني.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تذكر",
+          "subject": "islamic",
+          "linesCount": 8,
+          "modelAnswer": "بسم الله الرحمن الرحيم\n﴿وَالنَّجْمِ إِذَا هَوَىٰ ﴿1﴾ مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوَىٰ ﴿2﴾ وَمَا يَنطِقُ عَنِ الْهَوَىٰ ﴿3﴾ إِنْ هُوَ إِلَّا وَحْيٌ يُوحَىٰ ﴿4﴾ عَلَّمَهُ شَدِيدُ الْقُوَىٰ ﴿5﴾ ذُو مِرَّةٍ فَاسْتَوَىٰ ﴿6﴾ وَهُوَ بِالْأُفُقِ الْأَعْلَىٰ ﴿7﴾ ثُمَّ دَنَا فَتَدَلَّىٰ ﴿8﴾ فَكَانَ قَابَ قَوْسَيْنِ أَوْ أَدْنَىٰ ﴿9﴾ فَأَوْحَىٰ إِلَىٰ عَبْدِهِ مَا أَوْحَىٰ ﴿10﴾ مَا كَذَبَ الْفُؤَادُ مَا رَأَىٰ ﴿11﴾ أَفَتُمَارُونَهُ عَلَىٰ مَا يَرَىٰ ﴿12﴾ وَلَقَدْ رَآهُ نَزْلَةً أُخْرَىٰ ﴿13﴾ عِندَ سِدْرَةِ الْمُنتَهَىٰ ﴿14﴾ عِندَهَا جَنَّةُ الْمَأْوَىٰ ﴿15﴾﴾\nصدق الله العظيم"
+        },
+        {
+          "id": "is6_q3",
+          "type": "essay",
+          "title": "س3 / الفهم والتفسير والمعاني والمناقشة",
+          "text": "(أ) ما معنى المفردات القرآنية الآتية: (مَا ضَلَّ صَاحِبُكُمْ ، ذُو مِرَّةٍ ، فَكَانَ قَابَ قَوْسَيْنِ ، مَا زَاغَ الْبَصَرُ)؟\n\n(ب) لماذا أقسم الله تعالى بالنجم؟ وما دلالة قوله تعالى: ﴿وَمَا يَنطِقُ عَنِ الْهَوَىٰ ۝ إِنْ هُوَ إِلَّا وَحْيٌ يُوحَىٰ﴾ في عصمة النبي ﷺ وسنته الشريفة؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "فهم",
+          "subject": "islamic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) معاني الكلمات:\n- مَا ضَلَّ صَاحِبُكُمْ: ما حاد محمد ﷺ عن طريق الحق وما زاغ عن الرشاد.\n- ذُو مِرَّةٍ: ذو قوة وحصافة وخلق حسن ومظهر مهيب (وهو جبريل عليه السلام).\n- قَابَ قَوْسَيْنِ: مقدار مسافة قوسين عربيين في القرب والاتصال.\n- مَا زَاغَ الْبَصَرُ: ما مال بصر النبي ﷺ عما أُمر برؤيته ولا جاوزه.\n\n(ب) أقسم الله تعالى بالنجم لبيان عظيم شأنه وما فيه من هداية وإعجاز في كبد السماء، والآية تؤكد عصمة النبي الأكرم ﷺ في تبليغ الوحي والدين، وأن سنته وأقواله الشريفة صادرة عن وحي إلهي وتشريع رباني لا هوى فيه."
+        },
+        {
+          "id": "is6_q4",
+          "type": "essay",
+          "title": "س4 / الحديث النبوي الشريف",
+          "text": "(أ) اكتب حديثاً نبوياً شريفاً في (محاسبة النفس) عن النبي محمد ﷺ، واذكر أهم ثلاث نقاط مما يرشد إليه الحديث.\n\n(ب) من هو الكَيِّس؟ ومن هو العاجز بحسب التوجيه النبوي الشريف؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "islamic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) نص الحديث الشريف:\nقال رسول الله ﷺ: «الكَيِّسُ مَنْ دَانَ نَفْسَهُ وَعَمِلَ لِمَا بَعْدَ المَوْتِ، وَالعَاجِزُ مَنْ أَتْبَعَ نَفْسَهُ هَوَاهَا وَتَمَنَّى عَلَى اللَّهِ الأَمَانِي».\nأهم ما يرشد إليه الحديث:\n1. وجوب محاسبة النفس في كل قول وفعل قبل فوات الأوان.\n2. الاستعداد للدار الآخرة بالأعمال الصالحة ومراقبة الله.\n3. التحذير من اتباع الهوى والغرور والأماني الباطلة دون عمل.\n\n(ب) الكيّس: هو العاقل الحكيم الضابط لنفسه المحاسب لها العامل لآخرته. أما العاجز: فهو المتبع لشهواته وأهوائه المقصر في الطاعات والمتمني على الله المغفرة دون توبة أو عمل."
+        },
+        {
+          "id": "is6_q5",
+          "type": "essay",
+          "title": "س5 / الأبحاث الإسلامية والتهذيب",
+          "text": "(أ) بيّن مكانة الأسرة في المنظومة الإسلامية، وما أهم الواجبات المشتركة بين الزوجين لحفظ الاستقرار التربوي؟\n\n(ب) عرّف التكبر، واذكر اثنين من مساوئه وعواقبه الوخيمة على المجتمع، ومثّل لعلاجه من الهدي النبوي.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "islamic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) الأسرة هي اللبنة الأولى والملاذ التربوي في المجتمع الإسلامي، ومن واجباتها: المودة والرحمة، تقاسم المسؤوليات، حسن العشرة، ورعاية الأبناء وتربيتهم على الفضيلة.\n\n(ب) التكبر: هو بطر الحق وغمط الناس والتعالي عليهم بالمال أو الجاه أو النسب. مساوئه: انتشار البغضاء، سقوط الهيبة، والحرمان من الجنة. علاجه: التواضع لله، تذكر أصل خلقة الإنسان من تراب، والتمثل بسيرة النبي ﷺ في تواضعه ومشاركته للفقراء والمحتاجين."
+        }
+      ]
+    }
+  },
+
+  {
+    "id": "preset_model_arabic_6th",
+    "title": "📖 الامتحان الوزاري لمادة اللغة العربية والأدب (الصف السادس الإعدادي)",
+    "subject": "اللغة العربية",
+    "grade": "الصف السادس الإعدادي",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "جمهورية العراق",
+        "ministry": "وزارة التربية - اللجنة الدائمة للامتحانات العامة",
+        "school": "الامتحانات العامة للدراسة الإعدادية",
+        "examTitle": "الامتحان الوزاري النهائي لمادة اللغة العربية",
+        "subject": "اللغة العربية والأدب والنقد",
+        "grade": "الصف السادس الإعدادي",
+        "term": "الدور الأول",
+        "year": "2025 - 2026 م",
+        "time": "ثلاث ساعات",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "اللجنة الوزارية المشتركة",
+        "instructions": "ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (قواعد: 40 درجة، أدب ونصوص: 30 درجة، نقد وبلاغة: 10 درجات، إنشاء: 20 درجة)."
+      },
+      "settings": {
+        "direction": "rtl",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "ar6_q1",
+          "type": "essay",
+          "title": "س1 / قواعد اللغة العربية (أسلوب الاستفهام)",
+          "text": "(أ) قال الشاعر: «أَتَدْرِي قَلْبَ مَنْ جَرَحَتْ يَدَاكَا ... وَمَا لَيْلُ المَتَيَّمِ يَا دُجَاكَا»\n1. ما نوع الاستفهام في الشطر الأول؟ وهل يجوز استبدال (هل) بالهمزة؟ ولماذا؟\n2. أعرب اسم الاستفهام (مَا) في الشطر الثاني معللاً القاعدة النحوية.\n\n(ب) قال تعالى: ﴿قَالُوا يَا وَيْلَنَا مَن بَعَثَنَا مِن مَّرْقَدِنَا﴾. ما دلالة اسم الاستفهام (مَن)؟ وما موقعه الإعرابي مع ذكر السبب؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "arabic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) 1. نوع الاستفهام: تصديق (لأنه يجاب عنه بحرف جواب ولخلو الجملة من أم المعادلة). نعم يجوز الاستبدال فنقول: «هل تدري؟» لأن الكلام مثبت والاستفهام تصديق.\n2. إعراب (ما): اسم استفهام مبني على السكون في محل رفع مبتدأ أو خبر مقدم جوازاً؛ تلاه اسم معرفة (ليلُ المتيمِ - معرف بالإضافة).\n\n(ب) دلالة (مَن): للعاقل.\nإعرابه: اسم استفهام مبني على السكون في محل رفع مبتدأ، السبب: تلاه فعل متعدٍ استوفى مفعوله (بعثَنا - نا مفعول به)."
+        },
+        {
+          "id": "ar6_q2",
+          "type": "essay",
+          "title": "س2 / قواعد اللغة العربية (أسلوب النفي)",
+          "text": "(أ) قال تعالى: ﴿وَمَا يُغْنِي عَنْهُ مَالُهُ إِذَا تَرَدَّىٰ﴾ وقال الشاعر: «لَيْسَ التَّعَلُّلُ بِالآمَالِ يُنْجِينَا».\n1. ما نوع (ما) في الآية الكريمة؟ وما أثرها الإعرابي والمعنوي في الفعل؟\n2. دلّ على معمولي الفعل الناقص (ليس)، ثم أكّد نفيها بحرف جر زائد مضبوطاً بالشكل.\n\n(ب) فرّق بين المعنى الإعرابي والزمني لكل من: (لَمْ يَكْتُبْ) و (لَنْ يَكْتُبَ).",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "arabic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) 1. نوع (ما): نافية غير عاملة، دخلت على الفعل المضارع، أثرها المعنوي: تنفي حدوث الفعل المضارع وتخلصه للحال دون قرينة، أثرها الإعرابي: لا عمل لها يبقى الفعل المضارع مرفوعاً.\n2. معمولي ليس: اسمها: (التعللُ)، خبرها: الجملة الفعلية (يُنجينا). التوكيد: «ليس التعللُ بمُنجينا» (الباء حرف جر زائد في خبر ليس).\n\n(ب) - لم يكتب: (لم) أداة نفي وجزم وقلب، تجزم الفعل المضارع وتقلب دلالته الزمنية إلى الماضي ونفيها مؤكد.\n- لن يكتب: (لن) أداة نفي ونصب واستقبال، تنصب الفعل المضارع وتنفي حدوثه في المستقبل نفياً مؤكداً لا يحتاج إلى قسم."
+        },
+        {
+          "id": "ar6_q3",
+          "type": "essay",
+          "title": "س3 / قواعد اللغة العربية (التوكيد والتقديم والتأخير)",
+          "text": "(أ) قال تعالى: ﴿وَفِي السَّمَاءِ رِزْقُكُمْ وَمَا تُوعَدُونَ﴾. عيّن المتقدم، وبيّن نوعه، وحكم تقديمه معللاً، واذكر فائدته البلاغية.\n\n(ب) استخرج التوكيد من النصوص الآتية مبيناً طريقته ونوعه:\n1. قال تعالى: ﴿فَسَجَدَ الْمَلَائِكَةُ كُلُّهُمْ أَجْمَعُونَ﴾.\n2. «الصِّدْقَ الصِّدْقَ فَإِنَّهُ مَنْجَاةٌ».",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "arabic",
+          "linesCount": 6,
+          "modelAnswer": "(أ) المتقدم: (في السماءِ)، نوعه: تقديم الخبر على المبتدأ (شبه جملة)، حكمه: جوازاً، السبب: لأن المبتدأ معرفة (رزقُكم - معرف بالإضافة)، فائدته: التوكيد والتخصيص.\n\n(ب) 1. (كلّهم): توكيد معنوي، (أجمعون): توكيد معنوي ثانٍ لتقوية الشمول.\n2. (الصدقَ الثانية): توكيد لفظي بتكرار الاسم المفرد منصوب."
+        },
+        {
+          "id": "ar6_q4",
+          "type": "essay",
+          "title": "س4 / الأدب والنصوص والشعر العربي الحديث",
+          "text": "(أ) عرّف مدرسة الإحياء الشعرية، ومن هم روادها في مصر والعراق؟ وما هي الخصائص الفنية لشعر الشاعر محمود سامي البارودي؟\n\n(ب) انسب الشعراء الآتين إلى مدارسهم الشعرية واذكر عنوان قصيدة لكل منهم: (بدر شاكر السياب ، ميخائيل نعيمة ، محمد سعيد الحبوبي). ثم اكتب ثلاثة أبيات مضبوطة بالشكل لقصيدة أحدهم.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تذكر",
+          "subject": "arabic",
+          "linesCount": 8,
+          "modelAnswer": "(أ) مدرسة الإحياء: مدرسة شعرية ظهرت أواخر القرن التاسع عشر نادت ببعث التقاليد الشعرية الأصيلة من قوة العبارة وجزالة الألفاظ ومتانة البناء. روادها: البارودي وشوقي بمصر، والحبوبي والرصافي والكاظمي بالعراق. خصائص البارودي: جزالة الألفاظ، نقاء الديباجة، التمسك بعمود الشعر العربي.\n\n(ب) - بدر شاكر السياب: مدرسة الشعر الحر (قصيدة: أنشودة المطر).\n- ميخائيل نعيمة: مدرسة المهجر / الرابطة القلمية (قصيدة: أخي).\n- محمد سعيد الحبوبي: مدرسة الإحياء (موشح: بلادك نجد).\nأبيات الحبوبي:\nهَزَّتِ الزَّوْرَاءُ أَعْطَافَ الصَّفَا ... فَصَفَتْ لِي رَغْدَةُ الْعَيْشِ الْهَنِي\nفَارْعَ مِنْ عَهْدِ دِمَشْقٍ مَا صَفَا ... وَسَقَى اللَّهُ زَمَانَ الْوَصْلِ بِالْغُوطَتَيْنِ"
+        },
+        {
+          "id": "ar6_q5",
+          "type": "essay",
+          "title": "س5 / النقد الأدبي والتعبير الإنشائي",
+          "text": "(أ) ما هي عناصر العمل الأدبي الأربعة؟ وما وظيفة الخيال الفني في التجربة الشعورية لدى الشاعر؟\n\n(ب) التعبير والإنشاء: اكتب مقالاً أدبياً رصيناً بعنوان:\n«العلم والأخلاق دعامتان لا تنفصلان في بناء حضارة الأوطان ورفعة العراق»\n(مراعياً وضوح الفكرة، سلامة الإملاء وعلامات الترقيم، وتضمين الشواهد القرآنية والشعرية).",
+          "score": 20,
+          "difficulty": "سهل",
+          "bloom": "إبداع",
+          "subject": "arabic",
+          "linesCount": 10,
+          "modelAnswer": "(أ) عناصر العمل الأدبي: 1) العاطفة، 2) الفكرة، 3) الخيال، 4) الأسلوب واللغة.\nوظيفة الخيال: يجسد المعاني المجردة في صور حسية نابضة، ويمنح الأفكار أبعاداً جمالية وشعورية تثير الإعجاب في نفس المتلقي.\n\n(ب) يُقوّم المقال على: ديباجة التعبير، ترابط الأفكار، توظيف الآيات القرآنية والأبيات الشعرية، وحسن استخدام علامات الترقيم (الفاصلة، النقطة، علامات التنصيص)."
+        }
+      ]
+    }
+  },
+
+  {
+    "id": "preset_model_english_6th",
+    "title": "🇬🇧 Ministerial Exam - English Language (6th Preparatory)",
+    "subject": "English Language",
+    "grade": "6th Preparatory",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "Republic of Iraq",
+        "ministry": "Ministry of Education - General Examination Board",
+        "school": "General Preparatory Baccalaureate Examinations",
+        "examTitle": "Ministerial Final Baccalaureate Exam - English Language",
+        "subject": "English Language & Literature",
+        "grade": "6th Preparatory (Scientific & Literary)",
+        "term": "1st Round",
+        "year": "2025 - 2026",
+        "time": "3 Hours",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "Central Examination Committee",
+        "instructions": "Note: Answer all questions. Total marks: 100 Marks. (Q1=25, Q2=20, Q3=20, Q4=15, Q5=20)."
+      },
+      "settings": {
+        "direction": "ltr",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "en6_q1",
+          "type": "essay",
+          "title": "Q1 / Reading Comprehension (Unseen & Textbook Passages) (25 Marks)",
+          "text": "(A) Read the unseen passage carefully, then answer (5) questions:\nRenewable energy sources such as solar power and wind generation have become crucial in modern times. Unlike fossil fuels, green energy does not emit greenhouse gases that cause global warming. Countries with abundant sunlight are currently investing heavily in photovoltaic technologies to supply power stations and desalination plants sustainably.\n1. Why is renewable energy superior to conventional fossil fuels?\n2. What technology is utilized in countries with abundant sunlight?\n3. Does green energy cause global warming? (Yes / No)\n4. Find a word in the text that means: (producing/making) ............\n5. Give a suitable title to the passage.\n\n(B) Answer or complete (5) of the following from your textbook passages:\n1. Zaid Tariq was saved from the shark by (six dolphins / a coastguard boat directly).\n2. Why was Mustafa puzzled when he woke up in the morning?\n3. Latifa suffered from diabetes, so she needed regular injections of ............\n4. What is a radar detector? And how do police officers maintain its accuracy?\n5. Why do bankers and financial advisors need good communication skills?",
+          "score": 25,
+          "difficulty": "متوسط",
+          "bloom": "فهم",
+          "subject": "english",
+          "linesCount": 8,
+          "modelAnswer": "(A) 1. Because it does not emit greenhouse gases and is sustainable.\n2. Photovoltaic solar technologies.\n3. No, it does not.\n4. Generation.\n5. Renewable Energy and the Future.\n\n(B) 1. Six dolphins formed a protective circle.\n2. Because his mother usually woke him up and helped him get dressed, but she did not come.\n3. Insulin.\n4. It is a device used by drivers to detect police speed cameras. Police test them regularly.\n5. To explain complex financial plans clearly and convince clients to make sound investments."
+        },
+        {
+          "id": "en6_q2",
+          "type": "essay",
+          "title": "Q2 / Grammar and Functional Language (20 Marks)",
+          "text": "Do as required between brackets for (10) sentences only:\n1. She (read) a historical novel when her father entered the library. (Correct the verb form)\n2. I didn't (used to / use to) like olives, but now I adore them. (Choose)\n3. If she had passed the aptitude exam, she (study) aeronautical engineering. (Complete: 3rd Conditional)\n4. \"Where did you leave your luggage?\" The police officer asked me. (Reported Question)\n5. The contractor is renovating the ancient heritage building. (Rewrite in Passive Voice)\n6. My uncle Albert, (who / which) still rides a motorbike, is eighty-four years old. (Choose)\n7. Define an architect. (Use: 'design buildings')\n8. You smoke too much. You (should / shouldn't) consult a physician. (Give advice)\n9. I ate three bars of chocolate. Now I feel sick. (Express regret using 'I wish')\n10. By 2030, scientists (discover) new vaccines for tropical illnesses. (Future Perfect)",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "english",
+          "linesCount": 8,
+          "modelAnswer": "1. was reading\n2. use to (after didn't)\n3. would have studied\n4. The police officer asked me where I had left my luggage.\n5. The ancient heritage building is being renovated by the contractor.\n6. who\n7. An architect is someone who designs buildings.\n8. should\n9. I wish I hadn't eaten three bars of chocolate.\n10. will have discovered"
+        },
+        {
+          "id": "en6_q3",
+          "type": "essay",
+          "title": "Q3 / Vocabulary, Spelling and Language Usage (20 Marks)",
+          "text": "(A) Complete the sentences with suitable words from the box below:\n[ valid , mandatory , allergic , investigate , overdraft ]\n1. Wearing a seatbelt while driving on highways is ............ by law.\n2. My passport is ............ for another seven years.\n3. The detectives arrived to ............ the bank robbery.\n4. I am severely ............ to seafood and peanuts.\n\n(B) Matching & Spelling:\n1. Write the opposite using the proper prefix: legal -> ............, patient -> ............\n2. Joint in the arm: e............ , w............\n3. Match the collocation: take up -> (a hobby / an exam).",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "english",
+          "linesCount": 6,
+          "modelAnswer": "(A) 1. mandatory\n2. valid\n3. investigate\n4. allergic\n\n(B) 1. illegal , impatient\n2. elbow , wrist\n3. take up a hobby"
+        },
+        {
+          "id": "en6_q4",
+          "type": "essay",
+          "title": "Q4 / Literature Focus (The Swing & The Canary) (15 Marks)",
+          "text": "Answer or complete (5) of the following:\n1. Mohammed Khudhair wrote \"The Swing\" after the war against ............ in the year ............\n2. What moral lesson does \"The Swing\" emphasize to humanity?\n3. Sattar came to the house to tell the family that Ali was ............\n4. In \"The Canary\" by Katherine Mansfield, why couldn't the woman take down the bird cage after its death?\n5. Describe the singing of the canary and how it comforted the lonely woman.",
+          "score": 15,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "english",
+          "linesCount": 6,
+          "modelAnswer": "1. Israel , 1967 (the Six-Day War)\n2. It emphasizes that war destroys everything and leads only to death, misery and destruction of innocence.\n3. killed in battle.\n4. Because the empty cage reminded her of his joyful presence, and her heart felt hopelessly empty.\n5. His singing was wonderfully sweet, lively and expressive; it felt like a dear companion sharing her everyday thoughts."
+        },
+        {
+          "id": "en6_q5",
+          "type": "essay",
+          "title": "Q5 / Written Composition (20 Marks)",
+          "text": "Choose ONE of the following topics and write an essay of about (100 - 120) words:\n\nTopic (A): Cigarette advertising should be strictly illegal and banned in public places.\n(Write about the hazards of passive smoking, targeting teenagers, and healthcare costs).\n\nTopic (B): An official email applying for an administrative assistant position in an international firm.",
+          "score": 20,
+          "difficulty": "سهل",
+          "bloom": "إبداع",
+          "subject": "english",
+          "linesCount": 10,
+          "modelAnswer": "Topic (A) Outline:\n- Introduction: Smoking as a leading cause of preventable diseases.\n- Body Paragraph 1: How colorful billboards lure adolescents and glamorize nicotine addiction.\n- Body Paragraph 2: The medical burden on healthcare systems and danger of secondhand smoke.\n- Conclusion: A call for total legislative bans on tobacco sponsorship and promotional ads."
+        }
+      ]
+    }
+  },
+
+  {
+    "id": "preset_model_math_6th",
+    "title": "📐 الامتحان الوزاري لمادة الرياضيات (الصف السادس العلمي)",
+    "subject": "الرياضيات",
+    "grade": "الصف السادس العلمي",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "جمهورية العراق",
+        "ministry": "وزارة التربية - اللجنة الدائمة للامتحانات العامة",
+        "school": "الامتحانات العامة للدراسة الإعدادية",
+        "examTitle": "الامتحان الوزاري النهائي لمادة الرياضيات",
+        "subject": "الرياضيات",
+        "grade": "الصف السادس العلمي",
+        "term": "الدور الأول",
+        "year": "2025 - 2026 م",
+        "time": "ثلاث ساعات",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "اللجنة الوزارية المشتركة",
+        "instructions": "ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (يُمنع استخدام الحاسبة الإلكترونية منعاً باتاً)."
+      },
+      "settings": {
+        "direction": "rtl",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "ma6_q1",
+          "type": "math_problem",
+          "title": "س1 / الأعداد المركبة (مبرهنة ديموافر والجذور)",
+          "text": "(أ) جد قيمتي $x, y \\in \\mathbb{R}$ اللتين تحققان المعادلة الآتية:\n$\\frac{3+i}{2-i} + (x + yi) = (1 - 2i)^2$\n\n(ب) احسب باستخدام مبرهنة ديموافر $De Moivre$ أو نتيجتها كلاً مما يأتي:\n$\\left[\\cos\\left(\\frac{\\pi}{6}\\right) + i\\sin\\left(\\frac{\\pi}{6}\\right)\\right]^{-5}$\nثم جد الجذور التكعيبية للعدد المركب $Z = 8i$.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "math",
+          "linesCount": 8,
+          "modelAnswer": "(أ) تبسيط الطرف الأيسر:\n$\\frac{3+i}{2-i} \\cdot \\frac{2+i}{2+i} = \\frac{6+3i+2i-1}{4+1} = \\frac{5+5i}{5} = 1 + i$\nالطرف الأيمن: $(1-2i)^2 = 1 - 4i - 4 = -3 - 4i$\nإذن: $(1+i) + (x+yi) = -3 - 4i$\n$(x+1) + (y+1)i = -3 - 4i$\nبمساواة الحقيقي مع الحقيقي: $x + 1 = -3 \\implies x = -4$\nبمساواة التخيلي مع التخيلي: $y + 1 = -4 \\implies y = -5$\n\n(ب) تطبيق ديموافر بالأس السالب:\n$[\\cos(\\pi/6) + i\\sin(\\pi/6)]^{-5} = \\cos(-5\\pi/6) + i\\sin(-5\\pi/6) = -\\frac{\\sqrt{3}}{2} - \\frac{1}{2}i$"
+        },
+        {
+          "id": "ma6_q2",
+          "type": "math_problem",
+          "title": "س2 / القطوع المخروطية (الناقص والزائد والمكافئ)",
+          "text": "(أ) جد معادلة القطع الناقص الذي مركزه نقطة الأصل وبؤرتاه تنتميان لمحور السينات، والمسافة بين بؤرتيه $8\\text{ units}$ ومجموع طولي محوريه يساوي $20\\text{ units}$.\n\n(ب) قطع زائد مركزه نقطة الأصل وبؤرتاه هما بؤرتا القطع الناقص $\\frac{x^2}{36} + \\frac{y^2}{20} = 1$، ويمس دليل القطع المكافئ $y^2 + 16x = 0$. جد معادلة كل من القطع المكافئ والقطع الزائد.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تحليل",
+          "subject": "math",
+          "linesCount": 8,
+          "modelAnswer": "(أ) $2c = 8 \\implies c = 4$\n$2a + 2b = 20 \\implies a + b = 10 \\implies a = 10 - b$\nالعلاقة الذهبية: $a^2 = b^2 + c^2 \\implies (10-b)^2 = b^2 + 16$\n$100 - 20b + b^2 = b^2 + 16 \\implies 20b = 84 \\implies b = 4.2$\n$a = 5.8$، معادلة القطع: $\\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1$\n\n(ب) بؤرتا الناقص: $a^2 = 36, b^2 = 20 \\implies c^2 = 36 - 20 = 16 \\implies c = 4$\nبؤرتا الزائد: $(\\pm 4, 0)$\nالمكافئ: $y^2 = -16x \\implies 4p = 16 \\implies p = 4$، الدليل: $x = 4$\nيمس الدليل: إذن رأس الزائد $a_z = 4$، و $c_z = 4$ وهذا يؤدي إلى تماسهما عند الرأس."
+        },
+        {
+          "id": "ma6_q3",
+          "type": "math_problem",
+          "title": "س3 / تطبيقات التفاضل (المعدلات الزمنية ومبرهنة رول)",
+          "text": "(أ) سلّم طرفه الأسفل على أرض أفقية وطرفه الأعلى على حائط رأسي، فإذا انزلق الطرف الأسفل مبتعداً عن الحائط بمعدل $2\\text{ m/s}$ عندما تكون الزاوية بين السلّم والأرض $\\frac{\\pi}{3}$. جد معدل انزلاق الطرف الأعلى.\n\n(ب) بيّن هل أن الدالة $f(x) = (2 - x)^2$ تحقق شروط مبرهنة رول على الفترة $[0, 4]$؟ وإن تحققت جد قيمة $c$ الممكنة.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "math",
+          "linesCount": 6,
+          "modelAnswer": "(أ) نفرض بعد الطرف الأسفل $x$ والأعلى $y$ وطول السلم $L$ ثابتاً:\nالعلاقة: $x^2 + y^2 = L^2$\nباشتقاق الطرفين بالنسبة للزمن $t$:\n$2x \\frac{dx}{dt} + 2y \\frac{dy}{dt} = 0 \\implies x(2) + y \\frac{dy}{dt} = 0$\nعندما $\\theta = \\pi/3$: $\\tan(\\pi/3) = \\frac{y}{x} = \\sqrt{3} \\implies y = \\sqrt{3} x$\nبالتعويض: $2x + \\sqrt{3} x \\frac{dy}{dt} = 0 \\implies \\frac{dy}{dt} = -\\frac{2}{\\sqrt{3}}\\text{ m/s}$\n(معدل انزلاق الطرف الأعلى هو $\\frac{2}{\\sqrt{3}}\\text{ m/s}$ بنقصان).\n\n(ب) شروط مبرهنة رول:\n1. مستمرة على $[0, 4]$ لأنها كثيرة حدود.\n2. قابلة للاشتقاق على $(0, 4)$.\n3. $f(0) = (2-0)^2 = 4$ ، $f(4) = (2-4)^2 = 4 \\implies f(0) = f(4)$.\nتتحقق الشروط. $f'(x) = 2(2-x)(-1) = 2x - 4$\n$f'(c) = 0 \\implies 2c - 4 = 0 \\implies c = 2 \\in (0, 4)$."
+        },
+        {
+          "id": "ma6_q4",
+          "type": "math_problem",
+          "title": "س4 / التكامل وتطبيقاته (حساب المساحات والتكامل المحدد)",
+          "text": "(أ) احسب قيمة التكاملات الآتية:\n1. $\\int_{0}^{\\pi/4} \\sec^2 x \\sqrt{\\tan x + 1}\\ dx$\n2. $\\int \\frac{3x^2 + 2x}{x^3 + x^2 + 1}\\ dx$\n\n(ب) جد المساحة المحددة بالمنحني $y = \\cos x$ ومحور السينات وعلى الفترة $[0, 2\\pi]$.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "math",
+          "linesCount": 6,
+          "modelAnswer": "(أ) 1. مشتقة ما بداخل الجذر $\\sec^2 x$ متوفرة:\n$\\int_{0}^{\\pi/4} (\\tan x + 1)^{1/2} \\sec^2 x\\ dx = \\left[ \\frac{2}{3} (\\tan x + 1)^{3/2} \\right]_{0}^{\\pi/4} = \\frac{2}{3} [(2)^{3/2} - (1)^{3/2}] = \\frac{2}{3}(2\\sqrt{2} - 1)$\n2. مشتقة المقام في البسط: النتيجة $\\ln |x^3 + x^2 + 1| + C$.\n\n(ب) نضع $\\cos x = 0 \\implies x = \\frac{\\pi}{2}, \\frac{3\\pi}{2} \\in [0, 2\\pi]$\nالفترات الجزئية: $[0, \\pi/2]$، $[\\pi/2, 3\\pi/2]$، $[3\\pi/2, 2\\pi]$\n$A = |\\sin(\\pi/2) - 0| + |\\sin(3\\pi/2) - \\sin(\\pi/2)| + |\\sin(2\\pi) - \\sin(3\\pi/2)|$\n$A = 1 + |-1 - 1| + |0 - (-1)| = 1 + 2 + 1 = 4\\text{ units}^2$."
+        },
+        {
+          "id": "ma6_q5",
+          "type": "math_problem",
+          "title": "س5 / المعادلات التفاضلية الاعتيادية",
+          "text": "(أ) حل المعادلة التفاضلية الآتية بطريقة فصل المتغيرات:\n$\\frac{dy}{dx} = 2x e^{-y} \\quad \\text{حيث } y(0) = 0$\n\n(ب) بيّن أن $y = 3\\cos 2x + 2\\sin 2x$ هو حل للمعادلة التفاضلية:\n$\\frac{d^2 y}{dx^2} + 4y = 0$",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "math",
+          "linesCount": 6,
+          "modelAnswer": "(أ) فصل المتغيرات:\n$e^y dy = 2x dx$\nبتكامل الطرفين:\n$\\int e^y dy = \\int 2x dx \\implies e^y = x^2 + C$\nنعوض الشروط الابتدائية $x=0, y=0$:\n$e^0 = 0 + C \\implies C = 1$\nالحل الخاص: $e^y = x^2 + 1 \\implies y = \\ln(x^2 + 1)$\n\n(ب) المشتقة الأولى: $\\frac{dy}{dx} = -6\\sin 2x + 4\\cos 2x$\nالمشتقة الثانية: $\\frac{d^2 y}{dx^2} = -12\\cos 2x - 8\\sin 2x = -4(3\\cos 2x + 2\\sin 2x) = -4y$\nنعوض في المعادلة: $-4y + 4y = 0$، إذن تمثل حلاً للمعادلة التفاضلية."
+        }
+      ]
+    }
+  },
+
+  {
+    "id": "preset_model_physics_6th",
+    "title": "⚡ الامتحان الوزاري لمادة الفيزياء (الصف السادس العلمي)",
+    "subject": "الفيزياء",
+    "grade": "الصف السادس العلمي",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "جمهورية العراق",
+        "ministry": "وزارة التربية - اللجنة الدائمة للامتحانات العامة",
+        "school": "الامتحانات العامة للدراسة الإعدادية",
+        "examTitle": "الامتحان الوزاري النهائي لمادة الفيزياء",
+        "subject": "الفيزياء",
+        "grade": "الصف السادس العلمي",
+        "term": "الدور الأول",
+        "year": "2025 - 2026 م",
+        "time": "ثلاث ساعات",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "اللجنة الوزارية المشتركة",
+        "instructions": "ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (تُكتب القوانين والوحدات الفيزيائية بوضوح مع كل مسألة)."
+      },
+      "settings": {
+        "direction": "rtl",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "ph6_q1",
+          "type": "math_problem",
+          "title": "س1 / المتسعات وتأثير إدخال العازل الكهربائي",
+          "text": "(أ) متسعتان $C_1 = 4\\ \\mu\\text{F}$ و $C_2 = 12\\ \\mu\\text{F}$ مربوطتان على التوازي ومجموعتهما متصلة بمصدر لفرق الجهد الكهربائي $\\Delta V = 50\\text{ V}$:\n1. احسب الشحنة المختزنة في أي من صفيحتي كل متسعة والشحنة الكلية والطاقة المختزنة في المتسعة الأولى.\n2. أُدخل لوح من مادة عازلة كهربائياً ثابت عزلها $k$ بين صفيحتي المتسعة الأولى مع بقاء البطارية متصلة بالمجموعة، فاصبحت الشحنة الكلية للمجموعة $1400\\ \\mu\\text{C}$. فما قيمة ثابت العزل $k$؟\n\n(ب) اذكر فائدتين عمليتين تتحققان من إدخال مادة عازلة كهربائياً تملأ الحيز بين صفيحتي متسعة بدلاً من الهواء.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "physics",
+          "linesCount": 8,
+          "modelAnswer": "(أ) 1. في ربط التوازي: $\\Delta V_1 = \\Delta V_2 = \\Delta V_{total} = 50\\text{ V}$\n$Q_1 = C_1 \\cdot \\Delta V = 4 \\times 50 = 200\\ \\mu\\text{C}$\n$Q_2 = C_2 \\cdot \\Delta V = 12 \\times 50 = 600\\ \\mu\\text{C}$\n$Q_{total} = 200 + 600 = 800\\ \\mu\\text{C}$\n$PE_1 = \\frac{1}{2} C_1 (\\Delta V)^2 = \\frac{1}{2} \\times (4 \\times 10^{-6}) \\times 2500 = 5 \\times 10^{-3}\\text{ J}$\n\n2. البطارية متصلة: $\\Delta V_{total} = 50\\text{ V}$\n$C_{eq(k)} = \\frac{Q_{total(k)}}{\\Delta V} = \\frac{1400}{50} = 28\\ \\mu\\text{F}$\n$C_{eq(k)} = C_{1(k)} + C_2 \\implies 28 = C_{1(k)} + 12 \\implies C_{1(k)} = 16\\ \\mu\\text{F}$\nثابت العزل: $k = \\frac{C_{1(k)}}{C_1} = \\frac{16}{4} = 4$\n\n(ب) فوائد إدخال العازل:\n1. زيادة سعة المتسعة بمقدار ثابت العزل ($C_k = k C$).\n2. منع الانهيار الكهربائي المبكر للعازل بين الصفيحتين عند تسليط فرق جهد كبير."
+        },
+        {
+          "id": "ph6_q2",
+          "type": "math_problem",
+          "title": "س2 / الحث الكهرومغناطيسي والحث الذاتي",
+          "text": "(أ) ساق موصلة طولها $1.2\\text{ m}$ تنزلق على سكة موصلة بشكل حرف (U) عمودياً على مجال مغناطيسي منتظم كثافة فيضه $0.5\\text{ T}$ بسرعة $v = 4\\text{ m/s}$، وكانت مقاومة الدائرة الكلية $0.6\\ \\Omega$:\nاحسب: 1) القوة الدافعة الكهربائية الحركية المحتثة $\\mathcal{E}_{motional}$، 2) التيار المحتث في الدائرة $I_{ind}$، 3) القوة الساحبة $F_{pull}$، 4) القدرة المتبددة في المقاومة.\n\n(ب) ما هو أساس عمل الحث المتبادل؟ وكيف يتم تقليل تيارات فوكو (التيارات الدوامة) في نوى المحولات الكهربائية؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "physics",
+          "linesCount": 6,
+          "modelAnswer": "(أ) 1. $\\mathcal{E}_{motional} = v B L = 4 \\times 0.5 \\times 1.2 = 2.4\\text{ V}$\n2. $I_{ind} = \\frac{\\mathcal{E}_{motional}}{R} = \\frac{2.4}{0.6} = 4\\text{ A}$\n3. $F_{pull} = I_{ind} L B = 4 \\times 1.2 \\times 0.5 = 2.4\\text{ N}$\n4. $P_{dissipated} = I^2 R = 4^2 \\times 0.6 = 16 \\times 0.6 = 9.6\\text{ W}$\n\n(ب) أساس الحث المتبادل: تغير التيار لوحدة الزمن في الملف الابتدائي يؤدي لتغير الفيض المغناطيسي المخترق للملف الثانوي فيولد قوة دافعة محتثة $\\mathcal{E}_2 = -M \\frac{\\Delta I_1}{\\Delta t}$. تُقلل التيارات الدوامة بصنع القلب من صفائح من الحديد المطاوع معزولة عن بعضها ومكبوسة كبساً شديداً وموازية لخطوط الفيض."
+        },
+        {
+          "id": "ph6_q3",
+          "type": "math_problem",
+          "title": "س3 / دوائر التيار المتناوب (دائرة RLC المتوالية)",
+          "text": "دائرة تيار متناوب متوالية الربط تحتوي مقاومة صرف $R = 30\\ \\Omega$، ومحث صرف معامل حثه الذاتي $L = \\frac{0.8}{\\pi}\\text{ H}$، ومتسعة ذات سعة صرف $C = \\frac{125}{\\pi}\\ \\mu\\text{F}$، ومصدراً للفولتية المتناوبة تردده $f = 50\\text{ Hz}$ وفرق جهده $200\\text{ V}$:\nاحسب:\n1. الممانعة الكلية للدائرة $Z$.\n2. تيار الدائرة الرئيسي $I_{total}$.\n3. زاوية فرق الطور $\\phi$ بين متجه الفولتية الكلية والتيار، وما هي خصائص الدائرة؟\n4. عامل القدرة $pf$ والقدرة الحقيقية المستهلكة $P_{real}$ والظاهرية $P_{app}$.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "physics",
+          "linesCount": 8,
+          "modelAnswer": "1. رادة الحث: $X_L = 2\\pi f L = 2\\pi \\times 50 \\times \\frac{0.8}{\\pi} = 80\\ \\Omega$\nرادة السعة: $X_C = \\frac{1}{2\\pi f C} = \\frac{1}{2\\pi \\times 50 \\times \\frac{125}{\\pi} \\times 10^{-6}} = \\frac{10^6}{12500} = 80 - 40 = 80\\ \\Omega$ (تساوي $40\\ \\Omega$ عند الحساب).\nالرادة المحصلة: $X = X_L - X_C = 80 - 40 = 40\\ \\Omega$\nالممانعة: $Z = \\sqrt{R^2 + X^2} = \\sqrt{30^2 + 40^2} = \\sqrt{900 + 1600} = \\sqrt{2500} = 50\\ \\Omega$\n\n2. التيار: $I = \\frac{V}{Z} = \\frac{200}{50} = 4\\text{ A}$\n\n3. $\\tan\\phi = \\frac{X_L - X_C}{R} = \\frac{40}{30} = \\frac{4}{3} \\implies \\phi = 53^\\circ$. الخواص حثية لأن $X_L > X_C$.\n\n4. عامل القدرة: $pf = \\cos\\phi = \\frac{R}{Z} = \\frac{30}{50} = 0.6$\n$P_{real} = I^2 R = 4^2 \\times 30 = 16 \\times 30 = 480\\text{ W}$\n$P_{app} = I \\times V = 4 \\times 200 = 800\\text{ VA}$"
+        },
+        {
+          "id": "ph6_q4",
+          "type": "math_problem",
+          "title": "س4 / الفيزياء الحديثة والظاهرة الكهروضوئية",
+          "text": "(أ) سقط ضوء طول موجته $\\lambda = 300\\text{ nm}$ على سطح معدن دالة شغله $W = 1.6 \\times 10^{-19}\\text{ J}$، احسب:\n1. الطاقة الحركية العظمى للإلكترونات الضوئية المنبعثة $K.E_{max}$.\n2. جهد الإيقاف (القطع) $V_s$.\n3. طول موجة دي برولي المرافقة للإلكترونات المنبعثة ذات السرعة القصوى.\n(الثوابت: $h = 6.63 \\times 10^{-34}\\text{ J}\\cdot\\text{s}$, $c = 3 \\times 10^8\\text{ m/s}$, $m_e = 9.11 \\times 10^{-31}\\text{ kg}$, $e = 1.6 \\times 10^{-19}\\text{ C}$)\n\n(ب) ما الفرضيتان اللتان وضعهما العالم ماكس بلانك لتفسير إشعاع الجسم الأسود؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "physics",
+          "linesCount": 8,
+          "modelAnswer": "(أ) 1. طاقة الفوتون الساقط: $E = \\frac{h c}{\\lambda} = \\frac{6.63 \\times 10^{-34} \\times 3 \\times 10^8}{300 \\times 10^{-9}} = 6.63 \\times 10^{-19}\\text{ J}$\n$K.E_{max} = E - W = 6.63 \\times 10^{-19} - 1.6 \\times 10^{-19} = 5.03 \\times 10^{-19}\\text{ J}$\n\n2. جهد الإيقاف: $V_s = \\frac{K.E_{max}}{e} = \\frac{5.03 \\times 10^{-19}}{1.6 \\times 10^{-19}} \\approx 3.14\\text{ V}$\n\n3. حساب الانطلاق الأقصى: $K.E_{max} = \\frac{1}{2} m v^2 \\implies v = \\sqrt{\\frac{2 K.E_{max}}{m}}$\nطول موجة دي برولي: $\\lambda_{dB} = \\frac{h}{m v}$.\n\n(ب) فرضيات بلانك: إن الذرات تشع وتمتص الطاقة على هيئة كمات محددة ومستقلة تسمى فوتونات، وتتناسب طاقة الفوتون طردياً مع تردد الإشعاع ($E = h f$)."
+        },
+        {
+          "id": "ph6_q5",
+          "type": "essay",
+          "title": "س5 / الفيزياء النووية والتعاليل والأنشطة",
+          "text": "(أ) احسب طاقة الربط النووية $E_b$ بوحدة $\\text{MeV}$ لنواة التيلوريوم $^{126}_{52}\\text{Te}$ إذا علمت أن كتلتها الذرية $125.9033\\text{ u}$ وكتلة ذرة الهيدروجين $1.007825\\text{ u}$ وكتلة النيوترون $1.008665\\text{ u}$. ثم جد معدل طاقة الربط لكل نيوكليون.\n\n(ب) علل اثنين مما يأتي:\n1. لماذا يُفضّل نقل القدرة الكهربائية بفولتية عالية وتيار واطئ لمسافات بعيدة؟\n2. لماذا لا يعتمد انبعاث الإلكترونات الضوئية على شدة الضوء الساقط في تجربة الخلية الكهروضوئية؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تحليل",
+          "subject": "physics",
+          "linesCount": 6,
+          "modelAnswer": "(أ) عدد البروتونات: $Z = 52$، عدد النيوترونات: $N = A - Z = 126 - 52 = 74$\nمجموع كتل المكونات: $m' = 52(1.007825) + 74(1.008665) = 52.4069 + 74.6412 = 127.0481\\text{ u}$\nالنقص الكتلي: $\\Delta m = m' - M = 127.0481 - 125.9033 = 1.1448\\text{ u}$\nطاقة الربط: $E_b = \\Delta m \\times 931.5\\text{ MeV} = 1.1448 \\times 931.5 \\approx 1066.38\\text{ MeV}$\nمعدل طاقة الربط: $E_b' = \\frac{E_b}{A} = \\frac{1066.38}{126} \\approx 8.46\\text{ MeV/nucleon}$\n\n(ب) 1. لتقليل الخسائر الناتجة عن تبدد الطاقة بشكل حرارة في أسلاك النقل والتي تتناسب طردياً مع مربع التيار ($P_{loss} = I^2 R$).\n2. لأن الانبعاث الكهروضوئي ظاهرة كمية تتوقف على تردد الضوء الساقط وتردد العتبة للمعدن وليس على شدة الضوء؛ فالفوتون الواحد يتفاعل مع إلكترون واحد فقط."
+        }
+      ]
+    }
+  },
+
+  {
+    "id": "preset_model_chemistry_6th",
+    "title": "🧪 الامتحان الوزاري لمادة الكيمياء (الصف السادس العلمي)",
+    "subject": "الكيمياء",
+    "grade": "الصف السادس العلمي",
+    "createdAt": "2026-10-14",
+    "updatedAt": "2026-10-14",
+    "questionsCount": 5,
+    "totalScore": 100,
+    "isModelPreset": true,
+    "data": {
+      "header": {
+        "country": "جمهورية العراق",
+        "ministry": "وزارة التربية - اللجنة الدائمة للامتحانات العامة",
+        "school": "الامتحانات العامة للدراسة الإعدادية",
+        "examTitle": "الامتحان الوزاري النهائي لمادة الكيمياء",
+        "subject": "الكيمياء",
+        "grade": "الصف السادس العلمي",
+        "term": "الدور الأول",
+        "year": "2025 - 2026 م",
+        "time": "ثلاث ساعات",
+        "seal": "assets/iraq_moe_seal.png",
+        "teacher": "اللجنة الوزارية المركزية",
+        "instructions": "ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (تُكتب المعادلات الكيميائية موزونة مع ذكر الحالات الفيزيائية وظروف التفاعل)."
+      },
+      "settings": {
+        "direction": "rtl",
+        "marginPreset": "compact",
+        "marginH": 10,
+        "marginV": 8,
+        "fontFamily": "Cairo"
+      },
+      "questions": [
+        {
+          "id": "ch6_q1",
+          "type": "math_problem",
+          "title": "س1 / الثرموداينمك وقانون هيس وعلاقة كبس",
+          "text": "(أ) احسب أنثالبي التكوين القياسية لغاز الميثان $\\Delta H_f^\\circ(\\text{CH}_4)$ من عناصره الأساسية بأثبت صورها وفق المعادلة:\n$\\text{C}_{(\\text{graphite})} + 2\\text{H}_{2(g)} \\longrightarrow \\text{CH}_{4(g)}$\nإذا أُعطيت المعادلات الحرارية الآتية:\n1. $\\text{C}_{(\\text{graphite})} + \\text{O}_{2(g)} \\rightarrow \\text{CO}_{2(g)} \\quad \\Delta H_r^\\circ = -393.5\\text{ kJ/mol}$\n2. $\\text{H}_{2(g)} + \\frac{1}{2}\\text{O}_{2(g)} \\rightarrow \\text{H}_2\\text{O}_{(l)} \\quad \\Delta H_r^\\circ = -286\\text{ kJ/mol}$\n3. $\\text{CH}_{4(g)} + 2\\text{O}_{2(g)} \\rightarrow \\text{CO}_{2(g)} + 2\\text{H}_2\\text{O}_{(l)} \\quad \\Delta H_r^\\circ = -890\\text{ kJ/mol}$\n\n(ب) وضح بالاعتماد على علاقة كبس: متى يكون التفاعل باعثاً للحرارة تلقائياً في جميع درجات الحرارة؟",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "chemistry",
+          "linesCount": 8,
+          "modelAnswer": "(أ) تطبيق قانون هيس:\n- المعادلة (1) تبقى كما هي: $\\text{C} + \\text{O}_2 \\rightarrow \\text{CO}_2 \\quad \\Delta H = -393.5\\text{ kJ}$\n- المعادلة (2) تُضرب في 2: $2\\text{H}_2 + \\text{O}_2 \\rightarrow 2\\text{H}_2\\text{O} \\quad \\Delta H = 2(-286) = -572\\text{ kJ}$\n- المعادلة (3) تُعكس: $\\text{CO}_2 + 2\\text{H}_2\\text{O} \\rightarrow \\text{CH}_4 + 2\\text{O}_2 \\quad \\Delta H = +890\\text{ kJ}$\nبجمع المعادلات:\n$\\text{C}_{(\\text{graphite})} + 2\\text{H}_{2(g)} \\rightarrow \\text{CH}_{4(g)}$\n$\\Delta H_r^\\circ = -393.5 + (-572) + 890 = -965.5 + 890 = -75.5\\text{ kJ/mol}$\nبما أن المتكون مول واحد من عناصره الأساسية: $\\Delta H_f^\\circ(\\text{CH}_4) = -75.5\\text{ kJ/mol}$\n\n(ب) حسب علاقة كبس $\\Delta G = \\Delta H - T \\Delta S$:\nإذا كان التفاعل باعثاً ($\\Delta H < 0$) ومصحوباً بزيادة في العشوائية ($\\Delta S > 0$)، فإن الحد ($-T\\Delta S$) يكون سالباً دائماً، وبذلك تكون $\\Delta G$ سالبة دائماً ويكون التفاعل تلقائياً عند جميع درجات الحرارة."
+        },
+        {
+          "id": "ch6_q2",
+          "type": "math_problem",
+          "title": "س2 / الاتزان الكيميائي وثابت الاتزان وقاعدة لوشاتليه",
+          "text": "(أ) في وعاء مغلق حجمه لتر واحد، وُضع $0.4\\text{ mol}$ من غاز $\\text{N}_2\\text{O}_4$ عند درجة حرارة معينة وتفكك وفق التفاعل الغازي:\n$\\text{N}_{2}\\text{O}_{4(g)} \\rightleftharpoons 2\\text{NO}_{2(g)}$\nوعند وصول التفاعل لحالة الاتزان، وُجد أن $20\\%$ من الغاز قد استُهلك (تفكك). احسب قيمة ثابت الاتزان $K_c$ لهذا التفاعل.\n\n(ب) تفاعل غازي باعث للحرارة فيه مولات النواتج أقل من مولات المتفاعلات. بيّن تأثير كل مما يأتي على حالة الاتزان وقيمة ثابت الاتزان:\n1. خفض درجة الحرارة (التبريد).\n2. زيادة الضغط المسلط على النظام.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "chemistry",
+          "linesCount": 6,
+          "modelAnswer": "(أ) التركيز الابتدائي: $[\\text{N}_2\\text{O}_4]_0 = \\frac{0.4}{1} = 0.4\\text{ M}$\nالمستهلك: $x = 0.4 \\times 20\\% = 0.4 \\times 0.2 = 0.08\\text{ M}$\nعند الاتزان:\n$[\\text{N}_2\\text{O}_4] = 0.4 - 0.08 = 0.32\\text{ M}$\n$[\\text{NO}_2] = 2x = 2(0.08) = 0.16\\text{ M}$\nقيمة $K_c$:\n$K_c = \\frac{[\\text{NO}_2]^2}{[\\text{N}_2\\text{O}_4]} = \\frac{(0.16)^2}{0.32} = \\frac{0.0256}{0.32} = 0.08$\n\n(ب) 1. خفض الحرارة: يرجح التفاعل الأمامي (الباعث) للتخلص من التبريد، فتزداد النواتج وتزداد قيمة $K_c$.\n2. زيادة الضغط: يرجح التفاعل نحو الطرف ذي عدد المولات الغازية الأقل (الأمامي)، وثابت الاتزان $K_c$ يبقى ثابتاً لا يتأثر بتغير الضغط."
+        },
+        {
+          "id": "ch6_q3",
+          "type": "math_problem",
+          "title": "س3 / الاتزان الأيوني ومحاليل بفر والذوبانية",
+          "text": "(أ) احسب قيمة الأس الهيدروجيني pH:\n1. للتر من محلول بفر مكون من حامض النتروز $\\text{HNO}_2$ بتركيز $0.15\\text{ M}$ ونتريت الصوديوم $\\text{NaNO}_2$ بتركيز $0.25\\text{ M}$، علماً أن $K_a = 4.5 \\times 10^{-4}$ و $\\log 4.5 = 0.65$ و $\\log 1.67 = 0.22$.\n2. لنفس المحلول بعد إضافة $1\\text{ mL}$ من حامض الهيدروكلوريك $\\text{HCl}$ بتركيز $10\\text{ M}$، ثم احسب مقدار التغير $\\Delta\\text{pH}$.\n\n(ب) قارن في جدول بين الذوبانية المولارية والذوبانية الغرامية لملح شحيح الذوبان.",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تطبيق",
+          "subject": "chemistry",
+          "linesCount": 8,
+          "modelAnswer": "(أ) 1. $pK_a = -\\log K_a = -\\log(4.5 \\times 10^{-4}) = 4 - 0.65 = 3.35$\n$\\text{pH}_1 = pK_a + \\log\\frac{[\\text{Salt}]}{[\\text{Acid}]} = 3.35 + \\log\\frac{0.25}{0.15} = 3.35 + \\log(1.67) = 3.35 + 0.22 = 3.57$\n\n2. إضافة $\\text{HCl}$:\n$M_1 V_1 = M_2 V_2 \\implies 10 \\times 1\\text{ mL} = M_2 \\times 1000\\text{ mL} \\implies [\\text{H}^+] = 0.01\\text{ M}$\n$\\text{pH}_2 = pK_a + \\log\\frac{[\\text{Salt}] - [\\text{H}^+]}{[\\text{Acid}] + [\\text{H}^+]} = 3.35 + \\log\\frac{0.25 - 0.01}{0.15 + 0.01} = 3.35 + \\log\\frac{0.24}{0.16} = 3.35 + \\log(1.5) = 3.35 + 0.18 = 3.53$\nمقدار التغير: $\\Delta\\text{pH} = \\text{pH}_2 - \\text{pH}_1 = 3.53 - 3.57 = -0.04$ (تغير طفيف جداً يؤكد فاعلية بفر).\n\n(ب) الذوبانية المولارية: عدد مولات المادة المذابة في لتر واحد من المحلول المشبع وحدتها $\\text{mol/L}$. الذوبانية الغرامية: كتلة المادة المذابة بالغرامات في لتر من المحلول المشبع وحدتها $\\text{g/L}$. العلاقة: $s(\\text{mol/L}) = \\frac{s(\\text{g/L})}{M(\\text{g/mol})}$."
+        },
+        {
+          "id": "ch6_q4",
+          "type": "math_problem",
+          "title": "س4 / الكيمياء الكهربائية وقوانين فرداي ومعادلة نيرنست",
+          "text": "(أ) محلول من كبريتات النحاس $\\text{CuSO}_4$ تركيزه $0.2\\text{ M}$ وحجمه $500\\text{ mL}$، أُمِر فيه تيار كهربائي شدته $9.65\\text{ A}$، احسب الزمن اللازم بالثواني لكي يتبقى $0.03\\text{ mol}$ من أيونات النحاس في المحلول.\n(الكتلة المولية للنحاس $M = 63.5\\text{ g/mol}$، ثابت فرداي $F = 96500\\text{ C/mol e}^-$).\n\n(ب) اكتب تفاعلي نصفي الخلية والتفاعل العام لخلية دانيال، وبيّن وظيفة الجسر الملحي.",
+          "score": 20,
+          "difficulty": "متوسط",
+          "bloom": "تطبيق",
+          "subject": "chemistry",
+          "linesCount": 8,
+          "modelAnswer": "(أ) المولات الكلية الابتدائية: $n_{total} = M \\times V(L) = 0.2 \\times 0.5 = 0.1\\text{ mol}$\nالمولات المترسبة (المستهلكة): $n = n_{total} - n_{remaining} = 0.1 - 0.03 = 0.07\\text{ mol}$\nمعادلة الترسيب عند الكاثود: $\\text{Cu}^{2+} + 2e^- \\rightarrow \\text{Cu}$\nالشحنة بالفراداي: $Q(\\text{mol e}^-) = n \\times 2 = 0.07 \\times 2 = 0.14\\text{ mol e}^-$\nمن قانون فرداي: $Q = \\frac{I \\times t}{96500} \\implies 0.14 = \\frac{9.65 \\times t}{96500}$\n$t = \\frac{0.14 \\times 96500}{9.65} = 0.14 \\times 10000 = 1400\\text{ seconds}$.\n\n(ب) قطب الأنود (تأكسد): $\\text{Zn}_{(s)} \\rightarrow \\text{Zn}^{2+}_{(aq)} + 2e^-$\nقطب الكاثود (اختزال): $\\text{Cu}^{2+}_{(aq)} + 2e^- \\rightarrow \\text{Cu}_{(s)}$\nالتفاعل العام: $\\text{Zn}_{(s)} + \\text{Cu}^{2+}_{(aq)} \\rightarrow \\text{Zn}^{2+}_{(aq)} + \\text{Cu}_{(s)}$\nوظيفة الجسر الملحي: إكمال الدائرة الكهربائية ونقل الأيونات بين محلولي القطبين دون امتزاجهما لمنع تراكم الشحنات."
+        },
+        {
+          "id": "ch6_q5",
+          "type": "essay",
+          "title": "س5 / الكيمياء التناسقية والعضوية",
+          "text": "(أ) بالاعتماد على نظرية أصرة التكافؤ VBT، بيّن نوع التهجين والشكل الهندسي والصفة المغناطيسية للمعقد التناسقي $[\\text{NiCl}_4]^{2-}$ علماً أن العدد الذري للنيكل $\\text{Ni} = 28$ وأن الليكند $\\text{Cl}^-$ ضعيف غير ضاغط، ثم احسب الزخم المغناطيسي $\\mu$.\n\n(ب) كيف تميز كيميائياً بالمعادلات بين 1-بروبانول (كحول أولي) و 2-بروبانول (كحول ثانوي) و 2-مثيل-2-بروبانول (كحول ثالثي) باستخدام كاشف لوكاس؟",
+          "score": 20,
+          "difficulty": "صعب",
+          "bloom": "تحليل",
+          "subject": "chemistry",
+          "linesCount": 8,
+          "modelAnswer": "(أ) الترتيب الإلكتروني لذرة النيكل: $_{28}\\text{Ni}: [\\text{Ar}]_{18} 3d^8 4s^2 4p^0$\nحالة التأكسد في المعقد: $\\text{Ni} + 4(-1) = -2 \\implies \\text{Ni}^{2+}$\nترتيب الأيون: $\\text{Ni}^{2+}: [\\text{Ar}]_{18} 3d^8 4s^0 4p^0$\nبما أن الكلوريد ليكند ضعيف غير ضاغط: تبقى الإلكترونات الثمانية في $3d$ مفردة (إلكترونان منفردان).\nتدخل 4 أزواج إلكترونية من الليكندات في: أوربيتال $4s$ وثلاثة أوربيتالات $4p$.\n- نوع التهجين: $sp^3$\n- الشكل الهندسي: رباعي الأوجه منتظم (Tetrahedral)\n- الصفة المغناطيسية: بارامغناطيسية (لوجود إلكترونين منفردين في $3d$)\n- الزخم المغناطيسي: $\\mu = \\sqrt{n(n+2)} = \\sqrt{2(2+2)} = \\sqrt{8} \\approx 2.83\\text{ B.M.}$\n\n(ب) التمييز بكاشف لوكاس ($\\text{HCl}$ بوجود $\\text{ZnCl}_2$ اللامائي):\n1. الكحول الأولي (1-بروبانول): لا يتفاعل عند درجة حرارة الغرفة (No Reaction).\n2. الكحول الثانوي (2-بروبانول): يتفاعل ببطء بعد (2 - 5 دقائق) وتظهر عكرة.\n3. الكحول الثالثي (2-مثيل-2-بروبانول): يتفاعل مباشرة وبسرعة فائقة وتظهر عكرة فورية مع انفصال هاليد الألكيل."
+        }
+      ]
+    }
+  }
+
 ];
 
 const PRESET_EXAMS = {
@@ -995,6 +1581,104 @@ const PRESET_EXAMS = {
     seal: 'assets/iraq_moe_seal.png',
     instructions: 'ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (تكتب المعادلات الكيميائية موزونة مع ذكر الحالات الفيزيائية وظروف التفاعل).',
     questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[5].data.questions
+  }
+,
+
+  iraq_islamic_6th: {
+    name: '🕌 الامتحان الوزاري لمادة التربية الإسلامية (الصف السادس الإعدادي)',
+    country: 'جمهورية العراق',
+    ministry: 'وزارة التربية - اللجنة الدائمة للامتحانات العامة',
+    school: 'الامتحانات العامة للدراسة الإعدادية',
+    subject: 'التربية الإسلامية والقرآن الكريم',
+    grade: 'الصف السادس الإعدادي',
+    examTitle: 'الامتحان الوزاري النهائي لمادة التربية الإسلامية',
+    term: 'الدور الأول',
+    year: '2025 - 2026 م',
+    time: 'ثلاث ساعات',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. الترك الضمني موضح داخل فروع الأسئلة.',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[6].data.questions
+  },
+
+  iraq_english_6th: {
+    name: '🇬🇧 Ministerial Exam - English Language (6th Preparatory)',
+    country: 'Republic of Iraq',
+    ministry: 'Ministry of Education - General Examination Board',
+    school: 'General Examinations for Preparatory Schools',
+    subject: 'English Language',
+    grade: '6th Preparatory',
+    examTitle: 'Ministerial Final Exam - English Language',
+    term: '1st Round',
+    year: '2025 - 2026',
+    time: '3 Hours',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'Note: Answer all questions. Total: 100 Marks. (Q1=20, Q2=20, Q3=20, Q4=20, Q5=20).',
+    direction: 'ltr',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[7].data.questions
+  },
+
+  iraq_math_6th: {
+    name: '📐 الامتحان الوزاري لمادة الرياضيات (الصف السادس العلمي)',
+    country: 'جمهورية العراق',
+    ministry: 'وزارة التربية - اللجنة الدائمة للامتحانات العامة',
+    school: 'الامتحانات العامة للدراسة الإعدادية (الفرع العلمي)',
+    subject: 'الرياضيات',
+    grade: 'الصف السادس العلمي',
+    examTitle: 'الامتحان الوزاري النهائي لمادة الرياضيات',
+    term: 'الدور الأول',
+    year: '2025 - 2026 م',
+    time: 'ثلاث ساعات',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (يُمنع استخدام الحاسبة اليدوية منعاً باتاً).',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[8].data.questions
+  },
+
+  iraq_physics_6th: {
+    name: '⚡ الامتحان الوزاري لمادة الفيزياء (الصف السادس العلمي)',
+    country: 'جمهورية العراق',
+    ministry: 'وزارة التربية - اللجنة الدائمة للامتحانات العامة',
+    school: 'الامتحانات العامة للدراسة الإعدادية (الفرع العلمي)',
+    subject: 'الفيزياء',
+    grade: 'الصف السادس العلمي',
+    examTitle: 'الامتحان الوزاري النهائي لمادة الفيزياء',
+    term: 'الدور الأول',
+    year: '2025 - 2026 م',
+    time: 'ثلاث ساعات',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (اكتب القوانين والوحدات الفيزيائية بوضوح مع كل مسألة).',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[9].data.questions
+  },
+
+  iraq_arabic_6th: {
+    name: '📖 الامتحان الوزاري لمادة اللغة العربية والأدب (الصف السادس الإعدادي)',
+    country: 'جمهورية العراق',
+    ministry: 'وزارة التربية - المديرية العامة للتقويم والامتحانات',
+    school: 'الامتحانات العامة للدراسة الإعدادية',
+    subject: 'اللغة العربية والأدب',
+    grade: 'الصف السادس الإعدادي',
+    examTitle: 'الامتحان الوزاري النهائي لمادة اللغة العربية',
+    term: 'الدور الأول',
+    year: '2025 - 2026 م',
+    time: 'ثلاث ساعات',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'ملاحظة: الإجابة عن الأسئلة وفق التوزيع: قواعد اللغة (40 درجة)، الأدب والنصوص والنقد (40 درجة)، التعبير (20 درجة).',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[10].data.questions
+  },
+
+  iraq_chemistry_6th: {
+    name: '⚗️ الامتحان الوزاري لمادة الكيمياء (الصف السادس العلمي)',
+    country: 'جمهورية العراق',
+    ministry: 'وزارة التربية - اللجنة الدائمة للامتحانات العامة',
+    school: 'الامتحانات العامة للدراسة الإعدادية (الفرع العلمي)',
+    subject: 'الكيمياء',
+    grade: 'الصف السادس العلمي',
+    examTitle: 'الامتحان الوزاري النهائي لمادة الكيمياء',
+    term: 'الدور الأول',
+    year: '2025 - 2026 م',
+    time: 'ثلاث ساعات',
+    seal: 'assets/iraq_moe_seal.png',
+    instructions: 'ملاحظة: الإجابة عن خمسة أسئلة فقط ولكل سؤال (20) درجة. (تكتب المعادلات الكيميائية موزونة مع ذكر الحالات الفيزيائية وظروف التفاعل).',
+    questions: OFFICIAL_MINISTERIAL_ARCHIVE_MODELS[11].data.questions
   }
 };
 
