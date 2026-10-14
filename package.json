@@ -1,5 +1,24 @@
 {
-  "dependencies": {
+  "name": "masar-almoallem",
+  "version": "4.0.0",
+  "description": "منصة مسار المعلم الذكية لإعداد وتصميم وتوليد الاختبارات الوزارية والمدرسية العراقية",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 3000",
+    "test": "node --check js/app.js && node --check js/smart-generator.js"
+  },
+  "keywords": [
+    "iraq",
+    "exams",
+    "education",
+    "ministerial",
+    "وزاري",
+    "امتحانات",
+    "العراق"
+  ],
+  "author": "الأستاذ حسين",
+  "license": "MIT",
+  "devDependencies": {
     "puppeteer-core": "^25.13.0"
   }
 }

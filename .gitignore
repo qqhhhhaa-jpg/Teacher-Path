@@ -1,5 +1,26 @@
+# الاعتماديات المحلية وحزم Node
 node_modules/
+package-lock.json.bak
+
+# ملفات الاختبار والتطوير المحلي المؤقتة
 scratch/
-__pycache__/
 *.log
+server_bot.log
+
+# بيانات المستخدمين السحابية المحلية والتزامنات المؤقتة
+data/cloud_sync_*.json
+data/session_*.json
+
+# كاش بايثون والملفات التنفيذية المؤقتة
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# ملفات النظام المؤقتة
 .DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp
