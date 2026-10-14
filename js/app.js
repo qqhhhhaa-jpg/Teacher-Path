@@ -9898,5 +9898,311 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+/* ==========================================================================
+   AI Triple Generator Studio (توليد 3 نماذج متوازية بالذكاء الاصطناعي)
+   ========================================================================== */
+window.currentAiTripleExams = null;
+window.currentActiveAiVersionKey = 'versionA';
+
+window.switchToAiGeneratorTab = function() {
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(btn => btn.classList.remove('active'));
+
+  const aiTabBtn = document.getElementById('mainTabAiGeneratorBtn');
+  if (aiTabBtn) aiTabBtn.classList.add('active');
+
+  document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
+  const genTab = document.getElementById('tab-generator');
+  if (genTab) {
+    genTab.style.display = 'block';
+  }
+
+  // Pre-fill fields from appState if available
+  const gradeEl = document.getElementById('aiGenGrade');
+  if (gradeEl && !gradeEl.value && appState.header.grade) {
+    for (let opt of gradeEl.options) {
+      if (opt.value && appState.header.grade.includes(opt.value)) {
+        gradeEl.value = opt.value;
+        break;
+      }
+    }
+  }
+
+  const subjEl = document.getElementById('aiGenSubject');
+  if (subjEl && !subjEl.value && appState.header.subject) {
+    for (let opt of subjEl.options) {
+      if (opt.value && appState.header.subject.includes(opt.value)) {
+        subjEl.value = opt.value;
+        break;
+      }
+    }
+  }
+
+  const scrollPane = document.querySelector('.builder-body-scrollable');
+  if (scrollPane) scrollPane.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.clearAiValidationError = function(inputId) {
+  const el = document.getElementById(inputId);
+  if (el) el.classList.remove('input-error');
+
+  if (inputId === 'aiGenGrade') {
+    const err = document.getElementById('aiGradeErrorAlert');
+    if (err) err.style.display = 'none';
+  } else if (inputId === 'aiGenSubject') {
+    const err = document.getElementById('aiSubjectErrorAlert');
+    if (err) err.style.display = 'none';
+  } else if (inputId === 'aiGenDifficulty') {
+    const err = document.getElementById('aiDifficultyErrorAlert');
+    if (err) err.style.display = 'none';
+  }
+};
+
+window.generateTripleAiExams = function() {
+  const gradeEl = document.getElementById('aiGenGrade');
+  const subjEl = document.getElementById('aiGenSubject');
+  const diffEl = document.getElementById('aiGenDifficulty');
+  const notesEl = document.getElementById('aiGenTeacherNotes');
+
+  const grade = gradeEl ? gradeEl.value.trim() : '';
+  const subject = subjEl ? subjEl.value.trim() : '';
+  const difficulty = diffEl ? diffEl.value.trim() : '';
+  const teacherNotes = notesEl ? notesEl.value.trim() : '';
+
+  let hasError = false;
+
+  if (!grade) {
+    if (gradeEl) gradeEl.classList.add('input-error');
+    const alert = document.getElementById('aiGradeErrorAlert');
+    if (alert) alert.style.display = 'block';
+    hasError = true;
+  }
+  if (!subject) {
+    if (subjEl) subjEl.classList.add('input-error');
+    const alert = document.getElementById('aiSubjectErrorAlert');
+    if (alert) alert.style.display = 'block';
+    hasError = true;
+  }
+  if (!difficulty) {
+    if (diffEl) diffEl.classList.add('input-error');
+    const alert = document.getElementById('aiDifficultyErrorAlert');
+    if (alert) alert.style.display = 'block';
+    hasError = true;
+  }
+
+  if (hasError) {
+    showToast('⚠️ يرجى ملء الحقول الإجبارية (المرحلة الدراسية، المادة، مستوى الصعوبة) لتوليد الأسئلة', 'error');
+    return;
+  }
+
+  // Show Loading Spinner
+  const resultsSec = document.getElementById('aiTripleResultsSection');
+  const spinner = document.getElementById('aiGeneratingSpinner');
+  const content = document.getElementById('aiGeneratedVersionsContent');
+
+  if (resultsSec) resultsSec.style.display = 'block';
+  if (spinner) spinner.style.display = 'flex';
+  if (content) content.style.display = 'none';
+
+  // Smooth scroll down to results
+  if (resultsSec) {
+    resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  setTimeout(() => {
+    try {
+      if (!window.AiCurriculumEngine || typeof window.AiCurriculumEngine.generateTripleExamVersions !== 'function') {
+        throw new Error('محرك الذكاء الاصطناعي للمناهج غير متوفر');
+      }
+
+      const generated = window.AiCurriculumEngine.generateTripleExamVersions({
+        grade,
+        subject,
+        difficulty,
+        teacherNotes
+      });
+
+      window.currentAiTripleExams = generated;
+      if (spinner) spinner.style.display = 'none';
+      if (content) content.style.display = 'block';
+
+      window.switchAiExamVersion('versionA');
+      showToast('🎉 تم توليد 3 نماذج امتحانية ذكية بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
+    } catch (err) {
+      if (spinner) spinner.style.display = 'none';
+      showToast('خطأ في توليد الأسئلة: ' + err.message, 'error');
+    }
+  }, 600);
+};
+
+window.switchAiExamVersion = function(versionKey) {
+  if (!window.currentAiTripleExams) return;
+  const version = window.currentAiTripleExams[versionKey];
+  if (!version) return;
+
+  window.currentActiveAiVersionKey = versionKey;
+
+  // Update tabs UI
+  ['versionA', 'versionB', 'versionC'].forEach(key => {
+    const tab = document.getElementById(`tabAiVer${key.replace('version', '')}`);
+    if (tab) {
+      if (key === versionKey) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    }
+  });
+
+  // Render Version Header Details
+  const titleEl = document.getElementById('aiActiveVerTitle');
+  const metaEl = document.getElementById('aiActiveVerMeta');
+  if (titleEl) {
+    titleEl.innerHTML = `<span style="color: ${version.badgeColor};"><i class="fa-solid fa-file-signature"></i></span> ${version.versionName}`;
+  }
+  if (metaEl) {
+    metaEl.innerHTML = `
+      <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
+      <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
+      <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
+      <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
+    `;
+  }
+
+  // Render Questions List Preview
+  const listEl = document.getElementById('aiActiveVerQuestionsList');
+  if (listEl) {
+    listEl.innerHTML = version.questions.map((q, idx) => {
+      let branchesHTML = '';
+      if (Array.isArray(q.branches) && q.branches.length > 0) {
+        branchesHTML = `
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; padding-right: 12px; border-right: 2px solid var(--border-color);">
+            ${q.branches.map(b => `
+              <div style="font-size: 0.84rem;">
+                <strong>${b.title}:</strong> ${b.text} 
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-right: 4px;">(${b.score || 10} درجات)</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let optionsHTML = '';
+      if (Array.isArray(q.options) && q.options.length > 0) {
+        optionsHTML = `
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-right: 12px;">
+            ${q.options.map(opt => `
+              <div style="font-size: 0.82rem; ${opt.isCorrect ? 'color: #10b981; font-weight: 700;' : ''}">
+                ${opt.isCorrect ? '✔' : '○'} ${opt.text}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let answerHTML = '';
+      if (q.modelAnswer) {
+        answerHTML = `
+          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;">
+            <summary style="cursor: pointer; font-weight: 700; color: #10b981;">
+              <i class="fa-solid fa-key"></i> إظهار الجواب النموذجي وسلّم الدرجات
+            </summary>
+            <div style="margin-top: 6px; white-space: pre-line; color: var(--text-main);">${q.modelAnswer}</div>
+          </details>
+        `;
+      }
+
+      return `
+        <div class="ai-question-card-preview">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+            <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-main);">
+              ${q.title || `السؤال ${idx + 1}`}
+            </div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} درجة</span>
+              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || 'وزاري + كتاب'}</span>
+            </div>
+          </div>
+          <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">${q.text}</div>
+          ${branchesHTML}
+          ${optionsHTML}
+          ${answerHTML}
+        </div>
+      `;
+    }).join('');
+  }
+};
+
+window.applyCurrentAiVersionToWorkstation = function() {
+  if (!window.currentAiTripleExams || !window.currentActiveAiVersionKey) return;
+  const version = window.currentAiTripleExams[window.currentActiveAiVersionKey];
+  if (!version) return;
+
+  // Apply to workstation appState
+  appState.questions = JSON.parse(JSON.stringify(version.questions));
+  appState.header.grade = version.header.grade;
+  appState.header.subject = version.header.subject;
+  appState.header.examTitle = version.header.examTitle;
+  appState.header.instructions = version.header.instructions;
+  if (version.settings && version.settings.direction) {
+    appState.settings.direction = version.settings.direction;
+  }
+
+  // Sync UI and render
+  syncHeaderInputs();
+  saveStateToStorage();
+  applyPaperSettings();
+  applyPaperMargins();
+  renderAll();
+
+  // Switch to Questions Builder tab
+  const qTabBtn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
+  if (qTabBtn) qTabBtn.click();
+
+  showToast(`🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
+};
+
+window.saveAllAiVersionsToArchive = function() {
+  if (!window.currentAiTripleExams) {
+    showToast('لا توجد نماذج مولدة لحفظها حالياً', 'error');
+    return;
+  }
+
+  try {
+    const archive = getSavedExamsArchive();
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    ['versionA', 'versionB', 'versionC'].forEach(verKey => {
+      const ver = window.currentAiTripleExams[verKey];
+      if (ver) {
+        archive.unshift({
+          id: `archive_ai_${verKey.toLowerCase()}_${Date.now()}_${Math.floor(Math.random()*1000)}`,
+          title: `[ذكاء اصطناعي] ${ver.versionName} - ${ver.header.subject}`,
+          subject: ver.header.subject,
+          grade: ver.header.grade,
+          createdAt: dateStr,
+          updatedAt: dateStr,
+          questionsCount: ver.questionsCount,
+          totalScore: ver.totalScore,
+          isAiTripleModel: true,
+          data: {
+            header: ver.header,
+            settings: ver.settings,
+            questions: ver.questions
+          }
+        });
+      }
+    });
+
+    saveExamsArchive(archive);
+    updateArchiveCountBadge();
+    showToast('💾 تم حفظ النماذج الثلاثة (أ، ب، ج) في أرشيف اختباراتك بنجاح!', 'success');
+  } catch (err) {
+    showToast('خطأ في حفظ النماذج في الأرشيف: ' + err.message, 'error');
+  }
+};
+
+
 
 

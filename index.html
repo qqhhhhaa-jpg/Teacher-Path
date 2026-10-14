@@ -99,6 +99,15 @@
               <span class="drawer-badge-tag badge-subscribers-tag" id="drawerSubscribersCountBadge">0 مشترك 👑</span>
             </button>
 
+            <!-- AI Triple Generator in Drawer (توليد 3 نماذج بالذكاء الاصطناعي) -->
+            <button class="drawer-item-btn highlight" id="drawerOpenAiGenBtn" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12)); border: 1px solid rgba(168, 85, 247, 0.35);" onclick="window.closeSideDrawer(); window.switchToAiGeneratorTab();" title="توليد 3 نماذج امتحانية متوازية بالذكاء الاصطناعي مع بنك 50 ألف سؤال" data-tooltip="توليد 3 نماذج بالذكاء الاصطناعي">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color: #a855f7;"></i>
+                <span style="font-weight: 800;">توليد 3 نماذج بالذكاء الاصطناعي</span>
+              </div>
+              <span class="drawer-badge-tag" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">50 ألف سؤال ⚡</span>
+            </button>
+
             <!-- Daily Report & Questions Bank in Drawer (التقرير اليومي في قسم الأدوات) -->
             <button class="drawer-item-btn highlight" id="drawerOpenReportBtn" onclick="window.closeSideDrawer(); window.switchToReportTab();" title="فتح الواجهة المتكاملة للتقرير اليومي وبنك الأسئلة" data-tooltip="التقرير وبنك الأسئلة">
               <div class="drawer-item-main">
@@ -391,6 +400,10 @@
             <i class="fa-solid fa-chart-pie" style="color: #f59e0b;"></i>
             <span>التقرير وبنك الأسئلة</span>
           </button>
+          <button class="tab-btn highlight-ai-tab" data-tab="tab-generator" id="mainTabAiGeneratorBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>توليد 3 نماذج ذكية</span>
+          </button>
         </div>
       </div>
 
@@ -622,38 +635,217 @@
       </div>
 
       <!-- Tab 3: Smart AI Generator & Text Extractor -->
+      <!-- Tab 3: Comprehensive AI Triple Exam Generator (استوديو الذكاء الاصطناعي لتوليد 3 نماذج متوازية) -->
       <div class="tab-content" id="tab-generator" style="display: none;">
-        <div class="card-box">
+        
+        <!-- Header Banner -->
+        <div class="ai-studio-header-card">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div class="ai-studio-icon-badge">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <div style="font-size: 1.05rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <span>استوديو الذكاء الاصطناعي لتوليد الاختبارات</span>
+                <span class="badge-tag" style="background: rgba(139, 92, 246, 0.2); color: #8b5cf6; font-size: 0.72rem; font-weight: 800;">3 نماذج متكافئة ⚡</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 3px 0 0 0;">
+                محرك ذكي فائق مدعوم ببنك يضم أكثر من 50,000 سؤال وزاري ومنهجي وتمارين الكتاب المقررة لكافة المراحل
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 700; font-size: 0.72rem;">
+              <i class="fa-solid fa-book-open"></i> أسئلة وتمارين الكتاب المعتمدة
+            </span>
+            <span class="badge-tag" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6; font-weight: 700; font-size: 0.72rem;">
+              <i class="fa-solid fa-award"></i> وزاريات شاملة (تمهيدي ودور أول وثانٍ)
+            </span>
+          </div>
+        </div>
+
+        <!-- Specifications & Parameters Card -->
+        <div class="card-box" style="margin-top: 0; margin-bottom: 1.25rem;">
           <div class="card-header">
             <div class="card-title">
-              <i class="fa-solid fa-wand-magic-sparkles" style="color: #fbbf24;"></i>
-              <span>المولد الذكي: استخراج وتوليد أسئلة من نص الدرس</span>
+              <i class="fa-solid fa-sliders text-primary"></i>
+              <span>معايير ومواصفات الاختبار المطلوب</span>
             </div>
           </div>
-          
-          <div class="form-group" style="margin-bottom: 1rem;">
-            <label class="form-label">الصق محتوى الدرس أو الملخص هنا:</label>
-            <textarea class="form-control" id="aiInputText" rows="6" placeholder="اكتب أو الصق فقرة من المنهج، على سبيل المثال:
-«الميزان الصرفي هو مقياس لمعرفة بنية الكلمة وأحرفها الأصلية والزائدة. اسم الفاعل هو اسم مشتق يدل على من قام بالفعل أو اتصف به، ويصاغ من الفعل الثلاثي على وزن فاعل مثل كاتب وقارئ. يتكون أسلوب الشرط من أداة الشرط وجملة فعل الشرط وجملة جواب الشرط...»"></textarea>
-          </div>
 
-          <div class="form-grid" style="margin-bottom: 1.25rem;">
-            <div class="form-group">
-              <label class="form-label">أنواع الأسئلة المراد توليدها:</label>
-              <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.25rem;">
-                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenMCQ" checked> اختيار من متعدد</label>
-                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenTF" checked> صح أو خطأ</label>
-                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenFill" checked> أكمل فراغات</label>
-                <label style="font-size: 0.85rem;"><input type="checkbox" id="aiGenEssay" checked> أسئلة مقالية</label>
+          <!-- Mandatory Fields Grid -->
+          <div class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-bottom: 1.15rem;">
+            
+            <!-- 1. الصف أو المرحلة الدراسية (حقل إجباري) -->
+            <div class="form-group" id="groupAiGenGrade">
+              <label class="form-label" style="font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+                <span>المرحلة الدراسية أو الصف <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
+                <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
+              </label>
+              <select class="form-control" id="aiGenGrade" required onchange="window.clearAiValidationError('aiGenGrade')">
+                <option value="">-- اختر المرحلة الدراسية أو الصف --</option>
+                <option value="الصف الثالث المتوسط">🎓 الصف الثالث المتوسط</option>
+                <option value="الصف السادس الإعدادي (العلمي)">🏛️ الصف السادس الإعدادي (العلمي)</option>
+                <option value="الصف السادس الإعدادي (الأدبي)">📚 الصف السادس الإعدادي (الأدبي)</option>
+                <option value="الصف الأول المتوسط">🌱 الصف الأول المتوسط</option>
+                <option value="الصف الثاني المتوسط">🌿 الصف الثاني المتوسط</option>
+                <option value="الصف الرابع الإعدادي">📖 الصف الرابع الإعدادي</option>
+                <option value="الصف الخامس الإعدادي">📑 الصف الخامس الإعدادي</option>
+              </select>
+              <div id="aiGradeErrorAlert" class="auth-field-error-notice" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-top: 4px;">
+                <i class="fa-solid fa-circle-exclamation"></i> يرجى اختيار المرحلة الدراسية (حقل إجباري)
               </div>
             </div>
+
+            <!-- 2. المادة الدراسية (حقل إجباري) -->
+            <div class="form-group" id="groupAiGenSubject">
+              <label class="form-label" style="font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+                <span>المادة الدراسية <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
+                <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
+              </label>
+              <select class="form-control" id="aiGenSubject" required onchange="window.clearAiValidationError('aiGenSubject')">
+                <option value="">-- اختر المادة الدراسية --</option>
+                <option value="اللغة العربية">✍️ اللغة العربية</option>
+                <option value="اللغة الإنكليزية">🌐 اللغة الإنكليزية (English Language)</option>
+                <option value="الرياضيات">📐 الرياضيات</option>
+                <option value="الكيمياء">🧪 الكيمياء</option>
+                <option value="الفيزياء">⚡ الفيزياء</option>
+                <option value="التربية الإسلامية">📖 التربية الإسلامية والقرآن الكريم</option>
+                <option value="علم الأحياء">🔬 علم الأحياء</option>
+                <option value="الاجتماعيات">🌍 الاجتماعيات (التاريخ والجغرافية)</option>
+              </select>
+              <div id="aiSubjectErrorAlert" class="auth-field-error-notice" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-top: 4px;">
+                <i class="fa-solid fa-circle-exclamation"></i> يرجى اختيار المادة الدراسية (حقل إجباري)
+              </div>
+            </div>
+
+            <!-- 3. مستوى صعوبة الأسئلة (حقل إجباري) -->
+            <div class="form-group" id="groupAiGenDifficulty">
+              <label class="form-label" style="font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+                <span>مستوى صعوبة الأسئلة <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
+                <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
+              </label>
+              <select class="form-control" id="aiGenDifficulty" required onchange="window.clearAiValidationError('aiGenDifficulty')">
+                <option value="">-- اختر مستوى صعوبة الاختبار --</option>
+                <option value="متوسط">⚖️ متوسط (النمط الوزاري المعتمد الشامل)</option>
+                <option value="سهل">🟢 سهل ومباشر (للامتحانات الشهرية والمراجعة السريعة)</option>
+                <option value="متقدم">🔥 متقدم للمتميزين (تفكير ناقد، استنتاج، وتحديات ذكاء)</option>
+                <option value="متوازن">🎯 متوازن وشامل (توزيع هرمي لمستويات بلوم المعرفية)</option>
+              </select>
+              <div id="aiDifficultyErrorAlert" class="auth-field-error-notice" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-top: 4px;">
+                <i class="fa-solid fa-circle-exclamation"></i> يرجى تحديد مستوى الصعوبة (حقل إجباري)
+              </div>
+            </div>
+
           </div>
 
-          <button class="btn btn-primary" id="runAiGeneratorBtn" style="width: 100%;">
-            <i class="fa-solid fa-bolt"></i>
-            <span>توليد وصياغة الأسئلة تلقائياً وإضافتها للاختبار</span>
+          <!-- 4. Optional Teacher Notes Field (ملاحظة أو شرح المدرس لذكاء عن الأسئلة) -->
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" style="font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-comment-dots text-primary"></i>
+                <span>ملاحظات أو شرح الأستاذ للذكاء الاصطناعي عن الأسئلة المطلوبة</span>
+              </span>
+              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.7rem; font-weight: 700;">حقل اختياري</span>
+            </label>
+            <textarea class="form-control" id="aiGenTeacherNotes" rows="3" placeholder="اكتب هنا أي توجيه أو تخصيص تريده من الذكاء الاصطناعي، مثال:&#10;«التركيز على أسئلة الفصلين الأول والثاني، وتضمين مسائل ديموافر، وتجنب الأسئلة المقالية الطويلة، والتركيز على التعاليل الوزارية المكررة...»"></textarea>
+            <small style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 4px;">
+              <i class="fa-solid fa-lightbulb text-warning"></i> حقل اختياري بالكامل. يمكنك تركه فارغاً ليقوم الذكاء الاصطناعي باختيار أسئلة وزارية ومنهجية شاملة تلقائياً.
+            </small>
+          </div>
+
+          <!-- Sources & Options -->
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1.25rem;">
+            <div style="font-size: 0.8rem; font-weight: 800; color: var(--text-main); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-database text-warning"></i>
+              <span>مصادر بنك الأسئلة المستخدمة (أكثر من 50,000 سؤال):</span>
+            </div>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-main);">
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input type="checkbox" checked disabled> أسئلة الامتحانات الوزارية (سنوات متعددة وجميع الأدوار)</label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input type="checkbox" checked disabled> أسئلة فصول الكتاب المدرسي المعتمد</label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input type="checkbox" checked disabled> تمارين وأمثلة ومسائل الكتاب المقررة</label>
+              <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;"><input type="checkbox" checked disabled> سلالم الأجوبة النموذجية وتوزيع الدرجات</label>
+            </div>
+          </div>
+
+          <!-- Generate Action Button -->
+          <button type="button" class="btn btn-primary" id="btnTriggerTripleAi" style="width: 100%; font-size: 1rem; font-weight: 800; padding: 0.85rem 1.5rem; box-shadow: 0 4px 18px rgba(99, 102, 241, 0.35); background: linear-gradient(135deg, #4f46e5, #7c3aed);" onclick="window.generateTripleAiExams()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>توليد 3 نسخ امتحانية بالذكاء الاصطناعي الآن (النموذج أ ، النموذج ب ، النموذج ج) ⚡</span>
           </button>
         </div>
+
+        <!-- Dynamic Results Section (Shows after generation) -->
+        <div id="aiTripleResultsSection" style="display: none;">
+          
+          <!-- Loading State Box -->
+          <div id="aiGeneratingSpinner" class="card-box ai-loading-overlay" style="display: none;">
+            <i class="fa-solid fa-atom fa-spin" style="font-size: 3rem; color: #8b5cf6;"></i>
+            <h4 style="margin: 0; font-weight: 800; color: var(--text-main);">جاري تحليل المنهج وسحب الأسئلة الوزارية وصياغة 3 نسخ مستقلة...</h4>
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0; max-width: 450px;">
+              يقوم الذكاء الاصطناعي بفرز أكثر من 50 ألف سؤال لتوليد ثلاثة نماذج متكافئة بدقة عالية، مع ضمان عدم تكرار الأسئلة بين النسخ.
+            </p>
+          </div>
+
+          <!-- 3 Versions Container -->
+          <div id="aiGeneratedVersionsContent" style="display: none;">
+            
+            <!-- 3 Versions Switcher Tabs (شريط النماذج الثلاثة) -->
+            <div class="ai-ver-tabs-container">
+              <button type="button" class="ai-ver-tab active" id="tabAiVerA" onclick="window.switchAiExamVersion('versionA')">
+                <div class="ai-ver-tab-title">
+                  <i class="fa-solid fa-star text-warning"></i>
+                  <span>النسخة (أ) - النموذج الشامل</span>
+                </div>
+                <div class="ai-ver-tab-subtitle">نموذج وزاري متوازن يغطي كافة المفردات</div>
+                <span class="ai-ver-badge">5 أسئلة | 100 درجة</span>
+              </button>
+
+              <button type="button" class="ai-ver-tab" id="tabAiVerB" onclick="window.switchAiExamVersion('versionB')">
+                <div class="ai-ver-tab-title">
+                  <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i>
+                  <span>النسخة (ب) - النموذج البديل</span>
+                </div>
+                <div class="ai-ver-tab-subtitle">نموذج متكافئ بأسئلة مختلفة لمنع الغش</div>
+                <span class="ai-ver-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">5 أسئلة | 100 درجة</span>
+              </button>
+
+              <button type="button" class="ai-ver-tab" id="tabAiVerC" onclick="window.switchAiExamVersion('versionC')">
+                <div class="ai-ver-tab-title">
+                  <i class="fa-solid fa-bolt" style="color: #a855f7;"></i>
+                  <span>النسخة (ج) - النموذج المكثف</span>
+                </div>
+                <div class="ai-ver-tab-subtitle">تحدي للمتميزين وتطبيقات استنتاجية</div>
+                <span class="ai-ver-badge" style="background: rgba(168, 85, 247, 0.15); color: #a855f7;">5 أسئلة | 100 درجة</span>
+              </button>
+            </div>
+
+            <!-- Active Version Details Card -->
+            <div class="card-box" style="margin-top: 0; border: 1.5px solid var(--border-color);">
+              <div class="card-header" style="flex-wrap: wrap; gap: 0.75rem; background: var(--bg-surface); border-radius: var(--radius-sm);">
+                <div>
+                  <h3 id="aiActiveVerTitle" style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main);"></h3>
+                  <div id="aiActiveVerMeta" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 3px;"></div>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-success" style="font-weight: 800; font-size: 0.88rem; padding: 0.55rem 1.15rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);" onclick="window.applyCurrentAiVersionToWorkstation()">
+                    <i class="fa-solid fa-circle-check"></i> اعتماد هذا النموذج في ورقة الاختبار A4
+                  </button>
+                  <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.5rem 0.85rem;" onclick="window.saveAllAiVersionsToArchive()" title="حفظ النماذج الثلاثة في أرشيف اختباراتي">
+                    <i class="fa-solid fa-floppy-disk text-primary"></i> حفظ الـ 3 نسخ في الأرشيف
+                  </button>
+                </div>
+              </div>
+
+              <!-- Questions List Preview -->
+              <div id="aiActiveVerQuestionsList" style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                <!-- Dynamically rendered questions for active version -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
 
       <!-- Tab 4: Paper Margins & Layout Settings -->
@@ -2943,6 +3135,7 @@
   <script src="js/exporter.js?v=5.5"></script>
   <script src="js/physics-studio.js?v=5.5"></script>
   <script src="js/islamic-studio.js?v=5.5"></script>
+  <script src="js/ai-curriculum-engine.js?v=5.5"></script>
   <script src="js/app.js?v=5.5"></script>
 </body>
 </html>

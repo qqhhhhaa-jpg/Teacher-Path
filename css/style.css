@@ -9429,3 +9429,132 @@ body.printing-academic-report #academicReportPrintContainer {
   animation: inputShake 0.45s ease-in-out;
   transition: all 0.25s ease;
 }
+
+/* ==========================================================================
+   AI Triple Generator Studio (استوديو الذكاء الاصطناعي لتوليد 3 نماذج متوازية)
+   ========================================================================== */
+.highlight-ai-tab {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15)) !important;
+  border: 1.5px solid rgba(139, 92, 246, 0.45) !important;
+  color: #8b5cf6 !important;
+}
+
+.highlight-ai-tab:hover,
+.highlight-ai-tab.active {
+  background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+  color: #ffffff !important;
+  border-color: #7c3aed !important;
+  box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35) !important;
+}
+
+.ai-studio-header-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.12));
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ai-studio-icon-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 1.5rem;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
+  flex-shrink: 0;
+}
+
+.ai-ver-tabs-container {
+  display: flex;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.ai-ver-tab {
+  flex: 1;
+  min-width: 180px;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ai-ver-tab:hover {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.05);
+}
+
+.ai-ver-tab.active {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.2);
+}
+
+.ai-ver-tab-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-ver-tab-subtitle {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.ai-ver-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.15);
+  color: #6366f1;
+  width: fit-content;
+  margin-top: 2px;
+}
+
+.ai-question-card-preview {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.ai-question-card-preview:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ai-loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  gap: 1rem;
+}
