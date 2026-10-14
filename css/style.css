@@ -1165,12 +1165,14 @@ body {
 }
 
 .brand-logo-img {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-  box-shadow: 0 0 14px rgba(37, 99, 235, 0.3);
-  border: 2px solid rgba(245, 158, 11, 0.4);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 2px;
+  box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
+  border: 1.5px solid rgba(56, 189, 248, 0.6);
 }
 
 .brand-info h1 {
@@ -3677,9 +3679,9 @@ textarea.form-control {
 }
 
 .portal-topbar-seal {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   border: 2px solid #fbbf24;
   object-fit: contain;
   background: #ffffff;
@@ -6982,6 +6984,7 @@ body.view-only-mode .builder-pane::after {
 }
 
 .drawer-brand-logo {
+  border-radius: 10px !important;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -7006,7 +7009,7 @@ body.view-only-mode .builder-pane::after {
   position: absolute;
   width: 140px;
   height: 140px;
-  border-radius: 50%;
+  border-radius: 28px;
   background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(245, 158, 11, 0.25) 50%, transparent 72%);
   filter: blur(14px);
   animation: masarAuraPulse 3.5s ease-in-out infinite alternate;
@@ -7021,21 +7024,23 @@ body.view-only-mode .builder-pane::after {
 
 .masar-orbit-ring {
   position: absolute;
-  border-radius: 50%;
+  border-radius: 26px;
   pointer-events: none;
   z-index: 2;
 }
 
 .masar-orbit-ring.ring-outer {
-  width: 122px;
-  height: 122px;
+  width: 130px;
+  height: 130px;
+  border-radius: 30px;
   border: 1.5px dashed rgba(56, 189, 248, 0.55);
   animation: masarOrbitSpin 14s linear infinite;
 }
 
 .masar-orbit-ring.ring-inner {
-  width: 104px;
-  height: 104px;
+  width: 114px;
+  height: 114px;
+  border-radius: 24px;
   border: 1px dotted rgba(245, 158, 11, 0.65);
   animation: masarOrbitSpinRev 10s linear infinite;
 }
@@ -7052,12 +7057,12 @@ body.view-only-mode .builder-pane::after {
 
 .masar-logo-core-badge {
   position: relative;
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  padding: 3.5px;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  padding: 4.5px;
   background: linear-gradient(135deg, #38bdf8, #f59e0b, #10b981);
-  box-shadow: 0 12px 30px rgba(14, 165, 233, 0.45), 0 0 25px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 12px 32px rgba(14, 165, 233, 0.45), 0 0 25px rgba(245, 158, 11, 0.35);
   z-index: 3;
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
   transform-style: preserve-3d;
@@ -7065,7 +7070,7 @@ body.view-only-mode .builder-pane::after {
 
 .masar-interactive-hero:hover .masar-logo-core-badge {
   transform: scale(1.08) rotate(3deg);
-  box-shadow: 0 16px 42px rgba(14, 165, 233, 0.65), 0 0 35px rgba(245, 158, 11, 0.5);
+  box-shadow: 0 16px 44px rgba(14, 165, 233, 0.65), 0 0 35px rgba(245, 158, 11, 0.5);
 }
 
 .masar-interactive-hero:active .masar-logo-core-badge {
@@ -7075,20 +7080,20 @@ body.view-only-mode .builder-pane::after {
 .masar-main-logo-img {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 16px;
   object-fit: contain;
   display: block;
   background: #ffffff;
-  padding: 5px;
+  padding: 4px;
 }
 
 .masar-badge-live-pulse {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+  bottom: -3px;
+  right: -3px;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
   background: #10b981;
   border: 2px solid #0f172a;
   box-shadow: 0 0 8px #10b981;
