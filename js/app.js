@@ -3370,7 +3370,7 @@ window.updateModalMathPreview = function() {
   if (!previewEl) return;
   const text = qTextEl ? qTextEl.value.trim() : '';
   if (!text) {
-    previewEl.innerHTML = '<span style="color: var(--text-muted); font-size: 0.82rem;">(اكتب المسألة أو اختر رموز وقوالب الرياضيات من الاستوديو أعلاه للمعاينة الفورية المباشرة)</span>';
+    previewEl.innerHTML = '<span style="color: #64748b; font-size: 0.82rem; font-weight: 600;">(اكتب السؤال أو المسألة أو اختر رموزاً من الاستوديو للمعاينة الفورية المباشرة)</span>';
   } else {
     previewEl.innerHTML = formatMathText(text.replace(/\n/g, '<br/>'));
   }
