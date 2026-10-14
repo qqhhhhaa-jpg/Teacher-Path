@@ -119,7 +119,9 @@ const ACCENT_COLOR_NAMES = {
   purple: 'البنفسجي الإبداعي 🟣',
   crimson: 'الياقوتي العنابي 🔴',
   amber: 'العنبر الذهبي 🟡',
-  teal: 'الفيروزي البحري 🌊'
+  teal: 'الفيروزي البحري 🌊',
+  rose: 'الوردي الملكي 🌸',
+  orange: 'البرتقالي الناري 🍊'
 };
 
 function initAccentColor() {

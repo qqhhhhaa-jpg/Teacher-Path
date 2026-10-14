@@ -141,7 +141,7 @@
         <div class="drawer-section">
           <div class="drawer-section-title">
             <i class="fa-solid fa-palette text-accent"></i>
-            <span>المظهر والسمات (6 ألوان)</span>
+            <span>المظهر والسمات (8 ألوان)</span>
           </div>
 
           <!-- Dark/Light Theme Button -->
@@ -156,7 +156,7 @@
           <!-- Color Palette Picker -->
           <div class="drawer-palette-box">
             <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.45rem;">
-              🎨 اختر سمة الألوان (6 ألوان):
+              🎨 اختر سمة الألوان (8 ألوان):
             </div>
             <div class="drawer-palette-grid">
               <button type="button" class="palette-chip active" data-color="blue" onclick="setAccentColor('blue')">
@@ -182,6 +182,14 @@
               <button type="button" class="palette-chip" data-color="teal" onclick="setAccentColor('teal')">
                 <span class="chip-color-dot" style="background: #0891b2;"></span>
                 <span>فيروزي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="rose" onclick="setAccentColor('rose')">
+                <span class="chip-color-dot" style="background: #e11d48;"></span>
+                <span>وردي ملكي</span>
+              </button>
+              <button type="button" class="palette-chip" data-color="orange" onclick="setAccentColor('orange')">
+                <span class="chip-color-dot" style="background: #ea580c;"></span>
+                <span>برتقالي ناري</span>
               </button>
             </div>
           </div>
@@ -656,7 +664,7 @@
           <div class="card-header">
             <div class="card-title">
               <i class="fa-solid fa-palette" style="color: var(--primary);"></i>
-              <span>ألوان وسمات المنصة (6 ألوان متجددة لكسر الروتين)</span>
+              <span>ألوان وسمات المنصة (8 ألوان متجددة لكسر الروتين)</span>
             </div>
             <span class="badge-tag" style="background: rgba(37, 99, 235, 0.12); color: var(--primary); font-weight: 700;">
               اللون الأساسي: أبيض ناصع ⚪
@@ -664,7 +672,7 @@
           </div>
 
           <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">
-            الواجهة الأساسية معتمدة على <strong>اللون الأبيض النقي</strong>. يمكنك التبديل بين <strong>6 ألوان حيوية متجددة</strong> لتغيير ألوان الأزرار والأيقونات والتدرجات:
+            الواجهة الأساسية معتمدة على <strong>اللون الأبيض النقي</strong>. يمكنك التبديل بين <strong>8 ألوان حيوية متجددة</strong> لتغيير ألوان الأزرار والأيقونات والتدرجات:
           </p>
 
           <div class="color-palette-cards-grid">
@@ -724,6 +732,26 @@
               <div class="color-info">
                 <strong>الفيروزي البحري</strong>
                 <span>منعش ومتوازن</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 7. Royal Rose -->
+            <button type="button" class="color-theme-card" data-color="rose" onclick="setAccentColor('rose')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #e11d48, #fb7185);"></span>
+              <div class="color-info">
+                <strong>الوردي الملكي</strong>
+                <span>فاخر وجذاب</span>
+              </div>
+              <i class="fa-solid fa-check color-check-icon"></i>
+            </button>
+
+            <!-- 8. Sunset Orange -->
+            <button type="button" class="color-theme-card" data-color="orange" onclick="setAccentColor('orange')">
+              <span class="color-swatch-circle" style="background: linear-gradient(135deg, #ea580c, #fb923c);"></span>
+              <div class="color-info">
+                <strong>البرتقالي الناري</strong>
+                <span>طاقة وحيوية عالية</span>
               </div>
               <i class="fa-solid fa-check color-check-icon"></i>
             </button>
@@ -1349,6 +1377,8 @@
           <button type="button" class="palette-dot-btn" data-color="crimson" title="الياقوتي" style="background: #dc2626;" onclick="setAccentColor('crimson')"></button>
           <button type="button" class="palette-dot-btn" data-color="amber" title="العنبر" style="background: #d97706;" onclick="setAccentColor('amber')"></button>
           <button type="button" class="palette-dot-btn" data-color="teal" title="الفيروزي" style="background: #0891b2;" onclick="setAccentColor('teal')"></button>
+          <button type="button" class="palette-dot-btn" data-color="rose" title="الوردي الملكي" style="background: #e11d48;" onclick="setAccentColor('rose')"></button>
+          <button type="button" class="palette-dot-btn" data-color="orange" title="البرتقالي الناري" style="background: #ea580c;" onclick="setAccentColor('orange')"></button>
         </div>
         <button class="btn btn-outline btn-icon-only" onclick="toggleTheme()" title="التبديل بين الوضع الليلي والنهاري">
           <i class="fa-solid fa-moon"></i>
