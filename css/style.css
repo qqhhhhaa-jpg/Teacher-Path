@@ -7047,9 +7047,10 @@ body.view-only-mode .builder-pane::after {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
-  background: #0f172a;
+  background: #ffffff;
+  padding: 5px;
 }
 
 .masar-badge-live-pulse {
