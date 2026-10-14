@@ -7837,8 +7837,242 @@ window.toggleSideDrawerCollapse = function(forceState) {
 };
 
 /* ==========================================================================
-   Google Quick Sign-In & Multi-Device Cloud Sync
+   Google Official Identity Services & Cloud Synchronization (OAuth 2.0)
    ========================================================================== */
+
+const DEFAULT_GOOGLE_CLIENT_ID = '1084204892491-masaralmoallem.apps.googleusercontent.com';
+
+window.getGoogleClientId = function() {
+  return localStorage.getItem('moallem_google_client_id') || window.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
+};
+
+window.saveCustomGoogleClientId = function() {
+  const input = document.getElementById('cfgGoogleClientIdInput');
+  const val = (input && input.value) ? input.value.trim() : '';
+  if (!val) {
+    showToast('يرجى لصق معرّف Google Client ID الخاص بمشروعك!', 'warning');
+    return;
+  }
+  localStorage.setItem('moallem_google_client_id', val);
+  showToast('تم حفظ وتفعيل معرّف Google Client ID بنجاح ✔', 'success');
+  window.updateGoogleClientIdUI();
+  window.initGoogleIdentityServices();
+};
+
+window.resetGoogleClientIdDefault = function() {
+  localStorage.removeItem('moallem_google_client_id');
+  showToast('تمت استعادة معرّف Google الافتراضي للمنصة ✔', 'info');
+  window.updateGoogleClientIdUI();
+  window.initGoogleIdentityServices();
+};
+
+window.toggleGoogleClientIdBox = function() {
+  const box = document.getElementById('googleClientIdBox');
+  if (box) {
+    const isHidden = box.style.display === 'none';
+    box.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) window.updateGoogleClientIdUI();
+  }
+};
+
+window.updateGoogleClientIdUI = function() {
+  const curId = window.getGoogleClientId();
+  const input = document.getElementById('cfgGoogleClientIdInput');
+  if (input) input.value = curId;
+  const badge = document.getElementById('googleClientIdStatusBadge');
+  if (badge) {
+    if (localStorage.getItem('moallem_google_client_id')) {
+      badge.innerText = 'مخصص ✔';
+      badge.style.background = '#10b981';
+      badge.style.color = '#fff';
+    } else {
+      badge.innerText = 'افتراضي';
+      badge.style.background = 'rgba(66, 133, 244, 0.15)';
+      badge.style.color = '#4285f4';
+    }
+  }
+};
+
+// Helper: Decode Google JWT Token (Client-side RFC 7519)
+window.decodeGoogleJwtPayload = function(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (err) {
+    console.warn('JWT Decode error:', err);
+    return null;
+  }
+};
+
+let googleTokenClient = null;
+let isGisReady = false;
+
+window.initGoogleIdentityServices = function() {
+  const clientId = window.getGoogleClientId();
+  if (typeof google === 'undefined' || !google.accounts) {
+    setTimeout(window.initGoogleIdentityServices, 500);
+    return;
+  }
+
+  try {
+    // 1. Initialize Google Identity Services ID Token Client
+    google.accounts.id.initialize({
+      client_id: clientId,
+      callback: window.handleGoogleCredentialResponse,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+
+    // Render Official Google Sign-In Button inside Modal target
+    const btnTarget = document.getElementById('googleOfficialGsiButton');
+    if (btnTarget) {
+      btnTarget.innerHTML = '';
+      google.accounts.id.renderButton(btnTarget, {
+        theme: 'filled_blue',
+        size: 'large',
+        shape: 'pill',
+        text: 'signin_with',
+        logo_alignment: 'left',
+        width: 300
+      });
+    }
+
+    // 2. Initialize OAuth2 Token Client for Interactive Account Chooser Popup
+    if (google.accounts.oauth2) {
+      googleTokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: clientId,
+        scope: 'email profile openid',
+        callback: async (tokenResponse) => {
+          const statusEl = document.getElementById('googleAuthStatusNotice');
+          if (statusEl) statusEl.style.display = 'none';
+
+          if (tokenResponse && tokenResponse.access_token) {
+            window.fetchGoogleUserProfile(tokenResponse.access_token);
+          } else if (tokenResponse && tokenResponse.error) {
+            if (tokenResponse.error !== 'popup_closed_by_user') {
+              showToast('حدث خطأ أثناء المصادقة عبر Google: ' + tokenResponse.error, 'error');
+            }
+          }
+        }
+      });
+    }
+
+    isGisReady = true;
+  } catch (err) {
+    console.warn('GIS initialization notice:', err);
+  }
+};
+
+// Auto-init GIS on window load
+window.addEventListener('load', () => {
+  window.initGoogleIdentityServices();
+  window.updateGoogleClientIdUI();
+});
+
+// Handle Google Credential Response from Official Button / One Tap
+window.handleGoogleCredentialResponse = function(response) {
+  try {
+    if (!response || !response.credential) {
+      showToast('لم يتم استلام مصادقة صالحة من Google', 'error');
+      return;
+    }
+    const payload = window.decodeGoogleJwtPayload(response.credential);
+    if (!payload || !payload.email) {
+      showToast('تعذر قراءة بيانات حساب Google', 'error');
+      return;
+    }
+
+    window.handleVerifiedGoogleAccount({
+      email: payload.email,
+      name: payload.name || payload.given_name || '',
+      picture: payload.picture || '',
+      sub: payload.sub || ''
+    });
+  } catch (e) {
+    console.error('Credential response error:', e);
+    showToast('حدث خطأ أثناء معالجة تسجيل الدخول عبر Google', 'error');
+  }
+};
+
+// Fetch Google User Profile using OAuth 2.0 Access Token
+window.fetchGoogleUserProfile = async function(accessToken) {
+  const statusEl = document.getElementById('googleAuthStatusNotice');
+  if (statusEl) statusEl.style.display = 'block';
+
+  try {
+    const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (!res.ok) throw new Error('فشل جلب بيانات الحساب من Google');
+    const profile = await res.json();
+    
+    if (statusEl) statusEl.style.display = 'none';
+
+    window.handleVerifiedGoogleAccount({
+      email: profile.email,
+      name: profile.name || `${profile.given_name || ''} ${profile.family_name || ''}`.trim(),
+      picture: profile.picture || '',
+      sub: profile.sub || ''
+    });
+  } catch (err) {
+    if (statusEl) statusEl.style.display = 'none';
+    console.error('Fetch Google profile error:', err);
+    showToast('تعذر استلام بيانات الحساب من Google: ' + err.message, 'error');
+  }
+};
+
+// Main Unified Handler for Verified Google Account
+window.handleVerifiedGoogleAccount = function(googleProfile) {
+  if (!googleProfile || !googleProfile.email) {
+    showToast('تعذر التحقق من بريد Google الرسمي!', 'error');
+    return;
+  }
+
+  const email = googleProfile.email.toLowerCase().trim();
+  const name = googleProfile.name || email.split('@')[0];
+  const picture = googleProfile.picture || '';
+  const googleId = googleProfile.sub || '';
+
+  // Isolation check: Admin username/email cannot be claimed via Google
+  if (email === 'admin' || email.startsWith('admin@') || name.toLowerCase() === 'admin') {
+    showToast('حساب المدير العام محمي برمز مشفر، يرجى تسجيل الدخول من بوابة الآدمن باليوزر وكلمة المرور! 🛡️', 'error');
+    return;
+  }
+
+  const accounts = getAuthAccounts();
+
+  // Search if this Google account or email is ALREADY registered on this device
+  const existingAcc = accounts.find(a => 
+    !a.isAdmin && a.role !== 'admin' && a.id !== 'usr_admin' && (
+      (a.email && a.email.toLowerCase() === email) ||
+      (a.googleId && a.googleId === googleId)
+    )
+  );
+
+  if (existingAcc) {
+    // ACCOUNT ALREADY REGISTERED -> DIRECT 1-CLICK INSTANT LOGIN!
+    existingAcc.isGoogleUser = true;
+    if (picture) existingAcc.avatar = picture;
+    if (googleId) existingAcc.googleId = googleId;
+    window.performGoogleLoginSuccess(existingAcc);
+    return;
+  }
+
+  // Brand-new Google user: Show Step 2 to configure school, governorate & credentials
+  pendingGoogleAccount = {
+    name: name,
+    email: email,
+    picture: picture,
+    googleId: googleId
+  };
+
+  window.proceedToStep2(name, email, picture);
+};
+
 window.openGoogleAccountModal = function() {
   const modal = document.getElementById('googleAuthModal');
   if (modal) {
@@ -7846,24 +8080,21 @@ window.openGoogleAccountModal = function() {
     if (typeof window.backToGoogleStep1 === 'function') {
       window.backToGoogleStep1();
     }
-    // Clean input every time so no previous accounts/emails are left on screen for anyone taking the phone!
-    const emailInput = document.getElementById('customGoogleEmailInput');
-    if (emailInput) {
-      emailInput.value = '';
-      emailInput.focus();
+    window.updateGoogleClientIdUI();
+    if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+      window.initGoogleIdentityServices();
     }
   }
 };
 
 window.closeGoogleAccountModal = function() {
-  if (googlePopupRef && !googlePopupRef.closed) {
-    try { googlePopupRef.close(); } catch (e) {}
-  }
   const modal = document.getElementById('googleAuthModal');
   if (modal) modal.classList.remove('open');
+  const statusEl = document.getElementById('googleAuthStatusNotice');
+  if (statusEl) statusEl.style.display = 'none';
 };
 
-// Auto-attach backdrop click listeners for googleAuthModal and cloudSyncModal
+// Backdrop click listeners
 document.addEventListener('DOMContentLoaded', () => {
   const gModal = document.getElementById('googleAuthModal');
   if (gModal) {
@@ -7881,65 +8112,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let pendingGoogleAccount = {
   name: '',
-  email: ''
+  email: '',
+  picture: '',
+  googleId: ''
 };
 
-let googlePopupRef = null;
-
+// Launch Official Google Popup / Account Chooser
 window.launchGoogleRealPopup = function() {
+  const clientId = window.getGoogleClientId();
+
+  // If tokenClient is ready, directly request access token with prompt: 'select_account'
+  if (googleTokenClient) {
+    try {
+      const statusEl = document.getElementById('googleAuthStatusNotice');
+      if (statusEl) statusEl.style.display = 'block';
+      googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+      return;
+    } catch (e) {
+      console.warn('Failed to launch token client popup:', e);
+    }
+  }
+
+  // If GIS is present, initialize and try
+  if (typeof google !== 'undefined' && google.accounts) {
+    window.initGoogleIdentityServices();
+    if (googleTokenClient) {
+      try {
+        const statusEl = document.getElementById('googleAuthStatusNotice');
+        if (statusEl) statusEl.style.display = 'block';
+        googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+        return;
+      } catch (e) {}
+    }
+  }
+
+  // Fallback: Open modal so user sees official button and status
   window.openGoogleAccountModal();
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+    try {
+      google.accounts.id.prompt();
+    } catch (e) {}
+  }
 };
 
 window.submitGoogleLoginAction = function() {
-  const input = document.getElementById('customGoogleEmailInput');
-  const val = (input && input.value) ? input.value.trim() : '';
-  if (!val) {
-    showToast('يرجى كتابة عنوان بريد Google (Gmail) أو اسم المستخدم الخاص بك!', 'warning');
-    if (input) input.focus();
-    return;
-  }
-
-  // Admin isolation check
-  if (val.toLowerCase() === 'admin' || val.toLowerCase() === 'usr_admin') {
-    showToast('حساب المدير العام محمي برمز مشفر، يرجى تسجيل الدخول من بوابة الآدمن باليوزر وكلمة المرور! 🛡️', 'error');
-    if (input) input.value = '';
-    return;
-  }
-
-  const accounts = getAuthAccounts();
-  const valLower = val.toLowerCase();
-
-  // Search if this account was ALREADY registered on this device
-  const existingAcc = accounts.find(a => 
-    !a.isAdmin && a.role !== 'admin' && a.id !== 'usr_admin' && (
-      (a.email && a.email.toLowerCase() === valLower) ||
-      (a.username && a.username.toLowerCase() === valLower)
-    )
-  );
-
-  if (existingAcc) {
-    // ACCOUNT ALREADY REGISTERED -> DIRECT 1-CLICK LOGIN! Bypasses Step 2 completely!
-    window.performGoogleLoginSuccess(existingAcc);
-    return;
-  }
-
-  // Brand-new Google user: Show Step 2 for FIRST TIME setup
-  let email = val;
-  if (!email.includes('@')) {
-    email = val + '@gmail.com';
-  }
-
-  window.proceedToStep2('', email);
+  window.launchGoogleRealPopup();
 };
 
 window.selectCustomGoogleEmail = function() {
-  window.submitGoogleLoginAction();
+  window.launchGoogleRealPopup();
 };
 
-window.proceedToStep2 = function(name, email) {
+window.proceedToStep2 = function(name, email, picture) {
   pendingGoogleAccount = {
     name: name || '',
-    email: email || ''
+    email: email || '',
+    picture: picture || ''
   };
 
   const step1 = document.getElementById('googleAuthStep1');
@@ -7967,15 +8195,20 @@ window.proceedToStep2 = function(name, email) {
     }
   }
 
-  // Set Step 2 fields to EMPTY every time - the user fills them manually!
+  // Display Verified Email Badge
   const linkedEmailEl = document.getElementById('step2LinkedEmail');
   if (linkedEmailEl) linkedEmailEl.innerText = pendingGoogleAccount.email || '';
 
+  // Prefill teacher's real Google Name
   const nameInput = document.getElementById('step2TeacherName');
-  if (nameInput) nameInput.value = '';
+  if (nameInput) nameInput.value = name || '';
 
+  // Suggest clean unique username based on email
   const userInput = document.getElementById('step2TeacherUsername');
-  if (userInput) userInput.value = '';
+  if (userInput) {
+    const rawUser = (email.split('@')[0] || '').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+    userInput.value = rawUser;
+  }
 
   const passInput = document.getElementById('step2TeacherPassword');
   if (passInput) passInput.value = '';
@@ -7990,7 +8223,9 @@ window.proceedToStep2 = function(name, email) {
   if (govInput) govInput.value = '';
 
   const rightsInput = document.getElementById('step2TeacherRights');
-  if (rightsInput) rightsInput.value = '';
+  if (rightsInput) {
+    rightsInput.value = name ? `إعداد وتنظيم ${name} - جميع الحقوق محفوظة` : '';
+  }
 
   const contactInput = document.getElementById('step2TeacherContact');
   if (contactInput) contactInput.value = '';
@@ -8086,13 +8321,15 @@ window.completeGoogleLoginWithProfile = function() {
     username: username,
     password: password,
     email: pendingGoogleAccount.email || '',
+    avatar: pendingGoogleAccount.picture || '',
+    googleId: pendingGoogleAccount.googleId || '',
     subject: subject,
     school: school,
     governorate: governorate,
     rights: rights,
     contact: contact,
     isGoogleUser: true,
-    isVerified: false,
+    isVerified: true,
     role: 'viewer',
     isSubscribed: false,
     isVip: false
