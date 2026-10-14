@@ -972,17 +972,27 @@
             </div>
           </div>
 
-          <!-- Sub-View Navigation Switcher (التبديل بين سجل الاختبارات المنشأة وبنك الأسئلة) -->
+          <!-- Sub-View Navigation Switcher (التبديل بين النماذج الوزارية، الأسئلة الوزارية، وسجل الاختبارات المنشأة) -->
           <div class="report-view-switcher-bar">
-            <button type="button" class="report-view-btn active" id="btnReportViewExams" onclick="window.switchReportSubView('exams')" title="عرض والبحث في كافة الاختبارات والنماذج التي تم إنشاؤها">
-              <i class="fa-solid fa-file-signature"></i>
-              <span>سجل الاختبارات المنشأة والنماذج</span>
-              <span class="report-counter-chip" id="repCounterExams">0</span>
+            <!-- 1. قسم النماذج الوزارية المعتمدة (الـ 12 نموذج وزاري) -->
+            <button type="button" class="report-view-btn active" id="btnReportViewModels" onclick="window.switchReportSubView('models')" title="عرض واستعراض النماذج الوزارية المعتمدة (12 نموذج وزاري للثالث متوسط والسادس إعدادي)">
+              <i class="fa-solid fa-award text-warning"></i>
+              <span>النماذج الوزارية</span>
+              <span class="report-counter-chip" id="repCounterModels">12</span>
             </button>
-            <button type="button" class="report-view-btn" id="btnReportViewQuestions" onclick="window.switchReportSubView('questions')" title="عرض والبحث في بنك مفردات الأسئلة التفاعلية">
+
+            <!-- 2. حقل الأسئلة الوزارية المستقل (بنك مفردات الأسئلة الوزارية) -->
+            <button type="button" class="report-view-btn" id="btnReportViewQuestions" onclick="window.switchReportSubView('questions')" title="عرض والبحث في بنك الأسئلة الوزارية المستقل والمفردات التفاعلية">
               <i class="fa-solid fa-layer-group"></i>
-              <span>بنك مفردات الأسئلة</span>
+              <span>الأسئلة الوزارية</span>
               <span class="report-counter-chip" id="repCounterQuestions">0</span>
+            </button>
+
+            <!-- 3. سجل الاختبارات المنشأة (اختباراتك ومسوداتك الخاصة) -->
+            <button type="button" class="report-view-btn" id="btnReportViewExams" onclick="window.switchReportSubView('exams')" title="عرض والبحث في كافة الاختبارات المنشأة والمسودات الخاصة بك">
+              <i class="fa-solid fa-file-signature"></i>
+              <span>سجل الاختبارات المنشأة</span>
+              <span class="report-counter-chip" id="repCounterExams">0</span>
             </button>
           </div>
 

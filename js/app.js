@@ -6773,37 +6773,48 @@ window.removeQuestionFromHistoryBank = function(qId) {
 /* ==========================================================================
    Executive Academic Reports & Created Exams Command Center Controller
    ========================================================================== */
-window.currentReportSubView = 'exams';
+window.currentReportSubView = 'models';
 let currentFilteredReportExams = [];
 let currentFilteredBankQuestions = [];
 
 window.switchReportSubView = function(view) {
-  window.currentReportSubView = view || 'exams';
+  window.currentReportSubView = view || 'models';
 
-  const btnExams = document.getElementById('btnReportViewExams');
+  const btnModels = document.getElementById('btnReportViewModels');
   const btnQuestions = document.getElementById('btnReportViewQuestions');
+  const btnExams = document.getElementById('btnReportViewExams');
+
   const containerExams = document.getElementById('tabReportExamsListRender');
   const containerQuestions = document.getElementById('tabReportQuestionsListRender');
   const resultsLabel = document.getElementById('tabReportResultsLabel');
   const helpHint = document.getElementById('tabReportHelpHint');
 
-  if (view === 'exams') {
-    if (btnExams) btnExams.classList.add('active');
-    if (btnQuestions) btnQuestions.classList.remove('active');
+  // Toggle button active states
+  if (btnModels) btnModels.classList.toggle('active', view === 'models');
+  if (btnQuestions) btnQuestions.classList.toggle('active', view === 'questions');
+  if (btnExams) btnExams.classList.toggle('active', view === 'exams');
+
+  if (view === 'models') {
     if (containerExams) containerExams.style.display = 'grid';
     if (containerQuestions) containerQuestions.style.display = 'none';
-    if (resultsLabel) resultsLabel.innerText = 'الاختبارات المعروضة: ';
+    if (resultsLabel) resultsLabel.innerText = 'النماذج الوزارية المعروضة: ';
     if (helpHint) {
-      helpHint.innerHTML = '💡 انقر على <strong>فتح في ورقة الامتحان A4</strong> لاستعراض الاختبار فوراً أو <strong>طباعة</strong> للفرز والطباعة السريعة';
+      helpHint.innerHTML = '🏛️ <strong>قسم النماذج الوزارية المعتمدة (12 نموذجاً رسمياً):</strong> نماذج وزارية معتمدة ومتكاملة للثالث متوسط والسادس إعدادي لكافة المواد، جاهزة للاستعراض، التعديل المباشر، أو الطباعة الفورية.';
     }
-  } else {
-    if (btnQuestions) btnQuestions.classList.add('active');
-    if (btnExams) btnExams.classList.remove('active');
+  } else if (view === 'questions') {
     if (containerExams) containerExams.style.display = 'none';
     if (containerQuestions) containerQuestions.style.display = 'flex';
-    if (resultsLabel) resultsLabel.innerText = 'الأسئلة المعروضة: ';
+    if (resultsLabel) resultsLabel.innerText = 'الأسئلة الوزارية المعروضة: ';
     if (helpHint) {
-      helpHint.innerHTML = '💡 يمكنك إدراج أي سؤال فردي مباشرة في ورقة الاختبار النشطة حالياً عبر زر <strong>إدراج في الاختبار</strong>';
+      helpHint.innerHTML = '📑 <strong>حقل الأسئلة الوزارية المستقل:</strong> يمكنك البحث في بنك الأسئلة الوزارية المعتمدة وإدراج أي سؤال مباشرة في ورقة الاختبار الحالية بنقرة واحدة.';
+    }
+  } else {
+    // view === 'exams'
+    if (containerExams) containerExams.style.display = 'grid';
+    if (containerQuestions) containerQuestions.style.display = 'none';
+    if (resultsLabel) resultsLabel.innerText = 'سجل الاختبارات المنشأة والمسودات: ';
+    if (helpHint) {
+      helpHint.innerHTML = '✍️ <strong>سجل اختباراتك المنشأة:</strong> استعرض وعدّل مسوداتك واختباراتك المحفوظة التي قمت بإنشائها بنفسك على المنصة.';
     }
   }
 
@@ -7010,18 +7021,20 @@ function updateDailyReportMetrics() {
   const elModels = document.getElementById('tabReportStatModels');
   const elQuestions = document.getElementById('tabReportStatTotalQuestions');
   const elRecent = document.getElementById('tabReportStatRecent');
-  const chipExams = document.getElementById('repCounterExams');
-  const chipQuestions = document.getElementById('repCounterQuestions');
 
-  if (elExams) elExams.innerText = exams.length;
-  if (chipExams) chipExams.innerText = exams.length;
+  const chipModels = document.getElementById('repCounterModels');
+  const chipQuestions = document.getElementById('repCounterQuestions');
+  const chipExams = document.getElementById('repCounterExams');
+
+  const modelsList = exams.filter(e => e.isModelPreset);
+  const userExamsList = exams.filter(e => !e.isModelPreset);
+
+  if (elExams) elExams.innerText = userExamsList.length;
+  if (chipExams) chipExams.innerText = userExamsList.length;
+  if (chipModels) chipModels.innerText = modelsList.length;
+  if (elModels) elModels.innerText = modelsList.length;
   if (elQuestions) elQuestions.innerText = bank.length;
   if (chipQuestions) chipQuestions.innerText = bank.length;
-
-  if (elModels) {
-    const modelsCount = exams.filter(e => e.isModelPreset).length;
-    elModels.innerText = modelsCount;
-  }
 
   if (elGrades) {
     const gradesSet = new Set();
@@ -7102,8 +7115,15 @@ window.filterDailyReport = function() {
     return combined.includes(selectedGrade.toLowerCase());
   };
 
-  // 1. Filter Exams
-  const filteredExams = allExams.filter(exam => {
+  // 1. Filter Exams vs Ministerial Models depending on active subview
+  const isModelsView = (window.currentReportSubView === 'models');
+  const isExamsView = (window.currentReportSubView === 'exams');
+
+  const baseExamsList = isModelsView ? allExams.filter(exam => exam.isModelPreset)
+                      : isExamsView ? allExams.filter(exam => !exam.isModelPreset)
+                      : allExams;
+
+  const filteredExams = baseExamsList.filter(exam => {
     const examGrade = exam.grade || (exam.data && exam.data.header && exam.data.header.grade) || '';
     const examTitle = exam.title || '';
     const examSubj = exam.subject || (exam.data && exam.data.header && exam.data.header.subject) || '';
@@ -7256,24 +7276,46 @@ window.renderReportExamsList = function(list) {
   const container = document.getElementById('tabReportExamsListRender');
   if (!container) return;
 
+  const isModelsView = (window.currentReportSubView === 'models');
+
   if (list.length === 0) {
-    container.innerHTML = `
-      <div class="report-empty-state-box">
-        <i class="fa-solid fa-folder-open"></i>
-        <h4 style="color: var(--text-main); font-weight: 800; margin: 0 0 6px 0;">لا توجد اختبارات منشأة تطابق معايير الفلترة أو المرحلة الدراسية المحددة</h4>
-        <p style="font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem auto; line-height: 1.5;">
-          جرب تغيير المرحلة الدراسية إلى (جميع المراحل) أو تفريغ نص البحث لرؤية كافة الاختبارات والنماذج الوزارية المحفوظة في المنصة.
-        </p>
-        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-          <button type="button" class="btn btn-outline" onclick="window.resetReportFilters()">
-            <i class="fa-solid fa-rotate-left"></i> إعادة ضبط كافة الفلاتر
-          </button>
-          <button type="button" class="btn btn-primary" onclick="window.startNewExamFromDrawer()">
-            <i class="fa-solid fa-file-circle-plus"></i> إنشاء اختبار جديد الآن
-          </button>
+    if (isModelsView) {
+      container.innerHTML = `
+        <div class="report-empty-state-box">
+          <i class="fa-solid fa-award text-warning" style="font-size: 2.2rem; margin-bottom: 0.65rem;"></i>
+          <h4 style="color: var(--text-main); font-weight: 800; margin: 0 0 6px 0;">لا توجد نماذج وزارية تطابق الفلتر أو البحث المحدد</h4>
+          <p style="font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem auto; line-height: 1.5;">
+            تأكد من اختيار المرحلة الدراسية المناسبة أو اضغط بالأسفل لإعادة استيراد وتحديث كافة النماذج الوزارية الرسمية الـ 12 المعتمدة.
+          </p>
+          <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline" onclick="window.resetReportFilters()">
+              <i class="fa-solid fa-rotate-left"></i> إعادة ضبط الفلاتر
+            </button>
+            <button type="button" class="btn btn-success" onclick="window.reseedDefaultArchiveModels()">
+              <i class="fa-solid fa-cloud-arrow-down"></i> استيراد النماذج الوزارية (12 نموذج)
+            </button>
+          </div>
         </div>
-      </div>
-    `;
+      `;
+    } else {
+      container.innerHTML = `
+        <div class="report-empty-state-box">
+          <i class="fa-solid fa-file-pen" style="font-size: 2.2rem; margin-bottom: 0.65rem; color: #3b82f6;"></i>
+          <h4 style="color: var(--text-main); font-weight: 800; margin: 0 0 6px 0;">سجل اختباراتك المنشأة فارغ حالياً</h4>
+          <p style="font-size: 0.85rem; max-width: 500px; margin: 0 auto 1rem auto; line-height: 1.5;">
+            لم تقم بحفظ أي اختبار خاص بك بعد. يمكنك إنشاء اختبار جديد وتعديله وحفظه هنا، أو فتح أي نموذج من قسم (النماذج الوزارية) والتعديل عليه.
+          </p>
+          <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="window.startNewExamFromDrawer()">
+              <i class="fa-solid fa-file-circle-plus"></i> إنشاء اختبار جديد الآن
+            </button>
+            <button type="button" class="btn btn-outline" onclick="window.switchReportSubView('models')">
+              <i class="fa-solid fa-award text-warning"></i> تصفح النماذج الوزارية (12)
+            </button>
+          </div>
+        </div>
+      `;
+    }
     return;
   }
 
