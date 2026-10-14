@@ -193,7 +193,7 @@
     padding: 3px 0 !important;
     margin: 4px auto 10px auto !important;
     text-align: center !important;
-    display: flex !important;
+    display: flex;
     justify-content: center !important;
   }
 

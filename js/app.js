@@ -33,11 +33,11 @@ let appState = {
     direction: 'rtl', // 'rtl' (Arabic) or 'ltr' (English)
     columns: 1,
     watermark: '',
-    showGradingTable: true,
-    showStudentBar: true,
-    showInstructions: true,
-    showSeal: true,
-    showAnswerLines: true, // Optional answer writing lines toggle
+    showGradingTable: false, // اختياري (False by default)
+    showStudentBar: false,   // اختياري (False by default)
+    showInstructions: false, // اختياري (False by default)
+    showSeal: true,          // حقل ثابت معتمد (True by default)
+    showAnswerLines: false,  // اختياري (False by default)
     theme: 'light', // Primary base is clean pure white
     accentColor: 'blue', // Default accent is Royal Blue
     previewVisible: true
@@ -6263,17 +6263,38 @@ function applyPaperSettings() {
     }
   });
 
-  // Visibility toggles
-  if (seal) seal.style.display = appState.settings.showSeal ? 'block' : 'none';
-  if (studentBar) studentBar.style.display = appState.settings.showStudentBar ? 'flex' : 'none';
-  if (instructionsBox) instructionsBox.style.display = appState.settings.showInstructions ? 'block' : 'none';
-  if (gradingSec) gradingSec.style.display = appState.settings.showGradingTable ? 'block' : 'none';
+  // Visibility toggles across all pages
+  document.querySelectorAll('#paperSealImg, .school-seal').forEach(s => {
+    s.style.setProperty('display', (appState.settings.showSeal !== false) ? 'block' : 'none', 'important');
+  });
+  document.querySelectorAll('#paperStudentBar, .student-bar').forEach(sb => {
+    sb.style.setProperty('display', appState.settings.showStudentBar ? 'flex' : 'none', 'important');
+  });
+  document.querySelectorAll('#paperInstructionsBox, .instructions-box').forEach(ib => {
+    ib.style.setProperty('display', appState.settings.showInstructions ? 'flex' : 'none', 'important');
+  });
+  document.querySelectorAll('#paperGradingSection, .grading-table-container').forEach(gs => {
+    gs.style.setProperty('display', appState.settings.showGradingTable ? 'block' : 'none', 'important');
+  });
+
+  // Sync checkboxes UI with state
+  const chkGrading = document.getElementById('chkShowGradingTable');
+  if (chkGrading) chkGrading.checked = !!appState.settings.showGradingTable;
+
+  const chkStudent = document.getElementById('chkShowStudentBar');
+  if (chkStudent) chkStudent.checked = !!appState.settings.showStudentBar;
+
+  const chkInstr = document.getElementById('chkShowInstructions');
+  if (chkInstr) chkInstr.checked = !!appState.settings.showInstructions;
+
+  const chkSeal = document.getElementById('chkShowSeal');
+  if (chkSeal) chkSeal.checked = (appState.settings.showSeal !== false);
 
   // Answer writing lines toolbar button & sync
   const linesBtn = document.getElementById('toggleAnswerLinesToolbarBtn');
   const linesIcon = document.getElementById('toggleAnswerLinesIcon');
   const linesText = document.getElementById('toggleAnswerLinesText');
-  const isLinesActive = appState.settings.showAnswerLines !== false;
+  const isLinesActive = !!appState.settings.showAnswerLines;
 
   if (linesBtn) {
     if (isLinesActive) {

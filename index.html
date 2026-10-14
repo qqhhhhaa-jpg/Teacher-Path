@@ -931,12 +931,51 @@
                 <input type="text" class="form-control" id="watermarkInput" placeholder="مثال: الامتحانات الوزارية - سري للغاية">
               </div>
 
-              <div class="form-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.5rem;">
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowAnswerLines" checked> إظهار أسطر الإجابة المنقطة للأسئلة في ورقة الاختبار (يمكنك إزالتها لتوفير مساحة الورقة إذا كان الحل في دفتر امتحاني)</label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowGradingTable" checked> إظهار جدول رصد وتفقيط الدرجات للمصحح في نهاية الاختبار</label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowStudentBar" checked> إظهار شريط بيانات الطالب (الاسم الرباعي، رقم الجلوس، القاعة)</label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowInstructions" checked> إظهار صندوق تعليمات وملاحظة الاختبار</label>
-                <label style="cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><input type="checkbox" id="chkShowSeal" checked> إظهار الشعار الأكاديمي/النسر الجمهوري في الترويسة</label>
+              <div class="form-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.55rem;">
+                <!-- 1. أسطر الإجابة (اختياري) -->
+                <label style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-color);">
+                  <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="chkShowAnswerLines">
+                    <span>إظهار أسطر الإجابة المنقطة للأسئلة في ورقة الاختبار (يمكنك إزالتها لتوفير مساحة الورقة إذا كان الحل في دفتر امتحاني)</span>
+                  </span>
+                  <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem; font-weight: 700;">اختياري</span>
+                </label>
+
+                <!-- 2. جدول رصد الدرجات (اختياري) -->
+                <label style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-color);">
+                  <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="chkShowGradingTable">
+                    <span>إظهار جدول رصد وتفقيط الدرجات للمصحح في نهاية الاختبار</span>
+                  </span>
+                  <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem; font-weight: 700;">اختياري</span>
+                </label>
+
+                <!-- 3. شريط بيانات الطالب (اختياري) -->
+                <label style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-color);">
+                  <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="chkShowStudentBar">
+                    <span>إظهار شريط بيانات الطالب (الاسم الرباعي، رقم الجلوس، القاعة)</span>
+                  </span>
+                  <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem; font-weight: 700;">اختياري</span>
+                </label>
+
+                <!-- 4. صندوق تعليمات وملاحظة الاختبار (اختياري) -->
+                <label style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); background: var(--bg-surface); border: 1px solid var(--border-color);">
+                  <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="chkShowInstructions">
+                    <span>إظهار صندوق تعليمات وملاحظة الاختبار</span>
+                  </span>
+                  <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem; font-weight: 700;">اختياري</span>
+                </label>
+
+                <!-- 5. الشعار الأكاديمي / النسر الجمهوري (حقل ثابت معتمد) -->
+                <label style="cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.4rem 0.65rem; border-radius: var(--radius-sm); background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.35);">
+                  <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" id="chkShowSeal" checked>
+                    <span><strong>إظهار الشعار الأكاديمي/النسر الجمهوري في الترويسة</strong></span>
+                  </span>
+                  <span class="badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: 800; font-size: 0.7rem;">حقل ثابت معتمد ✔</span>
+                </label>
               </div>
             </div>
           </div>
