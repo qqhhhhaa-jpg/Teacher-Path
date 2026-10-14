@@ -115,13 +115,17 @@ function updateThemeIcon(theme) {
  */
 const ACCENT_COLOR_NAMES = {
   blue: 'الأزرق الأكاديمي 🔷',
-  emerald: 'الزمردي الإسلامي 🟢',
+  emerald: 'الذهبي / أصفر فاتح 👑🟡',
+  gold: 'الذهبي / أصفر فاتح 👑🟡',
   purple: 'البنفسجي الإبداعي 🟣',
-  crimson: 'الياقوتي العنابي 🔴',
-  amber: 'العنبر الذهبي 🟡',
+  crimson: 'الجوزي القهوائي ☕',
+  coffee: 'الجوزي القهوائي ☕',
+  amber: 'العنبر العسلي 🍯',
   teal: 'الفيروزي البحري 🌊',
-  rose: 'الوردي الملكي 🌸',
-  orange: 'البرتقالي الناري 🍊'
+  rose: 'الصحراوي الدافئ 🏜️',
+  desert: 'الصحراوي الدافئ 🏜️',
+  orange: 'الجويتي (أزرق غامق) 🌌',
+  navy: 'الجويتي (أزرق غامق) 🌌'
 };
 
 function initAccentColor() {
