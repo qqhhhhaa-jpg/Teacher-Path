@@ -9363,3 +9363,32 @@ body.printing-academic-report #academicReportPrintContainer {
   background: #10b981;
   color: #ffffff;
 }
+
+/* ==========================================================================
+   Password Error & Validation Feedback Styles (تأثيرات وتحذيرات خطأ كلمة المرور)
+   ========================================================================== */
+.input-error {
+  border-color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.05) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.22), 0 0 14px rgba(239, 68, 68, 0.35) !important;
+  color: #dc2626 !important;
+  animation: inputShake 0.45s ease-in-out !important;
+}
+
+[data-theme="dark"] .input-error {
+  border-color: #f87171 !important;
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35), 0 0 16px rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
+}
+
+@keyframes inputShake {
+  0%, 100% { transform: translateX(0); }
+  15%, 55%, 85% { transform: translateX(-7px); }
+  35%, 70% { transform: translateX(7px); }
+}
+
+.auth-field-error-notice {
+  animation: inputShake 0.45s ease-in-out;
+  transition: all 0.25s ease;
+}

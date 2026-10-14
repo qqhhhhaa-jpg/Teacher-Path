@@ -2138,12 +2138,37 @@ function initEventListeners() {
 
   // Login Form Submission
   if (formLogin) {
+    const passInput = document.getElementById('loginPassword');
+    const emailInput = document.getElementById('loginEmail');
+    const errBox = document.getElementById('loginPasswordErrorMsg');
+    const errTxt = document.getElementById('loginPasswordErrorText');
+
+    // Auto-clear error when user types again
+    if (passInput) {
+      passInput.addEventListener('input', () => {
+        passInput.classList.remove('input-error');
+        if (errBox) errBox.style.display = 'none';
+      });
+    }
+    if (emailInput) {
+      emailInput.addEventListener('input', () => {
+        if (passInput) passInput.classList.remove('input-error');
+        if (errBox) errBox.style.display = 'none';
+      });
+    }
+
     formLogin.addEventListener('submit', (e) => {
       e.preventDefault();
-      const emailOrUser = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value.trim();
+      const emailOrUser = (emailInput && emailInput.value) ? emailInput.value.trim() : '';
+      const password = (passInput && passInput.value) ? passInput.value : '';
 
       const accounts = getAuthAccounts();
+      const userExists = accounts.find(a => 
+        (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
+        (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
+        (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
+      );
+
       const found = accounts.find(a => 
         (
           (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
@@ -2154,6 +2179,10 @@ function initEventListeners() {
       );
 
       if (found) {
+        // Clear any previous error state
+        if (passInput) passInput.classList.remove('input-error');
+        if (errBox) errBox.style.display = 'none';
+
         // Sync linked email if user has one
         if (found.email) {
           localStorage.setItem('moallem_last_google_email', found.email);
@@ -2193,7 +2222,28 @@ function initEventListeners() {
         }
         showToast(roleMsg, isSubscribed ? 'success' : 'info');
       } else {
-        showToast('بيانات الدخول غير صحيحة، يرجى التأكد من اسم المستخدم وكلمة المرور', 'error');
+        // WRONG PASSWORD / CREDENTIALS ERROR!
+        if (passInput) {
+          passInput.classList.remove('input-error');
+          void passInput.offsetWidth; // Trigger reflow so shake animation replays cleanly
+          passInput.classList.add('input-error');
+          passInput.focus();
+          passInput.select();
+        }
+
+        if (errBox && errTxt) {
+          if (userExists) {
+            errTxt.innerText = 'كلمة المرور غير صحيحة! يرجى إعادة كتابة كلمة السر بدقة أو النقر على رمز العين للتأكد.';
+          } else {
+            errTxt.innerText = 'اسم المستخدم أو كلمة المرور غير صحيحة! يرجى التأكد من بيانات حسابك أو إنشاء حساب جديد.';
+          }
+          errBox.style.display = 'flex';
+        }
+
+        const msg = userExists 
+          ? '⚠️ كلمة المرور غير صحيحة! يرجى إعادة كتابة كلمة السر' 
+          : '⚠️ بيانات الدخول غير صحيحة، يرجى التأكد من اسم المستخدم وكلمة المرور';
+        showToast(msg, 'error');
       }
     });
   }
