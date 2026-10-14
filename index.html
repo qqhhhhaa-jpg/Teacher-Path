@@ -1483,11 +1483,11 @@
 
               <!-- Divider line -->
               <div class="auth-divider-line" style="margin: 1.35rem 0 1rem 0;">
-                <span>أو تسجيل الدخول السريع عبر حساب Google</span>
+                <span>أو تسجيل الدخول الرسمي عبر حساب Google</span>
               </div>
 
-              <!-- Google 1-Tap Quick Sign-In Button -->
-              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول السريع باستخدام حساب Google">
+              <!-- Google Official Sign-In Button -->
+              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول والمصادقة الرسمية عبر Google">
                 <svg class="google-logo-svg" viewBox="0 0 48 48">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -1495,8 +1495,8 @@
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                 </svg>
                 <div class="google-btn-text">
-                  <strong>تسجيل الدخول السريع عبر Google</strong>
-                  <small>حفظ كافة أسئلتك واختباراتك سحابياً والوصول إليها من أي جهاز</small>
+                  <strong>تسجيل الدخول الرسمي عبر Google</strong>
+                  <small>المصادقة الرسمية المباشرة وحفظ اختباراتك سحابياً بأمان تام</small>
                 </div>
                 <i class="fa-solid fa-arrow-left google-btn-arrow"></i>
               </button>
@@ -2147,64 +2147,85 @@
               </p>
             </div>
 
-            <!-- Official Personal Google Sign-In Card (حل جذري لمنع خطأ 404 ومصادقة الحسابات الشخصية) -->
-            <div style="background: var(--bg-surface); border: 1.5px solid rgba(66, 133, 244, 0.4); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1rem; text-align: right; box-shadow: 0 4px 18px rgba(66, 133, 244, 0.08);">
-              
-              <!-- Saved Google Accounts on this Device -->
-              <div id="googleSavedAccountsBox" style="display: none; margin-bottom: 1rem; padding-bottom: 0.85rem; border-bottom: 1px dashed var(--border-color);">
-                <div style="font-size: 0.8rem; font-weight: 800; color: #4285f4; margin-bottom: 0.55rem; display: flex; align-items: center; justify-content: space-between;">
-                  <span style="display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-users-viewfinder"></i>
-                    <span>حسابات Google المسجلة على هذا الجهاز:</span>
-                  </span>
-                  <span style="font-size: 0.7rem; color: #10b981; font-weight: 700;">دخول مباشر بنقرة واحدة ✔</span>
-                </div>
-                <div id="googleSavedAccountsList" style="display: flex; flex-direction: column; gap: 0.45rem;"></div>
+            <!-- Section 1: Official Google Identity Authentication (المصادقة الرسمية المباشرة مع منصة Google) -->
+            <div style="background: rgba(66, 133, 244, 0.06); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.15rem; text-align: center;">
+              <div style="font-size: 0.88rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg viewBox="0 0 48 48" width="22" height="22">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>المصادقة الرسمية المعتمدة عبر Google Identity</span>
               </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.85rem 0;">
+                تسجيل الدخول الرسمي من خلال منصة Google الأصلية عبر نافذة اختيار الحسابات المعتمدة:
+              </p>
 
-              <!-- Enter Personal Gmail Address -->
+              <!-- Official Google Identity Render Target Container -->
+              <div id="googleOfficialGsiButton" style="display: flex; justify-content: center; align-items: center; min-height: 48px; margin-bottom: 0.65rem;"></div>
+
+              <!-- Interactive Account Chooser Popup Button -->
+              <button type="button" class="btn btn-primary" id="btnLaunchOfficialGoogleAuth" onclick="window.launchGoogleRealPopup()" style="width: 100%; height: 46px; font-size: 0.95rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #4285f4; border-color: #4285f4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">
+                <svg viewBox="0 0 48 48" width="20" height="20">
+                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span>فتح نافذة تسجيل الدخول الرسمية لـ Google</span>
+              </button>
+
+              <div id="googleAuthStatusNotice" style="display: none; margin-top: 0.75rem; font-size: 0.8rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); background: rgba(66, 133, 244, 0.12); color: #1a73e8; font-weight: 700; text-align: center;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> جارٍ التحقق والاتصال بمنصة Google الرسمية...
+              </div>
+            </div>
+
+            <!-- Section 2: Strict Verified Email Entry (التحقق الصارم والمؤكد من البريد) -->
+            <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1rem; text-align: right;">
               <div style="margin-bottom: 0.85rem;">
                 <label style="font-size: 0.84rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
                   <span style="display: flex; align-items: center; gap: 6px;">
-                    <svg viewBox="0 0 48 48" width="18" height="18">
-                      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                    </svg>
-                    <span>بريد حسابك الشخصي في Google (Gmail)</span>
+                    <i class="fa-solid fa-envelope text-accent"></i>
+                    <span>التحقق من حساب بريد Google الرسمي (Gmail)</span>
                   </span>
-                  <span id="googleEmailStatusBadge" class="badge-tag" style="font-size: 0.7rem; background: rgba(66, 133, 244, 0.1); color: #4285f4; border: 1px solid rgba(66, 133, 244, 0.25);">مطلوب @gmail.com</span>
+                  <span id="googleEmailStatusBadge" class="badge-tag" style="font-size: 0.72rem; background: rgba(66, 133, 244, 0.1); color: #4285f4; border: 1px solid rgba(66, 133, 244, 0.25);">مطلوب @gmail.com</span>
                 </label>
                 
                 <div style="position: relative;">
                   <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr" placeholder="yourname@gmail.com" style="padding-left: 2.6rem; font-size: 0.95rem; font-weight: 600; border-radius: 10px; height: 46px;" oninput="window.handlePersonalGoogleEmailInput(this.value)">
                   <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ea4335; font-size: 1.15rem; pointer-events: none;">
-                    <i class="fa-solid fa-envelope"></i>
+                    <i class="fa-solid fa-at"></i>
                   </span>
                 </div>
-                <div id="googleEmailNoticeText" style="font-size: 0.74rem; color: var(--text-muted); margin-top: 5px; line-height: 1.4;">
-                  أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). لن تُقبل أي عناوين وهمية أو عشوائية.
+                <div id="googleEmailNoticeText" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                  يتم فحص العنوان والتأكد التام من مطابقته لقواعد وخوادم حسابات Google الرسمية (لا نقبل أي إيميل وهمي أو مؤقت).
                 </div>
               </div>
 
-              <!-- Submit Button -->
-              <button type="button" class="btn btn-primary" id="btnConfirmPersonalGoogle" onclick="window.submitPersonalGoogleEmail()" style="width: 100%; height: 46px; font-size: 0.96rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #4285f4; border-color: #4285f4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">
-                <i class="fa-brands fa-google"></i>
-                <span>تسجيل الدخول والمتابعة بحساب Google</span>
-                <i class="fa-solid fa-arrow-left" style="font-size: 0.85rem; margin-right: 4px;"></i>
-              </button>
-
-              <!-- Optional Live Google Cloud Popup Trigger -->
-              <div style="margin-top: 0.85rem; text-align: center;">
-                <button type="button" class="btn btn-outline" id="btnLaunchOfficialGoogleAuth" onclick="window.launchGoogleRealPopup()" style="font-size: 0.74rem; padding: 0.35rem 0.85rem; border-color: rgba(66, 133, 244, 0.3); color: #4285f4;">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> مصادقة سحابية عبر نافذة Google Cloud المباشرة
+              <!-- Password Challenge Box (يظهر فقط إذا كان الحساب مسجلاً مسبقاً لمنع أي اختراق أو دخول فوري) -->
+              <div id="googleExistingAccountPasswordBox" style="display: none; background: rgba(15, 23, 42, 0.75); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 0.95rem; margin-bottom: 0.85rem; text-align: right;">
+                <div style="font-size: 0.82rem; font-weight: 800; color: #fbbf24; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-lock"></i>
+                  <span id="googleExistingAccountPromptTitle">الحساب مسجل مسبقاً! يرجى إدخال كلمة المرور لتأكيد الهوية:</span>
+                </div>
+                <div style="position: relative; margin-bottom: 0.65rem;">
+                  <input type="password" id="googleExistingPassInput" class="form-control" placeholder="أدخل كلمة مرور حسابك لتأكيد الدخول" style="height: 42px; padding-right: 2.2rem;">
+                  <i class="fa-solid fa-key" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
+                </div>
+                <div id="googleExistingPassError" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-bottom: 0.55rem;">
+                  <i class="fa-solid fa-triangle-exclamation"></i> كلمة المرور غير صحيحة! يرجى إعادة المحاولة.
+                </div>
+                <button type="button" class="btn btn-warning" onclick="window.confirmExistingAccountWithPassword()" style="width: 100%; height: 42px; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                  <i class="fa-solid fa-shield-halved"></i> تأكيد الهوية وفتح المنصة
                 </button>
               </div>
 
-              <div id="googleAuthStatusNotice" style="display: none; margin-top: 0.75rem; font-size: 0.78rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); background: rgba(66, 133, 244, 0.08); color: #1a73e8; font-weight: 600; text-align: center;">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> جارٍ التحقق والاتصال بمنصة Google...
-              </div>
+              <!-- Submit Button -->
+              <button type="button" class="btn btn-outline" id="btnConfirmPersonalGoogle" onclick="window.submitPersonalGoogleEmail()" style="width: 100%; height: 44px; font-size: 0.92rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: #3b82f6; color: #60a5fa;">
+                <i class="fa-solid fa-magnifying-glass-chart"></i>
+                <span>فحص الحساب والتحقق من اعتماده لدى Google</span>
+              </button>
             </div>
 
             <!-- Security & Anti-Fraud Guarantee Box -->

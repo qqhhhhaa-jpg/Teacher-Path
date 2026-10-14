@@ -8262,27 +8262,41 @@ window.renderGoogleSavedAccountsList = function() {
   }).join('');
 };
 
+window.validateOfficialGoogleEmail = function(emailStr) {
+  const email = (emailStr || '').trim().toLowerCase();
+  if (!email) return { isValid: false, reason: 'empty' };
+
+  // Domain check
+  if (!email.endsWith('@gmail.com') && !email.endsWith('@googlemail.com')) {
+    return { isValid: false, reason: 'domain', message: 'يجب أن ينتهي البريد بـ @gmail.com أو @googlemail.com حصراً' };
+  }
+
+  const localPart = email.split('@')[0];
+  
+  // Google length check: 6 to 30 characters
+  if (localPart.length < 6 || localPart.length > 30) {
+    return { isValid: false, reason: 'length', message: 'معرفات حسابات Google تتكون من 6 إلى 30 حرفاً ورقماً' };
+  }
+
+  // Google character check: only a-z, 0-9, and .
+  if (!/^[a-z0-9]+(\.[a-z0-9]+)*$/.test(localPart)) {
+    return { isValid: false, reason: 'chars', message: 'حسابات Google لا تقبل رموزاً خاصة أو نقاطاً متتالية أو نقطة في البداية/النهاية' };
+  }
+
+  return { isValid: true, email: email, localPart: localPart };
+};
+
 window.handlePersonalGoogleEmailInput = function(val) {
   const email = (val || '').trim().toLowerCase();
   const badge = document.getElementById('googleEmailStatusBadge');
   const notice = document.getElementById('googleEmailNoticeText');
   const input = document.getElementById('googlePersonalEmailInput');
+  const passBox = document.getElementById('googleExistingAccountPasswordBox');
 
   if (input) input.classList.remove('input-error');
+  if (passBox) passBox.style.display = 'none';
 
-  const isGmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com)$/i.test(email);
-
-  if (isGmail) {
-    if (badge) {
-      badge.innerText = 'حساب Google شخصي معتمد ✔';
-      badge.style.background = 'rgba(16, 185, 129, 0.15)';
-      badge.style.color = '#10b981';
-      badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
-    }
-    if (notice) {
-      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> تم التحقق بنجاح: حساب Google رسمي وصالح.</span>';
-    }
-  } else {
+  if (!email) {
     if (badge) {
       badge.innerText = 'مطلوب @gmail.com';
       badge.style.background = 'rgba(66, 133, 244, 0.1)';
@@ -8290,28 +8304,51 @@ window.handlePersonalGoogleEmailInput = function(val) {
       badge.style.borderColor = 'rgba(66, 133, 244, 0.25)';
     }
     if (notice) {
-      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). لن تُقبل أي عناوين وهمية أو عشوائية.';
+      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). تم إلغاء أي دخول مباشر بدون مصادقة.';
+    }
+    return;
+  }
+
+  const check = window.validateOfficialGoogleEmail(email);
+
+  if (check.isValid) {
+    if (badge) {
+      badge.innerText = '✔ حساب Google رسمي مطابق';
+      badge.style.background = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#10b981';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+    }
+    if (notice) {
+      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> تم فحص المعرف: مطابق لقواعد حسابات Google الرسمية. اضغط الزر أدناه للمتابعة.</span>';
+    }
+  } else {
+    if (badge) {
+      badge.innerText = '❌ غير مطابق لـ Google';
+      badge.style.background = 'rgba(239, 68, 68, 0.1)';
+      badge.style.color = '#ef4444';
+      badge.style.borderColor = 'rgba(239, 68, 68, 0.25)';
+    }
+    if (notice) {
+      notice.innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${check.message || 'أدخل بريد Gmail صالح'}</span>`;
     }
   }
 };
+
+window.currentPromptedAccount = null;
 
 window.submitPersonalGoogleEmail = function() {
   const input = document.getElementById('googlePersonalEmailInput');
   const rawEmail = input ? input.value.trim().toLowerCase() : '';
 
   // Strict Google Account Validation
-  const isGmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com)$/i.test(rawEmail);
+  const check = window.validateOfficialGoogleEmail(rawEmail);
 
-  if (!isGmail) {
+  if (!check.isValid) {
     if (input) {
       input.classList.add('input-error');
       input.focus();
     }
-    showToast('يرجى إدخال عنوان بريد Google شخصي صالح ينتهي بـ @gmail.com (تم منع الحسابات الوهمية)! 🛡️', 'error');
-    const notice = document.getElementById('googleEmailNoticeText');
-    if (notice) {
-      notice.innerHTML = '<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-circle-xmark"></i> خطأ: يجب أن ينتهي البريد بـ @gmail.com حصراً.</span>';
-    }
+    showToast(check.message || 'يرجى إدخال بريد Google شخصي صالح ينتهي بـ @gmail.com 🛡️', 'error');
     return;
   }
 
@@ -8324,8 +8361,26 @@ window.submitPersonalGoogleEmail = function() {
   );
 
   if (existing) {
-    showToast(`مرحباً بعودتك! تم العثور على حساب Google الخاص بك (${existing.name || existing.username}) 🚀`, 'success');
-    window.performGoogleLoginSuccess(existing);
+    // SECURITY FIX: NEVER LOG IN INSTANTLY! REQUIRE PASSWORD!
+    window.currentPromptedAccount = existing;
+    const passBox = document.getElementById('googleExistingAccountPasswordBox');
+    const passInput = document.getElementById('googleExistingPassInput');
+    const titleEl = document.getElementById('googleExistingAccountPromptTitle');
+    const errEl = document.getElementById('googleExistingPassError');
+
+    if (passBox) {
+      passBox.style.display = 'block';
+      if (titleEl) {
+        titleEl.innerText = `حساب (${existing.name || existing.email}) مسجل مسبقاً! أدخل كلمة المرور لتأكيد الدخول:`;
+      }
+      if (errEl) errEl.style.display = 'none';
+      if (passInput) {
+        passInput.value = '';
+        passInput.classList.remove('input-error');
+        passInput.focus();
+      }
+    }
+    showToast('تم العثور على حسابك! يرجى إدخال كلمة المرور لتأكيد هويتك، أو المتابعة بزر Google الرسمي أعلاه 🔒', 'warning');
     return;
   }
 
@@ -8335,7 +8390,33 @@ window.submitPersonalGoogleEmail = function() {
 
   // Advance to Step 2 with verified email
   window.proceedToStep2(suggestedName, rawEmail, '');
-  showToast('تم التحقق من حساب Google بنجاح! أكمل بيانات مدرستك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
+  showToast('تم التحقق من حساب Google بنجاح! أكمل بيانات مدرستك وكلمة مرورك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
+};
+
+window.confirmExistingAccountWithPassword = function() {
+  const passInput = document.getElementById('googleExistingPassInput');
+  const errEl = document.getElementById('googleExistingPassError');
+  const enteredPass = passInput ? passInput.value : '';
+  const account = window.currentPromptedAccount;
+
+  if (!account) {
+    showToast('يرجى التحقق من عنوان البريد الإلكتروني أولاً', 'error');
+    return;
+  }
+
+  if (enteredPass && account.password === enteredPass) {
+    if (passInput) passInput.classList.remove('input-error');
+    if (errEl) errEl.style.display = 'none';
+    showToast(`تم تأكيد كلمة المرور بنجاح! مرحباً بك أستاذ ${account.name || ''} 🚀`, 'success');
+    window.performGoogleLoginSuccess(account);
+  } else {
+    if (passInput) {
+      passInput.classList.add('input-error');
+      passInput.focus();
+    }
+    if (errEl) errEl.style.display = 'block';
+    showToast('كلمة المرور غير صحيحة! يرجى إعادة المحاولة بدقة ❌', 'error');
+  }
 };
 
 window.openGoogleAccountModal = function() {
@@ -8345,8 +8426,12 @@ window.openGoogleAccountModal = function() {
     if (typeof window.backToGoogleStep1 === 'function') {
       window.backToGoogleStep1();
     }
-    window.renderGoogleSavedAccountsList();
     window.updateGoogleClientIdUI();
+    window.initGoogleIdentityServices();
+
+    const passBox = document.getElementById('googleExistingAccountPasswordBox');
+    if (passBox) passBox.style.display = 'none';
+
     const input = document.getElementById('googlePersonalEmailInput');
     if (input) {
       input.value = '';
@@ -8361,7 +8446,7 @@ window.openGoogleAccountModal = function() {
     }
     const notice = document.getElementById('googleEmailNoticeText');
     if (notice) {
-      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). لن تُقبل أي عناوين وهمية أو عشوائية.';
+      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). تم إلغاء أي دخول مباشر بدون مصادقة.';
     }
   }
 };
@@ -8371,6 +8456,8 @@ window.closeGoogleAccountModal = function() {
   if (modal) modal.classList.remove('open');
   const statusEl = document.getElementById('googleAuthStatusNotice');
   if (statusEl) statusEl.style.display = 'none';
+  const passBox = document.getElementById('googleExistingAccountPasswordBox');
+  if (passBox) passBox.style.display = 'none';
 };
 
 // Backdrop click listeners
