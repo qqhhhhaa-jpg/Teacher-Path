@@ -531,7 +531,9 @@ body {
 .side-drawer [style*="display: none"],
 .side-drawer.mini-mode [style*="display: none"],
 #drawerAdminGrantVipBtn.admin-only-hidden,
-.side-drawer.mini-mode #drawerAdminGrantVipBtn.admin-only-hidden {
+.side-drawer.mini-mode #drawerAdminGrantVipBtn.admin-only-hidden,
+#drawerAdminPermissionsBtn.admin-only-hidden,
+.side-drawer.mini-mode #drawerAdminPermissionsBtn.admin-only-hidden {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;

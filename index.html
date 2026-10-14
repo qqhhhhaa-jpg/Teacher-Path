@@ -81,8 +81,8 @@
             <span>قسم الأدوات والاختبارات</span>
           </div>
           <div class="drawer-buttons-list">
-            <!-- 1. Manage Permissions Button (زر إدارة الصلاحيات) -->
-            <button class="drawer-item-btn highlight-admin-permissions" id="drawerAdminPermissionsBtn" onclick="window.closeSideDrawer(); window.openAdminControlPanel();" title="لوحة تحكم المدير العام وإدارة صلاحيات المعلمين" data-tooltip="إدارة الصلاحيات 🛡️">
+            <!-- 1. Manage Permissions Button (زر إدارة الصلاحيات - يظهر للمدير فقط) -->
+            <button class="drawer-item-btn highlight-admin-permissions admin-only-hidden" id="drawerAdminPermissionsBtn" style="display: none;" onclick="window.closeSideDrawer(); window.openAdminControlPanel();" title="لوحة تحكم المدير العام وإدارة صلاحيات المعلمين" data-tooltip="إدارة الصلاحيات 🛡️">
               <div class="drawer-item-main">
                 <i class="fa-solid fa-shield-halved" style="color: #38bdf8; font-size: 1.05rem;"></i>
                 <span>إدارة الصلاحيات</span>
@@ -90,8 +90,8 @@
               <span class="drawer-badge-tag badge-permissions-tag">المدير 🛡️</span>
             </button>
 
-            <!-- 2. Manage Subscriptions Button (زر إدارة الاشتراكات بتصميم منسق وأنيق) -->
-            <button class="drawer-item-btn highlight-admin-grant" id="drawerAdminGrantVipBtn" onclick="window.closeSideDrawer(); window.openSubscriptionManagementModal();" title="إدارة الاشتراكات السنوية وتفعيل الحسابات" data-tooltip="إدارة الاشتراكات 👑">
+            <!-- 2. Manage Subscriptions Button (زر إدارة الاشتراكات - يظهر للمدير فقط) -->
+            <button class="drawer-item-btn highlight-admin-grant admin-only-hidden" id="drawerAdminGrantVipBtn" style="display: none;" onclick="window.closeSideDrawer(); window.openSubscriptionManagementModal();" title="إدارة الاشتراكات السنوية وتفعيل الحسابات" data-tooltip="إدارة الاشتراكات 👑">
               <div class="drawer-item-main">
                 <i class="fa-solid fa-crown text-warning" style="font-size: 1.05rem;"></i>
                 <span>إدارة الاشتراكات</span>

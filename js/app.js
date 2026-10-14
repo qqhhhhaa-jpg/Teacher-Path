@@ -705,35 +705,45 @@ function updateUserAuthUI() {
   const drawerGrantBtn = document.getElementById('drawerAdminGrantVipBtn');
   const drawerSubCountBadge = document.getElementById('drawerSubscribersCountBadge');
 
-  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin');
   const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
 
-  // Both Manage Permissions and Manage Subscriptions buttons are active and visible in the drawer
+  // Both Manage Permissions and Manage Subscriptions buttons are strictly for ADMIN ONLY
   if (drawerPermissionsBtn) {
-    drawerPermissionsBtn.style.setProperty('display', 'flex', 'important');
-    drawerPermissionsBtn.classList.remove('admin-only-hidden');
+    if (isAdmin) {
+      drawerPermissionsBtn.style.setProperty('display', 'flex', 'important');
+      drawerPermissionsBtn.classList.remove('admin-only-hidden');
+    } else {
+      drawerPermissionsBtn.style.setProperty('display', 'none', 'important');
+      drawerPermissionsBtn.classList.add('admin-only-hidden');
+    }
   }
 
   if (drawerGrantBtn) {
-    drawerGrantBtn.style.setProperty('display', 'flex', 'important');
-    drawerGrantBtn.classList.remove('admin-only-hidden');
-    
-    // Calculate active non-admin subscribers count (with 1-year expiration check)
-    const allAccounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
-    const nowTime = Date.now();
-    const activeSubsCount = allAccounts.filter(acc => {
-      if (acc.isAdmin || acc.role === 'admin' || acc.username === 'admin') return false;
-      const isSub = acc.isSubscribed || acc.isVip || (acc.id && localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
-      if (!isSub) return false;
-      if (acc.subscriptionExpiresAt) {
-        const expTime = new Date(acc.subscriptionExpiresAt).getTime();
-        if (!isNaN(expTime) && nowTime > expTime) return false;
-      }
-      return true;
-    }).length;
+    if (isAdmin) {
+      drawerGrantBtn.style.setProperty('display', 'flex', 'important');
+      drawerGrantBtn.classList.remove('admin-only-hidden');
+      
+      // Calculate active non-admin subscribers count (with 1-year expiration check)
+      const allAccounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+      const nowTime = Date.now();
+      const activeSubsCount = allAccounts.filter(acc => {
+        if (acc.isAdmin || acc.role === 'admin' || acc.username === 'admin') return false;
+        const isSub = acc.isSubscribed || acc.isVip || (acc.id && localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
+        if (!isSub) return false;
+        if (acc.subscriptionExpiresAt) {
+          const expTime = new Date(acc.subscriptionExpiresAt).getTime();
+          if (!isNaN(expTime) && nowTime > expTime) return false;
+        }
+        return true;
+      }).length;
 
-    if (drawerSubCountBadge) {
-      drawerSubCountBadge.innerText = `${activeSubsCount} مشترك 👑`;
+      if (drawerSubCountBadge) {
+        drawerSubCountBadge.innerText = `${activeSubsCount} مشترك 👑`;
+      }
+    } else {
+      drawerGrantBtn.style.setProperty('display', 'none', 'important');
+      drawerGrantBtn.classList.add('admin-only-hidden');
     }
   }
 
@@ -9082,6 +9092,12 @@ document.addEventListener('DOMContentLoaded', () => {
    Super Admin Control Panel & Accounts Management
    ========================================================================== */
 window.openAdminControlPanel = function() {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  if (!isAdmin) {
+    if (typeof showToast === 'function') showToast('هذه اللوحة مخصصة لحساب المدير العام فقط 🛡️', 'warning');
+    return;
+  }
   const modal = document.getElementById('adminControlPanelModal');
   if (modal) {
     modal.classList.add('open');
@@ -9101,6 +9117,12 @@ window.openAdminGrantSubscriptions = function() {
 };
 
 window.openSubscriptionManagementModal = function() {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  if (!isAdmin) {
+    if (typeof showToast === 'function') showToast('إدارة الاشتراكات مخصصة لحساب المدير العام فقط 👑', 'warning');
+    return;
+  }
   const modal = document.getElementById('subscriptionManagementModal');
   if (modal) {
     modal.classList.add('open');
