@@ -8145,6 +8145,124 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
   window.proceedToStep2(name, email, picture);
 };
 
+window.renderGoogleSavedAccountsList = function() {
+  const container = document.getElementById('googleSavedAccountsList');
+  const box = document.getElementById('googleSavedAccountsBox');
+  if (!container || !box) return;
+
+  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
+  // Filter accounts that are linked to Google or have gmail
+  const googleAccounts = accounts.filter(a => 
+    !a.isAdmin && a.role !== 'admin' && a.id !== 'usr_admin' && (
+      a.isGoogleUser || (a.email && a.email.toLowerCase().includes('@gmail'))
+    )
+  );
+
+  if (googleAccounts.length === 0) {
+    box.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  box.style.display = 'block';
+  container.innerHTML = googleAccounts.map(acc => {
+    const initials = (acc.name || acc.username || 'G').slice(0, 2);
+    const safeAccJson = JSON.stringify(acc).replace(/"/g, '&quot;');
+    return `
+      <div style="background: rgba(66, 133, 244, 0.06); border: 1px solid rgba(66, 133, 244, 0.25); border-radius: 8px; padding: 0.55rem 0.75rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: #4285f4; color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0;">
+            ${acc.avatar ? `<img src="${acc.avatar}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` : initials}
+          </div>
+          <div style="min-width: 0; text-align: right;">
+            <strong style="font-size: 0.84rem; display: block; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${acc.name || acc.username}</strong>
+            <span style="font-size: 0.72rem; color: var(--text-muted); direction: ltr; display: block; unicode-bidi: embed;">${acc.email || ''}</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="window.performGoogleLoginSuccess(${safeAccJson})" style="font-size: 0.76rem; padding: 0.35rem 0.75rem; font-weight: 700; white-space: nowrap;">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> دخول فوري
+        </button>
+      </div>
+    `;
+  }).join('');
+};
+
+window.handlePersonalGoogleEmailInput = function(val) {
+  const email = (val || '').trim().toLowerCase();
+  const badge = document.getElementById('googleEmailStatusBadge');
+  const notice = document.getElementById('googleEmailNoticeText');
+  const input = document.getElementById('googlePersonalEmailInput');
+
+  if (input) input.classList.remove('input-error');
+
+  const isGmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com)$/i.test(email);
+
+  if (isGmail) {
+    if (badge) {
+      badge.innerText = 'حساب Google شخصي معتمد ✔';
+      badge.style.background = 'rgba(16, 185, 129, 0.15)';
+      badge.style.color = '#10b981';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+    }
+    if (notice) {
+      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> تم التحقق بنجاح: حساب Google رسمي وصالح.</span>';
+    }
+  } else {
+    if (badge) {
+      badge.innerText = 'مطلوب @gmail.com';
+      badge.style.background = 'rgba(66, 133, 244, 0.1)';
+      badge.style.color = '#4285f4';
+      badge.style.borderColor = 'rgba(66, 133, 244, 0.25)';
+    }
+    if (notice) {
+      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). لن تُقبل أي عناوين وهمية أو عشوائية.';
+    }
+  }
+};
+
+window.submitPersonalGoogleEmail = function() {
+  const input = document.getElementById('googlePersonalEmailInput');
+  const rawEmail = input ? input.value.trim().toLowerCase() : '';
+
+  // Strict Google Account Validation
+  const isGmail = /^[a-zA-Z0-9._%+-]+@(gmail\.com|googlemail\.com)$/i.test(rawEmail);
+
+  if (!isGmail) {
+    if (input) {
+      input.classList.add('input-error');
+      input.focus();
+    }
+    showToast('يرجى إدخال عنوان بريد Google شخصي صالح ينتهي بـ @gmail.com (تم منع الحسابات الوهمية)! 🛡️', 'error');
+    const notice = document.getElementById('googleEmailNoticeText');
+    if (notice) {
+      notice.innerHTML = '<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-circle-xmark"></i> خطأ: يجب أن ينتهي البريد بـ @gmail.com حصراً.</span>';
+    }
+    return;
+  }
+
+  // Check if account already exists
+  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
+  const existing = accounts.find(a => 
+    !a.isAdmin && a.role !== 'admin' && a.id !== 'usr_admin' && (
+      (a.email && a.email.toLowerCase() === rawEmail)
+    )
+  );
+
+  if (existing) {
+    showToast(`مرحباً بعودتك! تم العثور على حساب Google الخاص بك (${existing.name || existing.username}) 🚀`, 'success');
+    window.performGoogleLoginSuccess(existing);
+    return;
+  }
+
+  // New Google Teacher: derive friendly suggested name
+  const rawPrefix = rawEmail.split('@')[0];
+  const suggestedName = 'أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
+
+  // Advance to Step 2 with verified email
+  window.proceedToStep2(suggestedName, rawEmail, '');
+  showToast('تم التحقق من حساب Google بنجاح! أكمل بيانات مدرستك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
+};
+
 window.openGoogleAccountModal = function() {
   const modal = document.getElementById('googleAuthModal');
   if (modal) {
@@ -8152,9 +8270,23 @@ window.openGoogleAccountModal = function() {
     if (typeof window.backToGoogleStep1 === 'function') {
       window.backToGoogleStep1();
     }
+    window.renderGoogleSavedAccountsList();
     window.updateGoogleClientIdUI();
-    if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-      window.initGoogleIdentityServices();
+    const input = document.getElementById('googlePersonalEmailInput');
+    if (input) {
+      input.value = '';
+      input.classList.remove('input-error');
+    }
+    const badge = document.getElementById('googleEmailStatusBadge');
+    if (badge) {
+      badge.innerText = 'مطلوب @gmail.com';
+      badge.style.background = 'rgba(66, 133, 244, 0.1)';
+      badge.style.color = '#4285f4';
+      badge.style.borderColor = 'rgba(66, 133, 244, 0.25)';
+    }
+    const notice = document.getElementById('googleEmailNoticeText');
+    if (notice) {
+      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). لن تُقبل أي عناوين وهمية أو عشوائية.';
     }
   }
 };
@@ -8191,9 +8323,21 @@ let pendingGoogleAccount = {
 
 // Launch Official Google Popup / Account Chooser
 window.launchGoogleRealPopup = function() {
-  const clientId = window.getGoogleClientId();
+  const hasCustomClientId = !!localStorage.getItem('moallem_google_client_id');
 
-  // If tokenClient is ready, directly request access token with prompt: 'select_account'
+  // If user has NOT configured their real Google Cloud project Client ID:
+  // DO NOT launch the popup that hits Google's 404 error! Guide them cleanly:
+  if (!hasCustomClientId) {
+    const input = document.getElementById('googlePersonalEmailInput');
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    showToast('لتفادي خطأ 404: يرجى كتابة بريد Gmail الخاص بك مباشرة في الحقل أعلاه، أو إدخال معرّف Client ID الخاص بمشروعك في إعدادات Google Cloud أدناه! 💡', 'info');
+    return;
+  }
+
+  // If custom client ID is present, run official token client safely
   if (googleTokenClient) {
     try {
       const statusEl = document.getElementById('googleAuthStatusNotice');
@@ -8205,7 +8349,6 @@ window.launchGoogleRealPopup = function() {
     }
   }
 
-  // If GIS is present, initialize and try
   if (typeof google !== 'undefined' && google.accounts) {
     window.initGoogleIdentityServices();
     if (googleTokenClient) {
@@ -8217,22 +8360,14 @@ window.launchGoogleRealPopup = function() {
       } catch (e) {}
     }
   }
-
-  // Fallback: Open modal so user sees official button and status
-  window.openGoogleAccountModal();
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-    try {
-      google.accounts.id.prompt();
-    } catch (e) {}
-  }
 };
 
 window.submitGoogleLoginAction = function() {
-  window.launchGoogleRealPopup();
+  window.submitPersonalGoogleEmail();
 };
 
 window.selectCustomGoogleEmail = function() {
-  window.launchGoogleRealPopup();
+  window.submitPersonalGoogleEmail();
 };
 
 window.proceedToStep2 = function(name, email, picture) {
