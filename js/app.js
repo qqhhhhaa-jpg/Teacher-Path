@@ -1501,6 +1501,7 @@ function openArchiveModal() {
   renderArchiveList();
   document.getElementById('archiveModal').classList.add('open');
 }
+window.openArchiveModal = openArchiveModal;
 
 window.currentArchiveSubject = 'all';
 
@@ -1602,9 +1603,15 @@ function renderArchiveList(filterQuery = '') {
         <button class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;" onclick="duplicateExamInArchive('${item.id}')" title="إنشاء نسخة مكررة">
           <i class="fa-solid fa-copy"></i>
         </button>
-        <button class="btn btn-outline btn-del" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; color: var(--danger);" onclick="deleteExamFromArchive('${item.id}')" title="حذف من الأرشيف">
-          <i class="fa-solid fa-trash-can"></i>
-        </button>
+        ${(item.isModelPreset || (item.id && (item.id.startsWith('preset_model_') || item.id === 'iraq_official_model'))) ? `
+          <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.74rem; padding: 0.38rem 0.65rem; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px;" title="نموذج وزاري رسمي معتمد - محمي من الحذف نهائياً 🔒">
+            <i class="fa-solid fa-lock"></i> محمي
+          </span>
+        ` : `
+          <button class="btn btn-outline btn-del" style="padding: 0.35rem 0.65rem; font-size: 0.8rem; color: var(--danger);" onclick="deleteExamFromArchive('${item.id}')" title="حذف هذا الاختبار فوراً">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        `}
       </div>
     </div>
   `).join('');
@@ -1671,15 +1678,65 @@ window.exportSingleArchiveWord = function(id) {
 };
 
 window.deleteExamFromArchive = function(id) {
-  if (confirm('هل أنت متأكد من حذف هذا الاختبار من الأرشيف نهائياً؟')) {
-    let archive = getSavedExamsArchive();
-    archive = archive.filter(e => e.id !== id);
-    saveExamsArchive(archive);
+  if (!id) return;
+
+  // 1. Guard against deleting ministerial models
+  const isMinisterial = id.startsWith('preset_model_') || id.startsWith('iraq_') || id === 'iraq_official_model';
+  if (isMinisterial) {
+    showToast('النماذج الوزارية الرسمية معتمدة ومحمية من الحذف نهائياً 🔒', 'warning');
+    return;
+  }
+
+  const archive = getSavedExamsArchive();
+  const targetExam = archive.find(e => e.id === id);
+  if (targetExam && (targetExam.isModelPreset || (targetExam.id && targetExam.id.startsWith('preset_model_')))) {
+    showToast('النماذج الوزارية الرسمية معتمدة ومحمية من الحذف نهائياً 🔒', 'warning');
+    return;
+  }
+
+  const examTitle = targetExam ? (targetExam.title || 'هذا الاختبار') : 'الاختبار';
+
+  if (confirm(`هل أنت متأكد من حذف «${examTitle}» نهائياً؟ سيتم الحذف فوراً.`)) {
+    // 2. Perform direct deletion from storage
+    const storageKey = getAccountStorageKey('moallem_saved_exams_archive');
+    let currentList = [];
+    try {
+      const raw = localStorage.getItem(storageKey);
+      if (raw) currentList = JSON.parse(raw);
+    } catch (e) { currentList = []; }
+
+    const updatedList = currentList.filter(e => e.id !== id);
+    localStorage.setItem(storageKey, JSON.stringify(updatedList));
+
+    // Admin fallback key sync
+    if (storageKey.includes('usr_admin')) {
+      try {
+        const adminRaw = localStorage.getItem('moallem_saved_exams_archive');
+        if (adminRaw) {
+          const adminList = JSON.parse(adminRaw).filter(e => e.id !== id);
+          localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(adminList));
+        }
+      } catch(e) {}
+    }
+
+    // Reset current active exam pointer if deleted
     if (appState.currentArchiveId === id) {
       appState.currentArchiveId = null;
+      saveStateToStorage();
     }
-    renderArchiveList();
-    showToast('تم حذف الاختبار من الأرشيف', 'info');
+
+    // 3. Immediately re-render all views in real-time
+    if (typeof renderArchiveList === 'function') {
+      renderArchiveList();
+    }
+    if (typeof window.filterDailyReport === 'function') {
+      window.filterDailyReport();
+    }
+    if (typeof updateArchiveBadge === 'function') {
+      updateArchiveBadge();
+    }
+
+    showToast(`تم حذف «${examTitle}» بنجاح 🗑️`, 'success');
   }
 };
 
@@ -7287,9 +7344,15 @@ window.renderReportExamsList = function(list) {
           <button type="button" class="btn-rep-action btn-rep-dup" onclick="window.duplicateExamInArchive('${exam.id}')" title="إنشاء نسخة مكررة من هذا الاختبار">
             <i class="fa-solid fa-copy"></i>
           </button>
-          <button type="button" class="btn-rep-action btn-rep-del" onclick="window.deleteExamFromArchive('${exam.id}')" title="حذف هذا الاختبار من الأرشيف">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
+          ${(exam.isModelPreset || (exam.id && (exam.id.startsWith('preset_model_') || exam.id === 'iraq_official_model'))) ? `
+            <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem; padding: 0.35rem 0.55rem; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px;" title="نموذج وزاري رسمي معتمد - محمي من الحذف نهائياً 🔒">
+              <i class="fa-solid fa-lock"></i> محمي
+            </span>
+          ` : `
+            <button type="button" class="btn-rep-action btn-rep-del" onclick="window.deleteExamFromArchive('${exam.id}')" title="حذف هذا الاختبار فوراً من الأرشيف والتقرير">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          `}
         </div>
       </div>
     `;
