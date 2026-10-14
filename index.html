@@ -412,24 +412,36 @@
               </div>
             </div>
 
-            <!-- Subject Mode Switcher: عربي / انكليزي / رياضيات -->
+            <!-- Subject Mode Switcher: 6 مواد في شريطين منظمين (بكل شريط 3 مواد) -->
             <div class="side-subject-switcher" id="sideSubjectSwitcher" title="تخصيص نمط الأسئلة والمادة">
-              <button type="button" class="side-sub-btn active" data-sub-mode="arabic" title="أسئلة اللغة العربية (RTL)">
-                <i class="fa-solid fa-feather-pointed"></i>
-                <span>عربي</span>
-              </button>
-              <button type="button" class="side-sub-btn" data-sub-mode="english" title="English Exam (LTR)">
-                <i class="fa-solid fa-globe"></i>
-                <span>English</span>
-              </button>
-              <button type="button" class="side-sub-btn" data-sub-mode="math" title="أسئلة الرياضيات والمعادلات">
-                <i class="fa-solid fa-calculator"></i>
-                <span>رياضيات</span>
-              </button>
-              <button type="button" class="side-sub-btn" data-sub-mode="chemistry" title="أسئلة الكيمياء والجدول الدوري والمعادلات">
-                <i class="fa-solid fa-flask-vial"></i>
-                <span>كيمياء</span>
-              </button>
+              <div class="side-sub-row">
+                <button type="button" class="side-sub-btn active" data-sub-mode="arabic" title="أسئلة اللغة العربية (RTL)">
+                  <i class="fa-solid fa-feather-pointed"></i>
+                  <span>عربي</span>
+                </button>
+                <button type="button" class="side-sub-btn" data-sub-mode="english" title="English Exam (LTR)">
+                  <i class="fa-solid fa-globe"></i>
+                  <span>انكليزي</span>
+                </button>
+                <button type="button" class="side-sub-btn" data-sub-mode="math" title="أسئلة الرياضيات والمعادلات">
+                  <i class="fa-solid fa-calculator"></i>
+                  <span>رياضيات</span>
+                </button>
+              </div>
+              <div class="side-sub-row">
+                <button type="button" class="side-sub-btn" data-sub-mode="chemistry" title="أسئلة الكيمياء والجدول الدوري والمعادلات">
+                  <i class="fa-solid fa-flask-vial"></i>
+                  <span>كيمياء</span>
+                </button>
+                <button type="button" class="side-sub-btn" data-sub-mode="physics" title="أسئلة الفيزياء والمعادلات والقوانين (ثالث متوسط وسادس إعدادي)">
+                  <i class="fa-solid fa-atom"></i>
+                  <span>فيزياء</span>
+                </button>
+                <button type="button" class="side-sub-btn" data-sub-mode="islamic" title="التربية الإسلامية: أحاديث، سور، آيات ورسم قرآني">
+                  <i class="fa-solid fa-book-quran"></i>
+                  <span>إسلامية</span>
+                </button>
+              </div>
             </div>
 
             <!-- Page Fast Scroll Up Button (صعود سريع لأعلى الأسئلة) -->
@@ -512,6 +524,9 @@
                 <button type="button" class="qfilter-chip chip-arabic" data-qfilter="arabic"><i class="fa-solid fa-feather-pointed"></i> عربي (<span id="countFilterArabic">0</span>)</button>
                 <button type="button" class="qfilter-chip chip-english" data-qfilter="english"><i class="fa-solid fa-globe"></i> English (<span id="countFilterEnglish">0</span>)</button>
                 <button type="button" class="qfilter-chip chip-math" data-qfilter="math"><i class="fa-solid fa-calculator"></i> رياضيات (<span id="countFilterMath">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-chemistry" data-qfilter="chemistry"><i class="fa-solid fa-flask-vial"></i> كيمياء (<span id="countFilterChemistry">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-physics" data-qfilter="physics"><i class="fa-solid fa-atom"></i> فيزياء (<span id="countFilterPhysics">0</span>)</button>
+                <button type="button" class="qfilter-chip chip-islamic" data-qfilter="islamic"><i class="fa-solid fa-book-quran"></i> إسلامية (<span id="countFilterIslamic">0</span>)</button>
               </div>
 
               <div id="questionsContainer" class="questions-list">
@@ -2731,6 +2746,8 @@
   <script src="js/question-types.js?v=5.5"></script>
   <script src="js/smart-generator.js?v=5.5"></script>
   <script src="js/exporter.js?v=5.5"></script>
+  <script src="js/physics-studio.js?v=5.5"></script>
+  <script src="js/islamic-studio.js?v=5.5"></script>
   <script src="js/app.js?v=5.5"></script>
 </body>
 </html>

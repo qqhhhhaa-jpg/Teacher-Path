@@ -2756,15 +2756,24 @@ function renderBuilderList() {
   const cArabic = appState.questions.filter(q => !q.subject || q.subject === 'arabic').length;
   const cEnglish = appState.questions.filter(q => q.subject === 'english').length;
   const cMath = appState.questions.filter(q => q.subject === 'math').length;
+  const cChem = appState.questions.filter(q => q.subject === 'chemistry').length;
+  const cPhys = appState.questions.filter(q => q.subject === 'physics').length;
+  const cIsl = appState.questions.filter(q => q.subject === 'islamic').length;
 
   const elAll = document.getElementById('countFilterAll');
   const elAr = document.getElementById('countFilterArabic');
   const elEn = document.getElementById('countFilterEnglish');
   const elMa = document.getElementById('countFilterMath');
+  const elCh = document.getElementById('countFilterChemistry');
+  const elPh = document.getElementById('countFilterPhysics');
+  const elIs = document.getElementById('countFilterIslamic');
   if (elAll) elAll.innerText = cAll;
   if (elAr) elAr.innerText = cArabic;
   if (elEn) elEn.innerText = cEnglish;
   if (elMa) elMa.innerText = cMath;
+  if (elCh) elCh.innerText = cChem;
+  if (elPh) elPh.innerText = cPhys;
+  if (elIs) elIs.innerText = cIsl;
 
   if (!container) return;
 
@@ -2780,7 +2789,7 @@ function renderBuilderList() {
       <div style="text-align: center; padding: 2.2rem 1rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
         <i class="fa-regular fa-file-circle-plus" style="font-size: 2.4rem; margin-bottom: 0.6rem; color: #38bdf8;"></i>
         <p style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">ورقة الاختبار فارغة حالياً</p>
-        <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">انقر على أي من أزرار المادة أعلاه (عربي / English / رياضيات) ثم اختر نوع السؤال للبدء فوراً.</p>
+        <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">انقر على أي من أزرار المواد أعلاه (عربي / انكليزي / رياضيات / كيمياء / فيزياء / إسلامية) ثم اختر نوع السؤال للبدء فوراً.</p>
       </div>
     `;
     return;
@@ -3231,19 +3240,37 @@ window.handleModalSubjectChange = function(newSub) {
   const toggleMathBtn = document.getElementById('btnToggleMathStudio');
   const chemStudio = document.getElementById('modalChemStudioContainer');
   const toggleChemBtn = document.getElementById('btnToggleChemStudio');
+  const physStudio = document.getElementById('modalPhysicsStudioContainer');
+  const togglePhysBtn = document.getElementById('btnTogglePhysicsStudio');
+  const islStudio = document.getElementById('modalIslamicStudioContainer');
+  const toggleIslBtn = document.getElementById('btnToggleIslamicStudio');
+
+  // Hide all first
+  if (mathStudio) mathStudio.style.display = 'none';
+  if (toggleMathBtn) toggleMathBtn.classList.remove('active');
+  if (chemStudio) chemStudio.style.display = 'none';
+  if (toggleChemBtn) toggleChemBtn.classList.remove('active');
+  if (physStudio) physStudio.style.display = 'none';
+  if (togglePhysBtn) togglePhysBtn.classList.remove('active');
+  if (islStudio) islStudio.style.display = 'none';
+  if (toggleIslBtn) toggleIslBtn.classList.remove('active');
 
   if (newSub === 'math') {
     if (mathStudio) mathStudio.style.display = 'block';
     if (toggleMathBtn) toggleMathBtn.classList.add('active');
-    if (chemStudio) chemStudio.style.display = 'none';
-    if (toggleChemBtn) toggleChemBtn.classList.remove('active');
     showToast('تم تفعيل ستوديو الرياضيات والمعادلات الوزارية 📐', 'info');
   } else if (newSub === 'chemistry') {
     if (chemStudio) chemStudio.style.display = 'block';
     if (toggleChemBtn) toggleChemBtn.classList.add('active');
-    if (mathStudio) mathStudio.style.display = 'none';
-    if (toggleMathBtn) toggleMathBtn.classList.remove('active');
     showToast('تم تفعيل ستوديو الكيمياء والجدول الدوري والمعادلات ⚗️🧪', 'info');
+  } else if (newSub === 'physics') {
+    if (physStudio) physStudio.style.display = 'block';
+    if (togglePhysBtn) togglePhysBtn.classList.add('active');
+    showToast('تم تفعيل ستوديو الفيزياء والمعادلات والقوانين الوزارية ⚛️⚡', 'info');
+  } else if (newSub === 'islamic') {
+    if (islStudio) islStudio.style.display = 'block';
+    if (toggleIslBtn) toggleIslBtn.classList.add('active');
+    showToast('تم تفعيل ستوديو التربية الإسلامية (سور، آيات، أحاديث ورسم قرآني) 📖✨', 'info');
   }
 };
 
@@ -4341,6 +4368,8 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           <option value="english" ${qSubject === 'english' ? 'selected' : ''}>English (اللغة الإنكليزية)</option>
           <option value="math" ${qSubject === 'math' ? 'selected' : ''}>رياضيات (الرياضيات والمعادلات)</option>
           <option value="chemistry" ${qSubject === 'chemistry' ? 'selected' : ''}>كيمياء (الكيمياء والجدول الدوري والمعادلات)</option>
+          <option value="physics" ${qSubject === 'physics' ? 'selected' : ''}>فيزياء (الفيزياء والمعادلات والقوانين)</option>
+          <option value="islamic" ${qSubject === 'islamic' ? 'selected' : ''}>إسلامية (التربية الإسلامية والسور والأحاديث)</option>
         </select>
       </div>
 
@@ -4398,18 +4427,30 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
             <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
               <i class="fa-solid fa-square-root-variable text-accent"></i>
               <span>ستوديو الرياضيات</span>
-              <span class="badge-math-pro">الأس والكسور والجذور</span>
+              <span class="badge-math-pro">الأس والكسور</span>
             </button>
             <button type="button" class="btn-chem-studio-toggle-pill ${(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem') ? 'active' : ''}" id="btnToggleChemStudio" onclick="window.toggleChemStudio()" title="فتح / إغلاق ستوديو الكيمياء والجدول الدوري والمعادلات الوزارية">
               <i class="fa-solid fa-flask-vial" style="color: #10b981;"></i>
               <span>ستوديو الكيمياء</span>
-              <span class="badge-chem-pro">عناصر، مركبات، معادلات</span>
+              <span class="badge-chem-pro">عناصر، مركبات</span>
+            </button>
+            <button type="button" class="btn-physics-studio-toggle-pill ${(qSubject === 'physics' || currentQuestion.type === 'physics_problem') ? 'active' : ''}" id="btnTogglePhysicsStudio" onclick="window.togglePhysicsStudio()" title="فتح / إغلاق ستوديو الفيزياء العراقي (ثالث متوسط وسادس إعدادي)">
+              <i class="fa-solid fa-atom" style="color: #f59e0b;"></i>
+              <span>ستوديو الفيزياء</span>
+              <span class="badge-physics-pro">قوانين، مسائل</span>
+            </button>
+            <button type="button" class="btn-islamic-studio-toggle-pill ${(qSubject === 'islamic' || currentQuestion.type === 'islamic_problem') ? 'active' : ''}" id="btnToggleIslamicStudio" onclick="window.toggleIslamicStudio()" title="فتح / إغلاق ستوديو التربية الإسلامية (سور، آيات، أحاديث ورسم قرآني)">
+              <i class="fa-solid fa-book-quran" style="color: #34d399;"></i>
+              <span>ستوديو الإسلامية</span>
+              <span class="badge-islamic-pro">رسم قرآني، أحاديث</span>
             </button>
           </div>
         </div>
 
         ${buildMathStudioHTML(qSubject === 'math' || currentQuestion.type === 'math_problem')}
         ${buildChemStudioHTML(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem')}
+        ${typeof window.buildPhysicsStudioHTML === 'function' ? window.buildPhysicsStudioHTML(qSubject === 'physics' || currentQuestion.type === 'physics_problem') : ''}
+        ${typeof window.buildIslamicStudioHTML === 'function' ? window.buildIslamicStudioHTML(qSubject === 'islamic' || currentQuestion.type === 'islamic_problem') : ''}
 
         <textarea class="form-control" id="modalQText" dir="${isEnMode ? 'ltr' : 'rtl'}" style="text-align: ${isEnMode ? 'left' : 'right'}; font-family: ${isEnMode ? 'Inter, Roboto, sans-serif' : 'inherit'}; font-size: 0.95rem;" rows="3" placeholder="${isEnMode ? 'Write the question text or problem here...' : 'اكتب نص السؤال، المسألة، أو الفقرة هنا (أو اتركه فارغاً)...'}">${currentQuestion.text || ''}</textarea>
 
@@ -6364,6 +6405,38 @@ const SUBJECT_PRESETS = {
       reasoning: 'علل كيميائياً (لوشاتليه)',
       math_problem: 'مسألة وحسابات كيميائية'
     }
+  },
+  physics: {
+    name: 'الفيزياء',
+    direction: 'rtl',
+    badgeClass: 'sub-physics',
+    btnLabels: {
+      mcq: 'اختر الإجابة الصحيحة',
+      true_false: 'صح أو خطأ فيزيائي',
+      definitions: 'تعاريف وقوانين فيزيائية',
+      comparisons: 'مقارنة دوائر وظواهر',
+      fill_blanks: 'أكمل القانون والوحدات',
+      matching: 'صل الكمية بالوحدة/القانون',
+      essay: 'نشاط وتجربة واستنتاج',
+      reasoning: 'علل فيزيائياً وبفرضيّات',
+      math_problem: 'مسألة وحسابات فيزيائية'
+    }
+  },
+  islamic: {
+    name: 'التربية الإسلامية',
+    direction: 'rtl',
+    badgeClass: 'sub-islamic',
+    btnLabels: {
+      mcq: 'اختر الإجابة الصحيحة',
+      true_false: 'صح أو خطأ',
+      definitions: 'معاني الكلمات والمفاهيم',
+      comparisons: 'مقارنة الأحكام والآداب',
+      fill_blanks: 'أكمل الآية أو الحديث',
+      matching: 'صل الكلمة بمعناها/الحكم',
+      essay: 'اكتب الآيات / الحديث الشريف',
+      reasoning: 'ما يرشد إليه النص / علل',
+      math_problem: 'أحكام التلاوة والتجويد'
+    }
   }
 };
 
@@ -6429,6 +6502,16 @@ function setSubjectMode(mode, userInitiated = false) {
       applyPaperSettings();
       renderAll();
       showToast('تم تفعيل نمط الكيمياء والجدول الدوري والمعادلات ⚗️🧪', 'info');
+    } else if (mode === 'physics') {
+      appState.settings.direction = 'rtl';
+      applyPaperSettings();
+      renderAll();
+      showToast('تم تفعيل نمط مادة الفيزياء (قوانين، مسائل وثوابت وزارية) ⚛️⚡', 'info');
+    } else if (mode === 'islamic') {
+      appState.settings.direction = 'rtl';
+      applyPaperSettings();
+      renderAll();
+      showToast('تم تفعيل نمط التربية الإسلامية (سور، آيات، أحاديث ورسم قرآني) 📖✨', 'info');
     } else {
       appState.settings.direction = 'rtl';
       applyPaperSettings();
