@@ -162,7 +162,12 @@ window.insertIslamicText = function(snippet) {
 };
 
 window.toggleIslamicStudio = function() {
-  const container = document.getElementById('modalIslamicStudioContainer');
+  const wrapper = document.getElementById('modalIslamicStudioWrapper');
+  let container = document.getElementById('modalIslamicStudioContainer');
+  if (!container && wrapper && typeof window.buildIslamicStudioHTML === 'function') {
+    wrapper.innerHTML = window.buildIslamicStudioHTML(true);
+    container = document.getElementById('modalIslamicStudioContainer');
+  }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
   container.style.display = isHidden ? 'block' : 'none';
