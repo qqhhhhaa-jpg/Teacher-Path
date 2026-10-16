@@ -7,6 +7,17 @@
   <link rel="icon" type="image/png" href="assets/masar_moallem_logo.png">
   <meta name="description" content="مسار المعلم - المنصة المتقدمة لمساعدة المعلمين والأساتذة في العراق على صياغة الأسئلة وإعداد الاختبارات الوزارية والمدرسية بأعلى المعايير.">
   
+  <!-- Performance Optimization: Preconnect & Font Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alexandria:wght@400;600;700;800&family=Almarai:wght@400;700;800&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Tajawal:wght@400;500;700;900&display=swap">
+
+  <!-- Mobile Browser Performance Meta -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#2563eb">
+
   <!-- FontAwesome 6 Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
@@ -14,11 +25,24 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   
   <!-- Official Google Identity Services SDK (GIS OAuth 2.0) -->
+  <script>
+    window.GOOGLE_CLIENT_ID = '87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com';
+    window._pendingGoogleAuthResponse = null;
+    window.Loingcallback = function(response) {
+      if (typeof window.handleGoogleCredentialResponse === 'function') {
+        window.handleGoogleCredentialResponse(response);
+      } else {
+        window._pendingGoogleAuthResponse = response;
+      }
+    };
+    window.LoginCallback = window.Loingcallback;
+    window.loginCallback = window.Loingcallback;
+  </script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   
   <!-- Core Styles -->
-  <link rel="stylesheet" href="css/style.css?v=5.5">
-  <link rel="stylesheet" href="css/print.css?v=5.5" media="print">
+  <link rel="stylesheet" href="css/style.css?v=5.6">
+  <link rel="stylesheet" href="css/print.css?v=5.6" media="print">
   
   <style id="dynamicPrintMarginStyle">
     @page { size: A4 portrait; margin: 8mm 10mm !important; }
@@ -39,7 +63,7 @@
       <div class="side-drawer-header">
         <div class="drawer-title" style="display: flex; align-items: center; gap: 9px;">
           <div class="drawer-brand-logo-wrapper" style="position: relative; flex-shrink: 0;">
-            <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="drawer-brand-logo" style="width: 44px; height: 44px; object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.45)); display: block;">
+            <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="drawer-brand-logo" style="width: 52px; height: 52px; object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; filter: drop-shadow(0 2px 10px rgba(139, 92, 246, 0.5)); display: block;">
           </div>
           <div style="line-height: 1.25;">
             <span style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
@@ -237,7 +261,7 @@
                 <span>حفظ الاختبار وتصفير الورقة ➔ التقرير</span>
               </button>
               <!-- Google Cloud Sync & Multi-Device Actions -->
-              <button class="drawer-action-btn highlight-google" id="drawerGoogleSyncBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول السريع بحساب Google وحفظ الأسئلة سحابياً" data-tooltip="تسجيل دخول Google والمزامنة">
+              <button class="drawer-action-btn highlight-google" id="drawerGoogleSyncBtn" onclick="window.loginWithGoogleFirebase()" title="تسجيل الدخول السريع بحساب Google وحفظ الأسئلة سحابياً" data-tooltip="تسجيل دخول Google والمزامنة">
                 <i class="fa-brands fa-google text-danger"></i>
                 <span>تسجيل دخول Google السحابي</span>
               </button>
@@ -245,10 +269,14 @@
                 <i class="fa-solid fa-cloud-arrow-up text-info"></i>
                 <span>مزامنة ونقل الأسئلة سحابياً</span>
               </button>
-              <!-- VIP Annual Subscription Button (باقة الاشتراك السنوي 50 ألف دينار) -->
-              <button class="drawer-action-btn highlight-vip" id="drawerSubscriptionBtn" onclick="window.openSubscriptionModal()" title="باقة الاشتراك السنوي الذهبية (50,000 د.ع)" data-tooltip="الباقة السنوية (50,000 د.ع)">
+              <button class="drawer-action-btn" id="drawerMobileSyncBtn" onclick="window.openMobileSyncModal()" title="المزامنة الفورية بين اللابتوب والموبايل" data-tooltip="مزامنة الموبايل الفورية">
+                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
+                <span>مزامنة الموبايل واللابتوب 📱</span>
+              </button>
+              <!-- Subscription Plans Button (خطط الاشتراك تبدأ من 25 ألف) -->
+              <button class="drawer-action-btn highlight-vip" id="drawerSubscriptionBtn" onclick="window.openSubscriptionModal()" title="خطط وباقات الاشتراك (تبدأ من 25 ألف د.ع)" data-tooltip="خطط الاشتراك (من 25 ألف)">
                 <i class="fa-solid fa-crown text-warning"></i>
-                <span>الباقة السنوية (50,000 د.ع) 👑</span>
+                <span>خطط الاشتراك والترقية 👑</span>
               </button>
               <button class="drawer-action-btn" id="menuOpenProfileBtn" title="تعديل الملف الشخصي للمعلم" data-tooltip="تعديل الملف الشخصي">
                 <i class="fa-solid fa-user-pen text-accent"></i>
@@ -287,7 +315,7 @@
           <span>القائمة والأدوات</span>
         </button>
         <div class="brand-wrapper">
-          <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-logo-img" id="appLogo" style="object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; filter: drop-shadow(0 3px 8px rgba(56, 189, 248, 0.45));">
+          <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-logo-img" id="appLogo" style="width: 54px; height: 54px; object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; filter: drop-shadow(0 3px 10px rgba(139, 92, 246, 0.5));">
           <div class="brand-info">
             <h1>مسار المعلم <span class="badge-pro">PRO</span></h1>
             <p>المنصة الذكية لإعداد وتصميم الاختبارات</p>
@@ -297,9 +325,15 @@
 
       <div class="nav-actions">
         <!-- Google Cloud Linked Indicator (شعار الاتصال بحساب Google) -->
-        <button class="btn-nav" id="navGoogleSyncStatusBtn" onclick="window.openCloudTransferModal()" title="حالة الربط بحساب Google والمزامنة السحابية" style="display: none; border-color: rgba(66, 133, 244, 0.35); background: rgba(66, 133, 244, 0.08);">
+        <button class="btn-nav" id="navGoogleSyncStatusBtn" onclick="window.openFirebaseConfigModal()" title="حالة الربط بحساب Google والمزامنة السحابية" style="display: none; border-color: rgba(66, 133, 244, 0.35); background: rgba(66, 133, 244, 0.08);">
           <i class="fa-brands fa-google" style="color: #ea4335;"></i>
-          <span id="navGoogleSyncText" style="color: #60a5fa; font-weight: 700; font-size: 0.8rem;">Google سحابي</span>
+          <span id="navGoogleSyncText" style="color: #60a5fa; font-weight: 700; font-size: 0.8rem;">سحابة Google</span>
+        </button>
+
+        <!-- Mobile Sync Button (زر المزامنة الفورية مع الهاتف) -->
+        <button class="btn-nav" id="topNavMobileSyncBtn" onclick="window.openMobileSyncModal()" title="المزامنة الفورية بين اللابتوب والموبايل" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.12); color: #0284c7; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-mobile-screen-button" style="color: #0284c7; font-size: 0.95rem;"></i>
+          <span>مزامنة الموبايل 📱</span>
         </button>
 
         <!-- Toggle Live Preview Button (زر المعاينة) -->
@@ -355,10 +389,10 @@
     <div class="view-banner-inner">
       <div class="view-banner-text">
         <span class="view-banner-badge"><i class="fa-solid fa-lock"></i> وضع المشاهدة فقط</span>
-        <span>حسابك في وضع المشاهدة — <strong>اشترك لتتيح لك جميع الصلاحيات</strong> (الباقة السنوية 50,000 د.ع)</span>
+        <span>حسابك في وضع المشاهدة — <strong>اشترك لتتيح لك جميع الصلاحيات</strong> (باقات مرنة تبدأ من 25,000 د.ع)</span>
       </div>
       <button type="button" class="view-banner-btn">
-        <i class="fa-solid fa-crown text-warning"></i> اشترك لتفعيل الصلاحيات 👑
+        <i class="fa-solid fa-crown text-warning"></i> اختر خطة التفعيل 👑
       </button>
     </div>
   </div>
@@ -682,15 +716,27 @@
                 <span>المرحلة الدراسية أو الصف <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
                 <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
               </label>
-              <select class="form-control" id="aiGenGrade" required onchange="window.clearAiValidationError('aiGenGrade')">
-                <option value="">-- اختر المرحلة الدراسية أو الصف --</option>
-                <option value="الصف الثالث المتوسط">🎓 الصف الثالث المتوسط</option>
-                <option value="الصف السادس الإعدادي (العلمي)">🏛️ الصف السادس الإعدادي (العلمي)</option>
-                <option value="الصف السادس الإعدادي (الأدبي)">📚 الصف السادس الإعدادي (الأدبي)</option>
-                <option value="الصف الأول المتوسط">🌱 الصف الأول المتوسط</option>
-                <option value="الصف الثاني المتوسط">🌿 الصف الثاني المتوسط</option>
-                <option value="الصف الرابع الإعدادي">📖 الصف الرابع الإعدادي</option>
-                <option value="الصف الخامس الإعدادي">📑 الصف الخامس الإعدادي</option>
+              <select class="form-control ai-select-control" id="aiGenGrade" required onchange="window.clearAiValidationError('aiGenGrade')">
+                <option value="">-- اختر المرحلة والصف الدراسي --</option>
+                <optgroup label="المرحلة الابتدائية">
+                  <option value="الصف الأول الابتدائي">🌱 الصف الأول الابتدائي</option>
+                  <option value="الصف الثاني الابتدائي">🌿 الصف الثاني الابتدائي</option>
+                  <option value="الصف الثالث الابتدائي">☘️ الصف الثالث الابتدائي</option>
+                  <option value="الصف الرابع الابتدائي">📘 الصف الرابع الابتدائي</option>
+                  <option value="الصف الخامس الابتدائي">📙 الصف الخامس الابتدائي</option>
+                  <option value="الصف السادس الابتدائي">🎖️ الصف السادس الابتدائي (الوزاري المعتمد)</option>
+                </optgroup>
+                <optgroup label="المرحلة المتوسطة">
+                  <option value="الصف الأول المتوسط">🌱 الصف الأول المتوسط</option>
+                  <option value="الصف الثاني المتوسط">🌿 الصف الثاني المتوسط</option>
+                  <option value="الصف الثالث المتوسط">🎓 الصف الثالث المتوسط (الوزاري المعتمد)</option>
+                </optgroup>
+                <optgroup label="المرحلة الإعدادية والثانوية">
+                  <option value="الصف الرابع الإعدادي">📖 الصف الرابع الإعدادي (العلمي والأدبي)</option>
+                  <option value="الصف الخامس الإعدادي">📑 الصف الخامس الإعدادي (العلمي والأدبي)</option>
+                  <option value="الصف السادس الإعدادي (العلمي)">🏛️ الصف السادس الإعدادي - العلمي (الوزاري المعتمد)</option>
+                  <option value="الصف السادس الإعدادي (الأدبي)">📚 الصف السادس الإعدادي - الأدبي (الوزاري المعتمد)</option>
+                </optgroup>
               </select>
               <div id="aiGradeErrorAlert" class="auth-field-error-notice" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-top: 4px;">
                 <i class="fa-solid fa-circle-exclamation"></i> يرجى اختيار المرحلة الدراسية (حقل إجباري)
@@ -703,16 +749,18 @@
                 <span>المادة الدراسية <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
                 <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
               </label>
-              <select class="form-control" id="aiGenSubject" required onchange="window.clearAiValidationError('aiGenSubject')">
+              <select class="form-control ai-select-control" id="aiGenSubject" required onchange="window.clearAiValidationError('aiGenSubject')">
                 <option value="">-- اختر المادة الدراسية --</option>
-                <option value="اللغة العربية">✍️ اللغة العربية</option>
-                <option value="اللغة الإنكليزية">🌐 اللغة الإنكليزية (English Language)</option>
+                <option value="اللغة العربية">✍️ اللغة العربية (قواعد وأدب وإملاء)</option>
                 <option value="الرياضيات">📐 الرياضيات</option>
-                <option value="الكيمياء">🧪 الكيمياء</option>
+                <option value="العلوم">🔬 العلوم العامة (للمرحلة الابتدائية والمتوسطة)</option>
+                <option value="اللغة الإنكليزية">🌐 اللغة الإنكليزية (English Language)</option>
                 <option value="الفيزياء">⚡ الفيزياء</option>
+                <option value="الكيمياء">🧪 الكيمياء</option>
+                <option value="علم الأحياء">🧬 علم الأحياء</option>
+                <option value="الاجتماعيات">🌍 الاجتماعيات (التاريخ والجغرافية والوطنية)</option>
                 <option value="التربية الإسلامية">📖 التربية الإسلامية والقرآن الكريم</option>
-                <option value="علم الأحياء">🔬 علم الأحياء</option>
-                <option value="الاجتماعيات">🌍 الاجتماعيات (التاريخ والجغرافية)</option>
+                <option value="الاقتصاد">📊 الاقتصاد (للسادس الأدبي)</option>
               </select>
               <div id="aiSubjectErrorAlert" class="auth-field-error-notice" style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-top: 4px;">
                 <i class="fa-solid fa-circle-exclamation"></i> يرجى اختيار المادة الدراسية (حقل إجباري)
@@ -725,7 +773,7 @@
                 <span>مستوى صعوبة الأسئلة <span style="color: #ef4444; font-size: 0.95rem;">*</span></span>
                 <span class="badge-tag" style="background: rgba(239, 68, 68, 0.12); color: #ef4444; font-weight: 800; font-size: 0.68rem;">إجباري الملء</span>
               </label>
-              <select class="form-control" id="aiGenDifficulty" required onchange="window.clearAiValidationError('aiGenDifficulty')">
+              <select class="form-control ai-select-control" id="aiGenDifficulty" required onchange="window.clearAiValidationError('aiGenDifficulty')">
                 <option value="">-- اختر مستوى صعوبة الاختبار --</option>
                 <option value="متوسط">⚖️ متوسط (النمط الوزاري المعتمد الشامل)</option>
                 <option value="سهل">🟢 سهل ومباشر (للامتحانات الشهرية والمراجعة السريعة)</option>
@@ -739,7 +787,112 @@
 
           </div>
 
-          <!-- 4. Optional Teacher Notes Field (ملاحظة أو شرح المدرس لذكاء عن الأسئلة) -->
+          <!-- 4. نطاق الفصول والوحدات المطلوبة (تحديد الفصول للاختبار) -->
+          <div class="card-box" style="background: var(--bg-surface); border: 1.5px solid rgba(139, 92, 246, 0.25); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
+              <label class="form-label" style="font-weight: 800; font-size: 0.92rem; margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-book-bookmark text-primary" style="font-size: 1.05rem;"></i>
+                <span>تحديد الفصول والوحدات المطلوبة للاختبار:</span>
+                <span class="badge-tag" style="background: rgba(99, 102, 241, 0.15); color: var(--primary); font-size: 0.72rem; font-weight: 800;">تحكم مباشر 🎯</span>
+              </label>
+              <div id="aiChaptersSelectedSummaryBadge" style="font-size: 0.78rem; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 4px 12px; border-radius: 999px; border: 1.5px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-circle-check"></i> <span>تم تحديد: كامل فصول الكتاب المنهجي المقررة 📚</span>
+              </div>
+            </div>
+
+            <!-- Quick Presets Dropdown & Custom Text -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.85rem; margin-bottom: 0.95rem;">
+              <div>
+                <label style="display: block; font-size: 0.76rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">
+                  <i class="fa-solid fa-bolt text-warning"></i> اختيار سريع من القائمة:
+                </label>
+                <select class="form-control ai-select-control" id="aiGenChaptersPreset" onchange="window.selectAiChaptersPreset(this.value)" style="font-size: 0.85rem; font-weight: 700;">
+                  <option value="all" selected>📚 الكتاب كامل (جميع فصول ووحدات المنهج)</option>
+                  <option value="1">1️⃣ الفصل الأول فقط</option>
+                  <option value="2">2️⃣ الفصل الثاني فقط</option>
+                  <option value="3">3️⃣ الفصل الثالث فقط</option>
+                  <option value="4">4️⃣ الفصل الرابع فقط</option>
+                  <option value="5">5️⃣ الفصل الخامس فقط</option>
+                  <option value="6">6️⃣ الفصل السادس فقط</option>
+                  <option value="1,2">📑 الفصلان (الأول والثاني) — الامتحان الشهري الأول</option>
+                  <option value="2,3">📑 الفصلان (الثاني والثالث) — الامتحان الشهري الثاني</option>
+                  <option value="1,2,3">🏫 الفصول الثلاثة الأولى (1، 2، 3) — امتحان نصف السنة</option>
+                  <option value="custom">✍️ تخصيص فصول محددة (انقر على الأزرار أدناه)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="display: block; font-size: 0.76rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.35rem;">
+                  <i class="fa-solid fa-pen-to-square text-info"></i> تخصيص نصي يدوي للفصول (اختياري):
+                </label>
+                <input type="text" class="form-control" id="aiGenCustomChaptersInput" placeholder="مثال: الفصل الأول والثاني، أو فصول 1، 3، 5..." oninput="window.handleCustomChaptersTextInput(this.value)" style="font-size: 0.85rem; height: 44px; border-radius: var(--radius-md);">
+              </div>
+            </div>
+
+            <!-- Quick Presets Shortcut Chips Row -->
+            <div style="margin-bottom: 0.85rem;">
+              <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> اختصارات شائعة سريعة بنقرة واحدة:
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button type="button" class="ai-preset-chip active" id="presetChip_all" onclick="window.selectAiChaptersPreset('all')"><i class="fa-solid fa-book-open"></i> كامل المنهج</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_1" onclick="window.selectAiChaptersPreset('1')">1️⃣ فصل 1</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_2" onclick="window.selectAiChaptersPreset('2')">2️⃣ فصل 2</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_3" onclick="window.selectAiChaptersPreset('3')">3️⃣ فصل 3</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_1_2" onclick="window.selectAiChaptersPreset('1,2')">📑 شهر 1 (ف1 + ف2)</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_2_3" onclick="window.selectAiChaptersPreset('2,3')">📑 شهر 2 (ف2 + ف3)</button>
+                <button type="button" class="ai-preset-chip" id="presetChip_1_2_3" onclick="window.selectAiChaptersPreset('1,2,3')">🏫 نصف السنة (1-3)</button>
+              </div>
+            </div>
+
+            <!-- Interactive Chapters Pills Toggle Bar -->
+            <div>
+              <div style="font-size: 0.74rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <span>انقر لتحديد أي فصل (يمكن اختيار فصل واحد أو أكثر، أو تحديد الكتاب كامل):</span>
+                <button type="button" class="btn btn-outline" style="font-size: 0.7rem; padding: 3px 8px; border-radius: var(--radius-sm);" onclick="window.resetAiChaptersToAll()">
+                  <i class="fa-solid fa-rotate-left"></i> إعادة ضبط للكل
+                </button>
+              </div>
+              
+              <div class="ai-chapter-pills-row" id="aiChapterPillsContainer">
+                <button type="button" class="ai-ch-pill active" id="pillChapter_all" data-chapter="all" onclick="window.toggleAiChapterPill('all')">
+                  <i class="fa-solid fa-book-open"></i> <span>كامل الكتاب</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_1" data-chapter="1" onclick="window.toggleAiChapterPill(1)">
+                  <span class="ch-badge">01</span> <span>الفصل الأول</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_2" data-chapter="2" onclick="window.toggleAiChapterPill(2)">
+                  <span class="ch-badge">02</span> <span>الفصل الثاني</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_3" data-chapter="3" onclick="window.toggleAiChapterPill(3)">
+                  <span class="ch-badge">03</span> <span>الفصل الثالث</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_4" data-chapter="4" onclick="window.toggleAiChapterPill(4)">
+                  <span class="ch-badge">04</span> <span>الفصل الرابع</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_5" data-chapter="5" onclick="window.toggleAiChapterPill(5)">
+                  <span class="ch-badge">05</span> <span>الفصل الخامس</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_6" data-chapter="6" onclick="window.toggleAiChapterPill(6)">
+                  <span class="ch-badge">06</span> <span>الفصل السادس</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_7" data-chapter="7" onclick="window.toggleAiChapterPill(7)">
+                  <span class="ch-badge">07</span> <span>الفصل السابع</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_8" data-chapter="8" onclick="window.toggleAiChapterPill(8)">
+                  <span class="ch-badge">08</span> <span>الفصل الثامن</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_9" data-chapter="9" onclick="window.toggleAiChapterPill(9)">
+                  <span class="ch-badge">09</span> <span>الفصل التاسع</span>
+                </button>
+                <button type="button" class="ai-ch-pill" id="pillChapter_10" data-chapter="10" onclick="window.toggleAiChapterPill(10)">
+                  <span class="ch-badge">10</span> <span>الفصل العاشر</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Optional Teacher Notes Field (ملاحظة أو شرح المدرس لذكاء عن الأسئلة) -->
           <div class="form-group" style="margin-bottom: 1.25rem;">
             <label class="form-label" style="font-weight: 800; display: flex; align-items: center; justify-content: space-between;">
               <span style="display: flex; align-items: center; gap: 6px;">
@@ -1228,40 +1381,90 @@
           </div>
 
           <!-- Executive KPI Metrics Dashboard -->
-          <div class="daily-metrics-dashboard" style="margin-bottom: 1rem;">
-            <div class="daily-metric-card metric-exams" style="border-right: 3px solid #3b82f6;">
-              <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i class="fa-solid fa-file-lines"></i></div>
+          <!-- Executive KPI Circular Metrics Dashboard (عدادات دائرية احترافية) -->
+          <div class="daily-metrics-dashboard" style="margin-bottom: 1.15rem;">
+            <div class="daily-metric-card metric-exams">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-exams" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatTotalExams">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-file-lines"></i></div>
                 <span class="metric-label">الاختبارات المنشأة</span>
-                <span class="metric-value" id="tabReportStatTotalExams">0</span>
+                <span class="metric-badge">اختبار محفوظ</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-grades" style="border-right: 3px solid #10b981;">
-              <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i class="fa-solid fa-graduation-cap"></i></div>
+
+            <div class="daily-metric-card metric-grades">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-grades" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatGrades">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <span class="metric-label">المراحل والصفوف</span>
-                <span class="metric-value" id="tabReportStatGrades">0</span>
+                <span class="metric-badge">مرحلة نشطة</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-models" style="border-right: 3px solid #f59e0b;">
-              <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i class="fa-solid fa-award"></i></div>
+
+            <div class="daily-metric-card metric-models">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-models" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatModels">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-award"></i></div>
                 <span class="metric-label">نماذج وزارية معتمدة</span>
-                <span class="metric-value" id="tabReportStatModels">0</span>
+                <span class="metric-badge">نموذج رسمي</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-total" style="border-right: 3px solid #8b5cf6;">
-              <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;"><i class="fa-solid fa-database"></i></div>
+
+            <div class="daily-metric-card metric-total">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-total" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatTotalQuestions">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
                 <span class="metric-label">مفردات الأسئلة بالبنك</span>
-                <span class="metric-value" id="tabReportStatTotalQuestions">0</span>
+                <span class="metric-badge">سؤال وزاري</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-today" style="border-right: 3px solid #06b6d4;">
-              <div class="metric-icon" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;"><i class="fa-solid fa-calendar-day"></i></div>
+
+            <div class="daily-metric-card metric-today">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-today" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatRecent">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
                 <span class="metric-label">نشاط حديث / اليوم</span>
-                <span class="metric-value" id="tabReportStatRecent">0</span>
+                <span class="metric-badge">تحديث مباشر</span>
               </div>
             </div>
           </div>
@@ -1602,7 +1805,7 @@
     <!-- Portal Top Bar -->
     <header class="portal-topbar">
       <div class="portal-topbar-brand">
-        <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="portal-topbar-seal" style="object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; width: 44px; height: 44px; filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.45));">
+        <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="portal-topbar-seal" style="object-fit: contain; background: transparent; padding: 0; border: none; box-shadow: none; width: 52px; height: 52px; filter: drop-shadow(0 2px 10px rgba(139, 92, 246, 0.5));">
         <div class="portal-topbar-title">
           <span>جمهورية العراق | منصة مسار المعلم</span>
           <small>بوابة المعلم المعتمدة المركزية — استوديو مسار المعلم الأكاديمي</small>
@@ -1724,11 +1927,31 @@
 
               <!-- Divider line -->
               <div class="auth-divider-line" style="margin: 1.35rem 0 1rem 0;">
-                <span>أو تسجيل الدخول الرسمي عبر حساب Google</span>
+                <span>أو تسجيل الدخول الرسمي المباشر عبر Google</span>
+              </div>
+
+              <!-- Google Official Identity Services Integration -->
+              <div id="g_id_onload"
+                   data-client_id="87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com"
+                   data-context="signin"
+                   data-ux_mode="popup"
+                   data-callback="Loingcallback"
+                   data-auto_prompt="false">
+              </div>
+
+              <div style="display: flex; justify-content: center; margin-bottom: 0.75rem;">
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-shape="rectangular"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
+                </div>
               </div>
 
               <!-- Google Official Sign-In Button -->
-              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول والمصادقة الرسمية عبر Google">
+              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.launchGoogleRealPopup()" title="تسجيل الدخول والمصادقة الرسمية عبر Google">
                 <svg class="google-logo-svg" viewBox="0 0 48 48">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -2193,41 +2416,90 @@
       </div>
 
       <div class="modal-body daily-report-modal-body">
-        <!-- Daily KPI Metrics Dashboard -->
+        <!-- Daily KPI Metrics Dashboard (عدادات دائرية احترافية) -->
         <div class="daily-metrics-dashboard">
           <div class="daily-metric-card metric-today">
-            <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-today" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatToday">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
               <span class="metric-label">أسئلة أنشئت اليوم</span>
-              <span class="metric-value" id="dailyStatToday">0</span>
+              <span class="metric-badge">نشاط اليوم</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-arabic">
-            <div class="metric-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-arabic" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatArabic">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-feather-pointed"></i></div>
               <span class="metric-label">لغة عربية</span>
-              <span class="metric-value" id="dailyStatArabic">0</span>
+              <span class="metric-badge">أسئلة معتمدة</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-english">
-            <div class="metric-icon"><i class="fa-solid fa-globe"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-english" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatEnglish">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-globe"></i></div>
               <span class="metric-label">English</span>
-              <span class="metric-value" id="dailyStatEnglish">0</span>
+              <span class="metric-badge">Language Bank</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-math">
-            <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-math" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatMath">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
               <span class="metric-label">رياضيات</span>
-              <span class="metric-value" id="dailyStatMath">0</span>
+              <span class="metric-badge">مسائل ومعادلات</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-total">
-            <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-total" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatTotal">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
               <span class="metric-label">إجمالي بنك الأسئلة</span>
-              <span class="metric-value" id="dailyStatTotal">0</span>
+              <span class="metric-badge">قاعدة البيانات</span>
             </div>
           </div>
         </div>
@@ -2388,63 +2660,73 @@
               </p>
             </div>
 
-            <!-- Section 1: Official Google Identity Authentication (المصادقة الرسمية المباشرة مع منصة Google) -->
-            <div style="background: rgba(66, 133, 244, 0.06); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.15rem; text-align: center;">
-              <div style="font-size: 0.88rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <!-- Official Google 1-Click Popup Button (المصادقة الرسمية المباشرة) -->
+            <div style="background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.15rem; text-align: center;">
+              <div style="font-size: 0.9rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
                 <svg viewBox="0 0 48 48" width="22" height="22">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                   <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                 </svg>
-                <span>المصادقة الرسمية المعتمدة عبر Google Identity</span>
+                <span>المصادقة الرسمية المعتمدة عبر حساب Google</span>
               </div>
-              <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.85rem 0;">
-                تسجيل الدخول الرسمي من خلال منصة Google الأصلية عبر نافذة اختيار الحسابات المعتمدة:
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.85rem 0;">
+                اضغط هنا لاختيار حساب Google الخاص بك والمصادقة التلقائية الرسمية بنقرة واحدة:
               </p>
 
-              <!-- Official Google Identity Render Target Container -->
-              <div id="googleOfficialGsiButton" style="display: flex; justify-content: center; align-items: center; min-height: 48px; margin-bottom: 0.65rem;"></div>
-
-              <!-- Interactive Account Chooser Popup Button -->
-              <button type="button" class="btn btn-primary" id="btnLaunchOfficialGoogleAuth" onclick="window.launchGoogleRealPopup()" style="width: 100%; height: 46px; font-size: 0.95rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #4285f4; border-color: #4285f4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">
-                <svg viewBox="0 0 48 48" width="20" height="20">
+              <button type="button" class="btn btn-primary" id="btnLaunchOfficialGoogleAuth" onclick="window.launchGoogleRealPopup()" style="width: 100%; height: 48px; font-size: 0.98rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #4285f4; border-color: #4285f4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">
+                <svg viewBox="0 0 48 48" width="22" height="22">
                   <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
                   <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
                   <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
                   <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
                 </svg>
-                <span>فتح نافذة تسجيل الدخول الرسمية لـ Google</span>
+                <span>فتح نافذة اختيار حساب Google الرسمي 🚀</span>
               </button>
+
+              <div id="googleOfficialGsiButton" style="display: flex; justify-content: center; align-items: center; margin-top: 0.65rem;"></div>
 
               <div id="googleAuthStatusNotice" style="display: none; margin-top: 0.75rem; font-size: 0.8rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); background: rgba(66, 133, 244, 0.12); color: #1a73e8; font-weight: 700; text-align: center;">
                 <i class="fa-solid fa-circle-notch fa-spin"></i> جارٍ التحقق والاتصال بمنصة Google الرسمية...
               </div>
             </div>
 
-            <!-- Section 2: Strict Verified Email Entry (التحقق الصارم والمؤكد من البريد) -->
-            <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1rem; text-align: right;">
-              <div style="margin-bottom: 0.85rem;">
-                <label style="font-size: 0.84rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
+            <!-- Saved Google Accounts Box (يظهر الحسابات المسجلة لدخول فوري بنقرة واحدة) -->
+            <div id="googleSavedAccountsBox" style="display: none; background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <div style="font-size: 0.85rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-users text-primary"></i>
+                  <span>حسابات Google المسجلة على هذا الجهاز:</span>
+                </span>
+                <span class="badge-tag" style="background: #10b981; color: #fff; font-size: 0.7rem; font-weight: 700;">دخول مباشر</span>
+              </div>
+              <div id="googleSavedAccountsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+            </div>
+
+            <!-- Direct Google Gmail Sign-in Box (تسجيل الدخول المباشر بحساب Google) -->
+            <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; text-align: right;">
+              <div style="margin-bottom: 1rem;">
+                <label style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
                   <span style="display: flex; align-items: center; gap: 6px;">
                     <i class="fa-solid fa-envelope text-accent"></i>
-                    <span>التحقق من حساب بريد Google الرسمي (Gmail)</span>
+                    <span>بريد Google الشخصي (Gmail):</span>
                   </span>
                   <span id="googleEmailStatusBadge" class="badge-tag" style="font-size: 0.72rem; background: rgba(66, 133, 244, 0.1); color: #4285f4; border: 1px solid rgba(66, 133, 244, 0.25);">مطلوب @gmail.com</span>
                 </label>
                 
                 <div style="position: relative;">
-                  <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr" placeholder="yourname@gmail.com" style="padding-left: 2.6rem; font-size: 0.95rem; font-weight: 600; border-radius: 10px; height: 46px;" oninput="window.handlePersonalGoogleEmailInput(this.value)">
-                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ea4335; font-size: 1.15rem; pointer-events: none;">
+                  <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr" placeholder="yourname@gmail.com" style="padding-left: 2.6rem; font-size: 1rem; font-weight: 600; border-radius: 10px; height: 48px;" oninput="window.handlePersonalGoogleEmailInput(this.value)">
+                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ea4335; font-size: 1.25rem; pointer-events: none;">
                     <i class="fa-solid fa-at"></i>
                   </span>
                 </div>
-                <div id="googleEmailNoticeText" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-                  يتم فحص العنوان والتأكد التام من مطابقته لقواعد وخوادم حسابات Google الرسمية (لا نقبل أي إيميل وهمي أو مؤقت).
+                <div id="googleEmailNoticeText" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+                  أدخل بريد Gmail الشخصي الخاص بك لفتح حسابك ومزامنة اختباراتك فوراً.
                 </div>
               </div>
 
-              <!-- Password Challenge Box (يظهر فقط إذا كان الحساب مسجلاً مسبقاً لمنع أي اختراق أو دخول فوري) -->
+              <!-- Password Challenge Box (يظهر فقط إذا كان الحساب مسجلاً مسبقاً) -->
               <div id="googleExistingAccountPasswordBox" style="display: none; background: rgba(15, 23, 42, 0.75); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 0.95rem; margin-bottom: 0.85rem; text-align: right;">
                 <div style="font-size: 0.82rem; font-weight: 800; color: #fbbf24; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 6px;">
                   <i class="fa-solid fa-lock"></i>
@@ -2463,21 +2745,25 @@
               </div>
 
               <!-- Submit Button -->
-              <button type="button" class="btn btn-outline" id="btnConfirmPersonalGoogle" onclick="window.submitPersonalGoogleEmail()" style="width: 100%; height: 44px; font-size: 0.92rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; border-color: #3b82f6; color: #60a5fa;">
-                <i class="fa-solid fa-magnifying-glass-chart"></i>
-                <span>فحص الحساب والتحقق من اعتماده لدى Google</span>
+              <button type="button" class="btn btn-primary" id="btnConfirmPersonalGoogle" onclick="window.submitPersonalGoogleEmail()" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #2563eb; border-color: #2563eb; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
+                <i class="fa-brands fa-google"></i>
+                <span>متابعة تسجيل الدخول بحساب Google 🚀</span>
               </button>
             </div>
 
-            <!-- Security & Anti-Fraud Guarantee Box -->
-            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem; font-size: 0.78rem; color: #10b981; line-height: 1.6; margin-bottom: 0.75rem;">
-              <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 4px;">
-                <i class="fa-solid fa-shield-halved" style="font-size: 1rem;"></i>
-                <span>مصادقة موثوقة ومحمية من الحسابات الوهمية</span>
+            <!-- Cross-Device Mobile Sync Shortcut -->
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+              <div>
+                <strong style="color: #10b981; font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-mobile-screen-button"></i> فتح المنصة على الموبايل ومزامنة الاختبارات
+                </strong>
+                <small style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 2px;">
+                  امسح الباركود بكاميرا الموبايل لنقل كافة الاختبارات والأسئلة فوراً
+                </small>
               </div>
-              <p style="margin: 0; font-size: 0.74rem; color: var(--text-muted);">
-                تم إلغاء الإدخال اليدوي؛ يتم استيراد البريد الشخصي والاسم تلقائياً من خوادم Google الرسمية بعد موافقتك. إذا كان الحساب مسجلاً مسبقاً، ستدخل بنقرة واحدة مباشرة.
-              </p>
+              <button type="button" class="btn btn-sm btn-outline" onclick="window.closeGoogleAccountModal(); window.openMobileSyncModal();" style="border-color: #10b981; color: #10b981; font-weight: 800; font-size: 0.78rem;">
+                <i class="fa-solid fa-qrcode"></i> باركود الموبايل 📱
+              </button>
             </div>
 
             <!-- Optional Google Client ID Config Toggle -->
@@ -2493,7 +2779,7 @@
                 <label style="font-size: 0.74rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">
                   معرّف العميل (Google OAuth 2.0 Client ID):
                 </label>
-                <input type="text" id="cfgGoogleClientIdInput" class="form-control" dir="ltr" placeholder="xxxxxx.apps.googleusercontent.com" style="font-size: 0.76rem; font-family: monospace; padding: 0.4rem 0.6rem; margin-bottom: 0.5rem;">
+                <input type="text" id="cfgGoogleClientIdInput" class="form-control" dir="ltr" value="87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com" placeholder="87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com" style="font-size: 0.76rem; font-family: monospace; padding: 0.4rem 0.6rem; margin-bottom: 0.5rem;">
                 <div style="display: flex; gap: 0.5rem;">
                   <button type="button" class="btn btn-primary" onclick="window.saveCustomGoogleClientId()" style="flex: 1; font-size: 0.74rem; padding: 0.35rem 0.6rem;">
                     <i class="fa-solid fa-check"></i> حفظ وتفعيل
@@ -2717,135 +3003,276 @@
     </div>
   </div>
 
-  <!-- VIP Annual Subscription Modal (باقة الاشتراك السنوي الذهبية 50,000 د.ع) -->
+  <!-- Google Firebase Cloud Sync & Configuration Modal -->
+  <div class="modal-overlay firebase-config-overlay" id="firebaseConfigModal">
+    <div class="modal-container" style="max-width: 600px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(234, 67, 53, 0.05)); border-bottom: 1px solid var(--border-color); padding: 1rem 1.25rem;">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 38px; height: 38px; border-radius: 10px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 48 48" width="24" height="24">
+              <path fill="#FFA000" d="M7.7 39.4l14.4-26.6c.7-1.3 2.6-1.3 3.3 0l5.8 10.7-18.4 16c-.9.8-2.3.6-2.9-.4-.7-1-.4-2.4.4-3.1l-2.6 3.4z"/>
+              <path fill="#F57C00" d="M25.4 12.8L19.6 2.1c-.7-1.3-2.6-1.3-3.3 0L7.7 39.4l14.8-13.6 2.9-13z"/>
+              <path fill="#FFCA28" d="M40.3 33.4L32.2 18.3c-.7-1.3-2.6-1.3-3.3 0l-5.8 10.7 13.9 12.2c1.2 1 3 .6 3.7-.7.5-.9.4-2.1-.4-2.9z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main);">
+              إعدادات الربط السحابي مع Google Firebase
+            </h3>
+            <small id="firebaseStatusDesc" style="font-size: 0.74rem; color: var(--text-muted);">
+              تسجيل الدخول بحساب Google الشخصي والمزامنة الفورية بين اللابتوب والموبايل
+            </small>
+          </div>
+        </div>
+        <button type="button" class="btn-drawer-close" onclick="window.closeFirebaseConfigModal()">✖</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.15rem; max-height: 75vh; overflow-y: auto;">
+        <!-- Explanatory Banner -->
+        <div style="background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.25); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+            <strong style="color: #4285f4; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-globe"></i> المزامنة العالمية بين اللابتوب والموبايل
+            </strong>
+            <span class="badge-tag" style="background: #10b981; color: #fff; font-size: 0.7rem; font-weight: 700;">خدمة مجانية 100% من Google</span>
+          </div>
+          <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
+            تتيح لك سحابة Google Firebase الدخول بحساب Gmail الشخصي بنقرة واحدة من أي جهاز في العالم (هاتفك، لابتوبك، أو حاسوب المدرسة) مع حفظ ومزامنة كافة اختباراتك وبنك أسئلتك تلقائياً وبأمان كامل.
+          </p>
+        </div>
+
+        <!-- 3-Step Setup Quick Guide -->
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.95rem; margin-bottom: 1rem;">
+          <h4 style="font-size: 0.86rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-list-check text-success"></i> خطوات ربط حسابك في دقيقتين فقط:
+          </h4>
+          <ol style="margin: 0; padding-right: 1.25rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.8;">
+            <li>ادخل مجاناً إلى <a href="https://console.firebase.google.com" target="_blank" style="color: #4285f4; font-weight: 700; text-decoration: underline;">لوحة Google Firebase Console</a> وسجل بحساب Gmail الخاص بك.</li>
+            <li>اضغط <strong>Add project</strong> وسمِّ مشروعك (مثلاً: <code>masar-exams</code>).</li>
+            <li>من القائمة الجانبية:
+              <br>• اذهب إلى <strong>Authentication</strong> ➔ اضغط Get started ➔ فعّل <strong>Google</strong>.
+              <br>• اذهب إلى <strong>Firestore Database</strong> ➔ اضغط Create database (في وضع Start in test mode).
+            </li>
+            <li>من أيقونة الترس ⚙️ ➔ <strong>Project settings</strong> ➔ في الأسفل اضغط أيقونة الويب <code>&lt;/&gt;</code> وانسخ كود <code>firebaseConfig</code>.</li>
+          </ol>
+        </div>
+
+        <!-- Import Snippet Button -->
+        <div style="margin-bottom: 1rem; text-align: center;">
+          <button type="button" class="btn btn-outline" onclick="window.importFirebaseConfigSnippet()" style="width: 100%; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; border-color: #10b981; color: #10b981; border-style: dashed; background: rgba(16, 185, 129, 0.05);">
+            <i class="fa-solid fa-paste"></i> اضغط هنا للصق كود إعدادات Firebase كاملاً بنقرة واحدة 📋
+          </button>
+        </div>
+
+        <!-- Manual Fields Accordion -->
+        <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem;">
+          <span style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 0.65rem;">أو إدخال المفاتيح يدوياً:</span>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">apiKey:</label>
+              <input type="text" id="fbCfgApiKey" class="form-control" dir="ltr" placeholder="AIzaSy..." style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">projectId:</label>
+              <input type="text" id="fbCfgProjectId" class="form-control" dir="ltr" placeholder="my-project-id" style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">authDomain:</label>
+              <input type="text" id="fbCfgAuthDomain" class="form-control" dir="ltr" placeholder="project.firebaseapp.com" style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">storageBucket:</label>
+              <input type="text" id="fbCfgStorageBucket" class="form-control" dir="ltr" placeholder="project.appspot.com" style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">messagingSenderId:</label>
+              <input type="text" id="fbCfgMessagingSenderId" class="form-control" dir="ltr" placeholder="123456789" style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size: 0.74rem;">appId:</label>
+              <input type="text" id="fbCfgAppId" class="form-control" dir="ltr" placeholder="1:123456:web:abcd" style="font-size: 0.76rem; font-family: monospace;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color);">
+        <button type="button" class="btn btn-outline" onclick="window.closeFirebaseConfigModal()">إلغاء</button>
+        <button type="button" class="btn btn-primary" onclick="window.saveFirebaseConfigFromInputs()" style="font-weight: 800; padding: 0.6rem 1.4rem;">
+          <i class="fa-solid fa-cloud-arrow-up"></i> حفظ وتفعيل سحابة Google 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIP Multi-Tier Subscription Modal (خطط وباقات الاشتراك الثلاث) -->
   <div class="modal-overlay vip-subscription-overlay" id="subscriptionModal">
-    <div class="modal-container vip-subscription-container" style="max-width: 680px;">
+    <div class="modal-container vip-subscription-container" style="max-width: 980px; width: 95%; max-height: 92vh; display: flex; flex-direction: column;">
       <div class="modal-header vip-header-gradient" style="border-bottom: none; padding-bottom: 0.5rem;">
         <div style="display: flex; align-items: center; gap: 0.65rem;">
           <div class="vip-crown-badge">
             <i class="fa-solid fa-crown text-warning"></i>
           </div>
           <div>
-            <span style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">باقة المعلم الذهبية السنوية PRO</span>
-            <small style="display: block; font-size: 0.75rem; color: #f59e0b; font-weight: 700;">الترقية الشاملة للعام الدراسي الكامل 2026</small>
+            <span style="font-weight: 800; font-size: 1.15rem; color: var(--text-main);">خطط وباقات الاشتراك المعتمدة — مسار المعلم PRO</span>
+            <small style="display: block; font-size: 0.75rem; color: #f59e0b; font-weight: 700;">اختر الخطة المناسبة لاحتياجاتك واستمتع بكافة أدوات إعداد الاختبارات الاحترافية</small>
           </div>
         </div>
         <button type="button" class="btn-drawer-close" onclick="window.closeSubscriptionModal()">✖</button>
       </div>
 
-      <div class="modal-body" style="padding-top: 0.5rem;">
+      <div class="modal-body" style="padding-top: 0.5rem; max-height: calc(88vh - 70px); overflow-y: auto;">
         
-        <!-- Pricing Hero Card -->
-        <div class="vip-pricing-hero">
-          <div class="vip-hero-left">
-            <span class="vip-savings-badge">خصم 60% — الباقة الأكثر طلباً وتوفيراً للمعلمين 🇮🇶</span>
-            <div class="vip-price-display">
-              <span class="vip-amount">50,000</span>
-              <span class="vip-currency">ألف دينار عراقي</span>
-              <span class="vip-period">/ سنوياً (عام دراسي كامل)</span>
-            </div>
-            <p class="vip-sub-price">فقط ما يُعادل <strong>~4,100 د.ع</strong> شهرياً مع كافة التحديثات السحابية المجانية</p>
-          </div>
-          <div class="vip-hero-right">
-            <div class="vip-seal-ring">
-              <i class="fa-solid fa-award"></i>
-              <span>ترخيص معتمد</span>
-            </div>
-          </div>
+        <!-- Scarcity / Season Urgency Banner -->
+        <div class="vip-urgency-banner">
+          <i class="fa-solid fa-bolt-lightning text-warning"></i>
+          <span>عروض الموسم الدراسي الجديد: خصومات حصرية وتفعيل فوري لحسابك عبر واتساب خلال دقائق معدودة! ⏳</span>
         </div>
 
-        <!-- 10 Core Features Grid -->
-        <h4 style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin: 1rem 0 0.65rem 0; display: flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-wand-magic-sparkles text-warning"></i>
-          <span>جميع المميزات الحصرية التي تتيحها الباقة الإلكترونية السنوية:</span>
-        </h4>
+        <!-- 3-Tier Pricing Plans Deck -->
+        <div class="vip-plans-deck">
 
-        <div class="vip-features-grid">
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #38bdf8;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-            <div class="vip-feat-text">
-              <strong>1. بنوك أسئلة سحابية غير محدودة</strong>
-              <small>حفظ وأرشفة آلاف الأسئلة في سحابتك الخاصة دون أي قيود على المساحة.</small>
+          <!-- Plan 1: باقة شهر واحد (25 ألف) -->
+          <div class="vip-plan-card">
+            <div class="plan-floating-badge badge-starter">
+              <i class="fa-solid fa-calendar-days"></i> مرونة شهرية
             </div>
+            
+            <div class="plan-header-box">
+              <div class="plan-title-text">باقة الشهر الواحد</div>
+              <div class="plan-subtitle-text">بدون التزام طويل — مناسبة لإعداد اختبارات الشهر الحالي وتجربة المنصة فوراً</div>
+            </div>
+
+            <div class="plan-price-zone">
+              <div class="plan-main-price">
+                <span class="plan-amount-num" style="color: var(--text-main);">25,000</span>
+                <span class="plan-currency-tag">د.ع</span>
+                <span class="plan-period-tag">/ شهرياً</span>
+              </div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">سعر ثابت ومرن بدون التزام سنوي</span>
+                </div>
+                <div class="plan-mental-math">يعادل ~830 د.ع فقط باليوم الواحد</div>
+              </div>
+            </div>
+
+            <ul class="plan-features-list">
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>صياغة وتوليد غير محدود للاختبارات</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>تفعيل كافة الاستوديوهات الـ 6 لجميع المواد</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>تصدير وطباعة PDF عالية الدقة بدون علامة مائية</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>وصول كامل لكافة الرموز والمعادلات التخصصية</span></li>
+              <li class="plan-feat-item muted-feat"><i class="fa-solid fa-circle-xmark"></i> <span>بدون بنك النماذج الوزارية الشاملة</span></li>
+              <li class="plan-feat-item muted-feat"><i class="fa-solid fa-circle-xmark"></i> <span>لا تشمل التخزين السحابي لعام كامل</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-cta btn-plan-starter" onclick="window.selectSubscriptionPlan('1_month')">
+              <i class="fa-brands fa-whatsapp" style="color: #25d366;"></i>
+              <span>اشتراك شهر (25 ألف د.ع)</span>
+            </button>
           </div>
 
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #10b981;"><i class="fa-solid fa-laptop-mobile"></i></div>
-            <div class="vip-feat-text">
-              <strong>2. مزامنة فورية على جميع الأجهزة</strong>
-              <small>افتح حسابك من الهاتف أو اللابتوب أو حاسوب المدرسة بحساب Google المعتمد.</small>
+          <!-- Plan 2: باقة الـ 4 أشهر (75 ألف بدل 100) - الأكثر طلباً 🔥 -->
+          <div class="vip-plan-card plan-popular">
+            <div class="plan-floating-badge badge-popular-glow">
+              <i class="fa-solid fa-fire-flame-curved"></i> الأكثر طلباً — اختيار 78% من المعلمين 🔥
             </div>
+            
+            <div class="plan-header-box">
+              <div class="plan-title-text" style="color: #a855f7;">باقة الـ 4 أشهر (الفصل الدراسي الممتد)</div>
+              <div class="plan-subtitle-text">تغطية شاملة طوال 4 أشهر كاملة للامتحانات اليومية، الشهرية، ونصف السنة</div>
+            </div>
+
+            <div class="plan-price-zone">
+              <div class="plan-main-price">
+                <span class="plan-amount-num" style="color: #8b5cf6;">75,000</span>
+                <span class="plan-currency-tag" style="color: #8b5cf6;">د.ع</span>
+                <span class="plan-period-tag">/ 4 أشهر كاملة</span>
+              </div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">السعر الأساسي:</span>
+                  <span class="plan-old-price">100,000 د.ع</span>
+                  <span class="plan-discount-pill pill-purple">خصم 25% — وفر 25,000 د.ع</span>
+                </div>
+                <div class="plan-mental-math" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.12);">
+                  <i class="fa-solid fa-gift"></i> احصل على 4 أشهر كاملة بسعر 3 أشهر (شهر إضافي مجاناً 🎁)
+                </div>
+              </div>
+            </div>
+
+            <ul class="plan-features-list">
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>جميع مميزات الباقة الشهرية طوال 120 يوماً كاملة</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span><strong>بونص حصري:</strong> بنك النماذج الوزارية للفصل</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>توليد وفرز نموذجين (A / B) لمنع الغش</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>ترويسة مخصصة باسم الأستاذ والمدرسة</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>أولوية سريعة في الدعم الفني وتنسيق الاختبارات</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>حفظ وأرشفة مشاريعك واختباراتك سحابياً</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-cta btn-plan-popular" onclick="window.selectSubscriptionPlan('4_months')">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>احصل على عرض الـ 4 أشهر (75 ألف فقط) 🚀</span>
+            </button>
           </div>
 
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #ef4444;"><i class="fa-solid fa-file-pdf"></i></div>
-            <div class="vip-feat-text">
-              <strong>3. طباعة وتصدير PDF عالي الدقة</strong>
-              <small>طباعة فورية وتصدير PDF منسق ومعتمد جاهز للتوزيع على الطلاب واللجان الامتحانية.</small>
+          <!-- Plan 3: الباقة السنوية الأكاديمية (150 ألف بدل 300) - وفر 50% 👑 -->
+          <div class="vip-plan-card plan-vip">
+            <div class="plan-floating-badge badge-vip-gold">
+              <i class="fa-solid fa-crown"></i> أفضل قيمة — وفر 50% نصف السعر 👑
             </div>
+            
+            <div class="plan-header-box">
+              <div class="plan-title-text" style="color: #f59e0b;">الباقة السنوية الأكاديمية VIP</div>
+              <div class="plan-subtitle-text">عام دراسي كامل (365 يوماً) راحة بال تامة بدون أي انقطاع مع كافة التحديثات</div>
+            </div>
+
+            <div class="plan-price-zone">
+              <div class="plan-main-price">
+                <span class="plan-amount-num" style="color: #f59e0b;">150,000</span>
+                <span class="plan-currency-tag" style="color: #f59e0b;">د.ع</span>
+                <span class="plan-period-tag">/ سنة كاملة</span>
+              </div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">السعر الأساسي:</span>
+                  <span class="plan-old-price">300,000 د.ع</span>
+                  <span class="plan-discount-pill pill-green">خصم 50% — وفر 150,000 د.ع كاش!</span>
+                </div>
+                <div class="plan-mental-math" style="color: #f59e0b; background: rgba(245, 158, 11, 0.12);">
+                  فقط ~12,500 د.ع شهرياً (نصف السعر الأصلي!)
+                </div>
+              </div>
+            </div>
+
+            <ul class="plan-features-list">
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span><strong>365 يوماً كاملة</strong> دون انقطاع مع راحة بال مطلقة</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span>مزامنة سحابية بحساب Google غير محدودة للأجهزة</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>كافة النماذج الوزارية وحلولها وسلالم التصحيح</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>حقوق طبع خاصة باسمك واسم مدرستك دون علامات</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span><strong>كافة التحديثات والميزات والذكاء الاصطناعي مجاناً</strong></span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span>خط دعم فني مباشر VIP خاص بالمشتركين 24/7</span></li>
+            </ul>
+
+            <button type="button" class="btn-plan-cta btn-plan-vip" onclick="window.selectSubscriptionPlan('1_year')">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>تفعيل السنوي بنصف السعر (150 ألف) 👑</span>
+            </button>
           </div>
 
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #f59e0b;"><i class="fa-solid fa-building-columns"></i></div>
-            <div class="vip-feat-text">
-              <strong>4. مطابقة تامة لضوابط وزارة التربية</strong>
-              <small>قوالب وزارية رسمية لجميع المديريات والمحافظات مع أختام الوزارة المعتمدة.</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #a855f7;"><i class="fa-solid fa-chart-pie"></i></div>
-            <div class="vip-feat-text">
-              <strong>5. نظام التقرير اليومي الشامل</strong>
-              <small>فلاتر ذكية وإحصائيات دقيقة وطباعة تقارير بنك الأسئلة وتصديرها بنقرة زر.</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #ec4899;"><i class="fa-solid fa-square-check"></i></div>
-            <div class="vip-feat-text">
-              <strong>6. الأجوبة النموذجية وسلالم التصحيح</strong>
-              <small>توليد أوراق الأجوبة النموذجية وسلالم توزيع الدرجات المعتمدة للجان الفحص.</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #14b8a6;"><i class="fa-solid fa-signature"></i></div>
-            <div class="vip-feat-text">
-              <strong>7. حقوق طبع وترويسة خاصة للأستاذ</strong>
-              <small>كتابة وحفظ حقوقك ومدرستك وتجريد نماذج الأسئلة من أي علامات خارجية.</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #ef4444;"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="vip-feat-text">
-              <strong>8. درع خصوصية المعلم والأمان السحابي</strong>
-              <small>تشفير 256-bit وقفل تلقائي لحسابك فور إغلاق المتصفح لضمان سرية الامتحانات.</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #8b5cf6;"><i class="fa-solid fa-book-bookmark"></i></div>
-            <div class="vip-feat-text">
-              <strong>9. مكتبة نماذج وزارية جاهزة (5 مواد كبرى)</strong>
-              <small>نماذج أسئلة متكاملة مع الأجوبة (عربي، إنكليزي، رياضيات، فيزياء، إسلامية).</small>
-            </div>
-          </div>
-
-          <div class="vip-feature-card">
-            <div class="vip-feat-icon" style="color: #f97316;"><i class="fa-solid fa-headset"></i></div>
-            <div class="vip-feat-text">
-              <strong>10. أولوية الدعم الفني وتحديثات المناهج</strong>
-              <small>تحديثات مستمرة لكل المناهج والقرارات الوزارية طوال العام مع دعم مباشر.</small>
-            </div>
-          </div>
         </div>
 
         <!-- Iraqi Payment Methods Box -->
         <div class="vip-payment-methods-box">
-          <div style="font-weight: 800; font-size: 0.82rem; color: var(--text-main); margin-bottom: 0.45rem; display: flex; align-items: center; gap: 5px;">
-            <i class="fa-solid fa-wallet text-success"></i> طرق الدفع المحلية المعتمدة في العراق:
+          <div style="font-weight: 800; font-size: 0.82rem; color: var(--text-main); margin-bottom: 0.45rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <i class="fa-solid fa-wallet text-success"></i> طرق الدفع المحلية المعتمدة في العراق:
+            </div>
+            <div style="font-size: 0.74rem; color: #10b981; font-weight: 700;">
+              <i class="fa-solid fa-shield-check"></i> تفعيل فوري ومباشر بعد استلام الإشعار
+            </div>
           </div>
           <div class="vip-pay-chips">
             <span class="pay-chip"><i class="fa-solid fa-mobile-screen-button text-danger"></i> زين كاش (Zain Cash)</span>
@@ -2855,24 +3282,26 @@
           </div>
         </div>
 
-        <!-- Call to Action Buttons -->
-        <div style="display: flex; gap: 0.65rem; margin-top: 1rem; flex-wrap: wrap;">
-          <a href="https://wa.me/9647700000000?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%D8%8C%20%D8%A3%D8%B1%D8%BA%D8%A8%20%D8%A8%D8%AA%D9%81%D8%B9%D9%8A%D9%84%20%D8%A8%D8%A7%D9%82%D8%A9%20%D8%A7%D9%84%D8%A7%D8%B4%D8%AA%D8%B1%D8%A7%D9%83%20%D8%A7%D9%84%D8%B3%D9%86%D9%88%D9%8A%20%D8%A7%D9%84%D8%B0%D9%87%D8%A8%D9%8A%D8%A9%20(50%20%D8%A3%D9%84%D9%81%20%D8%AF%D9%8A%D9%86%D8%A7%D8%B1)%20%D9%84%D9%85%D9%86%D8%B5%D8%A9%20%D9%85%D8%B9%D9%84%D9%85%20%D8%A8%D8%B1%D9%88" target="_blank" class="btn btn-primary btn-vip-cta" style="flex: 2; min-width: 200px; font-weight: 800; font-size: 0.95rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <i class="fa-brands fa-whatsapp" style="font-size: 1.15rem; color: #25d366;"></i>
-            <span>طلب التفعيل الفوري وسداد الرسوم (50,000 د.ع) 🚀</span>
-          </a>
-          <button type="button" class="btn btn-outline" style="flex: 1; min-width: 140px; font-weight: 700;" onclick="window.toggleVipSubscriptionDemo()">
+        <!-- Quick Actions Footer -->
+        <div style="display: flex; gap: 0.65rem; margin-top: 0.85rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-outline" style="flex: 1; min-width: 160px; font-weight: 700;" onclick="window.toggleVipSubscriptionDemo()">
             <i class="fa-solid fa-credit-card text-warning"></i>
             <span id="vipToggleBtnText">إشعار تسديد الرسوم 💳</span>
           </button>
+          <button type="button" class="btn btn-outline" style="min-width: 100px;" onclick="window.closeSubscriptionModal()">
+            <span>إغلاق</span>
+          </button>
         </div>
+      </div>
+    </div>
+  </div>
       </div>
     </div>
   </div>
 
   <!-- Subscription Management Modal (إدارة الاشتراكات وتفعيل الصلاحيات لمدة سنة واحدة فقط وعرض عدد المشتركين) -->
   <div class="modal-overlay" id="subscriptionManagementModal">
-    <div class="modal-container" style="max-width: 720px; width: 95%;">
+    <div class="modal-container" style="max-width: 940px; width: 95%;">
       <div class="modal-header" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.18), rgba(16, 185, 129, 0.12)); border-bottom: 1.5px solid rgba(245, 158, 11, 0.35); padding: 0.95rem 1.25rem;">
         <div style="display: flex; align-items: center; gap: 0.75rem;">
           <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);">
@@ -2891,63 +3320,117 @@
 
       <div class="modal-body" style="padding: 1.25rem; max-height: calc(85vh - 120px); overflow-y: auto;">
 
-        <!-- 1. عداد وإحصائية عدد المشتركين -->
-        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 41, 59, 0.6)); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 1.1rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 0.85rem;">
-            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fbbf24;">
-              <i class="fa-solid fa-users"></i>
+        <!-- 1. عدادات وإحصائيات الحسابات والمشتركين -->
+        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(30, 41, 59, 0.6)); border: 1.5px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 0.75rem 1.15rem; margin-bottom: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 1.75rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: #fbbf24;">
+                <i class="fa-solid fa-crown"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700;">المشتركون المفعلون:</div>
+                <div style="font-size: 1.25rem; font-weight: 900; color: #fbbf24; line-height: 1.1;">
+                  <span id="subscribersManagementCount">0</span> <small style="font-size: 0.76rem; font-weight: 700; color: var(--text-main);">مشترك 👑</small>
+                </div>
+              </div>
             </div>
-            <div>
-              <div style="font-size: 0.85rem; color: var(--text-muted); font-weight: 700;">عدد المشتركين المفعلين حالياً:</div>
-              <div style="font-size: 1.7rem; font-weight: 900; color: #fbbf24; line-height: 1.2;">
-                <span id="subscribersManagementCount">0</span> <small style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">مشترك مفعل 👑</small>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(14, 165, 233, 0.15); border: 1px solid rgba(14, 165, 233, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: #38bdf8;">
+                <i class="fa-solid fa-users"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700;">إجمالي المسجلين:</div>
+                <div style="font-size: 1.25rem; font-weight: 900; color: #38bdf8; line-height: 1.1;">
+                  <span id="subscribersTotalAccountsCount">0</span> <small style="font-size: 0.76rem; font-weight: 700; color: var(--text-main);">حساب 👥</small>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.35); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; color: #fb7185;">
+                <i class="fa-solid fa-clock"></i>
+              </div>
+              <div>
+                <div style="font-size: 0.74rem; color: var(--text-muted); font-weight: 700;">بانتظار التفعيل:</div>
+                <div style="font-size: 1.25rem; font-weight: 900; color: #fb7185; line-height: 1.1;">
+                  <span id="subscribersPendingCount">0</span> <small style="font-size: 0.76rem; font-weight: 700; color: var(--text-main);">طلب ⏳</small>
+                </div>
               </div>
             </div>
           </div>
-          <div style="text-align: left; font-size: 0.76rem; color: var(--text-muted); background: var(--bg-surface); padding: 0.5rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
-            <div style="color: #10b981; font-weight: 800; display: flex; align-items: center; gap: 5px;">
-              <i class="fa-solid fa-calendar-check"></i> مدة التفعيل: سنة واحدة فقط (365 يوماً)
-            </div>
-            <div style="margin-top: 2px;">يتم احتساب الصلاحية تلقائياً من تاريخ الموافقة</div>
+
+          <div style="font-size: 0.74rem; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25); display: flex; align-items: center; gap: 6px; font-weight: 800;">
+            <i class="fa-solid fa-bolt"></i>
+            <span>تحديث فوري وتلقائي لأي حساب جديد بالعالم ⚡</span>
           </div>
         </div>
 
-        <!-- 2. حقل التفعيل وزر الموافقة على منح التفعيل لشخص -->
-        <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.25rem;">
-          <label for="subActivationQueryInput" style="display: block; font-size: 0.88rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.4rem;">
-            <i class="fa-solid fa-user-check text-warning"></i> حقل التفعيل عن طريق الإيميل أو اسم المستخدم:
-          </label>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 0.75rem 0;">
-            أدخل البريد الإلكتروني أو اسم المستخدم (اليوزر) الخاص بالشخص المسدد للاشتراك، ثم اضغط على زر الموافقة أدناه لتفعيل حسابه لمدة سنة واحدة:
-          </p>
-
-          <div style="margin-bottom: 0.85rem;">
-            <input type="text" id="subActivationQueryInput" class="admin-activate-input" style="width: 100%; padding: 0.7rem 0.95rem; font-size: 0.92rem; border-radius: var(--radius-sm);" placeholder="أدخل البريد الإلكتروني أو اسم المستخدم (مثال: teacher1 أو user@gmail.com)..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.manageApproveGrantSubscription(); }">
+        <!-- 2. حقل التفعيل السريع واختيار الخطة -->
+        <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="font-size: 0.84rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-bolt text-warning"></i>
+              <span>تفعيل سريع بواسطة اليوزر / البريد، أو التفعيل المباشر من الجدول:</span>
+            </span>
+            <span style="font-size: 0.74rem; color: var(--text-muted);">اختر الباقة واضغط <strong>[تفعيل]</strong> أمام الحساب أدناه 👇</span>
           </div>
 
-          <!-- زر الموافقة على منح التفعيل ل شخص -->
-          <button type="button" id="manageApproveGrantSubscriptionBtn" class="btn btn-success" style="width: 100%; padding: 0.78rem 1rem; font-size: 0.95rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: var(--radius-sm); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; cursor: pointer;" onclick="window.manageApproveGrantSubscription()">
-            <i class="fa-solid fa-circle-check" style="font-size: 1.15rem;"></i>
-            <span>الموافقة على منح التفعيل للشخص (لمدة سنة واحدة)</span>
-          </button>
+          <div style="display: grid; grid-template-columns: 220px 1fr auto auto; gap: 8px; align-items: center;">
+            <select id="subActivationPlanSelect" class="form-control" style="height: 38px; padding: 0.35rem 0.65rem; font-size: 0.82rem; border-radius: var(--radius-sm); font-weight: 700;">
+              <option value="1_month">📅 شهر واحد (25,000 د.ع)</option>
+              <option value="4_months">🔥 4 أشهر - فصل دراسي (75,000 د.ع)</option>
+              <option value="1_year" selected>👑 سنوية كاملة (150,000 د.ع)</option>
+            </select>
+            <input type="text" id="subActivationQueryInput" class="admin-activate-input" style="height: 38px; padding: 0.45rem 0.75rem; font-size: 0.86rem; border-radius: var(--radius-sm);" placeholder="أدخل اسم المستخدم أو البريد لتفعيله أو حذفه..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.manageApproveGrantSubscription(); }">
+            <button type="button" id="manageApproveGrantSubscriptionBtn" class="btn btn-success" style="height: 38px; padding: 0.45rem 1rem; font-size: 0.84rem; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-sm); background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; cursor: pointer; white-space: nowrap;" onclick="window.manageApproveGrantSubscription()">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>تفعيل الحساب</span>
+            </button>
+            <button type="button" id="manageDeleteAccountByQueryBtn" class="btn btn-outline" style="height: 38px; padding: 0.45rem 0.85rem; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; border-radius: var(--radius-sm); color: #ef4444; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.05); cursor: pointer; white-space: nowrap;" onclick="window.manageDeleteAccountByQuery()" title="حذف الحساب / الإيميل المدخل نهائياً">
+              <i class="fa-solid fa-trash-can"></i>
+              <span>حذف الإيميل</span>
+            </button>
+          </div>
         </div>
 
-        <!-- 3. جدول وقائمة المشتركين المفعلين -->
+        <!-- 3. جدول وقائمة الحسابات المسجلة وإدارة التفعيل -->
         <div>
-          <h4 style="margin: 0 0 0.65rem 0; font-size: 0.92rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-list-check text-primary"></i>
-            <span>سجل المشتركين وتفاصيل الصلاحية السنوية:</span>
-          </h4>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-list-check text-primary"></i>
+              <span>سجل الحسابات المسجلة وإدارة حالة التفعيل:</span>
+            </h4>
+
+            <!-- Filter Pills -->
+            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-outline" id="subFilterAllBtn" onclick="window.setSubscribersFilter('all')" style="font-size: 0.76rem; padding: 0.3rem 0.65rem; border-radius: 999px; font-weight: 800;">
+                👥 كافة الحسابات (<span id="pillCountAll">0</span>)
+              </button>
+              <button type="button" class="btn btn-outline" id="subFilterPendingBtn" onclick="window.setSubscribersFilter('pending')" style="font-size: 0.76rem; padding: 0.3rem 0.65rem; border-radius: 999px; color: #f59e0b; border-color: rgba(245, 158, 11, 0.4);">
+                ⏳ بانتظار التفعيل (<span id="pillCountPending">0</span>)
+              </button>
+              <button type="button" class="btn btn-outline" id="subFilterActiveBtn" onclick="window.setSubscribersFilter('active')" style="font-size: 0.76rem; padding: 0.3rem 0.65rem; border-radius: 999px; color: #10b981; border-color: rgba(16, 185, 129, 0.4);">
+                👑 المفعلين (<span id="pillCountActive">0</span>)
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-time Search Input -->
+          <div style="margin-bottom: 0.75rem; position: relative;">
+            <input type="text" id="subscribersSearchFilterInput" class="form-control" placeholder="🔍 ابحث في الحسابات بالاسم، اسم المستخدم، البريد، أو المدرسة..." oninput="window.renderSubscribersManagementUI()" style="font-size: 0.85rem; height: 38px; padding-right: 2.2rem; border-radius: var(--radius-sm);">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+          </div>
 
           <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow-x: auto; background: var(--bg-surface);">
             <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: right;">
               <thead>
                 <tr style="background: rgba(30, 41, 59, 0.4); border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
-                  <th style="padding: 0.65rem 0.85rem;">المعلم المشترك</th>
+                  <th style="padding: 0.65rem 0.85rem;">المعلم المسجل</th>
                   <th style="padding: 0.65rem 0.85rem;">اليوزر / البريد</th>
-                  <th style="padding: 0.65rem 0.85rem;">تاريخ التفعيل</th>
-                  <th style="padding: 0.65rem 0.85rem;">انتهاء الصلاحية (سنة واحدة)</th>
-                  <th style="padding: 0.65rem 0.85rem; text-align: center;">إدارة التفعيل</th>
+                  <th style="padding: 0.65rem 0.85rem;">تاريخ التسجيل</th>
+                  <th style="padding: 0.65rem 0.85rem;">حالة الاشتراك والصلاحية</th>
+                  <th style="padding: 0.65rem 0.85rem; text-align: center;">إجراء التفعيل والإلغاء / الحذف</th>
                 </tr>
               </thead>
               <tbody id="subscribersListTableBody">
@@ -3123,19 +3606,138 @@
     </div>
   </div>
 
+  <!-- =========================================================================
+       Mobile & Cross-Device Instant Synchronization Modal (مزامنة الموبايل الفورية)
+       ========================================================================= -->
+  <div class="modal-overlay mobile-sync-overlay" id="mobileSyncModal" role="dialog" aria-modal="true">
+    <div class="modal-container mobile-sync-container" style="max-width: 640px; width: 95%; max-height: 92vh; overflow-y: auto;">
+      <div class="modal-header" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.12)); border-bottom: 1.5px solid rgba(56, 189, 248, 0.3); padding: 1.15rem 1.35rem;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.35rem;">
+            <i class="fa-solid fa-mobile-screen-button"></i>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">المزامنة الفورية بين اللابتوب والموبايل</h3>
+            <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: var(--text-muted);">نقل تلقائي كامل للحسابات، الاختبارات المحفوظة، وبنك الأسئلة</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" onclick="window.closeMobileSyncModal()" title="إغلاق">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem 1.35rem; display: flex; flex-direction: column; gap: 1.15rem;">
+        
+        <!-- Status Banner -->
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span>
+            <span style="font-weight: 700; font-size: 0.84rem; color: #10b981;">حالة السيرفر وقاعدة البيانات: نشطة ومتصلة</span>
+          </div>
+          <div style="font-size: 0.76rem; color: var(--text-muted);">
+            الحساب النشط: <strong id="syncCurrentAccountName" style="color: var(--text-main);">المدير العام</strong>
+          </div>
+        </div>
+
+        <!-- Section 1: QR Code & Direct Scan -->
+        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem; text-align: center;">
+          <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 6px;">
+            <i class="fa-solid fa-qrcode" style="color: #6366f1;"></i>
+            <span>الطريقة الأولى: المسح السريع بالباركود (QR Code)</span>
+          </div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0;">
+            وجّه كاميرا هاتفك نحو الباركود أدناه وافتح الرابط ليتم تسجيل دخولك واسترجاع كافة أسئلتك واختباراتك فوراً بنقرة واحدة:
+          </p>
+          
+          <div id="mobileSyncQRContainer" style="display: flex; justify-content: center; align-items: center; margin: 10px 0; min-height: 200px;">
+            <!-- QR SVG injected dynamically here -->
+          </div>
+
+          <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+            <button type="button" class="btn btn-primary" onclick="window.copyDirectMobileSyncLink()" style="font-weight: 800; font-size: 0.82rem; padding: 0.5rem 1rem;">
+              <i class="fa-solid fa-copy"></i> نسخ رابط المزامنة السريع (لإرساله للموبايل)
+            </button>
+            <button type="button" class="btn btn-outline" onclick="window.refreshMobileSyncPayload()" style="font-size: 0.82rem; padding: 0.5rem 0.85rem;">
+              <i class="fa-solid fa-rotate"></i> تحديث الرمز الآن
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 2: Wi-Fi Direct Connection -->
+        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem;">
+          <div style="font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-wifi text-accent"></i>
+            <span>الطريقة الثانية: فتح الرابط المباشر من متصفح الهاتف (Wi-Fi)</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 10px 0;">
+            تأكد أن الهاتف واللابتوب متصلان بنفس شبكة الواي فاي المنزلية، وافتح هذا الرابط من متصفح الهاتف:
+          </p>
+          <div style="display: flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.3); border-radius: 8px; padding: 8px 12px;">
+            <code style="font-size: 0.95rem; font-weight: 800; color: #6366f1; direction: ltr; flex-grow: 1;" id="syncWifiDirectUrl">http://192.168.0.29:8080</code>
+            <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="window.copyWifiDirectUrl()">
+              <i class="fa-solid fa-copy"></i> نسخ
+            </button>
+          </div>
+        </div>
+
+        <!-- Section 3: Manual Code & File Transfer -->
+        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem;">
+          <div style="font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-file-import text-warning"></i>
+            <span>الطريقة الثالثة: كود المزامنة الشامل أو النسخ الاحتياطي اليدوي</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 10px;">
+            <button type="button" class="btn btn-outline" onclick="window.copyFullSyncToken()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
+              <i class="fa-solid fa-key text-accent"></i> نسخ كود المزامنة الشامل
+            </button>
+            <button type="button" class="btn btn-outline" onclick="window.pasteAndImportFullSyncToken()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
+              <i class="fa-solid fa-paste text-success"></i> استيراد من كود المزامنة
+            </button>
+            <button type="button" class="btn btn-outline" onclick="window.downloadFullCloudBackupFile()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
+              <i class="fa-solid fa-download text-info"></i> تنزيل ملف المزامنة (.json)
+            </button>
+            <label class="btn btn-outline" style="margin: 0; font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem; cursor: pointer; text-align: center;">
+              <i class="fa-solid fa-upload text-warning"></i> استيراد ملف النسخة الاحتياطية
+              <input type="file" accept=".json" style="display: none;" onchange="window.importFullSyncFile(event)">
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer" style="padding: 0.85rem 1.35rem; background: var(--bg-surface); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <div style="font-size: 0.78rem; color: var(--text-muted);">
+          <span>الإحصائيات المزامنة: </span>
+          <strong id="syncAccountsCountBadge" style="color: var(--primary);">0 حساب</strong> • 
+          <strong id="syncExamsCountBadge" style="color: #10b981;">0 اختبار</strong>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="window.closeMobileSyncModal()" style="font-weight: 800; padding: 0.55rem 1.35rem;">
+          إغلاق النافذة
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- KaTeX Math Engine for Iraqi Ministerial Equations -->
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 
+  <!-- Google Firebase SDK (v10 compat) for Multi-Device Auth & Cloud Sync -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-sync.js?v=6.0"></script>
+
   <!-- Script Modules -->
-  <script src="js/question-types.js?v=5.5"></script>
-  <script src="js/smart-generator.js?v=5.5"></script>
-  <script src="js/exporter.js?v=5.5"></script>
-  <script src="js/physics-studio.js?v=5.5"></script>
-  <script src="js/islamic-studio.js?v=5.5"></script>
-  <script src="js/ai-curriculum-engine.js?v=5.5"></script>
-  <script src="js/app.js?v=5.5"></script>
+  <script src="js/qrcode-generator.js?v=5.7"></script>
+  <script src="js/question-types.js?v=5.7"></script>
+  <script src="js/smart-generator.js?v=5.7"></script>
+  <script src="js/exporter.js?v=5.7"></script>
+  <script src="js/physics-studio.js?v=5.7"></script>
+  <script src="js/islamic-studio.js?v=5.7"></script>
+  <script src="js/ai-curriculum-engine.js?v=5.7"></script>
+  <script src="js/app.js?v=5.7"></script>
 </body>
 </html>

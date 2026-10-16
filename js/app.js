@@ -49,6 +49,7 @@ let appState = {
 // Expose appState on window immediately for global access & handlers
 window.appState = appState;
 window.getAppState = () => appState;
+window.examPaperNeedsRender = false;
 
 // Teacher Profile State
 let teacherProfile = {
@@ -77,6 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAuthGatekeeper();
   checkDraftRestore();
   initSingleDeviceWatchdog();
+
+  // Background sync accounts from server (for cross-device synchronization)
+  if (typeof syncAccountsWithServer === 'function') {
+    syncAccountsWithServer().then(() => {
+      // If user is already logged in, restore their cloud-synced questions & archive
+      const u = getCurrentUser();
+      if (u && u.id && u.id !== 'usr_guest' && typeof window.restoreUserDataFromServer === 'function') {
+        window.restoreUserDataFromServer(u);
+      }
+    }).catch(() => {});
+  }
 });
 
 /**
@@ -220,9 +232,12 @@ window.setMobileWorkstationMode = function(mode) {
   }
 
   if (mode === 'preview') {
-    if (typeof renderPaperQuestions === 'function') renderPaperQuestions();
-    if (typeof applyPaperSettings === 'function') applyPaperSettings();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.examPaperNeedsRender) {
+      if (typeof renderPaperQuestions === 'function') renderPaperQuestions();
+      if (typeof applyPaperSettings === 'function') applyPaperSettings();
+      window.examPaperNeedsRender = false;
+    }
+    window.scrollTo(0, 0);
     const pPane = document.querySelector('.preview-pane');
     if (pPane) pPane.scrollTop = 0;
   }
@@ -290,6 +305,19 @@ function getAccountStorageKey(baseKey) {
 }
 window.getAccountStorageKey = getAccountStorageKey;
 
+function getBackendApiUrl(endpoint) {
+  const custom = localStorage.getItem('moallem_custom_backend_url');
+  if (custom && custom.trim()) {
+    const base = custom.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') {
+    return `http://localhost:8080${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  return endpoint;
+}
+window.getBackendApiUrl = getBackendApiUrl;
+
 function getAuthAccounts() {
   try {
     const raw = localStorage.getItem('moallem_auth_accounts');
@@ -314,12 +342,86 @@ function getAuthAccounts() {
   }
 }
 
+let isSyncingAccountsFlag = false;
+async function syncAccountsWithServer() {
+  if (isSyncingAccountsFlag) return getAuthAccounts();
+  isSyncingAccountsFlag = true;
+  try {
+    const res = await fetch(getBackendApiUrl('/api/accounts'), { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.accounts)) {
+        const localAccounts = getAuthAccounts();
+        const mergedMap = new Map();
+
+        // 1. Map local accounts
+        localAccounts.forEach(acc => {
+          const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
+          if (k) mergedMap.set(k, acc);
+        });
+
+        // 2. Check if local has accounts not yet on server (e.g. registered on this laptop earlier)
+        let hasNewLocalAccounts = false;
+        localAccounts.forEach(acc => {
+          if (acc.id === 'usr_admin' || acc.username === 'admin') return;
+          const existsOnServer = data.accounts.some(sa =>
+            (sa.id && acc.id && sa.id === acc.id) ||
+            (sa.email && acc.email && sa.email.toLowerCase() === acc.email.toLowerCase()) ||
+            (sa.username && acc.username && sa.username.toLowerCase() === acc.username.toLowerCase())
+          );
+          if (!existsOnServer) {
+            hasNewLocalAccounts = true;
+          }
+        });
+
+        // 3. Merge server accounts (server takes precedence for subscriptions/roles)
+        data.accounts.forEach(acc => {
+          const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
+          if (k) {
+            const existing = mergedMap.get(k) || {};
+            mergedMap.set(k, { ...existing, ...acc });
+          }
+        });
+
+        const mergedList = Array.from(mergedMap.values());
+        localStorage.setItem('moallem_auth_accounts', JSON.stringify(mergedList));
+
+        // If local had accounts that server didn't have yet, immediately push them to server!
+        if (hasNewLocalAccounts) {
+          fetch(getBackendApiUrl('/api/accounts'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accounts: mergedList })
+          }).catch(() => {});
+        }
+
+        return mergedList;
+      }
+    }
+  } catch (err) {
+    // Graceful offline fallback
+  } finally {
+    isSyncingAccountsFlag = false;
+  }
+  return getAuthAccounts();
+}
+window.syncAccountsWithServer = syncAccountsWithServer;
+
 function saveAuthAccounts(accounts) {
   try {
     localStorage.setItem('moallem_auth_accounts', JSON.stringify(accounts));
+    window.dispatchEvent(new CustomEvent('moallem_accounts_updated', { detail: { accounts } }));
   } catch (e) {
     console.error(e);
   }
+  // Immediately persist to server backend (24/7 server_bot / app.py)
+  try {
+    fetch(getBackendApiUrl('/api/accounts'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accounts })
+    }).catch(() => {});
+  } catch (err) {}
 }
 
 /* ==========================================================================
@@ -510,8 +612,8 @@ function initSingleDeviceWatchdog() {
     } catch (e) {}
   }
 
-  // C. Periodic Watchdog Heartbeat (every 2.5 seconds)
-  setInterval(verifySingleDeviceSession, 2500);
+  // C. Periodic Watchdog Heartbeat (every 12 seconds to prevent network contention on mobile)
+  setInterval(verifySingleDeviceSession, 12000);
 
   // D. Tab visibility change watchdog
   document.addEventListener('visibilitychange', () => {
@@ -999,6 +1101,10 @@ function saveStateToStorage(notify = false) {
     }
     // Schedule background auto-save to archive draft
     scheduleDraftAutoSave();
+    // Schedule cloud sync to server backend for cross-device support
+    if (typeof scheduleCloudAutoSync === 'function') {
+      scheduleCloudAutoSync();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -1369,6 +1475,9 @@ function saveExamsArchive(list) {
     const storageKey = getAccountStorageKey('moallem_saved_exams_archive');
     localStorage.setItem(storageKey, JSON.stringify(list));
     updateArchiveBadge();
+    if (typeof scheduleCloudAutoSync === 'function') {
+      scheduleCloudAutoSync();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -1498,6 +1607,11 @@ function saveCurrentExamToArchive(asNew = false) {
   updateArchiveBadge();
   if (typeof renderArchiveList === 'function') {
     renderArchiveList();
+  }
+
+  // Immediate cross-device cloud push!
+  if (typeof window.syncUserDataToServer === 'function') {
+    window.syncUserDataToServer(getCurrentUser(), true);
   }
 
   // Clear / Zero-out the current workspace and navigate directly to Report Center
@@ -1760,13 +1874,11 @@ window.deleteExamFromArchive = function(id) {
  * Right Slide-Out Sidebar Drawer Controller (شريط جانبي يظهر ويختفي من جهة اليمين)
  */
 window.openSideDrawer = function() {
-  if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
   const drawer = document.getElementById('sideDrawer');
   const backdrop = document.getElementById('drawerBackdrop');
   if (drawer) {
     drawer.classList.remove('mini-mode');
-    drawer.classList.add('open');
-    drawer.classList.add('expanded');
+    drawer.classList.add('open', 'expanded');
     localStorage.setItem('moallem_drawer_minidock', 'false');
   }
   if (backdrop && window.innerWidth <= 768) {
@@ -1779,7 +1891,6 @@ window.openSideDrawer = function() {
 };
 
 window.closeSideDrawer = function() {
-  if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
   const drawer = document.getElementById('sideDrawer');
   const backdrop = document.getElementById('drawerBackdrop');
   if (drawer) {
@@ -2252,19 +2363,19 @@ function initEventListeners() {
       });
     }
 
-    formLogin.addEventListener('submit', (e) => {
+    formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       const emailOrUser = (emailInput && emailInput.value) ? emailInput.value.trim() : '';
       const password = (passInput && passInput.value) ? passInput.value : '';
 
-      const accounts = getAuthAccounts();
-      const userExists = accounts.find(a => 
+      let accounts = getAuthAccounts();
+      let userExists = accounts.find(a => 
         (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
         (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
         (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
       );
 
-      const found = accounts.find(a => 
+      let found = accounts.find(a => 
         (
           (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
           (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
@@ -2272,6 +2383,28 @@ function initEventListeners() {
         ) &&
         (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
       );
+
+      // CROSS-DEVICE LOGIN SYNC (Laptop -> Phone):
+      // If user account is not found in this phone's local storage,
+      // IMMEDIATELY query the server accounts endpoint to fetch accounts created on laptop!
+      if (!found) {
+        if (typeof syncAccountsWithServer === 'function') {
+          accounts = await syncAccountsWithServer();
+          userExists = accounts.find(a => 
+            (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
+            (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
+            (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
+          );
+          found = accounts.find(a => 
+            (
+              (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
+              (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
+              (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
+            ) &&
+            (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
+          );
+        }
+      }
 
       if (found) {
         // Clear any previous error state
@@ -2298,6 +2431,11 @@ function initEventListeners() {
         renderAll();
         if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
         if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+
+        // Restore cloud questions & exams across devices from server backend!
+        if (typeof window.restoreUserDataFromServer === 'function') {
+          window.restoreUserDataFromServer(found);
+        }
 
         const portal = document.getElementById('fullscreenAuthPortal');
         const workstation = document.getElementById('appWorkstation');
@@ -2366,9 +2504,12 @@ function initEventListeners() {
         return;
       }
 
+      const nowReg = new Date();
+      const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
       const newAccount = {
         id: 'usr_' + Date.now(),
         name,
+        username: email ? email.split('@')[0] : ('user_' + Date.now()),
         subject,
         governorate: gov,
         school,
@@ -2378,15 +2519,33 @@ function initEventListeners() {
         isVerified: false,
         role: 'viewer',
         isSubscribed: false,
-        isVip: false
+        isVip: false,
+        registeredAt: nowReg.toISOString(),
+        registeredDateFormatted: dateFormatted
       };
 
       accounts.push(newAccount);
       saveAuthAccounts(accounts);
+      // Immediately register on server for cross-device support
+      try {
+        fetch(getBackendApiUrl('/api/accounts'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account: newAccount, accounts: accounts })
+        }).catch(() => {});
+      } catch(e) {}
+
+      if (typeof window.renderSubscribersManagementUI === 'function') {
+        window.renderSubscribersManagementUI();
+      }
       setCurrentUser(newAccount);
       registerActiveDeviceSession(newAccount);
       localStorage.setItem('moallem_logged_in', 'true');
       sessionStorage.setItem('moallem_session_active', 'true');
+
+      if (typeof window.syncUserDataToServer === 'function') {
+        window.syncUserDataToServer(newAccount, true);
+      }
       applyProfileToExamHeader();
       updatePrivacySettingsUI();
       updateUserAuthUI();
@@ -2590,6 +2749,11 @@ function initEventListeners() {
       }
     }
   }, 30000);
+
+  // Initial update for circular metric counters
+  if (typeof updateDailyReportMetrics === 'function') {
+    setTimeout(updateDailyReportMetrics, 100);
+  }
 }
 
 /**
@@ -3326,7 +3490,12 @@ window.insertMathSymbol = function(sym) {
 };
 
 window.toggleMathStudio = function() {
-  const container = document.getElementById('modalMathStudioContainer');
+  const wrapper = document.getElementById('modalMathStudioWrapper');
+  let container = document.getElementById('modalMathStudioContainer');
+  if (!container && wrapper) {
+    wrapper.innerHTML = buildMathStudioHTML(true);
+    container = document.getElementById('modalMathStudioContainer');
+  }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
   container.style.display = isHidden ? 'block' : 'none';
@@ -3381,6 +3550,29 @@ window.updateModalMathPreview = function() {
 };
 
 window.handleModalSubjectChange = function(newSub) {
+  // Ensure appropriate studio wrapper is loaded on demand
+  if (newSub === 'math') {
+    const wrap = document.getElementById('modalMathStudioWrapper');
+    if (wrap && !document.getElementById('modalMathStudioContainer')) {
+      wrap.innerHTML = buildMathStudioHTML(true);
+    }
+  } else if (newSub === 'chemistry') {
+    const wrap = document.getElementById('modalChemStudioWrapper');
+    if (wrap && !document.getElementById('modalChemStudioContainer')) {
+      wrap.innerHTML = buildChemStudioHTML(true);
+    }
+  } else if (newSub === 'physics') {
+    const wrap = document.getElementById('modalPhysicsStudioWrapper');
+    if (wrap && !document.getElementById('modalPhysicsStudioContainer') && typeof window.buildPhysicsStudioHTML === 'function') {
+      wrap.innerHTML = window.buildPhysicsStudioHTML(true);
+    }
+  } else if (newSub === 'islamic') {
+    const wrap = document.getElementById('modalIslamicStudioWrapper');
+    if (wrap && !document.getElementById('modalIslamicStudioContainer') && typeof window.buildIslamicStudioHTML === 'function') {
+      wrap.innerHTML = window.buildIslamicStudioHTML(true);
+    }
+  }
+
   const mathStudio = document.getElementById('modalMathStudioContainer');
   const toggleMathBtn = document.getElementById('btnToggleMathStudio');
   const chemStudio = document.getElementById('modalChemStudioContainer');
@@ -3927,7 +4119,12 @@ window.insertChemFormula = function(snippet) {
 };
 
 window.toggleChemStudio = function() {
-  const container = document.getElementById('modalChemStudioContainer');
+  const wrapper = document.getElementById('modalChemStudioWrapper');
+  let container = document.getElementById('modalChemStudioContainer');
+  if (!container && wrapper) {
+    wrapper.innerHTML = buildChemStudioHTML(true);
+    container = document.getElementById('modalChemStudioContainer');
+  }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
   container.style.display = isHidden ? 'block' : 'none';
@@ -4592,10 +4789,10 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           </div>
         </div>
 
-        ${buildMathStudioHTML(qSubject === 'math' || currentQuestion.type === 'math_problem')}
-        ${buildChemStudioHTML(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem')}
-        ${typeof window.buildPhysicsStudioHTML === 'function' ? window.buildPhysicsStudioHTML(qSubject === 'physics' || currentQuestion.type === 'physics_problem') : ''}
-        ${typeof window.buildIslamicStudioHTML === 'function' ? window.buildIslamicStudioHTML(qSubject === 'islamic' || currentQuestion.type === 'islamic_problem') : ''}
+        <div id="modalMathStudioWrapper">${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? buildMathStudioHTML(true) : ''}</div>
+        <div id="modalChemStudioWrapper">${(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem') ? buildChemStudioHTML(true) : ''}</div>
+        <div id="modalPhysicsStudioWrapper">${(qSubject === 'physics' || currentQuestion.type === 'physics_problem') && typeof window.buildPhysicsStudioHTML === 'function' ? window.buildPhysicsStudioHTML(true) : ''}</div>
+        <div id="modalIslamicStudioWrapper">${(qSubject === 'islamic' || currentQuestion.type === 'islamic_problem') && typeof window.buildIslamicStudioHTML === 'function' ? window.buildIslamicStudioHTML(true) : ''}</div>
 
         <textarea class="form-control" id="modalQText" dir="${isEnMode ? 'ltr' : 'rtl'}" style="text-align: ${isEnMode ? 'left' : 'right'}; font-family: ${isEnMode ? 'Inter, Roboto, sans-serif' : 'inherit'}; font-size: 0.95rem;" rows="3" placeholder="${isEnMode ? 'Write the question text or problem here...' : 'اكتب نص السؤال، المسألة، أو الفقرة هنا (أو اتركه فارغاً)...'}">${currentQuestion.text || ''}</textarea>
 
@@ -7028,25 +7225,38 @@ function updateDailyReportMetrics() {
     else arabicCount++;
   });
 
+  // Helper for Circular Meter Animation
+  function setCircularMeter(id, val, targetMax = 20) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const num = parseInt(val, 10) || 0;
+    el.innerText = num;
+
+    const card = el.closest('.daily-metric-card');
+    if (!card) return;
+    const meterFill = card.querySelector('.meter-fill');
+    if (!meterFill) return;
+
+    const circumference = 188.5; // 2 * Math.PI * 30
+    let ratio = 0;
+    if (num > 0) {
+      const maxVal = Math.max(targetMax, num);
+      ratio = Math.min(Math.max(num / maxVal, 0.18), 0.96);
+    } else {
+      ratio = 0.05; // visible accent notch for zero
+    }
+    const offset = circumference * (1 - ratio);
+    meterFill.style.strokeDashoffset = offset.toFixed(1);
+  }
+
   // Update modal metrics
-  const mToday = document.getElementById('dailyStatToday');
-  const mAr = document.getElementById('dailyStatArabic');
-  const mEn = document.getElementById('dailyStatEnglish');
-  const mMath = document.getElementById('dailyStatMath');
-  const mTot = document.getElementById('dailyStatTotal');
-  if (mToday) mToday.innerText = todayCount;
-  if (mAr) mAr.innerText = arabicCount;
-  if (mEn) mEn.innerText = englishCount;
-  if (mMath) mMath.innerText = mathCount;
-  if (mTot) mTot.innerText = bank.length;
+  setCircularMeter('dailyStatToday', todayCount, 15);
+  setCircularMeter('dailyStatArabic', arabicCount, 25);
+  setCircularMeter('dailyStatEnglish', englishCount, 25);
+  setCircularMeter('dailyStatMath', mathCount, 25);
+  setCircularMeter('dailyStatTotal', bank.length, 50);
 
   // Update Executive KPI Dashboard Counters
-  const elExams = document.getElementById('tabReportStatTotalExams');
-  const elGrades = document.getElementById('tabReportStatGrades');
-  const elModels = document.getElementById('tabReportStatModels');
-  const elQuestions = document.getElementById('tabReportStatTotalQuestions');
-  const elRecent = document.getElementById('tabReportStatRecent');
-
   const chipModels = document.getElementById('repCounterModels');
   const chipQuestions = document.getElementById('repCounterQuestions');
   const chipExams = document.getElementById('repCounterExams');
@@ -7054,41 +7264,41 @@ function updateDailyReportMetrics() {
   const modelsList = exams.filter(e => e.isModelPreset);
   const userExamsList = exams.filter(e => !e.isModelPreset);
 
-  if (elExams) elExams.innerText = userExamsList.length;
+  setCircularMeter('tabReportStatTotalExams', userExamsList.length, 10);
   if (chipExams) chipExams.innerText = userExamsList.length;
+
   if (chipModels) chipModels.innerText = modelsList.length;
-  if (elModels) elModels.innerText = modelsList.length;
-  if (elQuestions) elQuestions.innerText = bank.length;
+  setCircularMeter('tabReportStatModels', modelsList.length, 15);
+
+  setCircularMeter('tabReportStatTotalQuestions', bank.length, 50);
   if (chipQuestions) chipQuestions.innerText = bank.length;
 
-  if (elGrades) {
-    const gradesSet = new Set();
-    exams.forEach(e => {
-      const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
-      if (g && g !== 'غير محدد') gradesSet.add(g);
-    });
-    elGrades.innerText = Math.max(gradesSet.size, 1);
-  }
+  let gradesCount = 1;
+  const gradesSet = new Set();
+  exams.forEach(e => {
+    const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
+    if (g && g !== 'غير محدد') gradesSet.add(g);
+  });
+  gradesCount = Math.max(gradesSet.size, 1);
+  setCircularMeter('tabReportStatGrades', gradesCount, 6);
 
-  if (elRecent) {
-    let recentTotal = 0;
-    const now = Date.now();
-    const dayAgo = now - 24 * 3600 * 1000;
-    exams.forEach(e => {
-      const time = e.updatedAt || e.createdAt;
-      if (time) {
-        const t = new Date(time).getTime();
-        if (!isNaN(t) && t >= dayAgo) recentTotal++;
-      }
-    });
-    bank.forEach(q => {
-      if (q.createdAt) {
-        const t = new Date(q.createdAt).getTime();
-        if (!isNaN(t) && t >= dayAgo) recentTotal++;
-      }
-    });
-    elRecent.innerText = recentTotal || todayCount;
-  }
+  let recentTotal = 0;
+  const now = Date.now();
+  const dayAgo = now - 24 * 3600 * 1000;
+  exams.forEach(e => {
+    const time = e.updatedAt || e.createdAt;
+    if (time) {
+      const t = new Date(time).getTime();
+      if (!isNaN(t) && t >= dayAgo) recentTotal++;
+    }
+  });
+  bank.forEach(q => {
+    if (q.createdAt) {
+      const t = new Date(q.createdAt).getTime();
+      if (!isNaN(t) && t >= dayAgo) recentTotal++;
+    }
+  });
+  setCircularMeter('tabReportStatRecent', recentTotal || todayCount, 10);
 }
 
 window.filterDailyReport = function() {
@@ -8054,10 +8264,14 @@ window.toggleSideDrawerCollapse = function(forceState) {
    Google Official Identity Services & Cloud Synchronization (OAuth 2.0)
    ========================================================================== */
 
-const DEFAULT_GOOGLE_CLIENT_ID = '1084204892491-masaralmoallem.apps.googleusercontent.com';
+const DEFAULT_GOOGLE_CLIENT_ID = '87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com';
+window.GOOGLE_CLIENT_ID = DEFAULT_GOOGLE_CLIENT_ID;
+try {
+  localStorage.setItem('moallem_google_client_id', DEFAULT_GOOGLE_CLIENT_ID);
+} catch (e) {}
 
 window.getGoogleClientId = function() {
-  return localStorage.getItem('moallem_google_client_id') || window.GOOGLE_CLIENT_ID || DEFAULT_GOOGLE_CLIENT_ID;
+  return DEFAULT_GOOGLE_CLIENT_ID;
 };
 
 window.saveCustomGoogleClientId = function() {
@@ -8181,11 +8395,19 @@ window.initGoogleIdentityServices = function() {
   }
 };
 
-// Auto-init GIS on window load
+// Auto-init GIS on window load (safe stub)
 window.addEventListener('load', () => {
-  window.initGoogleIdentityServices();
-  window.updateGoogleClientIdUI();
+  if (typeof window.updateGoogleClientIdUI === 'function') {
+    window.updateGoogleClientIdUI();
+  }
 });
+
+// Official callback requested in Google Cloud snippet: data-callback="Loingcallback"
+window.Loingcallback = function(response) {
+  window.handleGoogleCredentialResponse(response);
+};
+window.LoginCallback = window.Loingcallback;
+window.loginCallback = window.Loingcallback;
 
 // Handle Google Credential Response from Official Button / One Tap
 window.handleGoogleCredentialResponse = function(response) {
@@ -8211,6 +8433,13 @@ window.handleGoogleCredentialResponse = function(response) {
     showToast('حدث خطأ أثناء معالجة تسجيل الدخول عبر Google', 'error');
   }
 };
+
+// Check if an authentication response arrived before app.js was loaded
+if (window._pendingGoogleAuthResponse) {
+  const pending = window._pendingGoogleAuthResponse;
+  window._pendingGoogleAuthResponse = null;
+  setTimeout(() => window.handleGoogleCredentialResponse(pending), 100);
+}
 
 // Fetch Google User Profile using OAuth 2.0 Access Token
 window.fetchGoogleUserProfile = async function(accessToken) {
@@ -8276,15 +8505,36 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
     return;
   }
 
-  // Brand-new Google user: Show Step 2 to configure school, governorate & credentials
-  pendingGoogleAccount = {
-    name: name,
+  // Brand-new Google user: Automatically create account with Google details and login instantly!
+  const nowReg = new Date();
+  const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+  const rawPrefix = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+  
+  const newGoogleAcc = {
+    id: 'usr_google_' + Date.now(),
+    name: name || ('أستاذ ' + email.split('@')[0]),
+    username: rawPrefix,
+    password: 'G_' + Math.random().toString(36).substring(2, 10),
     email: email,
-    picture: picture,
-    googleId: googleId
+    avatar: picture || '',
+    googleId: googleId || '',
+    subject: 'عام',
+    school: '',
+    governorate: '',
+    rights: `إعداد وتنظيم ${name} - جميع الحقوق محفوظة`,
+    contact: '',
+    isGoogleUser: true,
+    isVerified: true,
+    role: 'teacher',
+    isSubscribed: true,
+    isVip: true,
+    registeredAt: nowReg.toISOString(),
+    registeredDateFormatted: dateFormatted
   };
 
-  window.proceedToStep2(name, email, picture);
+  accounts.push(newGoogleAcc);
+  saveAuthAccounts(accounts);
+  window.performGoogleLoginSuccess(newGoogleAcc);
 };
 
 window.renderGoogleSavedAccountsList = function() {
@@ -8493,8 +8743,14 @@ window.openGoogleAccountModal = function() {
     if (typeof window.backToGoogleStep1 === 'function') {
       window.backToGoogleStep1();
     }
-    window.updateGoogleClientIdUI();
-    window.initGoogleIdentityServices();
+    // Initialize Google Identity Services with real client ID
+    if (typeof window.initGoogleIdentityServices === 'function') {
+      window.initGoogleIdentityServices();
+    }
+    // Render saved Google accounts list for 1-click instant login
+    if (typeof window.renderGoogleSavedAccountsList === 'function') {
+      window.renderGoogleSavedAccountsList();
+    }
 
     const passBox = document.getElementById('googleExistingAccountPasswordBox');
     if (passBox) passBox.style.display = 'none';
@@ -8503,6 +8759,7 @@ window.openGoogleAccountModal = function() {
     if (input) {
       input.value = '';
       input.classList.remove('input-error');
+      setTimeout(() => input.focus(), 150);
     }
     const badge = document.getElementById('googleEmailStatusBadge');
     if (badge) {
@@ -8513,7 +8770,7 @@ window.openGoogleAccountModal = function() {
     }
     const notice = document.getElementById('googleEmailNoticeText');
     if (notice) {
-      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). تم إلغاء أي دخول مباشر بدون مصادقة.';
+      notice.innerHTML = 'أدخل بريد Gmail الشخصي الخاص بك لفتح حسابك ومزامنة اختباراتك فوراً.';
     }
   }
 };
@@ -8552,42 +8809,58 @@ let pendingGoogleAccount = {
 
 // Launch Official Google Popup / Account Chooser
 window.launchGoogleRealPopup = function() {
-  const hasCustomClientId = !!localStorage.getItem('moallem_google_client_id');
+  const statusEl = document.getElementById('googleAuthStatusNotice');
+  if (statusEl) statusEl.style.display = 'block';
 
-  // If user has NOT configured their real Google Cloud project Client ID:
-  // DO NOT launch the popup that hits Google's 404 error! Guide them cleanly:
-  if (!hasCustomClientId) {
-    const input = document.getElementById('googlePersonalEmailInput');
-    if (input) {
-      input.focus();
-      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    showToast('لتفادي خطأ 404: يرجى كتابة بريد Gmail الخاص بك مباشرة في الحقل أعلاه، أو إدخال معرّف Client ID الخاص بمشروعك في إعدادات Google Cloud أدناه! 💡', 'info');
+  // 1. If GSI rendered button exists inside .g_id_signin, trigger it directly
+  const gsiBtn = document.querySelector('.g_id_signin div[role="button"], #googleOfficialGsiButton div[role="button"]');
+  if (gsiBtn) {
+    if (statusEl) statusEl.style.display = 'none';
+    gsiBtn.click();
     return;
   }
 
-  // If custom client ID is present, run official token client safely
+  // 2. Initialize if not ready
+  if (!googleTokenClient && typeof google !== 'undefined' && google.accounts) {
+    window.initGoogleIdentityServices();
+  }
+
+  // 3. Try GSI prompt (One Tap / Account Chooser)
+  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+    try {
+      google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // If One Tap cannot be displayed, try OAuth token client or modal
+          if (googleTokenClient) {
+            try { googleTokenClient.requestAccessToken({ prompt: 'select_account' }); } catch(err) {}
+          } else if (typeof window.openGoogleAccountModal === 'function') {
+            window.openGoogleAccountModal();
+          }
+        }
+      });
+      if (statusEl) statusEl.style.display = 'none';
+      return;
+    } catch(e) {
+      console.warn('GSI prompt notification:', e);
+    }
+  }
+
+  // 4. Try OAuth2 token client
   if (googleTokenClient) {
     try {
-      const statusEl = document.getElementById('googleAuthStatusNotice');
-      if (statusEl) statusEl.style.display = 'block';
       googleTokenClient.requestAccessToken({ prompt: 'select_account' });
+      if (statusEl) statusEl.style.display = 'none';
       return;
     } catch (e) {
       console.warn('Failed to launch token client popup:', e);
     }
   }
 
-  if (typeof google !== 'undefined' && google.accounts) {
-    window.initGoogleIdentityServices();
-    if (googleTokenClient) {
-      try {
-        const statusEl = document.getElementById('googleAuthStatusNotice');
-        if (statusEl) statusEl.style.display = 'block';
-        googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-        return;
-      } catch (e) {}
-    }
+  if (statusEl) statusEl.style.display = 'none';
+  if (typeof window.openGoogleAccountModal === 'function') {
+    window.openGoogleAccountModal();
+  } else {
+    showToast('جارٍ تشغيل مصادقة Google... يرجى اختيار حسابك من نافذة Google 💡', 'info');
   }
 };
 
@@ -8751,6 +9024,8 @@ window.completeGoogleLoginWithProfile = function() {
     return;
   }
 
+  const nowReg = new Date();
+  const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
   const finalGoogleAccount = {
     id: 'usr_google_' + Date.now(),
     name: name,
@@ -8768,11 +9043,16 @@ window.completeGoogleLoginWithProfile = function() {
     isVerified: true,
     role: 'viewer',
     isSubscribed: false,
-    isVip: false
+    isVip: false,
+    registeredAt: nowReg.toISOString(),
+    registeredDateFormatted: dateFormatted
   };
 
   accounts.push(finalGoogleAccount);
   saveAuthAccounts(accounts);
+  if (typeof window.renderSubscribersManagementUI === 'function') {
+    window.renderSubscribersManagementUI();
+  }
 
   // Update teacherProfile state
   teacherProfile = { ...teacherProfile, ...finalGoogleAccount };
@@ -8827,35 +9107,9 @@ window.performGoogleLoginSuccess = async function(account) {
   const emailText = account.email ? `ومربوط بالبريد: (${account.email}) ✔` : '';
   showToast(`مرحباً بك أستاذ ${account.name || account.username}! ${vipText} • ${emailText}`, isSubscribed ? 'success' : 'info');
 
-  // Automatically attempt to fetch cloud-synced questions & archive from server
-  try {
-    const res = await fetch(`/api/cloud_sync?email=${encodeURIComponent(account.email)}`);
-    const json = await res.json();
-    if (json.success && json.exists && json.data) {
-      const data = json.data;
-      let restoredCount = 0;
-      if (Array.isArray(data.questionsBank) && data.questionsBank.length > 0) {
-        localStorage.setItem('moallem_questions_bank', JSON.stringify(data.questionsBank));
-        restoredCount += data.questionsBank.length;
-      }
-      if (Array.isArray(data.examsArchive) && data.examsArchive.length > 0) {
-        localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(data.examsArchive));
-        updateArchiveBadge();
-      }
-      if (data.currentExam && (!appState.questions || appState.questions.length === 0)) {
-        if (data.currentExam.header) appState.header = data.currentExam.header;
-        if (data.currentExam.questions) appState.questions = data.currentExam.questions;
-        syncHeaderInputs();
-      }
-      renderAll();
-      if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-      showToast(`تم استرجاع ومزامنة بنك أسئلتك واختباراتك سحابياً من حسابك (${restoredCount} سؤال) بنجاح! ☁️🎉`, 'success');
-    } else {
-      // First time on cloud for this email -> auto backup current local state to cloud
-      window.syncCurrentDataToCloud(true);
-    }
-  } catch (err) {
-    console.log('Local cloud sync initialized');
+  // Automatically attempt to restore cloud-synced questions & archive from server
+  if (typeof window.restoreUserDataFromServer === 'function') {
+    await window.restoreUserDataFromServer(account);
   }
 
   window.updateCloudModalUI();
@@ -8875,7 +9129,7 @@ window.closeCloudTransferModal = function() {
 window.updateCloudModalUI = function() {
   const user = getCurrentUser() || {};
   const emailEl = document.getElementById('cloudAccountEmailDisplay');
-  if (emailEl) emailEl.innerText = user.email || 'hussein.teacher@gmail.com';
+  if (emailEl) emailEl.innerText = user.email || user.username || 'hussein.teacher@gmail.com';
 
   const qBank = getQuestionsHistoryBank();
   const archive = getSavedExamsArchive();
@@ -8885,18 +9139,48 @@ window.updateCloudModalUI = function() {
   if (exCountEl) exCountEl.innerText = archive.length;
 };
 
-window.syncCurrentDataToCloud = async function(isSilent = false) {
-  const user = getCurrentUser() || {};
-  const email = user.email || localStorage.getItem('moallem_last_google_email') || 'hussein.teacher@gmail.com';
-  const questionsBank = getQuestionsHistoryBank();
-  const examsArchive = getSavedExamsArchive();
+/* ==========================================================================
+   Comprehensive Cross-Device Cloud Sync Engine (مزامنة سحابية شاملة بين الحاسبة والهاتف)
+   ========================================================================== */
+
+let cloudAutoSyncTimer = null;
+function scheduleCloudAutoSync(delay = 2500) {
+  if (cloudAutoSyncTimer) clearTimeout(cloudAutoSyncTimer);
+  cloudAutoSyncTimer = setTimeout(() => {
+    const user = getCurrentUser();
+    if (user && user.id && user.id !== 'usr_guest') {
+      window.syncUserDataToServer(user, true);
+    }
+  }, delay);
+}
+window.scheduleCloudAutoSync = scheduleCloudAutoSync;
+
+window.syncUserDataToServer = async function(user, isSilent = false) {
+  if (!user || !user.id || user.id === 'usr_guest') return;
+  const email = (user.email || '').trim().toLowerCase();
+  const userId = (user.id || user.username || '').trim().toLowerCase();
+  const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
+  const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
+
+  let questionsBank = [];
+  try {
+    const rawBank = localStorage.getItem(bankStorageKey) || localStorage.getItem('moallem_questions_bank');
+    if (rawBank) questionsBank = JSON.parse(rawBank);
+  } catch(e) {}
+
+  let examsArchive = [];
+  try {
+    examsArchive = getSavedExamsArchive();
+  } catch(e) {}
 
   const payload = {
     email: email,
-    teacherName: user.name || teacherProfile.name || 'أستاذ حسين علي',
+    userId: userId,
+    teacherName: user.name || (teacherProfile && teacherProfile.name) || '',
     questionsBank: questionsBank,
     examsArchive: examsArchive,
     currentExam: {
+      currentArchiveId: appState.currentArchiveId,
       header: appState.header,
       questions: appState.questions,
       settings: appState.settings
@@ -8904,58 +9188,119 @@ window.syncCurrentDataToCloud = async function(isSilent = false) {
     savedAt: new Date().toISOString()
   };
 
-  // 1. Save to local scoped cloud key
-  localStorage.setItem(`moallem_cloud_sync_${email}`, JSON.stringify(payload));
+  // Local backup keys
+  if (email) {
+    localStorage.setItem(`moallem_cloud_sync_${email}`, JSON.stringify(payload));
+  }
+  localStorage.setItem(`moallem_cloud_sync_${userId}`, JSON.stringify(payload));
 
-  // 2. Send to server 24/7 bot API
+  // Also sync to Google Firebase Cloud (Multi-device worldwide sync)
+  if (typeof window.syncToFirestoreCloud === 'function') {
+    window.syncToFirestoreCloud(isSilent).catch(() => {});
+  }
+
   try {
-    const res = await fetch('/api/cloud_sync', {
+    const res = await fetch(getBackendApiUrl('/api/cloud_sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const resJson = await res.json();
-    if (resJson.success && !isSilent) {
-      showToast(`تم حفظ ومزامنة أسئلتك (${questionsBank.length} سؤال) في السحابة بنجاح! ☁️`, 'success');
+    if (res.ok) {
+      const resJson = await res.json();
+      if (!isSilent && resJson.success) {
+        showToast('تمت مزامنة وحفظ كافة أسئلتك واختباراتك سحابياً بنجاح! ☁️', 'success');
+      }
     }
   } catch (e) {
     if (!isSilent) {
-      showToast(`تم حفظ أسئلتك سحابياً على جهازك بنجاح! ☁️`, 'success');
+      showToast('تم الحفظ محلياً على جهازك 💾', 'info');
+    }
+  }
+  if (typeof window.updateCloudModalUI === 'function') {
+    window.updateCloudModalUI();
+  }
+};
+window.syncCurrentDataToCloud = window.syncUserDataToServer;
+
+window.restoreUserDataFromServer = async function(user) {
+  if (!user || !user.id || user.id === 'usr_guest') return false;
+  const email = (user.email || '').trim().toLowerCase();
+  const userId = (user.id || user.username || '').trim().toLowerCase();
+  const username = (user.username || '').trim().toLowerCase();
+
+  // If user has a Firebase UID or is Google user, also restore from Google Firestore
+  if (typeof window.restoreFromFirestore === 'function') {
+    const fbUid = user.firebaseUid || (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser && firebase.auth().currentUser.uid);
+    if (fbUid) {
+      try {
+        await window.restoreFromFirestore(fbUid);
+      } catch (e) {}
     }
   }
 
-  window.updateCloudModalUI();
-};
-
-window.restoreDataFromCloudServer = async function() {
-  const user = getCurrentUser() || {};
-  const email = user.email || localStorage.getItem('moallem_last_google_email') || 'hussein.teacher@gmail.com';
+  const userStorageKey = getAccountStorageKey('moallem_exam_data');
+  const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
+  const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
 
   try {
-    const res = await fetch(`/api/cloud_sync?email=${encodeURIComponent(email)}`);
+    const query = `email=${encodeURIComponent(email)}&userId=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}`;
+    const res = await fetch(getBackendApiUrl(`/api/cloud_sync?${query}`), { cache: 'no-store' });
+    if (!res.ok) return false;
     const json = await res.json();
-    if (json.success && json.exists && json.data) {
+    if (json && json.success && json.exists && json.data) {
       const data = json.data;
-      if (Array.isArray(data.questionsBank)) {
+      let restoredCount = 0;
+
+      // 1. Restore Questions Bank
+      if (Array.isArray(data.questionsBank) && data.questionsBank.length > 0) {
+        localStorage.setItem(bankStorageKey, JSON.stringify(data.questionsBank));
         localStorage.setItem('moallem_questions_bank', JSON.stringify(data.questionsBank));
+        localStorage.setItem('moallem_questions_history_bank', JSON.stringify(data.questionsBank));
+        restoredCount += data.questionsBank.length;
       }
-      if (Array.isArray(data.examsArchive)) {
+
+      // 2. Restore Exams Archive
+      if (Array.isArray(data.examsArchive) && data.examsArchive.length > 0) {
+        localStorage.setItem(archiveStorageKey, JSON.stringify(data.examsArchive));
         localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(data.examsArchive));
+        updateArchiveBadge();
+        if (typeof renderArchiveList === 'function') renderArchiveList();
       }
+
+      // 3. Restore Current Exam (if workspace is empty or matches)
       if (data.currentExam) {
-        if (data.currentExam.header) appState.header = data.currentExam.header;
-        if (data.currentExam.questions) appState.questions = data.currentExam.questions;
-        syncHeaderInputs();
+        const cur = data.currentExam;
+        localStorage.setItem(userStorageKey, JSON.stringify(cur));
+        localStorage.setItem('moallem_exam_data', JSON.stringify(cur));
+
+        if ((!appState.questions || appState.questions.length === 0) && Array.isArray(cur.questions) && cur.questions.length > 0) {
+          appState.questions = cur.questions;
+          if (cur.header) appState.header = { ...appState.header, ...cur.header };
+          if (cur.settings) appState.settings = { ...appState.settings, ...cur.settings };
+          if (cur.currentArchiveId) appState.currentArchiveId = cur.currentArchiveId;
+          syncHeaderInputs();
+          applyProfileToExamHeader();
+        }
       }
+
       renderAll();
-      updateArchiveBadge();
       if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-      showToast(`تم استرجاع جميع أسئلتك (${(data.questionsBank || []).length} سؤال) واختباراتك من السحابة بنجاح! 🎉`, 'success');
-    } else {
-      showToast('لا توجد بيانات سحابية سابقة مسجلة لهذا البريد بعد. جرب الضغط على "مزامنة وحفظ الآن"', 'info');
+
+      const totalItems = restoredCount + (Array.isArray(data.examsArchive) ? data.examsArchive.length : 0);
+      if (totalItems > 0) {
+        showToast(`تمت مزامنة واسترجاع جميع أسئلتك واختباراتك (${restoredCount} سؤال) من السيرفر بنجاح! ☁️📱`, 'success');
+      }
+      return true;
     }
   } catch (err) {
-    showToast('تعذر الاتصال بالسيرفر السحابي حالياً، يمكنك استخدام رمز المزامنة المنسوخ.', 'error');
+    console.log('Server cloud restore check:', err);
+  }
+  return false;
+};
+window.restoreDataFromCloudServer = function() {
+  const user = getCurrentUser();
+  if (user) {
+    return window.restoreUserDataFromServer(user);
   }
 };
 
@@ -9056,6 +9401,402 @@ window.handleUploadCloudBackup = function(event) {
     }
   };
   reader.readAsText(file);
+
+
+/* ==========================================================================
+   Comprehensive Mobile & Cross-Device Instant Synchronization Engine
+   محرك المزامنة الشامل بين اللابتوب والموبايل - بدون انقطاع ولا فقدان بيانات
+   ========================================================================== */
+
+function buildFullSyncPayload() {
+  const user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+  const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+  const qBank = typeof getQuestionsHistoryBank === 'function' ? getQuestionsHistoryBank() : [];
+  const archive = typeof getSavedExamsArchive === 'function' ? getSavedExamsArchive() : [];
+  
+  return {
+    app: 'Moallem Pro',
+    version: '5.7',
+    exportedAt: new Date().toISOString(),
+    accounts: accounts,
+    currentUser: user,
+    teacherProfile: typeof teacherProfile !== 'undefined' ? teacherProfile : {},
+    questionsBank: qBank,
+    examsArchive: archive,
+    currentExam: {
+      currentArchiveId: appState.currentArchiveId,
+      header: appState.header,
+      questions: appState.questions,
+      settings: appState.settings
+    }
+  };
+}
+window.buildFullSyncPayload = buildFullSyncPayload;
+
+window.applySyncPayload = function(data, showNotification = true) {
+  if (!data || typeof data !== 'object') {
+    if (showNotification) showToast('بيانات المزامنة غير صالحة أو تالفة!', 'error');
+    return false;
+  }
+
+  let importedAccountsCount = 0;
+  let importedExamsCount = 0;
+  let importedQuestionsCount = 0;
+
+  // 1. Merge Accounts
+  if (Array.isArray(data.accounts) && data.accounts.length > 0) {
+    try {
+      const localAccounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+      const accMap = new Map();
+      localAccounts.forEach(a => {
+        const k = a.id || a.email || a.username;
+        if (k) accMap.set(k, a);
+      });
+      data.accounts.forEach(a => {
+        const k = a.id || a.email || a.username;
+        if (k) {
+          if (accMap.has(k)) {
+            accMap.set(k, { ...accMap.get(k), ...a });
+          } else {
+            accMap.set(k, a);
+            importedAccountsCount++;
+          }
+        }
+      });
+      const mergedAccounts = Array.from(accMap.values());
+      localStorage.setItem('moallem_auth_accounts', JSON.stringify(mergedAccounts));
+      if (typeof saveAuthAccounts === 'function') {
+        saveAuthAccounts(mergedAccounts);
+      }
+    } catch (e) {
+      console.error('Sync accounts error:', e);
+    }
+  }
+
+  // 2. Set Current User Session (if supplied)
+  if (data.currentUser && data.currentUser.id && data.currentUser.id !== 'usr_guest') {
+    try {
+      const u = data.currentUser;
+      localStorage.setItem('moallem_current_user', JSON.stringify(u));
+      sessionStorage.setItem('moallem_current_user', JSON.stringify(u));
+      localStorage.setItem('moallem_active_session', JSON.stringify({
+        userId: u.id,
+        email: u.email,
+        loginAt: Date.now()
+      }));
+    } catch (e) {
+      console.error('Sync currentUser error:', e);
+    }
+  }
+
+  const activeUser = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || data.currentUser || {};
+  const userArchiveKey = typeof getAccountStorageKey === 'function' ? getAccountStorageKey('moallem_saved_exams_archive') : 'moallem_saved_exams_archive';
+  const userBankKey = typeof getAccountStorageKey === 'function' ? getAccountStorageKey('moallem_questions_history_bank') : 'moallem_questions_history_bank';
+
+  // 3. Merge Exams Archive
+  if (Array.isArray(data.examsArchive) && data.examsArchive.length > 0) {
+    try {
+      let existingArchive = [];
+      try {
+        const raw = localStorage.getItem(userArchiveKey) || localStorage.getItem('moallem_saved_exams_archive');
+        if (raw) existingArchive = JSON.parse(raw);
+      } catch(e) {}
+      
+      const examMap = new Map();
+      existingArchive.forEach(item => {
+        if (item && item.id) examMap.set(item.id, item);
+      });
+      data.examsArchive.forEach(item => {
+        if (item && item.id) {
+          if (!examMap.has(item.id)) importedExamsCount++;
+          examMap.set(item.id, item);
+        }
+      });
+      const mergedExams = Array.from(examMap.values());
+      localStorage.setItem(userArchiveKey, JSON.stringify(mergedExams));
+      localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(mergedExams));
+      updateArchiveBadge();
+      if (typeof renderArchiveList === 'function') renderArchiveList();
+    } catch (e) {
+      console.error('Sync examsArchive error:', e);
+    }
+  }
+
+  // 4. Merge Questions Bank
+  if (Array.isArray(data.questionsBank) && data.questionsBank.length > 0) {
+    try {
+      let existingBank = [];
+      try {
+        const raw = localStorage.getItem(userBankKey) || localStorage.getItem('moallem_questions_bank') || localStorage.getItem('moallem_questions_history_bank');
+        if (raw) existingBank = JSON.parse(raw);
+      } catch(e) {}
+
+      const qMap = new Map();
+      existingBank.forEach(q => {
+        const qId = q.id || (q.text || '').slice(0, 40);
+        if (qId) qMap.set(qId, q);
+      });
+      data.questionsBank.forEach(q => {
+        const qId = q.id || (q.text || '').slice(0, 40);
+        if (qId) {
+          if (!qMap.has(qId)) importedQuestionsCount++;
+          qMap.set(qId, q);
+        }
+      });
+      const mergedBank = Array.from(qMap.values());
+      localStorage.setItem(userBankKey, JSON.stringify(mergedBank));
+      localStorage.setItem('moallem_questions_bank', JSON.stringify(mergedBank));
+      localStorage.setItem('moallem_questions_history_bank', JSON.stringify(mergedBank));
+    } catch (e) {
+      console.error('Sync questionsBank error:', e);
+    }
+  }
+
+  // 5. Restore Teacher Profile
+  if (data.teacherProfile && typeof data.teacherProfile === 'object') {
+    try {
+      teacherProfile = { ...teacherProfile, ...data.teacherProfile };
+      localStorage.setItem('moallem_teacher_profile', JSON.stringify(teacherProfile));
+      if (activeUser && activeUser.id) {
+        localStorage.setItem(`moallem_teacher_profile_${activeUser.id}`, JSON.stringify(teacherProfile));
+      }
+      applyProfileToExamHeader();
+    } catch (e) {
+      console.error('Sync teacherProfile error:', e);
+    }
+  }
+
+  // 6. Restore Current Exam
+  if (data.currentExam && typeof data.currentExam === 'object') {
+    try {
+      const cur = data.currentExam;
+      if (Array.isArray(cur.questions) && cur.questions.length > 0) {
+        appState.questions = cur.questions;
+      }
+      if (cur.header) appState.header = { ...appState.header, ...cur.header };
+      if (cur.settings) appState.settings = { ...appState.settings, ...cur.settings };
+      if (cur.currentArchiveId) appState.currentArchiveId = cur.currentArchiveId;
+      syncHeaderInputs();
+      applyProfileToExamHeader();
+    } catch (e) {
+      console.error('Sync currentExam error:', e);
+    }
+  }
+
+  // 7. Refresh Application UI
+  if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+  if (typeof checkAuthGatekeeper === 'function') checkAuthGatekeeper();
+  renderAll();
+  updateArchiveBadge();
+  if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+
+  // 8. Push to local server if available
+  if (typeof syncAccountsWithServer === 'function') {
+    syncAccountsWithServer().catch(() => {});
+  }
+  if (typeof scheduleCloudAutoSync === 'function') {
+    scheduleCloudAutoSync(500);
+  }
+
+  if (showNotification) {
+    showToast(`تمت المزامنة بنجاح! تم استيراد الحسابات (${data.accounts ? data.accounts.length : 0}) والاختبارات (${data.examsArchive ? data.examsArchive.length : 0}) 🚀📱`, 'success');
+  }
+  return true;
+};
+
+window.checkAndApplyUrlSyncToken = function() {
+  try {
+    let token = '';
+    // 1. Check Hash: #sync=...
+    if (window.location.hash && window.location.hash.includes('sync=')) {
+      const match = window.location.hash.match(/sync=([^&]+)/);
+      if (match && match[1]) token = match[1];
+    }
+    // 2. Check Query: ?sync_token=...
+    if (!token && window.location.search && window.location.search.includes('sync_token=')) {
+      const urlParams = new URLSearchParams(window.location.search);
+      token = urlParams.get('sync_token');
+    }
+
+    if (token) {
+      const raw = decodeURIComponent(atob(token.trim()));
+      const data = JSON.parse(raw);
+      if (data && typeof data === 'object') {
+        const success = window.applySyncPayload(data, true);
+        if (success) {
+          // Clean URL without reloading
+          const cleanUrl = window.location.pathname;
+          window.history.replaceState(null, '', cleanUrl);
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Failed to parse sync token from URL:', err);
+  }
+};
+
+window.openMobileSyncModal = function() {
+  const modal = document.getElementById('mobileSyncModal');
+  if (!modal) return;
+
+  const user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+  const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+  const archive = typeof getSavedExamsArchive === 'function' ? getSavedExamsArchive() : [];
+
+  // Update badges
+  const accNameEl = document.getElementById('syncCurrentAccountName');
+  if (accNameEl) accNameEl.innerText = user.name || user.username || 'المدير العام';
+
+  const accBadge = document.getElementById('syncAccountsCountBadge');
+  if (accBadge) accBadge.innerText = `${accounts.length} حساب`;
+
+  const examBadge = document.getElementById('syncExamsCountBadge');
+  if (examBadge) examBadge.innerText = `${archive.length} اختبار`;
+
+  // Determine direct URL
+  let baseUrl = window.location.origin;
+  if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
+    baseUrl = 'http://192.168.0.29:8080';
+  }
+  const wifiUrlEl = document.getElementById('syncWifiDirectUrl');
+  if (wifiUrlEl) wifiUrlEl.innerText = baseUrl;
+
+  // Build Payload & Token
+  const payload = buildFullSyncPayload();
+  const token = btoa(encodeURIComponent(JSON.stringify(payload)));
+  window._lastMobileSyncToken = token;
+
+  // Direct sync URL
+  const syncDirectUrl = `${baseUrl.replace(/\/+$/, '')}/#sync=${token}`;
+  window._lastMobileSyncDirectUrl = syncDirectUrl;
+
+  // Render QR Code
+  const qrContainer = document.getElementById('mobileSyncQRContainer');
+  if (qrContainer) {
+    qrContainer.innerHTML = '';
+    if (window.MoallemQRCode && typeof window.MoallemQRCode.createQRCodeSVG === 'function') {
+      const qrEl = window.MoallemQRCode.createQRCodeSVG(syncDirectUrl, 210);
+      qrContainer.appendChild(qrEl);
+    } else {
+      qrContainer.innerHTML = `<a href="${syncDirectUrl}" target="_blank" class="btn btn-primary" style="padding: 0.5rem 1rem;">فتح رابط المزامنة المباشر</a>`;
+    }
+  }
+
+  modal.classList.add('open');
+};
+
+window.closeMobileSyncModal = function() {
+  const modal = document.getElementById('mobileSyncModal');
+  if (modal) modal.classList.remove('open');
+};
+
+window.refreshMobileSyncPayload = function() {
+  window.openMobileSyncModal();
+  showToast('تم تحديث باركود المزامنة بأحدث الاختبارات والأسئلة الحالية! 🔄', 'info');
+};
+
+window.copyDirectMobileSyncLink = function() {
+  const url = window._lastMobileSyncDirectUrl;
+  if (!url) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('تم نسخ رابط المزامنة المباشر! أرسله للموبايل عبر واتساب أو تيليجرام 📱🔗', 'success');
+    }).catch(() => {
+      prompt('انسخ رابط المزامنة السريع التالي:', url);
+    });
+  } else {
+    prompt('انسخ رابط المزامنة السريع التالي:', url);
+  }
+};
+
+window.copyWifiDirectUrl = function() {
+  let baseUrl = window.location.origin;
+  if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
+    baseUrl = 'http://192.168.0.29:8080';
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(baseUrl).then(() => {
+      showToast('تم نسخ رابط الواي فاي المباشر: ' + baseUrl + ' 📋', 'success');
+    }).catch(() => {
+      prompt('رابط الواي فاي المباشر:', baseUrl);
+    });
+  } else {
+    prompt('رابط الواي فاي المباشر:', baseUrl);
+  }
+};
+
+window.copyFullSyncToken = function() {
+  const token = window._lastMobileSyncToken;
+  if (!token) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(token).then(() => {
+      showToast('تم نسخ كود المزامنة الشامل للحافظة! 📋', 'success');
+    }).catch(() => {
+      prompt('كود المزامنة الشامل:', token);
+    });
+  } else {
+    prompt('كود المزامنة الشامل:', token);
+  }
+};
+
+window.pasteAndImportFullSyncToken = function() {
+  const token = prompt('الصق كود المزامنة الشامل هنا لمزامنة كافة الحسابات والأسئلة:');
+  if (!token || !token.trim()) return;
+  try {
+    const raw = decodeURIComponent(atob(token.trim()));
+    const data = JSON.parse(raw);
+    const success = window.applySyncPayload(data, true);
+    if (success) {
+      window.closeMobileSyncModal();
+    }
+  } catch (e) {
+    showToast('كود المزامنة غير صالح أو تالف!', 'error');
+  }
+};
+
+window.importFullSyncFile = function(event) {
+  const file = event && event.target && event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      const success = window.applySyncPayload(data, true);
+      if (success) {
+        window.closeMobileSyncModal();
+      }
+    } catch (err) {
+      showToast('فشل قراءة ملف النسخة الاحتياطية. تأكد أنه ملف JSON صالح.', 'error');
+    }
+  };
+  reader.readAsText(file);
+};
+
+// Automatic listener on tab focus / visibilitychange
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    if (user && user.id && user.id !== 'usr_guest') {
+      if (typeof window.restoreUserDataFromServer === 'function') {
+        window.restoreUserDataFromServer(user).catch(() => {});
+      }
+    }
+    if (typeof syncAccountsWithServer === 'function') {
+      syncAccountsWithServer().catch(() => {});
+    }
+  }
+});
+
+// Run immediate check for URL sync token on load
+if (typeof window !== 'undefined') {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.checkAndApplyUrlSyncToken();
+    });
+  } else {
+    window.checkAndApplyUrlSyncToken();
+  }
+}
 };
 
 /* ==========================================================================
@@ -9098,13 +9839,32 @@ function requireSubscription(featureName = 'هذه الميزة') {
   if (isUserSubscribedOrAdmin()) {
     return true;
   }
-  showToast('🔒 اشترك لتتيح لك جميع الصلاحيات! (الباقة السنوية 50 ألف د.ع)', 'warning');
+  showToast('🔒 اشترك لتتيح لك جميع الصلاحيات! (باقات مرنة تبدأ من 25 ألف د.ع)', 'warning');
   if (typeof window.openSubscriptionModal === 'function') {
     window.openSubscriptionModal();
   }
   return false;
 }
 window.requireSubscription = requireSubscription;
+
+window.selectSubscriptionPlan = function(planKey) {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const userIdentifier = current ? ` (${current.name || current.username} - ${current.email || ''})` : '';
+
+  let planMsg = '';
+  if (planKey === '1_month') {
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاشتراك في (الباقة الشهرية - 25,000 د.ع) لتفعيل حسابي${userIdentifier}.`;
+  } else if (planKey === '4_months' || planKey === '3_months') {
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفادة من عرض الأكثر طلباً (باقة الـ 4 أشهر - 75,000 د.ع بدلاً من 100 ألف / شهر مجاناً) لتفعيل حسابي${userIdentifier}.`;
+  } else if (planKey === '1_year') {
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود تفعيل العرض السنوي الشامل بنصف السعر (الباقة السنوية الأكاديمية - 150,000 د.ع بدلاً من 300 ألف) لتفعيل حسابي${userIdentifier}.`;
+  } else {
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفسار عن باقات الاشتراك وتفعيل حسابي${userIdentifier}.`;
+  }
+
+  const url = `https://wa.me/9647700000000?text=${encodeURIComponent(planMsg)}`;
+  window.open(url, '_blank');
+};
 
 window.openSubscriptionModal = function() {
   const modal = document.getElementById('subscriptionModal');
@@ -9130,9 +9890,9 @@ window.toggleVipSubscriptionDemo = function() {
     return;
   }
 
-  showToast('🔒 جميع الحسابات المنشأة تخضع لعملية دفع الاشتراك السنوي (50,000 د.ع) ما عدا حساب الآدمن. يرجى إتمام التحويل وإرسال إشعار الدفع للإدارة لتفعيل حسابك 💳', 'warning');
+  showToast('🔒 اختر الخطة المناسبة لك وسيتم تحويلك للواتساب لإرسال إشعار الدفع وتفعيل حسابك فوراً 💳', 'info');
   
-  const textMsg = encodeURIComponent(`مرحباً إدارة منصة المعلم، أود إرسال إشعار تسديد رسوم الاشتراك السنوي (50 ألف دينار) لتفعيل حسابي: (${current.name || current.username} - ${current.email || ''})`);
+  const textMsg = encodeURIComponent(`مرحباً إدارة منصة مسار المعلم، أود إرسال إشعار تسديد رسوم الاشتراك لتفعيل حسابي: (${current.name || current.username} - ${current.email || ''})`);
   window.open(`https://wa.me/9647700000000?text=${textMsg}`, '_blank');
 };
 
@@ -9169,9 +9929,9 @@ window.updateVipUIStatus = function() {
       if (isAdmin) {
         span.innerHTML = 'باقة الآدمن (كافة الصلاحيات 👑)';
       } else if (isSubscribed) {
-        span.innerHTML = 'الاشتراك السنوي (مفعل 👑)';
+        span.innerHTML = 'الاشتراك مفعل 👑';
       } else {
-        span.innerHTML = 'الباقة السنوية (50,000 د.ع) 🔒';
+        span.innerHTML = 'خطط الاشتراك (من 25 ألف) 🔒';
       }
     }
   }
@@ -9295,16 +10055,46 @@ window.closeSubscriptionManagementModal = function() {
   if (modal) modal.classList.remove('open');
 };
 
+window.currentSubscribersFilterMode = 'all';
+
+window.setSubscribersFilter = function(mode) {
+  window.currentSubscribersFilterMode = mode;
+  ['All', 'Pending', 'Active'].forEach(m => {
+    const btn = document.getElementById(`subFilter${m}Btn`);
+    if (btn) {
+      if (m.toLowerCase() === mode.toLowerCase()) {
+        btn.classList.add('active');
+        btn.style.fontWeight = '800';
+        btn.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.25)';
+      } else {
+        btn.classList.remove('active');
+        btn.style.fontWeight = 'normal';
+        btn.style.boxShadow = 'none';
+      }
+    }
+  });
+  window.renderSubscribersManagementUI();
+};
+
 window.renderSubscribersManagementUI = function() {
-  const countEl = document.getElementById('subscribersManagementCount');
+  const activeCountEl = document.getElementById('subscribersManagementCount');
+  const totalCountEl = document.getElementById('subscribersTotalAccountsCount');
+  const pendingCountEl = document.getElementById('subscribersPendingCount');
   const tbody = document.getElementById('subscribersListTableBody');
   const drawerSubCountBadge = document.getElementById('drawerSubscribersCountBadge');
+
+  const pillAll = document.getElementById('pillCountAll');
+  const pillPending = document.getElementById('pillCountPending');
+  const pillActive = document.getElementById('pillCountActive');
 
   const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
   const now = Date.now();
 
-  const activeSubs = accounts.filter(acc => {
-    if (acc.isAdmin || acc.role === 'admin' || acc.username === 'admin') return false;
+  // Exclude administrative account (Super Admin)
+  const teacherAccounts = accounts.filter(acc => !acc.isAdmin && acc.role !== 'admin' && acc.username !== 'admin' && acc.id !== 'usr_admin');
+
+  // Check active status
+  function isAccountActiveSub(acc) {
     const isSub = acc.isSubscribed || acc.isVip || (acc.id && localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
     if (!isSub) return false;
     if (acc.subscriptionExpiresAt) {
@@ -9312,66 +10102,218 @@ window.renderSubscribersManagementUI = function() {
       if (!isNaN(expTime) && now > expTime) return false;
     }
     return true;
-  });
+  }
 
-  if (countEl) countEl.innerText = activeSubs.length;
-  if (drawerSubCountBadge) drawerSubCountBadge.innerText = `${activeSubs.length} مشترك 👑`;
+  const activeAccounts = teacherAccounts.filter(a => isAccountActiveSub(a));
+  const pendingAccounts = teacherAccounts.filter(a => !isAccountActiveSub(a));
+
+  // Update counters
+  if (activeCountEl) activeCountEl.innerText = activeAccounts.length;
+  if (totalCountEl) totalCountEl.innerText = teacherAccounts.length;
+  if (pendingCountEl) pendingCountEl.innerText = pendingAccounts.length;
+  if (drawerSubCountBadge) drawerSubCountBadge.innerText = `${activeAccounts.length} مشترك 👑`;
+
+  if (pillAll) pillAll.innerText = teacherAccounts.length;
+  if (pillPending) pillPending.innerText = pendingAccounts.length;
+  if (pillActive) pillActive.innerText = activeAccounts.length;
 
   if (!tbody) return;
 
-  if (activeSubs.length === 0) {
+  // Search filter
+  const searchInput = document.getElementById('subscribersSearchFilterInput');
+  const searchQuery = searchInput ? (searchInput.value || '').trim().toLowerCase() : '';
+
+  let filtered = [...teacherAccounts];
+
+  // Apply tab filter mode
+  const mode = window.currentSubscribersFilterMode || 'all';
+  if (mode === 'active') {
+    filtered = activeAccounts;
+  } else if (mode === 'pending') {
+    filtered = pendingAccounts;
+  }
+
+  // Apply text search
+  if (searchQuery) {
+    filtered = filtered.filter(acc => {
+      const name = (acc.name || '').toLowerCase();
+      const user = (acc.username || '').toLowerCase();
+      const email = (acc.email || '').toLowerCase();
+      const school = (acc.school || '').toLowerCase();
+      const gov = (acc.governorate || '').toLowerCase();
+      return name.includes(searchQuery) || user.includes(searchQuery) || email.includes(searchQuery) || school.includes(searchQuery) || gov.includes(searchQuery);
+    });
+  }
+
+  // Sort: Pending accounts first, then newest registered
+  filtered.sort((a, b) => {
+    const aActive = isAccountActiveSub(a);
+    const bActive = isAccountActiveSub(b);
+    if (!aActive && bActive) return -1;
+    if (aActive && !bActive) return 1;
+    const aTime = new Date(a.registeredAt || a.createdAt || 0).getTime();
+    const bTime = new Date(b.registeredAt || b.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
+
+  if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
-          <div style="font-size: 1.8rem; color: var(--text-dim); margin-bottom: 0.4rem;">
+        <td colspan="5" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+          <div style="font-size: 2rem; color: var(--text-dim); margin-bottom: 0.5rem;">
             <i class="fa-solid fa-users-slash"></i>
           </div>
-          <div style="font-weight: 700; color: var(--text-main);">لا يوجد أي مشتركين مفعلين حالياً</div>
-          <div style="font-size: 0.78rem; margin-top: 4px;">أدخل اسم المستخدم أو البريد الإلكتروني في الحقل أعلاه واضغط موافقة لمنح التفعيل لمدة سنة كاملة.</div>
+          <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">لا توجد أي حسابات مطابقة للفلتر المحدد</div>
+          <div style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">عند تسجيل أي معلم أو مستخدم جديد في العالم، سيصعد حسابه تلقائياً هنا مع إمكانية التفعيل أو الإلغاء بنقرة زر واحدة.</div>
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = activeSubs.map(acc => {
-    const startDate = acc.subscriptionStartDate ? acc.subscriptionStartDate.slice(0, 10) : 'تفعيل معتمد';
+  tbody.innerHTML = filtered.map(acc => {
+    const active = isAccountActiveSub(acc);
+    const regDate = acc.registeredDateFormatted || (acc.registeredAt ? acc.registeredAt.slice(0, 10) : (acc.createdAt ? acc.createdAt.slice(0, 10) : 'مسجل حديثاً'));
     const expiryDate = acc.subscriptionExpiryFormatted || (acc.subscriptionExpiresAt ? acc.subscriptionExpiresAt.slice(0, 10) : 'سنة كاملة');
+    const planName = acc.subscriptionPlanName || 'الباقة السنوية (365 يوماً)';
+
+    const statusBadge = active 
+      ? `<div>
+           <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); font-weight: 800; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;">
+             <i class="fa-solid fa-crown"></i> مفعل (${planName})
+           </span>
+           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+             <i class="fa-solid fa-calendar-check text-success"></i> ينتهي: <strong>${expiryDate}</strong>
+           </div>
+         </div>`
+      : `<div>
+           <span class="badge-tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;">
+             <i class="fa-solid fa-clock"></i> بانتظار التفعيل (مجاني)
+           </span>
+           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+             بانتظار موافقة الإدارة
+           </div>
+         </div>`;
+
+    const actionButton = active
+      ? `<button type="button" class="btn btn-outline" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.4); padding: 0.35rem 0.75rem; font-size: 0.76rem; font-weight: 800; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" onclick="window.manageRevokeSubscription('${acc.id}')" title="إلغاء التفعيل لهذا الحساب">
+           <i class="fa-solid fa-ban"></i>
+           <span>إلغاء التفعيل</span>
+         </button>`
+      : `<button type="button" class="btn btn-success" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 0.38rem 0.9rem; font-size: 0.78rem; font-weight: 800; border-radius: 6px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" onclick="window.manageDirectActivateUser('${acc.id}')" title="تفعيل الاشتراك لهذا الحساب فوراً">
+           <i class="fa-solid fa-circle-check"></i>
+           <span>تفعيل الحساب</span>
+         </button>`;
+
+    const deleteButton = `
+      <button type="button" class="btn btn-outline" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.06); padding: 0.35rem 0.65rem; font-size: 0.76rem; font-weight: 800; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" onclick="window.manageDeleteSubscriberAccount('${acc.id}')" title="حذف الحساب / الإيميل نهائياً">
+        <i class="fa-solid fa-trash-can"></i>
+        <span>حذف الإيميل</span>
+      </button>
+    `;
 
     return `
       <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s ease;">
         <td style="padding: 0.75rem 0.85rem; font-weight: 700; color: var(--text-main);">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(245, 158, 11, 0.2); color: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 0.75rem;">
-              <i class="fa-solid fa-crown"></i>
+            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${active ? 'rgba(245, 158, 11, 0.2)' : 'rgba(148, 163, 184, 0.15)'}; color: ${active ? '#fbbf24' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+              <i class="fa-solid ${active ? 'fa-crown' : 'fa-user'}"></i>
             </div>
             <div>
-              <div>${acc.name || acc.username}</div>
-              <small style="color: var(--text-muted); font-size: 0.72rem;">${acc.school || 'مدرسة معتمدة'}</small>
+              <div style="font-weight: 800; color: var(--text-main); font-size: 0.88rem;">${acc.name || acc.username}</div>
+              <small style="color: var(--text-muted); font-size: 0.72rem;">${acc.school || 'مدرسة عامة'} • ${acc.governorate || 'العراق'}</small>
             </div>
           </div>
         </td>
         <td style="padding: 0.75rem 0.85rem;">
-          <code style="font-weight: bold; color: var(--primary);">${acc.username || ''}</code>
-          ${acc.email ? `<span style="font-size: 0.72rem; color: var(--text-muted); display: block;">${acc.email}</span>` : ''}
+          <code style="font-weight: bold; color: var(--primary); font-size: 0.82rem;">${acc.username || ''}</code>
+          ${acc.email ? `<span style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 1px;">${acc.email}</span>` : ''}
+          ${acc.contact ? `<span style="font-size: 0.7rem; color: var(--text-dim); display: block;" dir="ltr"><i class="fa-solid fa-phone"></i> ${acc.contact}</span>` : ''}
         </td>
         <td style="padding: 0.75rem 0.85rem; font-size: 0.78rem; color: var(--text-muted);">
-          <i class="fa-solid fa-calendar-plus text-info"></i> ${startDate}
+          <div><i class="fa-solid fa-calendar-plus text-info"></i> ${regDate}</div>
+          <span style="font-size: 0.68rem; color: var(--text-dim); display: block; margin-top: 2px;">مادة: ${acc.subject || 'عام'}</span>
         </td>
         <td style="padding: 0.75rem 0.85rem;">
-          <span style="display: inline-flex; align-items: center; gap: 5px; background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 8px; border-radius: 999px; font-size: 0.74rem; font-weight: 800;">
-            <i class="fa-solid fa-calendar-check"></i> ${expiryDate}
-          </span>
-          <span style="display: block; font-size: 0.68rem; color: var(--text-muted); margin-top: 2px;">مدة سنة واحدة فقط</span>
+          ${statusBadge}
         </td>
         <td style="padding: 0.75rem 0.85rem; text-align: center;">
-          <button type="button" class="btn btn-outline" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.35); padding: 0.3rem 0.65rem; font-size: 0.74rem; font-weight: 700;" onclick="window.manageRevokeSubscription('${acc.id}')" title="إلغاء التفعيل لهذا الحساب">
-            <i class="fa-solid fa-ban"></i> إلغاء التفعيل
-          </button>
+          <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap;">
+            ${actionButton}
+            ${deleteButton}
+          </div>
         </td>
       </tr>
     `;
   }).join('');
+};
+
+window.manageDirectActivateUser = function(accId) {
+  const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) {
+    showToast('لم يتم العثور على الحساب المراد تفعيله!', 'error');
+    return;
+  }
+
+  // Calculate Plan Duration from the dropdown select
+  const planSelect = document.getElementById('subActivationPlanSelect');
+  const chosenPlan = planSelect ? planSelect.value : '1_year';
+
+  const now = new Date();
+  const expiryDate = new Date(now);
+  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationCode = '1_year';
+
+  if (chosenPlan === '1_month') {
+    expiryDate.setDate(now.getDate() + 30);
+    durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
+    durationCode = '1_month';
+  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 120);
+    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
+    durationCode = '4_months';
+  } else {
+    expiryDate.setFullYear(now.getFullYear() + 1);
+    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationCode = '1_year';
+  }
+
+  const startStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+  const expiryStr = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth()+1).padStart(2,'0')}-${String(expiryDate.getDate()).padStart(2,'0')}`;
+
+  acc.isVip = true;
+  acc.isSubscribed = true;
+  acc.role = 'teacher_vip';
+  acc.subscriptionDuration = durationCode;
+  acc.subscriptionPlanName = durationLabel;
+  acc.subscriptionStartDate = now.toISOString();
+  acc.subscriptionExpiresAt = expiryDate.toISOString();
+  acc.subscriptionExpiryFormatted = expiryStr;
+
+  localStorage.setItem(`moallem_vip_subscription_${acc.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${acc.id}`, expiryDate.toISOString());
+  if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
+
+  const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (sessionUser && sessionUser.id === acc.id) {
+    sessionUser.isVip = true;
+    sessionUser.isSubscribed = true;
+    sessionUser.role = 'teacher_vip';
+    sessionUser.subscriptionDuration = durationCode;
+    sessionUser.subscriptionPlanName = durationLabel;
+    sessionUser.subscriptionStartDate = now.toISOString();
+    sessionUser.subscriptionExpiresAt = expiryDate.toISOString();
+    sessionUser.subscriptionExpiryFormatted = expiryStr;
+    localStorage.setItem('moallem_current_user', JSON.stringify(sessionUser));
+    if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+  }
+
+  window.renderSubscribersManagementUI();
+  if (typeof window.renderAdminAccountsTable === 'function') window.renderAdminAccountsTable();
+  if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+
+  showToast(`🎉 تم تفعيل الحساب للأستاذ [${acc.name || acc.username}] بنجاح (${durationLabel}) حتى (${expiryStr})! 👑✔`, 'success');
 };
 
 window.manageApproveGrantSubscription = function() {
@@ -9409,24 +10351,43 @@ window.manageApproveGrantSubscription = function() {
     return;
   }
 
-  // Calculate 1 Year (سنة واحدة فقط)
+  // Calculate Plan Duration
+  const planSelect = document.getElementById('subActivationPlanSelect');
+  const chosenPlan = planSelect ? planSelect.value : '1_year';
+
   const now = new Date();
-  const oneYearLater = new Date(now);
-  oneYearLater.setFullYear(now.getFullYear() + 1);
+  const expiryDate = new Date(now);
+  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationCode = '1_year';
+
+  if (chosenPlan === '1_month') {
+    expiryDate.setDate(now.getDate() + 30);
+    durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
+    durationCode = '1_month';
+  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 120);
+    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
+    durationCode = '4_months';
+  } else {
+    expiryDate.setFullYear(now.getFullYear() + 1);
+    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationCode = '1_year';
+  }
 
   const startStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  const expiryStr = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth()+1).padStart(2,'0')}-${String(oneYearLater.getDate()).padStart(2,'0')}`;
+  const expiryStr = `${expiryDate.getFullYear()}-${String(expiryDate.getMonth()+1).padStart(2,'0')}-${String(expiryDate.getDate()).padStart(2,'0')}`;
 
   targetAcc.isVip = true;
   targetAcc.isSubscribed = true;
   targetAcc.role = 'teacher_vip';
-  targetAcc.subscriptionDuration = '1_year';
+  targetAcc.subscriptionDuration = durationCode;
+  targetAcc.subscriptionPlanName = durationLabel;
   targetAcc.subscriptionStartDate = now.toISOString();
-  targetAcc.subscriptionExpiresAt = oneYearLater.toISOString();
+  targetAcc.subscriptionExpiresAt = expiryDate.toISOString();
   targetAcc.subscriptionExpiryFormatted = expiryStr;
 
   localStorage.setItem(`moallem_vip_subscription_${targetAcc.id}`, 'true');
-  localStorage.setItem(`moallem_vip_subscription_exp_${targetAcc.id}`, oneYearLater.toISOString());
+  localStorage.setItem(`moallem_vip_subscription_exp_${targetAcc.id}`, expiryDate.toISOString());
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
@@ -9434,9 +10395,10 @@ window.manageApproveGrantSubscription = function() {
     sessionUser.isVip = true;
     sessionUser.isSubscribed = true;
     sessionUser.role = 'teacher_vip';
-    sessionUser.subscriptionDuration = '1_year';
+    sessionUser.subscriptionDuration = durationCode;
+    sessionUser.subscriptionPlanName = durationLabel;
     sessionUser.subscriptionStartDate = now.toISOString();
-    sessionUser.subscriptionExpiresAt = oneYearLater.toISOString();
+    sessionUser.subscriptionExpiresAt = expiryDate.toISOString();
     sessionUser.subscriptionExpiryFormatted = expiryStr;
     localStorage.setItem('moallem_current_user', JSON.stringify(sessionUser));
     if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
@@ -9448,7 +10410,7 @@ window.manageApproveGrantSubscription = function() {
   if (typeof window.renderAdminAccountsTable === 'function') window.renderAdminAccountsTable();
   if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
 
-  showToast(`🎉 تمت الموافقة وتفعيل حساب الأستاذ [${targetAcc.name || targetAcc.username}] بنجاح لمدة سنة واحدة حتى (${expiryStr})! 👑✔`, 'success');
+  showToast(`🎉 تمت الموافقة وتفعيل [${durationLabel}] للأستاذ [${targetAcc.name || targetAcc.username}] بنجاح حتى (${expiryStr})! 👑✔`, 'success');
 };
 
 window.manageRevokeSubscription = function(accId) {
@@ -9487,6 +10449,101 @@ window.manageRevokeSubscription = function(accId) {
 
   showToast(`تم إيقاف تفعيل الاشتراك السنوي للحساب (${acc.name || acc.username}) 🔄`, 'info');
 };
+
+window.manageDeleteSubscriberAccount = function(accId) {
+  if (accId === 'usr_admin') {
+    showToast('لا يمكن حذف حساب المدير العام!', 'error');
+    return;
+  }
+  let accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+  const acc = accounts.find(a => a.id === accId);
+  if (!acc) {
+    showToast('لم يتم العثور على الحساب المراد حذفه!', 'error');
+    return;
+  }
+  const emailOrName = acc.email || acc.username || acc.name || 'المعلم';
+  if (!confirm(`هل أنت متأكد من حذف الحساب / الإيميل (${emailOrName}) نهائياً من المنصة؟ لن يتمكن من تسجيل الدخول بعد الآن.`)) {
+    return;
+  }
+
+  accounts = accounts.filter(a => a.id !== accId);
+  if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
+
+  // Clean up any VIP flags in localStorage
+  localStorage.removeItem(`moallem_vip_subscription_${accId}`);
+  localStorage.removeItem(`moallem_vip_subscription_exp_${accId}`);
+
+  // If current logged in user was this account, reset session
+  const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (sessionUser && sessionUser.id === accId) {
+    localStorage.removeItem('moallem_current_user');
+  }
+
+  window.renderSubscribersManagementUI();
+  if (typeof window.renderAdminAccountsTable === 'function') window.renderAdminAccountsTable();
+  if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+
+  showToast(`🗑️ تم حذف الحساب / الإيميل [${emailOrName}] بنجاح`, 'info');
+};
+
+window.manageDeleteAccountByQuery = function() {
+  const inputEl = document.getElementById('subActivationQueryInput');
+  if (!inputEl) return;
+  const query = (inputEl.value || '').trim();
+  if (!query) {
+    showToast('يرجى إدخال اسم المستخدم أو البريد الإلكتروني للحساب المراد حذفه!', 'warning');
+    inputEl.focus();
+    return;
+  }
+
+  let accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+  const queryLower = query.toLowerCase();
+
+  let targetAcc = accounts.find(a => 
+    (a.username && a.username.toLowerCase() === queryLower) ||
+    (a.email && a.email.toLowerCase() === queryLower) ||
+    (a.id && a.id.toLowerCase() === queryLower)
+  );
+
+  if (!targetAcc) {
+    targetAcc = accounts.find(a => a.name && a.name.toLowerCase() === queryLower);
+  }
+
+  if (!targetAcc) {
+    showToast(`لم يتم العثور على أي حساب يطابق ("${query}"). تأكد من صحة اسم المستخدم أو البريد!`, 'error');
+    inputEl.focus();
+    return;
+  }
+
+  if (targetAcc.isAdmin || targetAcc.role === 'admin' || targetAcc.id === 'usr_admin') {
+    showToast('لا يمكن حذف حساب المدير العام!', 'error');
+    return;
+  }
+
+  window.manageDeleteSubscriberAccount(targetAcc.id);
+  inputEl.value = '';
+};
+
+// Auto-sync subscribers management UI across tabs/windows in real time
+window.addEventListener('storage', (e) => {
+  if (e.key === 'moallem_auth_accounts' || (e.key && e.key.startsWith('moallem_vip_subscription_'))) {
+    if (typeof window.renderSubscribersManagementUI === 'function') {
+      window.renderSubscribersManagementUI();
+    }
+    if (typeof window.renderAdminAccountsTable === 'function') {
+      window.renderAdminAccountsTable();
+    }
+  }
+});
+
+window.addEventListener('moallem_accounts_updated', () => {
+  if (typeof window.renderSubscribersManagementUI === 'function') {
+    window.renderSubscribersManagementUI();
+  }
+  if (typeof window.renderAdminAccountsTable === 'function') {
+    window.renderAdminAccountsTable();
+  }
+});
 
 window.renderAdminAccountsTable = function() {
   const tbody = document.getElementById('adminAccountsTableBody');
@@ -9743,6 +10800,8 @@ window.adminPromptAddTeacher = function() {
     return;
   }
 
+  const nowReg = new Date();
+  const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
   const newAcc = {
     id: 'usr_' + Date.now(),
     name: name.trim(),
@@ -9753,12 +10812,18 @@ window.adminPromptAddTeacher = function() {
     school: 'مدرسة معتمدة',
     governorate: 'بغداد',
     isVerified: true,
-    isVip: false
+    isSubscribed: false,
+    isVip: false,
+    registeredAt: nowReg.toISOString(),
+    registeredDateFormatted: dateFormatted
   };
 
   accounts.push(newAcc);
   saveAuthAccounts(accounts);
   window.renderAdminAccountsTable();
+  if (typeof window.renderSubscribersManagementUI === 'function') {
+    window.renderSubscribersManagementUI();
+  }
   showToast(`تم إنشاء حساب الأستاذ ${name} بنجاح!`, 'success');
 };
 
@@ -9962,6 +11027,162 @@ window.clearAiValidationError = function(inputId) {
   }
 };
 
+/* ==========================================================================
+   AI Chapters Selection Controller (تحديد نطاق الفصول والوحدات للاختبار)
+   ========================================================================== */
+window.selectedAiChapters = ['all'];
+
+window.updateAiChaptersUI = function() {
+  const isAll = window.selectedAiChapters.includes('all') || window.selectedAiChapters.length === 0;
+  
+  // 1. Update Pills active state
+  const container = document.getElementById('aiChapterPillsContainer');
+  if (container) {
+    const pills = container.querySelectorAll('.ai-ch-pill');
+    pills.forEach(pill => {
+      const chAttr = pill.getAttribute('data-chapter');
+      if (chAttr === 'all') {
+        if (isAll) pill.classList.add('active');
+        else pill.classList.remove('active');
+      } else {
+        const num = parseInt(chAttr);
+        if (!isAll && window.selectedAiChapters.includes(num)) {
+          pill.classList.add('active');
+        } else {
+          pill.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  // 2. Update Summary Badge
+  const badge = document.getElementById('aiChaptersSelectedSummaryBadge');
+  if (badge) {
+    if (isAll) {
+      badge.style.color = '#10b981';
+      badge.style.background = 'rgba(16, 185, 129, 0.12)';
+      badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> تم تحديد: كامل فصول الكتاب المنهجي المقررة 📚';
+    } else {
+      const sorted = [...window.selectedAiChapters].sort((a,b) => a - b);
+      const chOrdinals = sorted.map(n => {
+        const ords = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
+        return ords[n-1] ? `الفصل ${ords[n-1]}` : `الفصل ${n}`;
+      }).join(' + ');
+
+      badge.style.color = '#6366f1';
+      badge.style.background = 'rgba(99, 102, 241, 0.12)';
+      badge.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+      badge.innerHTML = `<i class="fa-solid fa-bullseye"></i> تم حصر الأسئلة في: <strong>${chOrdinals}</strong> فقط 🎯`;
+    }
+  }
+
+  // 3. Update Preset Dropdown
+  const select = document.getElementById('aiGenChaptersPreset');
+  if (select) {
+    if (isAll) {
+      select.value = 'all';
+    } else {
+      const joined = [...window.selectedAiChapters].sort((a,b) => a - b).join(',');
+      if (select.querySelector(`option[value="${joined}"]`)) {
+        select.value = joined;
+      } else {
+        select.value = 'custom';
+      }
+    }
+  }
+
+  // 4. Update Preset Shortcut Chips
+  const joinedVal = isAll ? 'all' : [...window.selectedAiChapters].sort((a,b) => a - b).join('_');
+  const targetChipId = 'presetChip_' + joinedVal;
+  const allChips = document.querySelectorAll('.ai-preset-chip');
+  if (allChips && allChips.length > 0) {
+    allChips.forEach(chip => {
+      if (chip.id === targetChipId) {
+        chip.classList.add('active');
+      } else {
+        chip.classList.remove('active');
+      }
+    });
+  }
+};
+
+window.toggleAiChapterPill = function(chapterVal) {
+  if (chapterVal === 'all') {
+    window.selectedAiChapters = ['all'];
+    const customInput = document.getElementById('aiGenCustomChaptersInput');
+    if (customInput) customInput.value = '';
+  } else {
+    const num = parseInt(chapterVal);
+    if (window.selectedAiChapters.includes('all')) {
+      window.selectedAiChapters = [];
+    }
+    const idx = window.selectedAiChapters.indexOf(num);
+    if (idx !== -1) {
+      window.selectedAiChapters.splice(idx, 1);
+    } else {
+      window.selectedAiChapters.push(num);
+    }
+    if (window.selectedAiChapters.length === 0) {
+      window.selectedAiChapters = ['all'];
+    }
+  }
+  window.updateAiChaptersUI();
+};
+
+window.selectAiChaptersPreset = function(presetVal) {
+  if (presetVal === 'all') {
+    window.selectedAiChapters = ['all'];
+    const customInput = document.getElementById('aiGenCustomChaptersInput');
+    if (customInput) customInput.value = '';
+  } else if (presetVal === 'custom') {
+    const customInput = document.getElementById('aiGenCustomChaptersInput');
+    if (customInput) customInput.focus();
+  } else {
+    const parts = presetVal.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+    window.selectedAiChapters = parts.length > 0 ? parts : ['all'];
+  }
+  window.updateAiChaptersUI();
+};
+
+window.resetAiChaptersToAll = function() {
+  window.selectedAiChapters = ['all'];
+  const customInput = document.getElementById('aiGenCustomChaptersInput');
+  if (customInput) customInput.value = '';
+  window.updateAiChaptersUI();
+  if (typeof showToast === 'function') {
+    showToast('تمت إعادة ضبط نطاق الفصول ليشمل كامل فصول الكتاب المقررة 📚', 'info');
+  }
+};
+
+window.handleCustomChaptersTextInput = function(val) {
+  if (!val || !val.trim()) {
+    return;
+  }
+  const clean = val.trim();
+  const detected = [];
+  const map = [
+    { num: 1, pat: /(الأول|الاول|1|الأولى|الاولى)/i },
+    { num: 2, pat: /(الثاني|الثانية|2)/i },
+    { num: 3, pat: /(الثالث|الثالثة|3)/i },
+    { num: 4, pat: /(الرابع|الرابعة|4)/i },
+    { num: 5, pat: /(الخامس|الخامسة|5)/i },
+    { num: 6, pat: /(السادس|السادسة|6)/i },
+    { num: 7, pat: /(السابع|السابعة|7)/i },
+    { num: 8, pat: /(الثامن|الثامنة|8)/i },
+    { num: 9, pat: /(التاسع|التاسعة|9)/i },
+    { num: 10, pat: /(العاشر|العاشرة|10)/i }
+  ];
+  map.forEach(item => {
+    if (item.pat.test(clean)) detected.push(item.num);
+  });
+
+  if (detected.length > 0) {
+    window.selectedAiChapters = detected;
+    window.updateAiChaptersUI();
+  }
+};
+
 window.generateTripleAiExams = function() {
   const gradeEl = document.getElementById('aiGenGrade');
   const subjEl = document.getElementById('aiGenSubject');
@@ -10019,11 +11240,14 @@ window.generateTripleAiExams = function() {
         throw new Error('محرك الذكاء الاصطناعي للمناهج غير متوفر');
       }
 
+      window.__aiClickCount = (window.__aiClickCount || 0) + 1;
       const generated = window.AiCurriculumEngine.generateTripleExamVersions({
         grade,
         subject,
         difficulty,
-        teacherNotes
+        teacherNotes,
+        selectedChapters: window.selectedAiChapters || ['all'],
+        clickSeed: window.__aiClickCount
       });
 
       window.currentAiTripleExams = generated;
@@ -10031,7 +11255,10 @@ window.generateTripleAiExams = function() {
       if (content) content.style.display = 'block';
 
       window.switchAiExamVersion('versionA');
-      showToast('🎉 تم توليد 3 نماذج امتحانية ذكية بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
+      const isEnglish = (generated.versionA && generated.versionA.settings && generated.versionA.settings.direction === 'ltr');
+      showToast(isEnglish 
+        ? '🎉 3 Brand-New Smart English Exam Models Generated Successfully!' 
+        : '🎉 تم توليد 3 نماذج امتحانية ذكية جديدة بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
     } catch (err) {
       if (spinner) spinner.style.display = 'none';
       showToast('خطأ في توليد الأسئلة: ' + err.message, 'error');
@@ -10058,6 +11285,9 @@ window.switchAiExamVersion = function(versionKey) {
     }
   });
 
+  const isEnglish = (version.settings && version.settings.direction === 'ltr') || 
+                    (version.header && version.header.subject && (version.header.subject.toLowerCase().includes('eng') || version.header.subject.includes('إنكل') || version.header.subject.includes('انكل')));
+
   // Render Version Header Details
   const titleEl = document.getElementById('aiActiveVerTitle');
   const metaEl = document.getElementById('aiActiveVerMeta');
@@ -10065,12 +11295,21 @@ window.switchAiExamVersion = function(versionKey) {
     titleEl.innerHTML = `<span style="color: ${version.badgeColor};"><i class="fa-solid fa-file-signature"></i></span> ${version.versionName}`;
   }
   if (metaEl) {
-    metaEl.innerHTML = `
-      <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
-      <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
-      <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
-      <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
-    `;
+    if (isEnglish) {
+      metaEl.innerHTML = `
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
+        <span>Difficulty: <strong>${version.difficulty}</strong></span> • 
+        <span>Total: <strong>${version.totalScore} Marks</strong> (${version.questionsCount} Questions)</span>
+      `;
+    } else {
+      metaEl.innerHTML = `
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
+        <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
+        <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
+      `;
+    }
   }
 
   // Render Questions List Preview
@@ -10079,12 +11318,17 @@ window.switchAiExamVersion = function(versionKey) {
     listEl.innerHTML = version.questions.map((q, idx) => {
       let branchesHTML = '';
       if (Array.isArray(q.branches) && q.branches.length > 0) {
+        const branchBorder = isEnglish 
+          ? 'padding-left: 12px; border-left: 2px solid var(--border-color); direction: ltr; text-align: left;'
+          : 'padding-right: 12px; border-right: 2px solid var(--border-color); direction: rtl; text-align: right;';
+        const scoreLabel = isEnglish ? `(${b => (b.score || 10)} Marks)` : `(${b => (b.score || 10)} درجات)`;
+
         branchesHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; padding-right: 12px; border-right: 2px solid var(--border-color);">
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; ${branchBorder}">
             ${q.branches.map(b => `
               <div style="font-size: 0.84rem;">
                 <strong>${b.title}:</strong> ${b.text} 
-                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-right: 4px;">(${b.score || 10} درجات)</span>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-${isEnglish ? 'left' : 'right'}: 4px;">(${b.score || 10} ${isEnglish ? 'Marks' : 'درجات'})</span>
               </div>
             `).join('')}
           </div>
@@ -10094,7 +11338,7 @@ window.switchAiExamVersion = function(versionKey) {
       let optionsHTML = '';
       if (Array.isArray(q.options) && q.options.length > 0) {
         optionsHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-right: 12px;">
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-${isEnglish ? 'left' : 'right'}: 12px; direction: ${isEnglish ? 'ltr' : 'rtl'};">
             ${q.options.map(opt => `
               <div style="font-size: 0.82rem; ${opt.isCorrect ? 'color: #10b981; font-weight: 700;' : ''}">
                 ${opt.isCorrect ? '✔' : '○'} ${opt.text}
@@ -10106,10 +11350,11 @@ window.switchAiExamVersion = function(versionKey) {
 
       let answerHTML = '';
       if (q.modelAnswer) {
+        const answerBtnLabel = isEnglish ? 'Show Model Answer & Marking Scheme' : 'إظهار الجواب النموذجي وسلّم الدرجات';
         answerHTML = `
-          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;">
+          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
             <summary style="cursor: pointer; font-weight: 700; color: #10b981;">
-              <i class="fa-solid fa-key"></i> إظهار الجواب النموذجي وسلّم الدرجات
+              <i class="fa-solid fa-key"></i> ${answerBtnLabel}
             </summary>
             <div style="margin-top: 6px; white-space: pre-line; color: var(--text-main);">${q.modelAnswer}</div>
           </details>
@@ -10117,14 +11362,14 @@ window.switchAiExamVersion = function(versionKey) {
       }
 
       return `
-        <div class="ai-question-card-preview">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+        <div class="ai-question-card-preview" style="direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; flex-direction: ${isEnglish ? 'row' : 'row'};">
             <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-main);">
-              ${q.title || `السؤال ${idx + 1}`}
+              ${q.title || (isEnglish ? `Question ${idx + 1}` : `السؤال ${idx + 1}`)}
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} درجة</span>
-              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || 'وزاري + كتاب'}</span>
+              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} ${isEnglish ? 'Marks' : 'درجة'}</span>
+              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || (isEnglish ? 'Ministerial Standard' : 'وزاري + كتاب')}</span>
             </div>
           </div>
           <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">${q.text}</div>
@@ -10148,8 +11393,19 @@ window.applyCurrentAiVersionToWorkstation = function() {
   appState.header.subject = version.header.subject;
   appState.header.examTitle = version.header.examTitle;
   appState.header.instructions = version.header.instructions;
+  if (version.header.country) appState.header.country = version.header.country;
+  if (version.header.ministry) appState.header.ministry = version.header.ministry;
+  if (version.header.school) appState.header.school = version.header.school;
+  if (version.header.time) appState.header.time = version.header.time;
+  if (version.header.year) appState.header.year = version.header.year;
+  if (version.header.term) appState.header.term = version.header.term;
+  if (version.header.teacher) appState.header.teacher = version.header.teacher;
+
   if (version.settings && version.settings.direction) {
     appState.settings.direction = version.settings.direction;
+  }
+  if (version.settings && version.settings.fontFamily) {
+    appState.settings.fontFamily = version.settings.fontFamily;
   }
 
   // Sync UI and render
@@ -10163,7 +11419,10 @@ window.applyCurrentAiVersionToWorkstation = function() {
   const qTabBtn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
   if (qTabBtn) qTabBtn.click();
 
-  showToast(`🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
+  const isEnglish = (version.settings && version.settings.direction === 'ltr');
+  showToast(isEnglish 
+    ? `🎉 «${version.versionName}» applied to A4 Examination Paper successfully! Ready for printing or customization 🚀` 
+    : `🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
 };
 
 window.saveAllAiVersionsToArchive = function() {

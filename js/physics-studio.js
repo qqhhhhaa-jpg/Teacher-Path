@@ -365,7 +365,12 @@ window.insertPhysicsFormula = function(snippet) {
 };
 
 window.togglePhysicsStudio = function() {
-  const container = document.getElementById('modalPhysicsStudioContainer');
+  const wrapper = document.getElementById('modalPhysicsStudioWrapper');
+  let container = document.getElementById('modalPhysicsStudioContainer');
+  if (!container && wrapper && typeof window.buildPhysicsStudioHTML === 'function') {
+    wrapper.innerHTML = window.buildPhysicsStudioHTML(true);
+    container = document.getElementById('modalPhysicsStudioContainer');
+  }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
   container.style.display = isHidden ? 'block' : 'none';

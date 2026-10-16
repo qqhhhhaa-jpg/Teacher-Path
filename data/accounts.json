@@ -1,0 +1,27 @@
+[
+  {
+    "id": "usr_admin",
+    "name": "الأستاذ حسين علي (المدير العام)",
+    "username": "admin",
+    "email": "admin@moallem.iq",
+    "password": "qq7878aassdd",
+    "role": "admin",
+    "isAdmin": true,
+    "isVip": true,
+    "isVerified": true,
+    "governorate": "العراق - الإدارة العامة",
+    "school": "إدارة منصة مُعَلِّم بـرو",
+    "subject": "الإشراف العام والتطوير",
+    "rights": "إعداد وتنظيم الأستاذ حسين علي - الإدارة العامة لمنصة مُعَلِّم برو",
+    "contact": "07700000000",
+    "createdAt": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "usr_test123",
+    "name": "استاذ احمد",
+    "username": "ahmed",
+    "email": "ahmed@test.com",
+    "password": "123",
+    "isSubscribed": true
+  }
+]
