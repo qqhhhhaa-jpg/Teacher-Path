@@ -68,8 +68,58 @@ import json
 import re
 from urllib.parse import urlparse, parse_qs
 
+ACCOUNTS_FILE = os.path.join(WORKSPACE_DIR, 'data', 'accounts.json')
+DEFAULT_ADMIN_ACCOUNT = {
+    'id': 'usr_admin',
+    'name': 'الأستاذ حسين علي (المدير العام)',
+    'username': 'admin',
+    'email': 'admin@moallem.iq',
+    'password': 'qq7878aassdd',
+    'role': 'admin',
+    'isAdmin': True,
+    'isVip': True,
+    'isVerified': True,
+    'governorate': 'العراق - الإدارة العامة',
+    'school': 'إدارة منصة مُعَلِّم بـرو',
+    'subject': 'الإشراف العام والتطوير',
+    'rights': 'إعداد وتنظيم الأستاذ حسين علي - الإدارة العامة لمنصة مُعَلِّم برو',
+    'contact': '07700000000',
+    'createdAt': '2026-01-01T00:00:00.000Z'
+}
+
+def load_server_accounts():
+    data_dir = os.path.join(WORKSPACE_DIR, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    accounts = []
+    if os.path.exists(ACCOUNTS_FILE):
+        try:
+            with open(ACCOUNTS_FILE, 'r', encoding='utf-8') as f:
+                accounts = json.load(f)
+        except Exception:
+            accounts = []
+    if not isinstance(accounts, list):
+        accounts = []
+    
+    admin_idx = -1
+    for i, a in enumerate(accounts):
+        if a.get('id') == 'usr_admin' or a.get('username') == 'admin':
+            admin_idx = i
+            break
+            
+    if admin_idx == -1:
+        accounts.insert(0, dict(DEFAULT_ADMIN_ACCOUNT))
+    else:
+        accounts[admin_idx] = { **DEFAULT_ADMIN_ACCOUNT, **accounts[admin_idx], 'password': 'qq7878aassdd' }
+    return accounts
+
+def save_server_accounts(accounts):
+    data_dir = os.path.join(WORKSPACE_DIR, 'data')
+    os.makedirs(data_dir, exist_ok=True)
+    with open(ACCOUNTS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(accounts, f, ensure_ascii=False, indent=2)
+
 class RobustRequestHandler(SimpleHTTPRequestHandler):
-    """Enhanced HTTP Handler with UTF-8 support, health-check, and cloud-sync API"""
+    """Enhanced HTTP Handler with UTF-8 support, health-check, accounts DB, and cloud-sync API"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WORKSPACE_DIR, **kwargs)
@@ -82,8 +132,9 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        # Health-check endpoint for bots and keep-alive monitors
         clean_path = self.path.split('?')[0].rstrip('/')
+
+        # Health-check endpoint for bots and keep-alive monitors
         if clean_path in ('/health', '/ping', '/bot-status'):
             uptime_seconds = int(time.time() - START_TIME)
             hours, remainder = divmod(uptime_seconds, 3600)
@@ -101,21 +152,46 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             self.wfile.write(response.encode('utf-8'))
             return
 
-        # Cloud Sync GET endpoint: /api/cloud_sync?email=...
+        # Accounts GET endpoint: /api/accounts
+        if clean_path == '/api/accounts':
+            accounts = load_server_accounts()
+            res = json.dumps({"success": True, "accounts": accounts}, ensure_ascii=False)
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(res.encode('utf-8'))
+            return
+
+        # Cloud Sync GET endpoint: /api/cloud_sync?email=...&userId=...
         if clean_path == '/api/cloud_sync':
             query = parse_qs(urlparse(self.path).query)
             email = query.get('email', [''])[0].strip().lower()
-            clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) or 'default'
+            user_id = query.get('userId', [''])[0].strip().lower()
+            username = query.get('username', [''])[0].strip().lower()
+
+            clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) if email else ''
+            clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) if user_id else ''
+            clean_u = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', username) if username else ''
+
             data_dir = os.path.join(WORKSPACE_DIR, 'data')
-            file_path = os.path.join(data_dir, f'cloud_sync_{clean_email}.json')
-            
-            if os.path.exists(file_path):
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        saved_data = json.load(f)
-                    res = json.dumps({"success": True, "exists": True, "data": saved_data}, ensure_ascii=False)
-                except Exception as e:
-                    res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+            candidate_files = []
+            if clean_email: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_email}.json'))
+            if clean_uid: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_uid}.json'))
+            if clean_u: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_u}.json'))
+
+            saved_data = None
+            for fp in candidate_files:
+                if os.path.exists(fp):
+                    try:
+                        with open(fp, 'r', encoding='utf-8') as f:
+                            saved_data = json.load(f)
+                            if saved_data:
+                                break
+                    except Exception:
+                        pass
+
+            if saved_data:
+                res = json.dumps({"success": True, "exists": True, "data": saved_data}, ensure_ascii=False)
             else:
                 res = json.dumps({"success": True, "exists": False, "data": None}, ensure_ascii=False)
 
@@ -152,21 +228,95 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         clean_path = self.path.split('?')[0].rstrip('/')
+
+        # Accounts POST endpoint: /api/accounts
+        if clean_path == '/api/accounts':
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                body = self.rfile.read(length).decode('utf-8')
+                payload = json.loads(body) if body else {}
+                accounts = load_server_accounts()
+
+                if 'account' in payload and isinstance(payload['account'], dict):
+                    acc = payload['account']
+                    aid = acc.get('id')
+                    aemail = (acc.get('email') or '').lower().strip()
+                    auser = (acc.get('username') or '').lower().strip()
+
+                    found_idx = -1
+                    for i, existing in enumerate(accounts):
+                        if aid and existing.get('id') == aid:
+                            found_idx = i
+                            break
+                        if aemail and (existing.get('email') or '').lower().strip() == aemail:
+                            found_idx = i
+                            break
+                        if auser and (existing.get('username') or '').lower().strip() == auser:
+                            found_idx = i
+                            break
+
+                    if found_idx >= 0:
+                        accounts[found_idx] = { **accounts[found_idx], **acc }
+                    else:
+                        accounts.append(acc)
+
+                elif 'accounts' in payload and isinstance(payload['accounts'], list):
+                    acc_map = {}
+                    for a in accounts:
+                        k = a.get('id') or (a.get('email') or a.get('username') or '')
+                        if k:
+                            acc_map[k] = a
+                    for acc in payload['accounts']:
+                        k = acc.get('id') or (acc.get('email') or acc.get('username') or '')
+                        if k:
+                            if k in acc_map:
+                                acc_map[k] = { **acc_map[k], **acc }
+                            else:
+                                acc_map[k] = acc
+                    accounts = list(acc_map.values())
+
+                save_server_accounts(accounts)
+                res = json.dumps({
+                    "success": True, 
+                    "message": "تم حفظ وتحديث الحسابات على السيرفر بنجاح", 
+                    "accounts_count": len(accounts)
+                }, ensure_ascii=False)
+                self.send_response(200)
+            except Exception as e:
+                res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
+                self.send_response(500)
+
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(res.encode('utf-8'))
+            return
+
+        # Cloud Sync POST endpoint: /api/cloud_sync
         if clean_path == '/api/cloud_sync':
             try:
                 length = int(self.headers.get('Content-Length', 0))
                 body = self.rfile.read(length).decode('utf-8')
                 payload = json.loads(body)
                 email = payload.get('email', '').strip().lower()
-                clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) or 'default'
+                user_id = payload.get('userId', '').strip().lower()
+                clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) if email else ''
+                clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) if user_id else ''
+                primary_key = clean_email or clean_uid or 'default'
+
                 data_dir = os.path.join(WORKSPACE_DIR, 'data')
                 os.makedirs(data_dir, exist_ok=True)
-                file_path = os.path.join(data_dir, f'cloud_sync_{clean_email}.json')
+                file_path = os.path.join(data_dir, f'cloud_sync_{primary_key}.json')
                 
                 payload['server_saved_at'] = datetime.now().isoformat()
                 with open(file_path, 'w', encoding='utf-8') as f:
                     json.dump(payload, f, ensure_ascii=False, indent=2)
                 
+                # Also save under userId if distinct so phone can find by userId
+                if clean_uid and clean_uid != primary_key:
+                    second_path = os.path.join(data_dir, f'cloud_sync_{clean_uid}.json')
+                    with open(second_path, 'w', encoding='utf-8') as f:
+                        json.dump(payload, f, ensure_ascii=False, indent=2)
+
                 res = json.dumps({
                     "success": True, 
                     "message": "تمت المزامنة والحفظ السحابي بنجاح", 

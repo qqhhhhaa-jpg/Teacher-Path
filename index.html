@@ -1358,40 +1358,90 @@
           </div>
 
           <!-- Executive KPI Metrics Dashboard -->
-          <div class="daily-metrics-dashboard" style="margin-bottom: 1rem;">
-            <div class="daily-metric-card metric-exams" style="border-right: 3px solid #3b82f6;">
-              <div class="metric-icon" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;"><i class="fa-solid fa-file-lines"></i></div>
+          <!-- Executive KPI Circular Metrics Dashboard (عدادات دائرية احترافية) -->
+          <div class="daily-metrics-dashboard" style="margin-bottom: 1.15rem;">
+            <div class="daily-metric-card metric-exams">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-exams" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatTotalExams">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-file-lines"></i></div>
                 <span class="metric-label">الاختبارات المنشأة</span>
-                <span class="metric-value" id="tabReportStatTotalExams">0</span>
+                <span class="metric-badge">اختبار محفوظ</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-grades" style="border-right: 3px solid #10b981;">
-              <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;"><i class="fa-solid fa-graduation-cap"></i></div>
+
+            <div class="daily-metric-card metric-grades">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-grades" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatGrades">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-graduation-cap"></i></div>
                 <span class="metric-label">المراحل والصفوف</span>
-                <span class="metric-value" id="tabReportStatGrades">0</span>
+                <span class="metric-badge">مرحلة نشطة</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-models" style="border-right: 3px solid #f59e0b;">
-              <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;"><i class="fa-solid fa-award"></i></div>
+
+            <div class="daily-metric-card metric-models">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-models" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatModels">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-award"></i></div>
                 <span class="metric-label">نماذج وزارية معتمدة</span>
-                <span class="metric-value" id="tabReportStatModels">0</span>
+                <span class="metric-badge">نموذج رسمي</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-total" style="border-right: 3px solid #8b5cf6;">
-              <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;"><i class="fa-solid fa-database"></i></div>
+
+            <div class="daily-metric-card metric-total">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-total" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatTotalQuestions">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
                 <span class="metric-label">مفردات الأسئلة بالبنك</span>
-                <span class="metric-value" id="tabReportStatTotalQuestions">0</span>
+                <span class="metric-badge">سؤال وزاري</span>
               </div>
             </div>
-            <div class="daily-metric-card metric-today" style="border-right: 3px solid #06b6d4;">
-              <div class="metric-icon" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;"><i class="fa-solid fa-calendar-day"></i></div>
+
+            <div class="daily-metric-card metric-today">
+              <div class="circular-meter-wrap">
+                <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                  <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                  <circle class="meter-fill fill-today" cx="38" cy="38" r="30"></circle>
+                </svg>
+                <div class="circular-meter-inner">
+                  <span class="metric-value" id="tabReportStatRecent">0</span>
+                </div>
+              </div>
               <div class="metric-info">
+                <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
                 <span class="metric-label">نشاط حديث / اليوم</span>
-                <span class="metric-value" id="tabReportStatRecent">0</span>
+                <span class="metric-badge">تحديث مباشر</span>
               </div>
             </div>
           </div>
@@ -2323,41 +2373,90 @@
       </div>
 
       <div class="modal-body daily-report-modal-body">
-        <!-- Daily KPI Metrics Dashboard -->
+        <!-- Daily KPI Metrics Dashboard (عدادات دائرية احترافية) -->
         <div class="daily-metrics-dashboard">
           <div class="daily-metric-card metric-today">
-            <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-today" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatToday">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-calendar-day"></i></div>
               <span class="metric-label">أسئلة أنشئت اليوم</span>
-              <span class="metric-value" id="dailyStatToday">0</span>
+              <span class="metric-badge">نشاط اليوم</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-arabic">
-            <div class="metric-icon"><i class="fa-solid fa-feather-pointed"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-arabic" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatArabic">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-feather-pointed"></i></div>
               <span class="metric-label">لغة عربية</span>
-              <span class="metric-value" id="dailyStatArabic">0</span>
+              <span class="metric-badge">أسئلة معتمدة</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-english">
-            <div class="metric-icon"><i class="fa-solid fa-globe"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-english" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatEnglish">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-globe"></i></div>
               <span class="metric-label">English</span>
-              <span class="metric-value" id="dailyStatEnglish">0</span>
+              <span class="metric-badge">Language Bank</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-math">
-            <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-math" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatMath">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-calculator"></i></div>
               <span class="metric-label">رياضيات</span>
-              <span class="metric-value" id="dailyStatMath">0</span>
+              <span class="metric-badge">مسائل ومعادلات</span>
             </div>
           </div>
+
           <div class="daily-metric-card metric-total">
-            <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
+            <div class="circular-meter-wrap">
+              <svg class="circular-meter-svg" viewBox="0 0 76 76" width="68" height="68">
+                <circle class="meter-track" cx="38" cy="38" r="30"></circle>
+                <circle class="meter-fill fill-total" cx="38" cy="38" r="30"></circle>
+              </svg>
+              <div class="circular-meter-inner">
+                <span class="metric-value" id="dailyStatTotal">0</span>
+              </div>
+            </div>
             <div class="metric-info">
+              <div class="metric-icon"><i class="fa-solid fa-database"></i></div>
               <span class="metric-label">إجمالي بنك الأسئلة</span>
-              <span class="metric-value" id="dailyStatTotal">0</span>
+              <span class="metric-badge">قاعدة البيانات</span>
             </div>
           </div>
         </div>
@@ -2886,15 +2985,17 @@
             </div>
 
             <div class="plan-price-zone">
-              <div class="plan-strike-row">
-                <span style="font-size: 0.74rem; color: var(--text-muted);">سعر اشتراك شهري ثابت</span>
-              </div>
               <div class="plan-main-price">
                 <span class="plan-amount-num" style="color: var(--text-main);">25,000</span>
                 <span class="plan-currency-tag">د.ع</span>
                 <span class="plan-period-tag">/ شهرياً</span>
               </div>
-              <div class="plan-mental-math">يعادل ~830 د.ع فقط باليوم الواحد</div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">سعر ثابت ومرن بدون التزام سنوي</span>
+                </div>
+                <div class="plan-mental-math">يعادل ~830 د.ع فقط باليوم الواحد</div>
+              </div>
             </div>
 
             <ul class="plan-features-list">
@@ -2912,32 +3013,37 @@
             </button>
           </div>
 
-          <!-- Plan 2: باقة الفصل الدراسي (75 ألف بدل 100) - الأكثر طلباً 🔥 -->
+          <!-- Plan 2: باقة الـ 4 أشهر (75 ألف بدل 100) - الأكثر طلباً 🔥 -->
           <div class="vip-plan-card plan-popular">
             <div class="plan-floating-badge badge-popular-glow">
               <i class="fa-solid fa-fire-flame-curved"></i> الأكثر طلباً — اختيار 78% من المعلمين 🔥
             </div>
             
             <div class="plan-header-box">
-              <div class="plan-title-text" style="color: #a855f7;">باقة الفصل الدراسي (3 أشهر)</div>
-              <div class="plan-subtitle-text">تغطية امتحانية متكاملة للامتحانات اليومية، الشهرية، ونصف السنة</div>
+              <div class="plan-title-text" style="color: #a855f7;">باقة الـ 4 أشهر (الفصل الدراسي الممتد)</div>
+              <div class="plan-subtitle-text">تغطية شاملة طوال 4 أشهر كاملة للامتحانات اليومية، الشهرية، ونصف السنة</div>
             </div>
 
             <div class="plan-price-zone">
-              <div class="plan-strike-row">
-                <span class="plan-old-price">100,000 د.ع</span>
-                <span class="plan-discount-pill">خصم 25% — وفر 25,000 د.ع</span>
-              </div>
               <div class="plan-main-price">
                 <span class="plan-amount-num" style="color: #8b5cf6;">75,000</span>
                 <span class="plan-currency-tag" style="color: #8b5cf6;">د.ع</span>
-                <span class="plan-period-tag">/ 3 أشهر</span>
+                <span class="plan-period-tag">/ 4 أشهر كاملة</span>
               </div>
-              <div class="plan-mental-math" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.1);">توفير فوري 25 ألف دينار كاش في جيبك!</div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">السعر الأساسي:</span>
+                  <span class="plan-old-price">100,000 د.ع</span>
+                  <span class="plan-discount-pill pill-purple">خصم 25% — وفر 25,000 د.ع</span>
+                </div>
+                <div class="plan-mental-math" style="color: #8b5cf6; background: rgba(139, 92, 246, 0.12);">
+                  <i class="fa-solid fa-gift"></i> احصل على 4 أشهر كاملة بسعر 3 أشهر (شهر إضافي مجاناً 🎁)
+                </div>
+              </div>
             </div>
 
             <ul class="plan-features-list">
-              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>جميع مميزات الباقة الشهرية طوال 90 يوماً</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>جميع مميزات الباقة الشهرية طوال 120 يوماً كاملة</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span><strong>بونص حصري:</strong> بنك النماذج الوزارية للفصل</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>توليد وفرز نموذجين (A / B) لمنع الغش</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>ترويسة مخصصة باسم الأستاذ والمدرسة</span></li>
@@ -2945,9 +3051,9 @@
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>حفظ وأرشفة مشاريعك واختباراتك سحابياً</span></li>
             </ul>
 
-            <button type="button" class="btn-plan-cta btn-plan-popular" onclick="window.selectSubscriptionPlan('3_months')">
+            <button type="button" class="btn-plan-cta btn-plan-popular" onclick="window.selectSubscriptionPlan('4_months')">
               <i class="fa-brands fa-whatsapp"></i>
-              <span>احصل على عرض الفصل (75 ألف فقط) 🚀</span>
+              <span>احصل على عرض الـ 4 أشهر (75 ألف فقط) 🚀</span>
             </button>
           </div>
 
@@ -2963,16 +3069,21 @@
             </div>
 
             <div class="plan-price-zone">
-              <div class="plan-strike-row">
-                <span class="plan-old-price">300,000 د.ع</span>
-                <span class="plan-discount-pill pill-green">خصم 50% — وفر 150,000 د.ع كاش!</span>
-              </div>
               <div class="plan-main-price">
                 <span class="plan-amount-num" style="color: #f59e0b;">150,000</span>
                 <span class="plan-currency-tag" style="color: #f59e0b;">د.ع</span>
                 <span class="plan-period-tag">/ سنة كاملة</span>
               </div>
-              <div class="plan-mental-math" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">فقط ~12,500 د.ع شهرياً (أرخص بنصف السعر!)</div>
+              <div class="plan-discount-under-price">
+                <div class="plan-strike-row-under">
+                  <span class="plan-old-price-label">السعر الأساسي:</span>
+                  <span class="plan-old-price">300,000 د.ع</span>
+                  <span class="plan-discount-pill pill-green">خصم 50% — وفر 150,000 د.ع كاش!</span>
+                </div>
+                <div class="plan-mental-math" style="color: #f59e0b; background: rgba(245, 158, 11, 0.12);">
+                  فقط ~12,500 د.ع شهرياً (نصف السعر الأصلي!)
+                </div>
+              </div>
             </div>
 
             <ul class="plan-features-list">
@@ -3107,7 +3218,7 @@
           <div style="display: grid; grid-template-columns: 220px 1fr auto auto; gap: 8px; align-items: center;">
             <select id="subActivationPlanSelect" class="form-control" style="height: 38px; padding: 0.35rem 0.65rem; font-size: 0.82rem; border-radius: var(--radius-sm); font-weight: 700;">
               <option value="1_month">📅 شهر واحد (25,000 د.ع)</option>
-              <option value="3_months">🔥 3 أشهر - فصل (75,000 د.ع)</option>
+              <option value="4_months">🔥 4 أشهر - فصل دراسي (75,000 د.ع)</option>
               <option value="1_year" selected>👑 سنوية كاملة (150,000 د.ع)</option>
             </select>
             <input type="text" id="subActivationQueryInput" class="admin-activate-input" style="height: 38px; padding: 0.45rem 0.75rem; font-size: 0.86rem; border-radius: var(--radius-sm);" placeholder="أدخل اسم المستخدم أو البريد لتفعيله أو حذفه..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.manageApproveGrantSubscription(); }">
