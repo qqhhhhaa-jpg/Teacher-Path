@@ -24,21 +24,6 @@
   <!-- KaTeX CSS for Iraqi Ministerial Math Typography -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   
-  <!-- Official Google Identity Services SDK (GIS OAuth 2.0) -->
-  <script>
-    window.GOOGLE_CLIENT_ID = '87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com';
-    window._pendingGoogleAuthResponse = null;
-    window.Loingcallback = function(response) {
-      if (typeof window.handleGoogleCredentialResponse === 'function') {
-        window.handleGoogleCredentialResponse(response);
-      } else {
-        window._pendingGoogleAuthResponse = response;
-      }
-    };
-    window.LoginCallback = window.Loingcallback;
-    window.loginCallback = window.Loingcallback;
-  </script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   
   <!-- Core Styles -->
   <link rel="stylesheet" href="css/style.css?v=5.6">
@@ -121,6 +106,15 @@
                 <span>إدارة الاشتراكات</span>
               </div>
               <span class="drawer-badge-tag badge-subscribers-tag" id="drawerSubscribersCountBadge">0 مشترك 👑</span>
+            </button>
+
+            <!-- 3. Server Live Dashboard Button (رادار وسيرفر المراقبة الحية - يظهر للمدير فقط) -->
+            <button class="drawer-item-btn admin-only-hidden" id="drawerServerDashboardBtn" style="display: none; background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(59, 130, 246, 0.12)); border: 1px solid rgba(14, 165, 233, 0.35);" onclick="window.open('/dashboard', '_blank');" title="لوحة مراقبة السيرفر وقاعدة البيانات ورادار الأنشطة المباشر" data-tooltip="سيرفر البيانات والرادار 🖥️">
+              <div class="drawer-item-main">
+                <i class="fa-solid fa-server" style="color: #38bdf8; font-size: 1.05rem;"></i>
+                <span style="font-weight: 800;">سيرفر البيانات والرادار الحي</span>
+              </div>
+              <span class="drawer-badge-tag" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">24 ساعة متصل ⚡</span>
             </button>
 
             <!-- AI Triple Generator in Drawer (توليد 3 نماذج بالذكاء الاصطناعي) -->
@@ -260,19 +254,6 @@
                 <i class="fa-solid fa-floppy-disk text-success"></i>
                 <span>حفظ الاختبار وتصفير الورقة ➔ التقرير</span>
               </button>
-              <!-- Google Cloud Sync & Multi-Device Actions -->
-              <button class="drawer-action-btn highlight-google" id="drawerGoogleSyncBtn" onclick="window.loginWithGoogleFirebase()" title="تسجيل الدخول السريع بحساب Google وحفظ الأسئلة سحابياً" data-tooltip="تسجيل دخول Google والمزامنة">
-                <i class="fa-brands fa-google text-danger"></i>
-                <span>تسجيل دخول Google السحابي</span>
-              </button>
-              <button class="drawer-action-btn" id="drawerCloudCenterBtn" onclick="window.openCloudTransferModal()" title="مركز المزامنة السحابية ونقل الأسئلة لأي جهاز" data-tooltip="مركز المزامنة السحابية">
-                <i class="fa-solid fa-cloud-arrow-up text-info"></i>
-                <span>مزامنة ونقل الأسئلة سحابياً</span>
-              </button>
-              <button class="drawer-action-btn" id="drawerMobileSyncBtn" onclick="window.openMobileSyncModal()" title="المزامنة الفورية بين اللابتوب والموبايل" data-tooltip="مزامنة الموبايل الفورية">
-                <i class="fa-solid fa-mobile-screen-button text-primary"></i>
-                <span>مزامنة الموبايل واللابتوب 📱</span>
-              </button>
               <!-- Subscription Plans Button (خطط الاشتراك تبدأ من 25 ألف) -->
               <button class="drawer-action-btn highlight-vip" id="drawerSubscriptionBtn" onclick="window.openSubscriptionModal()" title="خطط وباقات الاشتراك (تبدأ من 25 ألف د.ع)" data-tooltip="خطط الاشتراك (من 25 ألف)">
                 <i class="fa-solid fa-crown text-warning"></i>
@@ -324,17 +305,6 @@
       </div>
 
       <div class="nav-actions">
-        <!-- Google Cloud Linked Indicator (شعار الاتصال بحساب Google) -->
-        <button class="btn-nav" id="navGoogleSyncStatusBtn" onclick="window.openFirebaseConfigModal()" title="حالة الربط بحساب Google والمزامنة السحابية" style="display: none; border-color: rgba(66, 133, 244, 0.35); background: rgba(66, 133, 244, 0.08);">
-          <i class="fa-brands fa-google" style="color: #ea4335;"></i>
-          <span id="navGoogleSyncText" style="color: #60a5fa; font-weight: 700; font-size: 0.8rem;">سحابة Google</span>
-        </button>
-
-        <!-- Mobile Sync Button (زر المزامنة الفورية مع الهاتف) -->
-        <button class="btn-nav" id="topNavMobileSyncBtn" onclick="window.openMobileSyncModal()" title="المزامنة الفورية بين اللابتوب والموبايل" style="border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.12); color: #0284c7; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;">
-          <i class="fa-solid fa-mobile-screen-button" style="color: #0284c7; font-size: 0.95rem;"></i>
-          <span>مزامنة الموبايل 📱</span>
-        </button>
 
         <!-- Toggle Live Preview Button (زر المعاينة) -->
         <button class="btn-nav-preview preview-active" id="togglePreviewBtn" title="إظهار أو إخفاء ورقة المعاينة المباشرة A4">
@@ -1925,24 +1895,21 @@
                 </button>
               </form>
 
-              <!-- Divider line -->
+              <!-- Divider Line -->
               <div class="auth-divider-line" style="margin: 1.35rem 0 1rem 0;">
-                <span>أو تسجيل الدخول الرسمي المباشر عبر Google</span>
+                <span>ليس لديك حساب بعد؟</span>
               </div>
 
-              <!-- Google Official Sign-In Button -->
-              <button type="button" class="btn-google-login-prominent" id="portalGoogleLoginBtn" onclick="window.openGoogleAccountModal()" title="تسجيل الدخول والمصادقة المباشرة عبر Google">
-                <svg class="google-logo-svg" viewBox="0 0 48 48">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <div class="google-btn-text">
-                  <strong>تسجيل الدخول الرسمي عبر Google</strong>
-                  <small>المصادقة الرسمية المباشرة وحفظ اختباراتك سحابياً بأمان تام</small>
+              <!-- Prominent New Account Registration Button -->
+              <button type="button" class="btn-register-account-prominent" id="portalOpenRegisterBtn" onclick="window.openGoogleAccountModal()" title="إنشاء وتسجيل حساب معلم جديد">
+                <div class="register-btn-icon-wrap">
+                  <i class="fa-solid fa-user-plus"></i>
                 </div>
-                <i class="fa-solid fa-arrow-left google-btn-arrow"></i>
+                <div class="register-btn-text">
+                  <strong>إنشاء وتسجيل حساب معلم جديد ✨</strong>
+                  <small>إعداد وتوثيق حسابك مجاناً وتخصيص ترويسة الاختبارات</small>
+                </div>
+                <i class="fa-solid fa-arrow-left register-btn-arrow"></i>
               </button>
             </div>
 
@@ -2138,7 +2105,7 @@
               </div>
             </div>
 
-            <!-- Feature 6: Privacy Guard & Cloud Sync -->
+            <!-- Feature 6: Privacy Guard & Exam Confidentiality -->
             <div class="welcome-feature-card feat-security-card" data-cat="security">
               <div class="feat-card-glow"></div>
               <span class="feat-badge-chip badge-rose"><i class="fa-solid fa-shield-halved"></i> حماية وتشفير 256-bit</span>
@@ -2147,14 +2114,14 @@
                   <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div class="feature-card-title-wrap">
-                  <h4>درع الخصوصية ومزامنة Google</h4>
-                  <span class="feat-subtext">Cloud Sync & Exam Confidentiality</span>
+                  <h4>درع الخصوصية والسرية التامة</h4>
+                  <span class="feat-subtext">Security & Exam Confidentiality</span>
                 </div>
               </div>
-              <p>ربط سريع بحساب Google لنقل ومزامنة أسئلتك بين الحاسوب والهاتف، مع نظام قفل فوري عند إغلاق المتصفح لحماية سرية الأسئلة والامتحانات.</p>
+              <p>حماية مشفرة لأسئلتك واختباراتك مع نظام قفل فوري عند إغلاق المتصفح لحماية سرية الأسئلة والامتحانات المدرسية.</p>
               <div class="feat-micro-tags">
-                <span>مزامنة سحابية</span>
-                <span>تسجيل Google</span>
+                <span>تشفير وأمان</span>
+                <span>حماية الحساب</span>
                 <span>قفل عند الخروج</span>
                 <span>سرية تامة</span>
               </div>
@@ -2259,8 +2226,8 @@
       </div>
 
       <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-        <button type="button" class="btn btn-outline" style="border-color: rgba(234, 67, 53, 0.4); color: #ea4335; background: rgba(234, 67, 53, 0.05);" onclick="document.getElementById('profileModal').classList.remove('open'); window.openGoogleAccountModal();" title="ربط حساب Google لحفظ ومزامنة الأسئلة سحابياً">
-          <i class="fa-brands fa-google"></i> ربط بحساب Google
+        <button type="button" class="btn btn-outline" onclick="document.getElementById('profileModal').classList.remove('open'); window.openGoogleAccountModal();" title="تسجيل الدخول أو ربط الحساب بالبريد الإلكتروني">
+          <i class="fa-solid fa-envelope text-primary"></i> تسجيل الدخول بالبريد
         </button>
         <div style="display: flex; gap: 0.5rem;">
           <button class="btn btn-outline" id="applyProfileToHeaderBtn" title="تطبيق هذه البيانات في ترويسة الاختبار المفتوح">
@@ -2589,27 +2556,24 @@
     </div>
   </div>
 
-  <!-- Google Account Selector Modal (معالج تسجيل الدخول والربط عبر Google - خطوتين) -->
-  <div class="modal-overlay google-auth-overlay" id="googleAuthModal">
-    <div class="modal-container google-auth-container" style="max-width: 530px;">
+  <!-- Teacher Email Registration & Login Modal -->
+  <div class="modal-overlay" id="googleAuthModal">
+    <div class="modal-container" style="max-width: 530px;">
       <div class="modal-header" style="border-bottom: none; padding-bottom: 0.35rem;">
         <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <svg viewBox="0 0 48 48" width="28" height="28">
-            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          </svg>
-          <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">تسجيل الدخول وربط حساب Google</span>
+          <div style="width: 34px; height: 34px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+            <i class="fa-solid fa-envelope" style="font-size: 1.1rem;"></i>
+          </div>
+          <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">تسجيل الدخول بالبريد الإلكتروني</span>
         </div>
         <button type="button" class="btn-drawer-close" onclick="window.closeGoogleAccountModal()">✖</button>
       </div>
 
       <!-- Stepper Progress Header (مؤشر الخطوتين) -->
       <div class="auth-stepper-header" style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 1.25rem 0.85rem 1.25rem; border-bottom: 1px solid var(--border-color);">
-        <div class="stepper-step active" id="stepIndicator1" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: #4285f4;">
-          <span class="step-num-badge" id="step1Badge" style="width: 24px; height: 24px; border-radius: 50%; background: #4285f4; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">1</span>
-          <span>الخطوة 1: حساب Google</span>
+        <div class="stepper-step active" id="stepIndicator1" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary);">
+          <span class="step-num-badge" id="step1Badge" style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">1</span>
+          <span>الخطوة 1: البريد الإلكتروني</span>
         </div>
         <div style="flex: 1; height: 2px; background: var(--border-color); max-width: 45px;"></div>
         <div class="stepper-step" id="stepIndicator2" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">
@@ -2620,89 +2584,29 @@
 
       <div class="modal-body" style="padding-top: 0.85rem;">
         
-        <!-- STEP 1: Official Google Identity Authentication (الخطوة الأولى: المصادقة الرسمية عبر Google) -->
+        <!-- STEP 1: Direct Email Input (الخطوة الأولى: إدخال البريد الإلكتروني يدوياً) -->
         <div id="googleAuthStep1">
           <div id="googleStep1SelectionView">
-            <div style="text-align: center; margin-bottom: 1.15rem; padding-bottom: 0.85rem; border-bottom: 1px solid var(--border-color);">
-              <div style="width: 52px; height: 52px; border-radius: 50%; background: #ffffff; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.25); display: flex; align-items: center; justify-content: center; margin: 0 auto 0.65rem auto;">
-                <svg viewBox="0 0 48 48" width="32" height="32">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-              </div>
-              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.35rem;">
-                تسجيل الدخول الرسمي عبر Google
-              </h3>
-              <p style="font-size: 0.84rem; color: var(--text-muted); margin: 0; line-height: 1.5;">
-                المصادقة الرسمية المباشرة مع منصة Google لاختيار حسابك الشخصي (Gmail) وحفظ اختباراتك سحابياً.
-              </p>
-            </div>
 
-            <!-- Official Google 1-Click Popup Button (المصادقة الرسمية المباشرة) -->
-            <div style="background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1.15rem; text-align: center;">
-              <div style="font-size: 0.9rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <svg viewBox="0 0 48 48" width="22" height="22">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <span>المصادقة الرسمية المعتمدة عبر حساب Google</span>
-              </div>
-              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 0.85rem 0;">
-                اضغط هنا لاختيار حساب Google الخاص بك والمصادقة التلقائية الرسمية بنقرة واحدة:
-              </p>
-
-              <button type="button" class="btn btn-primary" id="btnLaunchOfficialGoogleAuth" onclick="window.launchGoogleRealPopup()" style="width: 100%; height: 48px; font-size: 0.98rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #4285f4; border-color: #4285f4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">
-                <svg viewBox="0 0 48 48" width="22" height="22">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <span>فتح نافذة اختيار حساب Google الرسمي 🚀</span>
-              </button>
-
-              <div id="googleOfficialGsiButton" style="display: flex; justify-content: center; align-items: center; margin-top: 0.65rem;"></div>
-
-              <div id="googleAuthStatusNotice" style="display: none; margin-top: 0.75rem; font-size: 0.8rem; padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); background: rgba(66, 133, 244, 0.12); color: #1a73e8; font-weight: 700; text-align: center;">
-                <i class="fa-solid fa-circle-notch fa-spin"></i> جارٍ التحقق والاتصال بمنصة Google الرسمية...
-              </div>
-            </div>
-
-            <!-- Saved Google Accounts Box (يظهر الحسابات المسجلة لدخول فوري بنقرة واحدة) -->
-            <div id="googleSavedAccountsBox" style="display: none; background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.3); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
-              <div style="font-size: 0.85rem; font-weight: 800; color: #4285f4; margin-bottom: 0.65rem; display: flex; align-items: center; justify-content: space-between;">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-users text-primary"></i>
-                  <span>حسابات Google المسجلة على هذا الجهاز:</span>
-                </span>
-                <span class="badge-tag" style="background: #10b981; color: #fff; font-size: 0.7rem; font-weight: 700;">دخول مباشر</span>
-              </div>
-              <div id="googleSavedAccountsList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
-            </div>
-
-            <!-- Direct Google Gmail Sign-in Box (تسجيل الدخول المباشر بحساب Google) -->
+            <!-- Direct Email Sign-in Box -->
             <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; text-align: right;">
               <div style="margin-bottom: 1rem;">
                 <label style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
                   <span style="display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-envelope text-accent"></i>
-                    <span>بريد Google الشخصي (Gmail):</span>
+                    <i class="fa-solid fa-envelope text-primary"></i>
+                    <span>البريد الإلكتروني للأستاذ:</span>
                   </span>
-                  <span id="googleEmailStatusBadge" class="badge-tag" style="font-size: 0.72rem; background: rgba(66, 133, 244, 0.1); color: #4285f4; border: 1px solid rgba(66, 133, 244, 0.25);">مطلوب @gmail.com</span>
+                  <span id="googleEmailStatusBadge" class="badge-tag" style="font-size: 0.72rem; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.25);">إدخال يدوي</span>
                 </label>
                 
                 <div style="position: relative;">
-                  <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr" placeholder="yourname@gmail.com" style="padding-left: 2.6rem; font-size: 1rem; font-weight: 600; border-radius: 10px; height: 48px;" oninput="window.handlePersonalGoogleEmailInput(this.value)">
-                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #ea4335; font-size: 1.25rem; pointer-events: none;">
+                  <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr" placeholder="name@example.com" style="padding-left: 2.6rem; font-size: 1rem; font-weight: 600; border-radius: 10px; height: 48px;" oninput="window.handlePersonalGoogleEmailInput(this.value)">
+                  <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.25rem; pointer-events: none;">
                     <i class="fa-solid fa-at"></i>
                   </span>
                 </div>
                 <div id="googleEmailNoticeText" style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-                  أدخل بريد Gmail الشخصي الخاص بك لفتح حسابك ومزامنة اختباراتك فوراً.
+                  أدخل بريدك الإلكتروني يدوياً لفتح حسابك أو تسجيل حساب جديد ومتابعة الإعدادات.
                 </div>
               </div>
 
@@ -2726,53 +2630,11 @@
 
               <!-- Submit Button -->
               <button type="button" class="btn btn-primary" id="btnConfirmPersonalGoogle" onclick="window.submitPersonalGoogleEmail()" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #2563eb; border-color: #2563eb; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
-                <i class="fa-brands fa-google"></i>
-                <span>متابعة تسجيل الدخول بحساب Google 🚀</span>
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>متابعة تسجيل الحساب بالبريد 🚀</span>
               </button>
             </div>
 
-            <!-- Cross-Device Mobile Sync Shortcut -->
-            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 10px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
-              <div>
-                <strong style="color: #10b981; font-size: 0.84rem; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-mobile-screen-button"></i> فتح المنصة على الموبايل ومزامنة الاختبارات
-                </strong>
-                <small style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 2px;">
-                  امسح الباركود بكاميرا الموبايل لنقل كافة الاختبارات والأسئلة فوراً
-                </small>
-              </div>
-              <button type="button" class="btn btn-sm btn-outline" onclick="window.closeGoogleAccountModal(); window.openMobileSyncModal();" style="border-color: #10b981; color: #10b981; font-weight: 800; font-size: 0.78rem;">
-                <i class="fa-solid fa-qrcode"></i> باركود الموبايل 📱
-              </button>
-            </div>
-
-            <!-- Optional Google Client ID Config Toggle -->
-            <div style="border-top: 1px solid var(--border-color); padding-top: 0.65rem; margin-top: 0.5rem;">
-              <button type="button" class="btn btn-outline" onclick="window.toggleGoogleClientIdBox()" style="width: 100%; font-size: 0.74rem; padding: 0.35rem 0.65rem; display: flex; align-items: center; justify-content: space-between; border-style: dashed;">
-                <span style="display: flex; align-items: center; gap: 5px;">
-                  <i class="fa-solid fa-gear text-primary"></i>
-                  <span>معرّف ربط Google Cloud Client ID للمنصة</span>
-                </span>
-                <span id="googleClientIdStatusBadge" class="badge-tag" style="font-size: 0.68rem; padding: 2px 6px;">مضبوط</span>
-              </button>
-              <div id="googleClientIdBox" style="display: none; margin-top: 0.65rem; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; text-align: right;">
-                <label style="font-size: 0.74rem; font-weight: 700; display: block; margin-bottom: 0.35rem; color: var(--text-main);">
-                  معرّف العميل (Google OAuth 2.0 Client ID):
-                </label>
-                <input type="text" id="cfgGoogleClientIdInput" class="form-control" dir="ltr" value="87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com" placeholder="87825334391-geh3j7npfjhkc0d0inf0ii2g4ejjdu6p.apps.googleusercontent.com" style="font-size: 0.76rem; font-family: monospace; padding: 0.4rem 0.6rem; margin-bottom: 0.5rem;">
-                <div style="display: flex; gap: 0.5rem;">
-                  <button type="button" class="btn btn-primary" onclick="window.saveCustomGoogleClientId()" style="flex: 1; font-size: 0.74rem; padding: 0.35rem 0.6rem;">
-                    <i class="fa-solid fa-check"></i> حفظ وتفعيل
-                  </button>
-                  <button type="button" class="btn btn-outline" onclick="window.resetGoogleClientIdDefault()" style="font-size: 0.74rem; padding: 0.35rem 0.6rem;">
-                    استعادة الافتراضي
-                  </button>
-                </div>
-                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 0.4rem; line-height: 1.4;">
-                  لربط دومين موقعك، أنشئ OAuth Client ID في Google Cloud Console وأضف رابط موقعك في Authorized JavaScript Origins.
-                </small>
-              </div>
-            </div>
 
           </div>
         </div>
@@ -2782,19 +2644,14 @@
           <!-- Account Linked Ribbon -->
           <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <svg viewBox="0 0 48 48" width="22" height="22">
-                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              </svg>
+              <i class="fa-solid fa-circle-check text-success" style="font-size: 1.2rem;"></i>
               <div>
-                <strong style="font-size: 0.82rem; color: #10b981; display: block;">تم التحقق من حساب Google الشخصي ✔</strong>
-                <small id="step2LinkedEmail" style="font-size: 0.72rem; color: var(--text-muted);" dir="ltr">hussein.teacher@gmail.com</small>
+                <strong style="font-size: 0.82rem; color: #10b981; display: block;">تم تأكيد البريد الإلكتروني ✔</strong>
+                <small id="step2LinkedEmail" style="font-size: 0.72rem; color: var(--text-muted);" dir="ltr">teacher@example.com</small>
               </div>
             </div>
             <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;" onclick="window.backToGoogleStep1()">
-              تغيير الحساب
+              تغيير البريد
             </button>
           </div>
 
@@ -2893,199 +2750,6 @@
     </div>
   </div>
 
-  <!-- Cloud Sync & Multi-Device Transfer Modal (مركز المزامنة ونقل الأسئلة السحابي) -->
-  <div class="modal-overlay cloud-sync-overlay" id="cloudSyncModal">
-    <div class="modal-container cloud-sync-container" style="max-width: 580px;">
-      <div class="modal-header">
-        <div class="modal-title" style="display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fa-solid fa-cloud-arrow-up text-info" style="font-size: 1.25rem;"></i>
-          <span>مركز المزامنة السحابية ونقل الأسئلة</span>
-        </div>
-        <button type="button" class="btn-drawer-close" onclick="window.closeCloudTransferModal()">✖</button>
-      </div>
-
-      <div class="modal-body">
-        <!-- Status Box -->
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 0.85rem 1rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-          <div>
-            <div style="font-weight: 800; color: #10b981; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
-              <i class="fa-solid fa-circle-check"></i> متصل بحساب: <span id="cloudAccountEmailDisplay">hussein.teacher@gmail.com</span>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
-              الأسئلة المحفوظة سحابياً: (<span id="cloudQuestionsCount">0</span> سؤال) | الاختبارات: (<span id="cloudExamsCount">0</span> اختبار)
-            </div>
-          </div>
-          <button type="button" class="btn btn-success" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;" onclick="window.syncCurrentDataToCloud()">
-            <i class="fa-solid fa-rotate"></i> مزامنة وحفظ الآن
-          </button>
-        </div>
-
-        <p style="font-size: 0.84rem; color: var(--text-main); margin-bottom: 0.85rem; line-height: 1.5;">
-          يمكنك نقل كافة أسئلتك واختباراتك بسهولة إلى أي جهاز آخر (هاتف، لابتوب، أو حاسوب المدرسة) بإحدى الطرق التالية:
-        </p>
-
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-          <!-- Option 1: 1-Click Server Sync (When connecting to the same server/Wi-Fi) -->
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
-            <div style="font-weight: 800; font-size: 0.86rem; color: #38bdf8; margin-bottom: 4px;">
-              <i class="fa-solid fa-wifi"></i> 1. المزامنة التلقائية عبر السيرفر
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
-              إذا كنت تفتح المنصة من هاتفك أو كمبيوترك، اضغط زر الاسترجاع السحابي لسحب كل الأسئلة فوراً:
-            </p>
-            <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.restoreDataFromCloudServer()">
-              <i class="fa-solid fa-cloud-arrow-down text-primary"></i> استرجاع أسئلتي من السحابة الآن ☁️
-            </button>
-          </div>
-
-          <!-- Option 2: Copy Cloud Token (رمز المزامنة السحابي) -->
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
-            <div style="font-weight: 800; font-size: 0.86rem; color: #fbbf24; margin-bottom: 4px;">
-              <i class="fa-solid fa-key"></i> 2. رمز المزامنة السحابي (نسخ ولصق فوري)
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
-              انسخ رمز بياناتك السحابية والصقه في أي متصفح في أي مكان لاسترجاع كل أسئلتك في ثانية:
-            </p>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.copyCloudSyncToken()">
-                <i class="fa-solid fa-copy"></i> نسخ رمز المزامنة للحافظة
-              </button>
-              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.pasteAndImportCloudToken()">
-                <i class="fa-solid fa-paste"></i> استيراد من رمز منسوخ
-              </button>
-            </div>
-          </div>
-
-          <!-- Option 3: Download Complete Offline Backup File (.json) -->
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 0.95rem;">
-            <div style="font-weight: 800; font-size: 0.86rem; color: #10b981; margin-bottom: 4px;">
-              <i class="fa-solid fa-floppy-disk"></i> 3. ملف النسخة الاحتياطية الشامل (Google Drive / Flash)
-            </div>
-            <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 6px 0;">
-              تنزيل ملف يحتوي على كل أسئلتك واختباراتك لتخزينه في Google Drive أو فلاش ميموري:
-            </p>
-            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="window.downloadFullCloudBackupFile()">
-                <i class="fa-solid fa-download"></i> تنزيل ملف السحابة (.json)
-              </button>
-              <button type="button" class="btn btn-outline" style="padding: 0.38rem 0.85rem; font-size: 0.8rem;" onclick="document.getElementById('cloudBackupFileInput').click()">
-                <i class="fa-solid fa-upload"></i> استيراد ملف سحابي
-              </button>
-              <input type="file" id="cloudBackupFileInput" accept=".json" style="display: none;" onchange="window.handleUploadCloudBackup(event)">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline" onclick="window.closeCloudTransferModal()">إغلاق</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Google Firebase Cloud Sync & Configuration Modal -->
-  <div class="modal-overlay firebase-config-overlay" id="firebaseConfigModal">
-    <div class="modal-container" style="max-width: 600px;">
-      <div class="modal-header" style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(234, 67, 53, 0.05)); border-bottom: 1px solid var(--border-color); padding: 1rem 1.25rem;">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <div style="width: 38px; height: 38px; border-radius: 10px; background: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center;">
-            <svg viewBox="0 0 48 48" width="24" height="24">
-              <path fill="#FFA000" d="M7.7 39.4l14.4-26.6c.7-1.3 2.6-1.3 3.3 0l5.8 10.7-18.4 16c-.9.8-2.3.6-2.9-.4-.7-1-.4-2.4.4-3.1l-2.6 3.4z"/>
-              <path fill="#F57C00" d="M25.4 12.8L19.6 2.1c-.7-1.3-2.6-1.3-3.3 0L7.7 39.4l14.8-13.6 2.9-13z"/>
-              <path fill="#FFCA28" d="M40.3 33.4L32.2 18.3c-.7-1.3-2.6-1.3-3.3 0l-5.8 10.7 13.9 12.2c1.2 1 3 .6 3.7-.7.5-.9.4-2.1-.4-2.9z"/>
-            </svg>
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.05rem; font-weight: 800; color: var(--text-main);">
-              إعدادات الربط السحابي مع Google Firebase
-            </h3>
-            <small id="firebaseStatusDesc" style="font-size: 0.74rem; color: var(--text-muted);">
-              تسجيل الدخول بحساب Google الشخصي والمزامنة الفورية بين اللابتوب والموبايل
-            </small>
-          </div>
-        </div>
-        <button type="button" class="btn-drawer-close" onclick="window.closeFirebaseConfigModal()">✖</button>
-      </div>
-
-      <div class="modal-body" style="padding: 1.15rem; max-height: 75vh; overflow-y: auto;">
-        <!-- Explanatory Banner -->
-        <div style="background: rgba(66, 133, 244, 0.08); border: 1.5px solid rgba(66, 133, 244, 0.25); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 1rem;">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
-            <strong style="color: #4285f4; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-globe"></i> المزامنة العالمية بين اللابتوب والموبايل
-            </strong>
-            <span class="badge-tag" style="background: #10b981; color: #fff; font-size: 0.7rem; font-weight: 700;">خدمة مجانية 100% من Google</span>
-          </div>
-          <p style="margin: 0; font-size: 0.78rem; color: var(--text-muted); line-height: 1.5;">
-            تتيح لك سحابة Google Firebase الدخول بحساب Gmail الشخصي بنقرة واحدة من أي جهاز في العالم (هاتفك، لابتوبك، أو حاسوب المدرسة) مع حفظ ومزامنة كافة اختباراتك وبنك أسئلتك تلقائياً وبأمان كامل.
-          </p>
-        </div>
-
-        <!-- 3-Step Setup Quick Guide -->
-        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 0.95rem; margin-bottom: 1rem;">
-          <h4 style="font-size: 0.86rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-list-check text-success"></i> خطوات ربط حسابك في دقيقتين فقط:
-          </h4>
-          <ol style="margin: 0; padding-right: 1.25rem; font-size: 0.78rem; color: var(--text-muted); line-height: 1.8;">
-            <li>ادخل مجاناً إلى <a href="https://console.firebase.google.com" target="_blank" style="color: #4285f4; font-weight: 700; text-decoration: underline;">لوحة Google Firebase Console</a> وسجل بحساب Gmail الخاص بك.</li>
-            <li>اضغط <strong>Add project</strong> وسمِّ مشروعك (مثلاً: <code>masar-exams</code>).</li>
-            <li>من القائمة الجانبية:
-              <br>• اذهب إلى <strong>Authentication</strong> ➔ اضغط Get started ➔ فعّل <strong>Google</strong>.
-              <br>• اذهب إلى <strong>Firestore Database</strong> ➔ اضغط Create database (في وضع Start in test mode).
-            </li>
-            <li>من أيقونة الترس ⚙️ ➔ <strong>Project settings</strong> ➔ في الأسفل اضغط أيقونة الويب <code>&lt;/&gt;</code> وانسخ كود <code>firebaseConfig</code>.</li>
-          </ol>
-        </div>
-
-        <!-- Import Snippet Button -->
-        <div style="margin-bottom: 1rem; text-align: center;">
-          <button type="button" class="btn btn-outline" onclick="window.importFirebaseConfigSnippet()" style="width: 100%; padding: 0.65rem; font-size: 0.85rem; font-weight: 800; border-color: #10b981; color: #10b981; border-style: dashed; background: rgba(16, 185, 129, 0.05);">
-            <i class="fa-solid fa-paste"></i> اضغط هنا للصق كود إعدادات Firebase كاملاً بنقرة واحدة 📋
-          </button>
-        </div>
-
-        <!-- Manual Fields Accordion -->
-        <div style="border-top: 1px solid var(--border-color); padding-top: 0.85rem;">
-          <span style="font-size: 0.78rem; font-weight: 800; color: var(--text-muted); display: block; margin-bottom: 0.65rem;">أو إدخال المفاتيح يدوياً:</span>
-          
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">apiKey:</label>
-              <input type="text" id="fbCfgApiKey" class="form-control" dir="ltr" placeholder="AIzaSy..." style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">projectId:</label>
-              <input type="text" id="fbCfgProjectId" class="form-control" dir="ltr" placeholder="my-project-id" style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">authDomain:</label>
-              <input type="text" id="fbCfgAuthDomain" class="form-control" dir="ltr" placeholder="project.firebaseapp.com" style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">storageBucket:</label>
-              <input type="text" id="fbCfgStorageBucket" class="form-control" dir="ltr" placeholder="project.appspot.com" style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">messagingSenderId:</label>
-              <input type="text" id="fbCfgMessagingSenderId" class="form-control" dir="ltr" placeholder="123456789" style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size: 0.74rem;">appId:</label>
-              <input type="text" id="fbCfgAppId" class="form-control" dir="ltr" placeholder="1:123456:web:abcd" style="font-size: 0.76rem; font-family: monospace;">
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="modal-footer" style="padding: 0.85rem 1.25rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color);">
-        <button type="button" class="btn btn-outline" onclick="window.closeFirebaseConfigModal()">إلغاء</button>
-        <button type="button" class="btn btn-primary" onclick="window.saveFirebaseConfigFromInputs()" style="font-weight: 800; padding: 0.6rem 1.4rem;">
-          <i class="fa-solid fa-cloud-arrow-up"></i> حفظ وتفعيل سحابة Google 🚀
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- VIP Multi-Tier Subscription Modal (خطط وباقات الاشتراك الثلاث) -->
   <div class="modal-overlay vip-subscription-overlay" id="subscriptionModal">
@@ -3229,7 +2893,7 @@
 
             <ul class="plan-features-list">
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span><strong>365 يوماً كاملة</strong> دون انقطاع مع راحة بال مطلقة</span></li>
-              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span>مزامنة سحابية بحساب Google غير محدودة للأجهزة</span></li>
+              <li class="plan-feat-item"><i class="fa-solid fa-circle-check" style="color: #f59e0b;"></i> <span>حفظ وأرشفة غير محدودة لجميع نماذج الاختبارات والأسئلة</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>كافة النماذج الوزارية وحلولها وسلالم التصحيح</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span>حقوق طبع خاصة باسمك واسم مدرستك دون علامات</span></li>
               <li class="plan-feat-item"><i class="fa-solid fa-circle-check"></i> <span><strong>كافة التحديثات والميزات والذكاء الاصطناعي مجاناً</strong></span></li>
@@ -3478,6 +3142,26 @@
           </div>
         </div>
 
+        <!-- Section: Central Server & Live Telemetry Radar Card -->
+        <div style="background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(59, 130, 246, 0.15)); border: 1.5px solid rgba(56, 189, 248, 0.4); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #0284c7, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; box-shadow: 0 0 15px rgba(37,99,235,0.4);">
+              <i class="fa-solid fa-server"></i>
+            </div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.98rem; color: #fff; display: flex; align-items: center; gap: 8px;">
+                <span>سيرفر البيانات المركزي ورادار الأنشطة الحية</span>
+                <span style="font-size: 0.7rem; padding: 2px 8px; border-radius: 999px; background: rgba(16, 185, 129, 0.2); color: #34d399; font-weight: 800;">SQLite متصل 24 ساعة ⚡</span>
+              </div>
+              <small style="color: #cbd5e1; font-size: 0.78rem;">مراقبة كل ما يدور بالمنصة كاملاً، إدارة الحسابات، سجلات الدخول، وتحميل النسخ الاحتياطية</small>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="window.open('/dashboard', '_blank');" style="background: linear-gradient(135deg, #0284c7, #2563eb); border: none; padding: 8px 18px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; color: #fff; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 3px 10px rgba(2, 132, 199, 0.35);">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>فتح لوحة السيرفر الحية (/dashboard)</span>
+          </button>
+        </div>
+
         <!-- Section: Quick VIP Activation Card (Exclusive for Admin) -->
         <div class="admin-activate-card">
           <div class="admin-activate-card-title">
@@ -3586,117 +3270,7 @@
     </div>
   </div>
 
-  <!-- =========================================================================
-       Mobile & Cross-Device Instant Synchronization Modal (مزامنة الموبايل الفورية)
-       ========================================================================= -->
-  <div class="modal-overlay mobile-sync-overlay" id="mobileSyncModal" role="dialog" aria-modal="true">
-    <div class="modal-container mobile-sync-container" style="max-width: 640px; width: 95%; max-height: 92vh; overflow-y: auto;">
-      <div class="modal-header" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(99, 102, 241, 0.12)); border-bottom: 1.5px solid rgba(56, 189, 248, 0.3); padding: 1.15rem 1.35rem;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; color: #0284c7; font-size: 1.35rem;">
-            <i class="fa-solid fa-mobile-screen-button"></i>
-          </div>
-          <div>
-            <h3 class="modal-title" style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-main);">المزامنة الفورية بين اللابتوب والموبايل</h3>
-            <p style="margin: 2px 0 0 0; font-size: 0.78rem; color: var(--text-muted);">نقل تلقائي كامل للحسابات، الاختبارات المحفوظة، وبنك الأسئلة</p>
-          </div>
-        </div>
-        <button type="button" class="btn-modal-close" onclick="window.closeMobileSyncModal()" title="إغلاق">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
 
-      <div class="modal-body" style="padding: 1.25rem 1.35rem; display: flex; flex-direction: column; gap: 1.15rem;">
-        
-        <!-- Status Banner -->
-        <div style="background: rgba(16, 185, 129, 0.08); border: 1.5px solid rgba(16, 185, 129, 0.3); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; display: inline-block; box-shadow: 0 0 8px #10b981;"></span>
-            <span style="font-weight: 700; font-size: 0.84rem; color: #10b981;">حالة السيرفر وقاعدة البيانات: نشطة ومتصلة</span>
-          </div>
-          <div style="font-size: 0.76rem; color: var(--text-muted);">
-            الحساب النشط: <strong id="syncCurrentAccountName" style="color: var(--text-main);">المدير العام</strong>
-          </div>
-        </div>
-
-        <!-- Section 1: QR Code & Direct Scan -->
-        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem; text-align: center;">
-          <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; justify-content: center; gap: 6px;">
-            <i class="fa-solid fa-qrcode" style="color: #6366f1;"></i>
-            <span>الطريقة الأولى: المسح السريع بالباركود (QR Code)</span>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 12px 0;">
-            وجّه كاميرا هاتفك نحو الباركود أدناه وافتح الرابط ليتم تسجيل دخولك واسترجاع كافة أسئلتك واختباراتك فوراً بنقرة واحدة:
-          </p>
-          
-          <div id="mobileSyncQRContainer" style="display: flex; justify-content: center; align-items: center; margin: 10px 0; min-height: 200px;">
-            <!-- QR SVG injected dynamically here -->
-          </div>
-
-          <div style="margin-top: 10px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
-            <button type="button" class="btn btn-primary" onclick="window.copyDirectMobileSyncLink()" style="font-weight: 800; font-size: 0.82rem; padding: 0.5rem 1rem;">
-              <i class="fa-solid fa-copy"></i> نسخ رابط المزامنة السريع (لإرساله للموبايل)
-            </button>
-            <button type="button" class="btn btn-outline" onclick="window.refreshMobileSyncPayload()" style="font-size: 0.82rem; padding: 0.5rem 0.85rem;">
-              <i class="fa-solid fa-rotate"></i> تحديث الرمز الآن
-            </button>
-          </div>
-        </div>
-
-        <!-- Section 2: Wi-Fi Direct Connection -->
-        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem;">
-          <div style="font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-wifi text-accent"></i>
-            <span>الطريقة الثانية: فتح الرابط المباشر من متصفح الهاتف (Wi-Fi)</span>
-          </div>
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin: 0 0 10px 0;">
-            تأكد أن الهاتف واللابتوب متصلان بنفس شبكة الواي فاي المنزلية، وافتح هذا الرابط من متصفح الهاتف:
-          </p>
-          <div style="display: flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.08); border: 1px dashed rgba(99, 102, 241, 0.3); border-radius: 8px; padding: 8px 12px;">
-            <code style="font-size: 0.95rem; font-weight: 800; color: #6366f1; direction: ltr; flex-grow: 1;" id="syncWifiDirectUrl">http://192.168.0.29:8080</code>
-            <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem;" onclick="window.copyWifiDirectUrl()">
-              <i class="fa-solid fa-copy"></i> نسخ
-            </button>
-          </div>
-        </div>
-
-        <!-- Section 3: Manual Code & File Transfer -->
-        <div class="card-box" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.15rem;">
-          <div style="font-weight: 800; font-size: 0.92rem; margin-bottom: 6px; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
-            <i class="fa-solid fa-file-import text-warning"></i>
-            <span>الطريقة الثالثة: كود المزامنة الشامل أو النسخ الاحتياطي اليدوي</span>
-          </div>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 10px;">
-            <button type="button" class="btn btn-outline" onclick="window.copyFullSyncToken()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
-              <i class="fa-solid fa-key text-accent"></i> نسخ كود المزامنة الشامل
-            </button>
-            <button type="button" class="btn btn-outline" onclick="window.pasteAndImportFullSyncToken()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
-              <i class="fa-solid fa-paste text-success"></i> استيراد من كود المزامنة
-            </button>
-            <button type="button" class="btn btn-outline" onclick="window.downloadFullCloudBackupFile()" style="font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem;">
-              <i class="fa-solid fa-download text-info"></i> تنزيل ملف المزامنة (.json)
-            </button>
-            <label class="btn btn-outline" style="margin: 0; font-size: 0.8rem; font-weight: 700; padding: 0.6rem 0.8rem; cursor: pointer; text-align: center;">
-              <i class="fa-solid fa-upload text-warning"></i> استيراد ملف النسخة الاحتياطية
-              <input type="file" accept=".json" style="display: none;" onchange="window.importFullSyncFile(event)">
-            </label>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="modal-footer" style="padding: 0.85rem 1.35rem; background: var(--bg-surface); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-        <div style="font-size: 0.78rem; color: var(--text-muted);">
-          <span>الإحصائيات المزامنة: </span>
-          <strong id="syncAccountsCountBadge" style="color: var(--primary);">0 حساب</strong> • 
-          <strong id="syncExamsCountBadge" style="color: #10b981;">0 اختبار</strong>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="window.closeMobileSyncModal()" style="font-weight: 800; padding: 0.55rem 1.35rem;">
-          إغلاق النافذة
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
@@ -3704,11 +3278,6 @@
   <!-- KaTeX Math Engine for Iraqi Ministerial Equations -->
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 
-  <!-- Google Firebase SDK (v10 compat) for Multi-Device Auth & Cloud Sync -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  <script src="js/firebase-sync.js?v=6.0"></script>
 
   <!-- Script Modules -->
   <script src="js/qrcode-generator.js?v=5.7"></script>
