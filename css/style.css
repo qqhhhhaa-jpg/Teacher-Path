@@ -5743,79 +5743,277 @@ textarea.form-control {
   gap: 1rem;
 }
 
-/* Daily KPI Dashboard */
+/* Daily Executive KPI Circular Dashboard */
 .daily-metrics-dashboard {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+/* Modal Dashboard: Sleek 5-column single row */
+.daily-report-modal-body .daily-metrics-dashboard {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+@media (max-width: 960px) {
+  .daily-report-modal-body .daily-metrics-dashboard {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+.daily-report-modal-body .daily-metric-card {
+  padding: 0.6rem 0.65rem;
+  gap: 0.45rem;
+}
+
+.daily-report-modal-body .circular-meter-wrap {
+  width: 52px;
+  height: 52px;
+}
+
+.daily-report-modal-body .circular-meter-svg {
+  width: 52px;
+  height: 52px;
+}
+
+.daily-report-modal-body .circular-meter-inner .metric-value {
+  font-size: 1.08rem;
+}
+
+.daily-report-modal-body .daily-metric-card .metric-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 0.78rem;
+}
+
+.daily-report-modal-body .daily-metric-card .metric-label {
+  font-size: 0.72rem;
+  white-space: normal;
+  line-height: 1.22;
+}
+
+.daily-report-modal-body .daily-metric-card .metric-badge {
+  font-size: 0.62rem;
+  padding: 1px 5px;
+}
+
+@media (max-width: 480px) {
+  .daily-metrics-dashboard {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
 }
 
 .daily-metric-card {
+  --card-theme-color: #2563eb;
+  --card-glow-color: rgba(37, 99, 235, 0.16);
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: var(--radius-md);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 0.75rem 0.85rem;
+  border-radius: 16px;
+  background: var(--bg-card, rgba(30, 41, 59, 0.7));
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+  border-right: 3.5px solid var(--card-theme-color);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  overflow: hidden;
+}
+
+.daily-metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, var(--card-glow-color) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
 }
 
 .daily-metric-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px var(--card-glow-color), 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-color: var(--card-theme-color);
 }
 
-.daily-metric-card .metric-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
+.daily-metric-card:hover::before {
+  opacity: 1;
+}
+
+/* Card Themes */
+.daily-metric-card.metric-exams {
+  --card-theme-color: #2563eb;
+  --card-glow-color: rgba(37, 99, 235, 0.2);
+}
+.daily-metric-card.metric-grades {
+  --card-theme-color: #059669;
+  --card-glow-color: rgba(5, 150, 105, 0.2);
+}
+.daily-metric-card.metric-models {
+  --card-theme-color: #d97706;
+  --card-glow-color: rgba(217, 119, 6, 0.2);
+}
+.daily-metric-card.metric-total {
+  --card-theme-color: #7c3aed;
+  --card-glow-color: rgba(124, 58, 237, 0.2);
+}
+.daily-metric-card.metric-today {
+  --card-theme-color: #0891b2;
+  --card-glow-color: rgba(8, 145, 178, 0.2);
+}
+.daily-metric-card.metric-arabic {
+  --card-theme-color: #10b981;
+  --card-glow-color: rgba(16, 185, 129, 0.2);
+}
+.daily-metric-card.metric-english {
+  --card-theme-color: #0ea5e9;
+  --card-glow-color: rgba(14, 165, 233, 0.2);
+}
+.daily-metric-card.metric-math {
+  --card-theme-color: #8b5cf6;
+  --card-glow-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Circular Meter Components */
+.circular-meter-wrap {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
-  flex-shrink: 0;
 }
 
-.metric-today .metric-icon {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
-}
-.metric-arabic .metric-icon {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-}
-.metric-english .metric-icon {
-  background: rgba(14, 165, 233, 0.15);
-  color: #0ea5e9;
-}
-.metric-math .metric-icon {
-  background: rgba(139, 92, 246, 0.15);
-  color: #8b5cf6;
-}
-.metric-total .metric-icon {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+.circular-meter-svg {
+  width: 68px;
+  height: 68px;
+  transform: rotate(-90deg);
+  overflow: visible;
+  filter: drop-shadow(0 2px 5px var(--card-glow-color));
 }
 
+.meter-track {
+  fill: none;
+  stroke: rgba(148, 163, 184, 0.16);
+  stroke-width: 5.5;
+}
+
+.meter-fill {
+  fill: none;
+  stroke: var(--card-theme-color);
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-dasharray: 188.5;
+  stroke-dashoffset: 188.5;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fill-exams { stroke: #2563eb; }
+.fill-grades { stroke: #059669; }
+.fill-models { stroke: #d97706; }
+.fill-total { stroke: #7c3aed; }
+.fill-today { stroke: #0891b2; }
+.fill-arabic { stroke: #10b981; }
+.fill-english { stroke: #0ea5e9; }
+.fill-math { stroke: #8b5cf6; }
+
+.circular-meter-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.circular-meter-inner .metric-value {
+  font-size: 1.32rem;
+  font-weight: 900;
+  font-family: var(--font-family, sans-serif);
+  color: var(--card-theme-color);
+  line-height: 1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.daily-metric-card:hover .circular-meter-inner .metric-value {
+  transform: scale(1.08);
+}
+
+/* Card Info */
 .daily-metric-card .metric-info {
   display: flex;
   flex-direction: column;
+  gap: 0.2rem;
   min-width: 0;
+  flex: 1;
+}
+
+.daily-metric-card .metric-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  background: var(--card-glow-color);
+  color: var(--card-theme-color);
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.daily-metric-card:hover .metric-icon {
+  transform: scale(1.15) rotate(-6deg);
 }
 
 .daily-metric-card .metric-label {
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: var(--text-muted);
+  color: var(--text-main);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.daily-metric-card .metric-value {
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: var(--text-main);
-  line-height: 1.2;
+.daily-metric-card .metric-badge {
+  display: inline-block;
+  font-size: 0.67rem;
+  font-weight: 600;
+  padding: 1.5px 7px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--text-muted);
+  width: fit-content;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+[data-theme="light"] .daily-metric-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-right: 3.5px solid var(--card-theme-color);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .meter-track {
+  stroke: rgba(226, 232, 240, 0.95);
+}
+
+[data-theme="light"] .daily-metric-card .metric-badge {
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .circular-meter-inner .metric-value {
+  text-shadow: none;
 }
 
 /* Comprehensive Filter Toolbar */
@@ -6625,19 +6823,64 @@ textarea.form-control {
   line-height: 1.35;
 }
 
-/* Pricing Presentation */
+/* Pricing Presentation: Discount Professionally Under Main Price */
 .plan-price-zone {
   text-align: center;
-  margin: 0.5rem 0 0.85rem 0;
+  margin: 0.6rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.plan-strike-row {
+.plan-main-price {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+}
+
+.plan-amount-num {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1;
+  font-family: var(--font-family, sans-serif);
+  letter-spacing: -0.5px;
+}
+
+.plan-currency-tag {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.plan-period-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.plan-discount-under-price {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.plan-strike-row-under {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 3px;
-  min-height: 22px;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.plan-old-price-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
 }
 
 .plan-old-price {
@@ -6645,59 +6888,45 @@ textarea.form-control {
   color: #ef4444;
   text-decoration: line-through;
   font-weight: 800;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .plan-discount-pill {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(239, 68, 68, 0.14);
   color: #ef4444;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  padding: 1px 7px;
-  border-radius: 4px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.plan-discount-pill.pill-green {
-  background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-.plan-main-price {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
+  padding: 2.5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  display: inline-flex;
+  align-items: center;
   gap: 4px;
 }
 
-.plan-amount-num {
-  font-size: 2.15rem;
-  font-weight: 900;
-  line-height: 1;
+.plan-discount-pill.pill-green {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.28);
 }
 
-.plan-currency-tag {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: var(--text-main);
-}
-
-.plan-period-tag {
-  font-size: 0.76rem;
-  color: var(--text-muted);
+.plan-discount-pill.pill-purple {
+  background: rgba(168, 85, 247, 0.14);
+  color: #a855f7;
+  border-color: rgba(168, 85, 247, 0.28);
 }
 
 .plan-mental-math {
-  font-size: 0.72rem;
+  font-size: 0.73rem;
   color: #10b981;
   font-weight: 700;
-  margin-top: 5px;
-  background: rgba(16, 185, 129, 0.08);
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(16, 185, 129, 0.09);
+  padding: 3px 10px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
 /* Features List inside Card */

@@ -78,6 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAuthGatekeeper();
   checkDraftRestore();
   initSingleDeviceWatchdog();
+
+  // Background sync accounts from server (for cross-device synchronization)
+  if (typeof syncAccountsWithServer === 'function') {
+    syncAccountsWithServer().then(() => {
+      // If user is already logged in, restore their cloud-synced questions & archive
+      const u = getCurrentUser();
+      if (u && u.id && u.id !== 'usr_guest' && typeof window.restoreUserDataFromServer === 'function') {
+        window.restoreUserDataFromServer(u);
+      }
+    }).catch(() => {});
+  }
 });
 
 /**
@@ -318,6 +329,71 @@ function getAuthAccounts() {
   }
 }
 
+let isSyncingAccountsFlag = false;
+async function syncAccountsWithServer() {
+  if (isSyncingAccountsFlag) return getAuthAccounts();
+  isSyncingAccountsFlag = true;
+  try {
+    const res = await fetch('/api/accounts', { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.accounts)) {
+        const localAccounts = getAuthAccounts();
+        const mergedMap = new Map();
+
+        // 1. Map local accounts
+        localAccounts.forEach(acc => {
+          const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
+          if (k) mergedMap.set(k, acc);
+        });
+
+        // 2. Check if local has accounts not yet on server (e.g. registered on this laptop earlier)
+        let hasNewLocalAccounts = false;
+        localAccounts.forEach(acc => {
+          if (acc.id === 'usr_admin' || acc.username === 'admin') return;
+          const existsOnServer = data.accounts.some(sa =>
+            (sa.id && acc.id && sa.id === acc.id) ||
+            (sa.email && acc.email && sa.email.toLowerCase() === acc.email.toLowerCase()) ||
+            (sa.username && acc.username && sa.username.toLowerCase() === acc.username.toLowerCase())
+          );
+          if (!existsOnServer) {
+            hasNewLocalAccounts = true;
+          }
+        });
+
+        // 3. Merge server accounts (server takes precedence for subscriptions/roles)
+        data.accounts.forEach(acc => {
+          const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
+          if (k) {
+            const existing = mergedMap.get(k) || {};
+            mergedMap.set(k, { ...existing, ...acc });
+          }
+        });
+
+        const mergedList = Array.from(mergedMap.values());
+        localStorage.setItem('moallem_auth_accounts', JSON.stringify(mergedList));
+
+        // If local had accounts that server didn't have yet, immediately push them to server!
+        if (hasNewLocalAccounts) {
+          fetch('/api/accounts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ accounts: mergedList })
+          }).catch(() => {});
+        }
+
+        return mergedList;
+      }
+    }
+  } catch (err) {
+    // Graceful offline fallback
+  } finally {
+    isSyncingAccountsFlag = false;
+  }
+  return getAuthAccounts();
+}
+window.syncAccountsWithServer = syncAccountsWithServer;
+
 function saveAuthAccounts(accounts) {
   try {
     localStorage.setItem('moallem_auth_accounts', JSON.stringify(accounts));
@@ -325,6 +401,14 @@ function saveAuthAccounts(accounts) {
   } catch (e) {
     console.error(e);
   }
+  // Immediately persist to server backend (24/7 server_bot / app.py)
+  try {
+    fetch('/api/accounts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ accounts })
+    }).catch(() => {});
+  } catch (err) {}
 }
 
 /* ==========================================================================
@@ -1004,6 +1088,10 @@ function saveStateToStorage(notify = false) {
     }
     // Schedule background auto-save to archive draft
     scheduleDraftAutoSave();
+    // Schedule cloud sync to server backend for cross-device support
+    if (typeof scheduleCloudAutoSync === 'function') {
+      scheduleCloudAutoSync();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -1374,6 +1462,9 @@ function saveExamsArchive(list) {
     const storageKey = getAccountStorageKey('moallem_saved_exams_archive');
     localStorage.setItem(storageKey, JSON.stringify(list));
     updateArchiveBadge();
+    if (typeof scheduleCloudAutoSync === 'function') {
+      scheduleCloudAutoSync();
+    }
   } catch (e) {
     console.error(e);
   }
@@ -1503,6 +1594,11 @@ function saveCurrentExamToArchive(asNew = false) {
   updateArchiveBadge();
   if (typeof renderArchiveList === 'function') {
     renderArchiveList();
+  }
+
+  // Immediate cross-device cloud push!
+  if (typeof window.syncUserDataToServer === 'function') {
+    window.syncUserDataToServer(getCurrentUser(), true);
   }
 
   // Clear / Zero-out the current workspace and navigate directly to Report Center
@@ -2254,19 +2350,19 @@ function initEventListeners() {
       });
     }
 
-    formLogin.addEventListener('submit', (e) => {
+    formLogin.addEventListener('submit', async (e) => {
       e.preventDefault();
       const emailOrUser = (emailInput && emailInput.value) ? emailInput.value.trim() : '';
       const password = (passInput && passInput.value) ? passInput.value : '';
 
-      const accounts = getAuthAccounts();
-      const userExists = accounts.find(a => 
+      let accounts = getAuthAccounts();
+      let userExists = accounts.find(a => 
         (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
         (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
         (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
       );
 
-      const found = accounts.find(a => 
+      let found = accounts.find(a => 
         (
           (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
           (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
@@ -2274,6 +2370,28 @@ function initEventListeners() {
         ) &&
         (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
       );
+
+      // CROSS-DEVICE LOGIN SYNC (Laptop -> Phone):
+      // If user account is not found in this phone's local storage,
+      // IMMEDIATELY query the server accounts endpoint to fetch accounts created on laptop!
+      if (!found) {
+        if (typeof syncAccountsWithServer === 'function') {
+          accounts = await syncAccountsWithServer();
+          userExists = accounts.find(a => 
+            (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
+            (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
+            (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
+          );
+          found = accounts.find(a => 
+            (
+              (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) || 
+              (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
+              (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
+            ) &&
+            (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
+          );
+        }
+      }
 
       if (found) {
         // Clear any previous error state
@@ -2300,6 +2418,11 @@ function initEventListeners() {
         renderAll();
         if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
         if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+
+        // Restore cloud questions & exams across devices from server backend!
+        if (typeof window.restoreUserDataFromServer === 'function') {
+          window.restoreUserDataFromServer(found);
+        }
 
         const portal = document.getElementById('fullscreenAuthPortal');
         const workstation = document.getElementById('appWorkstation');
@@ -2390,6 +2513,15 @@ function initEventListeners() {
 
       accounts.push(newAccount);
       saveAuthAccounts(accounts);
+      // Immediately register on server for cross-device support
+      try {
+        fetch('/api/accounts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account: newAccount, accounts: accounts })
+        }).catch(() => {});
+      } catch(e) {}
+
       if (typeof window.renderSubscribersManagementUI === 'function') {
         window.renderSubscribersManagementUI();
       }
@@ -2397,6 +2529,10 @@ function initEventListeners() {
       registerActiveDeviceSession(newAccount);
       localStorage.setItem('moallem_logged_in', 'true');
       sessionStorage.setItem('moallem_session_active', 'true');
+
+      if (typeof window.syncUserDataToServer === 'function') {
+        window.syncUserDataToServer(newAccount, true);
+      }
       applyProfileToExamHeader();
       updatePrivacySettingsUI();
       updateUserAuthUI();
@@ -2600,6 +2736,11 @@ function initEventListeners() {
       }
     }
   }, 30000);
+
+  // Initial update for circular metric counters
+  if (typeof updateDailyReportMetrics === 'function') {
+    setTimeout(updateDailyReportMetrics, 100);
+  }
 }
 
 /**
@@ -7071,25 +7212,38 @@ function updateDailyReportMetrics() {
     else arabicCount++;
   });
 
+  // Helper for Circular Meter Animation
+  function setCircularMeter(id, val, targetMax = 20) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const num = parseInt(val, 10) || 0;
+    el.innerText = num;
+
+    const card = el.closest('.daily-metric-card');
+    if (!card) return;
+    const meterFill = card.querySelector('.meter-fill');
+    if (!meterFill) return;
+
+    const circumference = 188.5; // 2 * Math.PI * 30
+    let ratio = 0;
+    if (num > 0) {
+      const maxVal = Math.max(targetMax, num);
+      ratio = Math.min(Math.max(num / maxVal, 0.18), 0.96);
+    } else {
+      ratio = 0.05; // visible accent notch for zero
+    }
+    const offset = circumference * (1 - ratio);
+    meterFill.style.strokeDashoffset = offset.toFixed(1);
+  }
+
   // Update modal metrics
-  const mToday = document.getElementById('dailyStatToday');
-  const mAr = document.getElementById('dailyStatArabic');
-  const mEn = document.getElementById('dailyStatEnglish');
-  const mMath = document.getElementById('dailyStatMath');
-  const mTot = document.getElementById('dailyStatTotal');
-  if (mToday) mToday.innerText = todayCount;
-  if (mAr) mAr.innerText = arabicCount;
-  if (mEn) mEn.innerText = englishCount;
-  if (mMath) mMath.innerText = mathCount;
-  if (mTot) mTot.innerText = bank.length;
+  setCircularMeter('dailyStatToday', todayCount, 15);
+  setCircularMeter('dailyStatArabic', arabicCount, 25);
+  setCircularMeter('dailyStatEnglish', englishCount, 25);
+  setCircularMeter('dailyStatMath', mathCount, 25);
+  setCircularMeter('dailyStatTotal', bank.length, 50);
 
   // Update Executive KPI Dashboard Counters
-  const elExams = document.getElementById('tabReportStatTotalExams');
-  const elGrades = document.getElementById('tabReportStatGrades');
-  const elModels = document.getElementById('tabReportStatModels');
-  const elQuestions = document.getElementById('tabReportStatTotalQuestions');
-  const elRecent = document.getElementById('tabReportStatRecent');
-
   const chipModels = document.getElementById('repCounterModels');
   const chipQuestions = document.getElementById('repCounterQuestions');
   const chipExams = document.getElementById('repCounterExams');
@@ -7097,41 +7251,41 @@ function updateDailyReportMetrics() {
   const modelsList = exams.filter(e => e.isModelPreset);
   const userExamsList = exams.filter(e => !e.isModelPreset);
 
-  if (elExams) elExams.innerText = userExamsList.length;
+  setCircularMeter('tabReportStatTotalExams', userExamsList.length, 10);
   if (chipExams) chipExams.innerText = userExamsList.length;
+
   if (chipModels) chipModels.innerText = modelsList.length;
-  if (elModels) elModels.innerText = modelsList.length;
-  if (elQuestions) elQuestions.innerText = bank.length;
+  setCircularMeter('tabReportStatModels', modelsList.length, 15);
+
+  setCircularMeter('tabReportStatTotalQuestions', bank.length, 50);
   if (chipQuestions) chipQuestions.innerText = bank.length;
 
-  if (elGrades) {
-    const gradesSet = new Set();
-    exams.forEach(e => {
-      const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
-      if (g && g !== 'غير محدد') gradesSet.add(g);
-    });
-    elGrades.innerText = Math.max(gradesSet.size, 1);
-  }
+  let gradesCount = 1;
+  const gradesSet = new Set();
+  exams.forEach(e => {
+    const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
+    if (g && g !== 'غير محدد') gradesSet.add(g);
+  });
+  gradesCount = Math.max(gradesSet.size, 1);
+  setCircularMeter('tabReportStatGrades', gradesCount, 6);
 
-  if (elRecent) {
-    let recentTotal = 0;
-    const now = Date.now();
-    const dayAgo = now - 24 * 3600 * 1000;
-    exams.forEach(e => {
-      const time = e.updatedAt || e.createdAt;
-      if (time) {
-        const t = new Date(time).getTime();
-        if (!isNaN(t) && t >= dayAgo) recentTotal++;
-      }
-    });
-    bank.forEach(q => {
-      if (q.createdAt) {
-        const t = new Date(q.createdAt).getTime();
-        if (!isNaN(t) && t >= dayAgo) recentTotal++;
-      }
-    });
-    elRecent.innerText = recentTotal || todayCount;
-  }
+  let recentTotal = 0;
+  const now = Date.now();
+  const dayAgo = now - 24 * 3600 * 1000;
+  exams.forEach(e => {
+    const time = e.updatedAt || e.createdAt;
+    if (time) {
+      const t = new Date(time).getTime();
+      if (!isNaN(t) && t >= dayAgo) recentTotal++;
+    }
+  });
+  bank.forEach(q => {
+    if (q.createdAt) {
+      const t = new Date(q.createdAt).getTime();
+      if (!isNaN(t) && t >= dayAgo) recentTotal++;
+    }
+  });
+  setCircularMeter('tabReportStatRecent', recentTotal || todayCount, 10);
 }
 
 window.filterDailyReport = function() {
@@ -8877,35 +9031,9 @@ window.performGoogleLoginSuccess = async function(account) {
   const emailText = account.email ? `ومربوط بالبريد: (${account.email}) ✔` : '';
   showToast(`مرحباً بك أستاذ ${account.name || account.username}! ${vipText} • ${emailText}`, isSubscribed ? 'success' : 'info');
 
-  // Automatically attempt to fetch cloud-synced questions & archive from server
-  try {
-    const res = await fetch(`/api/cloud_sync?email=${encodeURIComponent(account.email)}`);
-    const json = await res.json();
-    if (json.success && json.exists && json.data) {
-      const data = json.data;
-      let restoredCount = 0;
-      if (Array.isArray(data.questionsBank) && data.questionsBank.length > 0) {
-        localStorage.setItem('moallem_questions_bank', JSON.stringify(data.questionsBank));
-        restoredCount += data.questionsBank.length;
-      }
-      if (Array.isArray(data.examsArchive) && data.examsArchive.length > 0) {
-        localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(data.examsArchive));
-        updateArchiveBadge();
-      }
-      if (data.currentExam && (!appState.questions || appState.questions.length === 0)) {
-        if (data.currentExam.header) appState.header = data.currentExam.header;
-        if (data.currentExam.questions) appState.questions = data.currentExam.questions;
-        syncHeaderInputs();
-      }
-      renderAll();
-      if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-      showToast(`تم استرجاع ومزامنة بنك أسئلتك واختباراتك سحابياً من حسابك (${restoredCount} سؤال) بنجاح! ☁️🎉`, 'success');
-    } else {
-      // First time on cloud for this email -> auto backup current local state to cloud
-      window.syncCurrentDataToCloud(true);
-    }
-  } catch (err) {
-    console.log('Local cloud sync initialized');
+  // Automatically attempt to restore cloud-synced questions & archive from server
+  if (typeof window.restoreUserDataFromServer === 'function') {
+    await window.restoreUserDataFromServer(account);
   }
 
   window.updateCloudModalUI();
@@ -8925,7 +9053,7 @@ window.closeCloudTransferModal = function() {
 window.updateCloudModalUI = function() {
   const user = getCurrentUser() || {};
   const emailEl = document.getElementById('cloudAccountEmailDisplay');
-  if (emailEl) emailEl.innerText = user.email || 'hussein.teacher@gmail.com';
+  if (emailEl) emailEl.innerText = user.email || user.username || 'hussein.teacher@gmail.com';
 
   const qBank = getQuestionsHistoryBank();
   const archive = getSavedExamsArchive();
@@ -8935,18 +9063,48 @@ window.updateCloudModalUI = function() {
   if (exCountEl) exCountEl.innerText = archive.length;
 };
 
-window.syncCurrentDataToCloud = async function(isSilent = false) {
-  const user = getCurrentUser() || {};
-  const email = user.email || localStorage.getItem('moallem_last_google_email') || 'hussein.teacher@gmail.com';
-  const questionsBank = getQuestionsHistoryBank();
-  const examsArchive = getSavedExamsArchive();
+/* ==========================================================================
+   Comprehensive Cross-Device Cloud Sync Engine (مزامنة سحابية شاملة بين الحاسبة والهاتف)
+   ========================================================================== */
+
+let cloudAutoSyncTimer = null;
+function scheduleCloudAutoSync(delay = 2500) {
+  if (cloudAutoSyncTimer) clearTimeout(cloudAutoSyncTimer);
+  cloudAutoSyncTimer = setTimeout(() => {
+    const user = getCurrentUser();
+    if (user && user.id && user.id !== 'usr_guest') {
+      window.syncUserDataToServer(user, true);
+    }
+  }, delay);
+}
+window.scheduleCloudAutoSync = scheduleCloudAutoSync;
+
+window.syncUserDataToServer = async function(user, isSilent = false) {
+  if (!user || !user.id || user.id === 'usr_guest') return;
+  const email = (user.email || '').trim().toLowerCase();
+  const userId = (user.id || user.username || '').trim().toLowerCase();
+  const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
+  const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
+
+  let questionsBank = [];
+  try {
+    const rawBank = localStorage.getItem(bankStorageKey) || localStorage.getItem('moallem_questions_bank');
+    if (rawBank) questionsBank = JSON.parse(rawBank);
+  } catch(e) {}
+
+  let examsArchive = [];
+  try {
+    examsArchive = getSavedExamsArchive();
+  } catch(e) {}
 
   const payload = {
     email: email,
-    teacherName: user.name || teacherProfile.name || 'أستاذ حسين علي',
+    userId: userId,
+    teacherName: user.name || (teacherProfile && teacherProfile.name) || '',
     questionsBank: questionsBank,
     examsArchive: examsArchive,
     currentExam: {
+      currentArchiveId: appState.currentArchiveId,
       header: appState.header,
       questions: appState.questions,
       settings: appState.settings
@@ -8954,58 +9112,104 @@ window.syncCurrentDataToCloud = async function(isSilent = false) {
     savedAt: new Date().toISOString()
   };
 
-  // 1. Save to local scoped cloud key
-  localStorage.setItem(`moallem_cloud_sync_${email}`, JSON.stringify(payload));
+  // Local backup keys
+  if (email) {
+    localStorage.setItem(`moallem_cloud_sync_${email}`, JSON.stringify(payload));
+  }
+  localStorage.setItem(`moallem_cloud_sync_${userId}`, JSON.stringify(payload));
 
-  // 2. Send to server 24/7 bot API
   try {
     const res = await fetch('/api/cloud_sync', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
-    const resJson = await res.json();
-    if (resJson.success && !isSilent) {
-      showToast(`تم حفظ ومزامنة أسئلتك (${questionsBank.length} سؤال) في السحابة بنجاح! ☁️`, 'success');
+    if (res.ok) {
+      const resJson = await res.json();
+      if (!isSilent && resJson.success) {
+        showToast('تمت مزامنة وحفظ كافة أسئلتك واختباراتك سحابياً بنجاح! ☁️', 'success');
+      }
     }
   } catch (e) {
     if (!isSilent) {
-      showToast(`تم حفظ أسئلتك سحابياً على جهازك بنجاح! ☁️`, 'success');
+      showToast('تم الحفظ محلياً على جهازك 💾', 'info');
     }
   }
-
-  window.updateCloudModalUI();
+  if (typeof window.updateCloudModalUI === 'function') {
+    window.updateCloudModalUI();
+  }
 };
+window.syncCurrentDataToCloud = window.syncUserDataToServer;
 
-window.restoreDataFromCloudServer = async function() {
-  const user = getCurrentUser() || {};
-  const email = user.email || localStorage.getItem('moallem_last_google_email') || 'hussein.teacher@gmail.com';
+window.restoreUserDataFromServer = async function(user) {
+  if (!user || !user.id || user.id === 'usr_guest') return false;
+  const email = (user.email || '').trim().toLowerCase();
+  const userId = (user.id || user.username || '').trim().toLowerCase();
+  const username = (user.username || '').trim().toLowerCase();
+
+  const userStorageKey = getAccountStorageKey('moallem_exam_data');
+  const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
+  const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
 
   try {
-    const res = await fetch(`/api/cloud_sync?email=${encodeURIComponent(email)}`);
+    const query = `email=${encodeURIComponent(email)}&userId=${encodeURIComponent(userId)}&username=${encodeURIComponent(username)}`;
+    const res = await fetch(`/api/cloud_sync?${query}`, { cache: 'no-store' });
+    if (!res.ok) return false;
     const json = await res.json();
-    if (json.success && json.exists && json.data) {
+    if (json && json.success && json.exists && json.data) {
       const data = json.data;
-      if (Array.isArray(data.questionsBank)) {
+      let restoredCount = 0;
+
+      // 1. Restore Questions Bank
+      if (Array.isArray(data.questionsBank) && data.questionsBank.length > 0) {
+        localStorage.setItem(bankStorageKey, JSON.stringify(data.questionsBank));
         localStorage.setItem('moallem_questions_bank', JSON.stringify(data.questionsBank));
+        localStorage.setItem('moallem_questions_history_bank', JSON.stringify(data.questionsBank));
+        restoredCount += data.questionsBank.length;
       }
-      if (Array.isArray(data.examsArchive)) {
+
+      // 2. Restore Exams Archive
+      if (Array.isArray(data.examsArchive) && data.examsArchive.length > 0) {
+        localStorage.setItem(archiveStorageKey, JSON.stringify(data.examsArchive));
         localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(data.examsArchive));
+        updateArchiveBadge();
+        if (typeof renderArchiveList === 'function') renderArchiveList();
       }
+
+      // 3. Restore Current Exam (if workspace is empty or matches)
       if (data.currentExam) {
-        if (data.currentExam.header) appState.header = data.currentExam.header;
-        if (data.currentExam.questions) appState.questions = data.currentExam.questions;
-        syncHeaderInputs();
+        const cur = data.currentExam;
+        localStorage.setItem(userStorageKey, JSON.stringify(cur));
+        localStorage.setItem('moallem_exam_data', JSON.stringify(cur));
+
+        if ((!appState.questions || appState.questions.length === 0) && Array.isArray(cur.questions) && cur.questions.length > 0) {
+          appState.questions = cur.questions;
+          if (cur.header) appState.header = { ...appState.header, ...cur.header };
+          if (cur.settings) appState.settings = { ...appState.settings, ...cur.settings };
+          if (cur.currentArchiveId) appState.currentArchiveId = cur.currentArchiveId;
+          syncHeaderInputs();
+          applyProfileToExamHeader();
+        }
       }
+
       renderAll();
-      updateArchiveBadge();
       if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-      showToast(`تم استرجاع جميع أسئلتك (${(data.questionsBank || []).length} سؤال) واختباراتك من السحابة بنجاح! 🎉`, 'success');
-    } else {
-      showToast('لا توجد بيانات سحابية سابقة مسجلة لهذا البريد بعد. جرب الضغط على "مزامنة وحفظ الآن"', 'info');
+
+      const totalItems = restoredCount + (Array.isArray(data.examsArchive) ? data.examsArchive.length : 0);
+      if (totalItems > 0) {
+        showToast(`تمت مزامنة واسترجاع جميع أسئلتك واختباراتك (${restoredCount} سؤال) من السيرفر بنجاح! ☁️📱`, 'success');
+      }
+      return true;
     }
   } catch (err) {
-    showToast('تعذر الاتصال بالسيرفر السحابي حالياً، يمكنك استخدام رمز المزامنة المنسوخ.', 'error');
+    console.log('Server cloud restore check:', err);
+  }
+  return false;
+};
+window.restoreDataFromCloudServer = function() {
+  const user = getCurrentUser();
+  if (user) {
+    return window.restoreUserDataFromServer(user);
   }
 };
 
@@ -9163,8 +9367,8 @@ window.selectSubscriptionPlan = function(planKey) {
   let planMsg = '';
   if (planKey === '1_month') {
     planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاشتراك في (الباقة الشهرية - 25,000 د.ع) لتفعيل حسابي${userIdentifier}.`;
-  } else if (planKey === '3_months') {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفادة من عرض الأكثر طلباً (باقة الفصل الدراسي 3 أشهر - 75,000 د.ع بدلاً من 100 ألف) لتفعيل حسابي${userIdentifier}.`;
+  } else if (planKey === '4_months' || planKey === '3_months') {
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفادة من عرض الأكثر طلباً (باقة الـ 4 أشهر - 75,000 د.ع بدلاً من 100 ألف / شهر مجاناً) لتفعيل حسابي${userIdentifier}.`;
   } else if (planKey === '1_year') {
     planMsg = `مرحباً إدارة منصة مسار المعلم، أود تفعيل العرض السنوي الشامل بنصف السعر (الباقة السنوية الأكاديمية - 150,000 د.ع بدلاً من 300 ألف) لتفعيل حسابي${userIdentifier}.`;
   } else {
@@ -9578,10 +9782,10 @@ window.manageDirectActivateUser = function(accId) {
     expiryDate.setDate(now.getDate() + 30);
     durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
     durationCode = '1_month';
-  } else if (chosenPlan === '3_months') {
-    expiryDate.setDate(now.getDate() + 90);
-    durationLabel = 'باقة الفصل الدراسي (75 ألف د.ع)';
-    durationCode = '3_months';
+  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 120);
+    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
+    durationCode = '4_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
     durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
@@ -9673,10 +9877,10 @@ window.manageApproveGrantSubscription = function() {
     expiryDate.setDate(now.getDate() + 30);
     durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
     durationCode = '1_month';
-  } else if (chosenPlan === '3_months') {
-    expiryDate.setDate(now.getDate() + 90);
-    durationLabel = 'باقة الفصل الدراسي (75 ألف د.ع)';
-    durationCode = '3_months';
+  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 120);
+    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
+    durationCode = '4_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
     durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
@@ -10549,12 +10753,14 @@ window.generateTripleAiExams = function() {
         throw new Error('محرك الذكاء الاصطناعي للمناهج غير متوفر');
       }
 
+      window.__aiClickCount = (window.__aiClickCount || 0) + 1;
       const generated = window.AiCurriculumEngine.generateTripleExamVersions({
         grade,
         subject,
         difficulty,
         teacherNotes,
-        selectedChapters: window.selectedAiChapters || ['all']
+        selectedChapters: window.selectedAiChapters || ['all'],
+        clickSeed: window.__aiClickCount
       });
 
       window.currentAiTripleExams = generated;
@@ -10562,7 +10768,10 @@ window.generateTripleAiExams = function() {
       if (content) content.style.display = 'block';
 
       window.switchAiExamVersion('versionA');
-      showToast('🎉 تم توليد 3 نماذج امتحانية ذكية بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
+      const isEnglish = (generated.versionA && generated.versionA.settings && generated.versionA.settings.direction === 'ltr');
+      showToast(isEnglish 
+        ? '🎉 3 Brand-New Smart English Exam Models Generated Successfully!' 
+        : '🎉 تم توليد 3 نماذج امتحانية ذكية جديدة بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
     } catch (err) {
       if (spinner) spinner.style.display = 'none';
       showToast('خطأ في توليد الأسئلة: ' + err.message, 'error');
@@ -10589,6 +10798,9 @@ window.switchAiExamVersion = function(versionKey) {
     }
   });
 
+  const isEnglish = (version.settings && version.settings.direction === 'ltr') || 
+                    (version.header && version.header.subject && (version.header.subject.toLowerCase().includes('eng') || version.header.subject.includes('إنكل') || version.header.subject.includes('انكل')));
+
   // Render Version Header Details
   const titleEl = document.getElementById('aiActiveVerTitle');
   const metaEl = document.getElementById('aiActiveVerMeta');
@@ -10596,12 +10808,21 @@ window.switchAiExamVersion = function(versionKey) {
     titleEl.innerHTML = `<span style="color: ${version.badgeColor};"><i class="fa-solid fa-file-signature"></i></span> ${version.versionName}`;
   }
   if (metaEl) {
-    metaEl.innerHTML = `
-      <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
-      <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
-      <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
-      <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
-    `;
+    if (isEnglish) {
+      metaEl.innerHTML = `
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
+        <span>Difficulty: <strong>${version.difficulty}</strong></span> • 
+        <span>Total: <strong>${version.totalScore} Marks</strong> (${version.questionsCount} Questions)</span>
+      `;
+    } else {
+      metaEl.innerHTML = `
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
+        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
+        <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
+        <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
+      `;
+    }
   }
 
   // Render Questions List Preview
@@ -10610,12 +10831,17 @@ window.switchAiExamVersion = function(versionKey) {
     listEl.innerHTML = version.questions.map((q, idx) => {
       let branchesHTML = '';
       if (Array.isArray(q.branches) && q.branches.length > 0) {
+        const branchBorder = isEnglish 
+          ? 'padding-left: 12px; border-left: 2px solid var(--border-color); direction: ltr; text-align: left;'
+          : 'padding-right: 12px; border-right: 2px solid var(--border-color); direction: rtl; text-align: right;';
+        const scoreLabel = isEnglish ? `(${b => (b.score || 10)} Marks)` : `(${b => (b.score || 10)} درجات)`;
+
         branchesHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; padding-right: 12px; border-right: 2px solid var(--border-color);">
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; ${branchBorder}">
             ${q.branches.map(b => `
               <div style="font-size: 0.84rem;">
                 <strong>${b.title}:</strong> ${b.text} 
-                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-right: 4px;">(${b.score || 10} درجات)</span>
+                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-${isEnglish ? 'left' : 'right'}: 4px;">(${b.score || 10} ${isEnglish ? 'Marks' : 'درجات'})</span>
               </div>
             `).join('')}
           </div>
@@ -10625,7 +10851,7 @@ window.switchAiExamVersion = function(versionKey) {
       let optionsHTML = '';
       if (Array.isArray(q.options) && q.options.length > 0) {
         optionsHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-right: 12px;">
+          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-${isEnglish ? 'left' : 'right'}: 12px; direction: ${isEnglish ? 'ltr' : 'rtl'};">
             ${q.options.map(opt => `
               <div style="font-size: 0.82rem; ${opt.isCorrect ? 'color: #10b981; font-weight: 700;' : ''}">
                 ${opt.isCorrect ? '✔' : '○'} ${opt.text}
@@ -10637,10 +10863,11 @@ window.switchAiExamVersion = function(versionKey) {
 
       let answerHTML = '';
       if (q.modelAnswer) {
+        const answerBtnLabel = isEnglish ? 'Show Model Answer & Marking Scheme' : 'إظهار الجواب النموذجي وسلّم الدرجات';
         answerHTML = `
-          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem;">
+          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
             <summary style="cursor: pointer; font-weight: 700; color: #10b981;">
-              <i class="fa-solid fa-key"></i> إظهار الجواب النموذجي وسلّم الدرجات
+              <i class="fa-solid fa-key"></i> ${answerBtnLabel}
             </summary>
             <div style="margin-top: 6px; white-space: pre-line; color: var(--text-main);">${q.modelAnswer}</div>
           </details>
@@ -10648,14 +10875,14 @@ window.switchAiExamVersion = function(versionKey) {
       }
 
       return `
-        <div class="ai-question-card-preview">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px;">
+        <div class="ai-question-card-preview" style="direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; flex-direction: ${isEnglish ? 'row' : 'row'};">
             <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-main);">
-              ${q.title || `السؤال ${idx + 1}`}
+              ${q.title || (isEnglish ? `Question ${idx + 1}` : `السؤال ${idx + 1}`)}
             </div>
             <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} درجة</span>
-              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || 'وزاري + كتاب'}</span>
+              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} ${isEnglish ? 'Marks' : 'درجة'}</span>
+              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || (isEnglish ? 'Ministerial Standard' : 'وزاري + كتاب')}</span>
             </div>
           </div>
           <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">${q.text}</div>
@@ -10679,8 +10906,19 @@ window.applyCurrentAiVersionToWorkstation = function() {
   appState.header.subject = version.header.subject;
   appState.header.examTitle = version.header.examTitle;
   appState.header.instructions = version.header.instructions;
+  if (version.header.country) appState.header.country = version.header.country;
+  if (version.header.ministry) appState.header.ministry = version.header.ministry;
+  if (version.header.school) appState.header.school = version.header.school;
+  if (version.header.time) appState.header.time = version.header.time;
+  if (version.header.year) appState.header.year = version.header.year;
+  if (version.header.term) appState.header.term = version.header.term;
+  if (version.header.teacher) appState.header.teacher = version.header.teacher;
+
   if (version.settings && version.settings.direction) {
     appState.settings.direction = version.settings.direction;
+  }
+  if (version.settings && version.settings.fontFamily) {
+    appState.settings.fontFamily = version.settings.fontFamily;
   }
 
   // Sync UI and render
@@ -10694,7 +10932,10 @@ window.applyCurrentAiVersionToWorkstation = function() {
   const qTabBtn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
   if (qTabBtn) qTabBtn.click();
 
-  showToast(`🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
+  const isEnglish = (version.settings && version.settings.direction === 'ltr');
+  showToast(isEnglish 
+    ? `🎉 «${version.versionName}» applied to A4 Examination Paper successfully! Ready for printing or customization 🚀` 
+    : `🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
 };
 
 window.saveAllAiVersionsToArchive = function() {
