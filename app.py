@@ -29,6 +29,12 @@ def add_cors_headers(response):
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
+@app.before_request
+def handle_options():
+    if request.method == 'OPTIONS':
+        response = app.make_default_options_response()
+        return add_cors_headers(response)
+
 @app.route('/')
 def index():
     return send_from_directory(BASE_DIR, 'index.html')
