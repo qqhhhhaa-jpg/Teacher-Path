@@ -7175,9 +7175,8 @@
   }
 };
 
-  // =========================================================================
-  // Master Chapter-by-Chapter Rich Question Catalog (15+ Questions Per Chapter)
-  // Guarantees massive variety and 100% zero-overlap across Model A, B, and C
+// =========================================================================
+  // Master Dynamic Ministerial Question Banks & Catalogs
   // =========================================================================
 
   // Dynamic Ministerial Unseen Reading Comprehension Passages
@@ -7217,941 +7216,1953 @@
     "topic": "Iraqi Youth & International Robotics Olympiad",
     "text": "Read the following unseen text carefully and answer (5) questions:\n\"A talented team of young Iraqi high school students from Baghdad and Mosul achieved worldwide recognition at the International Robotics Olympiad. Over six intensive months of laboratory work, the five students designed an autonomous rescue robot equipped with infrared sensors and high-resolution thermal cameras. The machine is engineered to navigate dangerous collapsed buildings after earthquakes and locate trapped survivors in total darkness. The team won the prestigious Gold Innovation Trophy among competitors representing forty different nations.\"\n\nQuestions:\n1. Which two Iraqi cities did the award-winning robotics students come from?\n2. How long did the team spend working in the laboratory to develop their robot?\n3. What two specialized technologies is the rescue robot equipped with?\n4. What vital humanitarian task is the autonomous robot designed to perform?\n5. The Iraqi students won a bronze medal in a local competition with only three schools. (True / False)\n6. Give the passage a short suitable title.",
     "modelAnswer": "1. Baghdad and Mosul.\n2. Six intensive months.\n3. Infrared sensors and high-resolution thermal cameras.\n4. To navigate collapsed buildings and locate trapped survivors in total darkness.\n5. False (they won the Gold Innovation Trophy competing against forty nations).\n6. Young Iraqi Innovators / Champions of the Robotics Olympiad."
+  },
+  {
+    "id": "unseen_p7",
+    "topic": "The Invention of Writing in Ancient Sumer",
+    "text": "Read the following unseen text carefully and answer (5) questions:\n\"More than five thousand years ago, the ancient Sumerians in southern Mesopotamia invented the earliest known system of writing called cuneiform. Originally created to record commercial transactions, agricultural grain yields, and livestock counts, writing transformed human civilization forever. Scribes used sharpened reeds to press wedge-shaped characters into soft clay tablets, which were subsequently baked under the intense Mesopotamian sun. Through this brilliant innovation, ancient laws such as the Code of Hammurabi, epic literature, and medical remedies were preserved for future generations.\"\n\nQuestions:\n1. What was the earliest system of writing invented by the ancient Sumerians called?\n2. What was writing originally created to record?\n3. What tools did ancient scribes use to write on soft clay tablets?\n4. How were the clay tablets hardened to preserve the text?\n5. The ancient Sumerians used electronic tablets to write their cuneiform symbols. (True / False)\n6. Give the passage a short suitable title.",
+    "modelAnswer": "1. Cuneiform writing.\n2. Commercial transactions, agricultural grain yields, and livestock counts.\n3. Sharpened reeds.\n4. They were baked under the intense sun (or in kilns).\n5. False.\n6. The Invention of Writing / Mesopotamian Cuneiform Heritage."
+  },
+  {
+    "id": "unseen_p8",
+    "topic": "Sleep, Memory and Academic Achievement",
+    "text": "Read the following unseen text carefully and answer (5) questions:\n\"Medical research has demonstrated that quality sleep plays a fundamental role in memory consolidation and brain performance. When high school students sleep between eight to nine hours every night, the hippocampus transfers newly acquired facts and mathematical formulas into long-term memory reserves. In contrast, sleep-deprived pupils suffer from poor concentration, slower reaction times, and heightened exam anxiety. Neurologists strongly advise adolescents to turn off blue-light smartphones and tablets at least forty minutes before bedtime to ensure deep, restorative sleep.\"\n\nQuestions:\n1. How many hours of sleep every night do neurologists recommend for high school students?\n2. Which part of the brain transfers newly learned facts into long-term memory?\n3. Mention two negative effects that sleep deprivation causes to students.\n4. Why should students switch off smartphones and tablets before bedtime?\n5. Sleeping only three hours before a final exam improves memory retention. (True / False)\n6. Give the passage a short suitable title.",
+    "modelAnswer": "1. Between eight to nine hours every night.\n2. The hippocampus.\n3. Poor concentration, slower reaction times, and heightened exam anxiety.\n4. Because blue light emitted by screens disrupts melatonin and prevents deep restorative sleep.\n5. False.\n6. Sleep and Memory / The Importance of Rest for High School Students."
   }
 ];
 
+  // Master Chapter-by-Chapter Rich Question Catalog
   const CHAPTER_QUESTION_CATALOG = {
-    "english": {
-  "1": [
-    {
-      "id": "en_u1_q1",
-      "title": "Question 1: Reading Comprehension (Panther 3.0D - Car of the Year)",
-      "text": "Reading Comprehension and Textbook Passage (Unit 1):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم واستيعاب",
-      "chapter": 1,
-      "topic": "The Panther 3.0D and Car Specifications",
-      "sourceType": "Ministerial Exam - Garnet English for Iraq Unit 1",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the following unseen text and answer (5) questions:\n\"Modern electric cars have become popular worldwide as cities battle air pollution. In Baghdad and Basra, engineering teams are testing hybrid vehicles powered by both clean electricity and efficient fuel engines. These automobiles feature smart regenerative brakes that recharge batteries whenever the driver slows down. Many drivers find that maintenance costs drop significantly compared to traditional petrol models.\"\n1. Why are electric cars becoming popular worldwide?\n2. What two power sources do hybrid vehicles combine?\n3. How do regenerative brakes recharge the car's batteries?\n4. What advantage regarding maintenance costs do drivers discover?\n5. Electric cars produce more toxic emissions than old petrol engines. (True / False)\n6. Give the passage a short suitable title.",
-          "score": 10,
-          "modelAnswer": "1. Because cities are battling air pollution (they are cleaner).\n2. Clean electricity and efficient fuel engines.\n3. By converting braking energy whenever the vehicle slows down.\n4. Maintenance costs drop significantly compared to traditional petrol models.\n5. False.\n6. Modern Clean Vehicles / Electric Cars in Modern Cities."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) of the following from your textbook (Panther 3.0D):\n1. The Panther 3.0D has seats for ............... people. (six / eight / ten)\n2. Are the young men interested in the engine of the Panther 3.0D? (Yes, they are / No, they aren't)\n3. What safety features are installed in the Panther 3.0D?\n4. The Panther 3.0D actually looks very expensive, but it is quite ...............\n5. The Panther 3.0D does ............... kilometres to the litre. (12 / 20 / 8)\n6. Some people just stand and gaze at its beautiful shape. (True / False)",
-          "score": 10,
-          "modelAnswer": "1. eight (8).\n2. Yes, they are.\n3. Airbags for the driver and passengers, and other safety features.\n4. cheap (or inexpensive).\n5. 12 kilometres to the litre.\n6. True."
-        }
-      ]
-    },
-    {
-      "id": "en_u1_q2",
-      "title": "Question 2: Grammar & Functional Language (Giving Reasons & Descriptions)",
-      "text": "Grammar and Language Functions (Unit 1):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 1,
-      "topic": "Giving Reasons, Telling Time & Polite Descriptions",
-      "sourceType": "Ministerial Exam Official Standards",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Do as required between brackets (Choose 5 only)",
-          "text": "1. Modern cars have airbags (help you in a crash). (Give reason using: 'so that you can' or 'to')\n2. 15:40. (Tell the time in words)\n3. He is fat. (Make the sentence more polite: He is a bit ...............)\n4. There is an escalator in the mall. (Change into negative form)\n5. She is lazy. (Make it polite: She is not very ...............)\n6. Cars have air conditioning (keep cool). (Give reason using: 'to help you')",
-          "score": 10,
-          "modelAnswer": "1. Modern cars have airbags to help you in a crash. (or: so that you can be safe in a crash)\n2. It is three forty. (or: It is twenty minutes to four)\n3. He is a bit fat.\n4. There is not an escalator in the mall.\n5. She is not very hardworking.\n6. Cars have air conditioning to help you keep cool."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Choose the correct alternative (Choose 5 only)",
-          "text": "1. There (is / are) lots of shops in the central shopping complex.\n2. Cars have GPS (so that / because / to) drivers cannot get lost.\n3. The store (has / have) a large swimming pool on the top floor.\n4. He has got (straight black / black straight / straight a black) hair.\n5. (Is there / Are there) any sweet shops near your school?\n6. The Panther 3.0D is (really / quite) fast; you must be careful.",
-          "score": 10,
-          "modelAnswer": "1. are.\n2. so that.\n3. has.\n4. straight black.\n5. Are there.\n6. really."
-        }
-      ]
-    },
-    {
-      "id": "en_u1_q3",
-      "title": "Question 3: Vocabulary, Spelling & Written Component (Unit 1 Focus)",
-      "text": "Vocabulary definitions, spelling drills, and paragraph writing:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق وتعبير",
-      "chapter": 1,
-      "topic": "Compound Words, Spelling Opposites & Email Writing",
-      "sourceType": "Ministerial Exam Unit 1",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Match compound words and write missing spellings (10 Marks)",
-          "text": "1. Match words to form compound nouns: (sun / sweet / litter / disc) with (shop / bin / brakes / roof).\n2. Write the opposites: dangerous -> ............, old-fashioned -> ............, expensive -> ............\n3. Past tense forms: do -> did ; drive -> ............, spend -> ............\n4. Nationalities: Iraq -> Iraqi ; Japan -> ............, Lebanon -> ............",
-          "score": 10,
-          "modelAnswer": "1. sun-roof, sweet shop, litter bin, disc brakes.\n2. safe, modern, cheap.\n3. drove, spent.\n4. Japanese, Lebanese."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Written Composition (10 Marks)",
-          "text": "Write an email of (60-80 words) to your cousin describing your best friend:\n(Mention his/her name, general appearance, hair and eyes, personal qualities, and what activities you enjoy doing together).",
-          "score": 10,
-          "modelAnswer": "Marking Rubric:\n- Task completion and descriptive details: 4 Marks\n- Grammatical accuracy and vocabulary choice: 3 Marks\n- Spelling and punctuation: 2 Marks\n- Layout and presentation: 1 Mark."
-        }
-      ]
-    }
-  ],
-  "2": [
-    {
-      "id": "en_u2_q1",
-      "title": "Question 1: Reading Comprehension (Lucy's TV Comedy - Samara's Family)",
-      "text": "Reading Comprehension and Textbook Passage (Unit 2):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم وتحليل",
-      "chapter": 2,
-      "topic": "TV Comedies & Lucy Fisher Interview",
-      "sourceType": "Ministerial Exam Unit 2",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the following text and answer (5) questions:\n\"Documentary television programmes have grown tremendously in popularity over the last decade. Unlike fictional dramas, nature documentaries present real-life behaviours of rare species in remote habitats such as the Amazon rainforest or polar ice caps. Cameramen often wait patiently for months in extreme weather conditions just to film a few minutes of breathtaking animal interaction. Scientists believe these films inspire young audiences to pursue ecological careers and support wildlife conservation.\"\n1. How do nature documentaries differ from fictional dramas?\n2. Where do documentary film crews travel to capture rare species?\n3. Why do cameramen wait for months in harsh conditions?\n4. What effect do wildlife films have on young audiences according to scientists?\n5. Cameramen work in luxurious indoor studios to film wild polar bears. (True / False)\n6. Suggest an appropriate title for this reading passage.",
-          "score": 10,
-          "modelAnswer": "1. They present real-life behaviours of rare species rather than fictional stories.\n2. To remote habitats such as the Amazon rainforest or polar ice caps.\n3. To film a few minutes of breathtaking animal interactions.\n4. They inspire them to pursue ecological careers and support wildlife conservation.\n5. False.\n6. The Power of Nature Documentaries / Filming Wild Animals."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) of the following from your textbook (Lucy's Family / Samara):\n1. Lucy plays the character of ............... in the comedy series.\n2. Samara's brother is ............... than her. (older / younger)\n3. What did Samara's clumsy brother put in his mother's cup of tea instead of sugar?\n4. Lucy's brother fell into the hotel swimming pool with all his clothes on. (True / False)\n5. Why did Lucy enjoy filming the latest episode of the series?\n6. Samara's brother spilled his drink at lunch and slipped in the puddle. (True / False)",
-          "score": 10,
-          "modelAnswer": "1. Samara.\n2. younger.\n3. Salt.\n4. True.\n5. Because the family went away on a holiday and stayed in a fancy hotel.\n6. True."
-        }
-      ]
-    },
-    {
-      "id": "en_u2_q2",
-      "title": "Question 2: Grammar & Functions (Preferences, Suggestions & Invitations)",
-      "text": "Grammar and Language Functions (Unit 2):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 2,
-      "topic": "Expressing Preferences, Making Suggestions & Invitations",
-      "sourceType": "Ministerial Exam Official Questions",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Do as required between brackets (Choose 5 only)",
-          "text": "1. Express your preference concerning going to the cinema. (Use: 'I'd love to')\n2. Make a suggestion to your friend about spending the weekend. (Use: 'How about ...')\n3. Invite your friend to attend your school graduation party. (Use: 'Would you like ...')\n4. \"Let's (watch / watching / watched) an action movie tonight.\" (Choose the correct verb)\n5. I'd like (to play / playing / play) tennis this afternoon. (Choose)\n6. Accept your friend's invitation to go to the park: ...............",
-          "score": 10,
-          "modelAnswer": "1. I'd love to go to the cinema.\n2. How about spending the weekend at the riverside? (or: at the park)\n3. Would you like to come to my school graduation party?\n4. watch (after Let's).\n5. to play (after I'd like).\n6. Yes, I'd love to. / That sounds great."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Choose the correct word between brackets (Choose 5 only)",
-          "text": "1. I prefer (reading / read / to read) historical novels in my free time.\n2. What's your favourite hobby? - I like (swim / swimming / swam).\n3. Would you like (to have / have / having) dinner with us tonight?\n4. How about (visiting / visit / visited) the national museum tomorrow?\n5. Let's (go / to go / going) for a boat trip on the Shatt Al-Arab.\n6. I'd rather (stay / to stay / staying) at home this evening.",
-          "score": 10,
-          "modelAnswer": "1. reading.\n2. swimming.\n3. to have.\n4. visiting.\n5. go.\n6. stay."
-        }
-      ]
-    },
-    {
-      "id": "en_u2_q3",
-      "title": "Question 3: Vocabulary, Story Time & Literature Focus (Unit 2)",
-      "text": "Story Time (Kareem - Lucky Customer 50) and Vocabulary:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تذكر وتحليل",
-      "chapter": 2,
-      "topic": "Story Time: Kareem's Dream & Types of Books",
-      "sourceType": "Ministerial Exam Story Time",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Answer (5) questions about Story Time (Lucky Customer 50)",
-          "text": "1. Describe Kareem's character in three adjectives from the story.\n2. What was the name of the poetry collection Kareem wanted to purchase?\n3. Who was the famous Iraqi poet who wrote the collection?\n4. Why had Kareem been saving money for months?\n5. What surprised Kareem when he reached the front of the queue?\n6. What was Kareem's ultimate secret ambition in life?",
-          "score": 10,
-          "modelAnswer": "1. Hardworking, imaginative, and patient.\n2. Islands of Salt (جزر الملح).\n3. Muzaffar Al-Nawab.\n4. To be the first to buy the new book of poems.\n5. The shopkeeper rang a bell and cheered because Kareem was customer number 50.\n6. To become a famous poet himself."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Vocabulary & Punctuation (10 Marks)",
-          "text": "1. Fill in the blanks with suitable words: [ comedy , author , tragedy , review ]\n   a. A book or play that makes people laugh: ...............\n   b. The writer of a book or literary piece: ...............\n2. Punctuation: Re-write the sentence using proper capital letters and marks:\n   \"ali and ahmed don't like horror films do they\"",
-          "score": 10,
-          "modelAnswer": "1. a. comedy , b. author.\n2. \"Ali and Ahmed don't like horror films, do they?\""
-        }
-      ]
-    }
-  ],
-  "3": [
-    {
-      "id": "en_u3_q1",
-      "title": "Question 1: Reading Comprehension (The Marsh Arabs & Bedouin Falconry)",
-      "text": "Reading Comprehension and Textbook Passage (Unit 3):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم واستيعاب",
-      "chapter": 3,
-      "topic": "Wildlife, The Marsh Arabs & Falconry",
-      "sourceType": "Ministerial Exam Unit 3",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the unseen text and answer (5) questions:\n\"Falconry has existed in the Arabian Peninsula and Mesopotamia for thousands of years. Originally, Bedouins utilized falcons not as a luxury sport, but as a practical method to capture fresh meat like houbara and birds across dry desert terrains. Falcons can dive through the air at speeds exceeding 300 km/h, making them the fastest predators on earth. Today, falconry has transformed into a prestigious cultural heritage celebrated in regional tournaments and protected under wildlife conservation laws.\"\n1. Why did Bedouins originally practice falconry in the desert?\n2. What is the diving speed that a trained falcon can exceed?\n3. The falcon is the fastest living creature on earth. (True / False)\n4. What has falconry evolved into in modern times?\n5. Did Bedouins practice falconry merely as an expensive leisure hobby in the past?\n6. Give the passage a suitable concise title.",
-          "score": 10,
-          "modelAnswer": "1. As a practical method to hunt fresh meat like houbara and birds.\n2. Over 300 kilometres per hour (km/h).\n3. True.\n4. A prestigious cultural heritage celebrated in tournaments and protected by laws.\n5. No, they practiced it out of necessity to catch food.\n6. The Art and Heritage of Falconry / Falcons in Iraq and Arabia."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) questions from your textbook (The Marsh Arabs & Wildlife):\n1. Where can Marsh Arabs still be found in southern Iraq?\n2. What domestic animals do Marsh Arabs raise?\n3. Marsh Arabs live in arched houses constructed from ...............\n4. What traditional boats do Marsh Arabs use for transport? (Mashhoof and Tarrada / Yachts)\n5. Forty species of birds can be found in the Iraqi marshlands. (True / False)\n6. The draining of the marshes in the 1990s caused a catastrophic change in the ecosystem. (True / False)",
-          "score": 10,
-          "modelAnswer": "1. In the marshes in the south-east of Iraq (Basra, Maysan, Dhi Qar).\n2. Domestic buffalo, sheep, and cattle.\n3. reeds.\n4. Mashhoof and Tarrada.\n5. True.\n6. True."
-        }
-      ]
-    },
-    {
-      "id": "en_u3_q2",
-      "title": "Question 2: Grammar & Conditionals (Comparatives, As...as & If Sentences)",
-      "text": "Grammar and Language Functions (Unit 3):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 3,
-      "topic": "Comparatives, Superlatives & First / Second Conditionals",
-      "sourceType": "Ministerial Exam Unit 3 Grammar",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Do as required between brackets (Choose 5 only)",
-          "text": "1. A bear is bigger than a wolf. (Rewrite using: 'as ... as')\n2. Monkeys are more intelligent than sheep. (Rewrite: Sheep are less ...............)\n3. If people grow a lot taller, we (need) bigger houses. (Second Conditional: Correct the verb)\n4. If there were no spiders, there (be) more insects. (Second Conditional: Complete with would)\n5. Gold is more expensive than silver. (Rewrite using: 'Silver is not as ...')\n6. If the temperature rises further, the ice caps (melt). (First Conditional: Correct the verb)",
-          "score": 10,
-          "modelAnswer": "1. A wolf is not as big as a bear.\n2. Sheep are less intelligent than monkeys.\n3. would need.\n4. would be.\n5. Silver is not as expensive as gold.\n6. will melt."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Choose the correct alternative (Choose 5 only)",
-          "text": "1. A dawn is (more beautiful / beautifulest / most beautiful) than a night.\n2. Cows are (bigger / big / the biggest) than goats.\n3. If it (rains / rained / will rain) tomorrow, we will postpone the outdoor match.\n4. If I had a sports car, I (will / would / can) travel across the country.\n5. The cheetah is (the fastest / faster / fast) animal on dry land.\n6. Cities are (noisiest / noisier / as noisy) than rural villages.",
-          "score": 10,
-          "modelAnswer": "1. more beautiful.\n2. bigger.\n3. rains.\n4. would.\n5. the fastest.\n6. noisier."
-        }
-      ]
-    },
-    {
-      "id": "en_u3_q3",
-      "title": "Question 3: Literature Story Time & Composition (The Deer & Wildlife Fact File)",
-      "text": "Story Time (The Pregnant Deer) and Written Composition:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تحليل وابتكار",
-      "chapter": 3,
-      "topic": "Story Time: Nature's Lessons & Writing a Fact File",
-      "sourceType": "Ministerial Exam Unit 3 Writing",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Answer (5) questions about Story Time (The Deer in the Forest)",
-          "text": "1. Where did the pregnant deer go to give birth to her fawn?\n2. What natural danger threatened the deer from the front?\n3. What two dangerous predators/hunters appeared on her left and right?\n4. What did the deer do when faced with all these overwhelming dangers?\n5. How did nature help the deer survive the crisis?\n6. What moral lesson does this story teach humans about overcoming difficult moments?",
-          "score": 10,
-          "modelAnswer": "1. To a remote grass field near a fast-flowing river in the forest.\n2. A rushing, powerful river.\n3. A hunter with an arrow on her left, and a hungry stalking lion on her right.\n4. She stayed calm, focused on the birth of her new life, and did what she could control.\n5. Lightning struck and blinded the hunter, his arrow missed the deer and struck the lion, and heavy rain extinguished the wildfire.\n6. To stay calm, focus on your immediate duty, and trust that challenges can resolve with patience."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Written Composition (10 Marks)",
-          "text": "Write a fact file (70-80 words) about wildlife in the Iraqi Marshes:\n(Include: Habitat and geography, types of birds and animals, lifestyle of the people, threats and conservation).",
-          "score": 10,
-          "modelAnswer": "Marking Rubric:\n- Organization into clear fact-file sections: 4 Marks\n- Factual accuracy and vocabulary: 3 Marks\n- Grammar, punctuation, and capitalization: 3 Marks."
-        }
-      ]
-    }
-  ],
-  "4": [
-    {
-      "id": "en_u4_q1",
-      "title": "Question 1: Reading Comprehension & Past Passive Voice (Consolidation Unit)",
-      "text": "Mid-term Consolidation and Review (Unit 4 / 5):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم وتطبيق",
-      "chapter": 4,
-      "topic": "Comprehensive Review & Passive Voice",
-      "sourceType": "Ministerial Exam Mid-term Review",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Unseen Comprehension",
-          "text": "Read the passage carefully and answer (5) questions:\n\"The Ministry of Education in Iraq has initiated a nation-wide digital library platform accessible to all secondary students. Over twenty thousand interactive science experiments, recorded video lectures by senior educators, and ministerial past papers have been catalogued. Students in remote governorates can now access top-tier revision materials from home without incurring private tutoring expenses.\"\n1. What initiative did the Iraqi Ministry of Education launch?\n2. Name two types of educational materials available on the platform.\n3. How does this digital library benefit students living in remote governorates?\n4. The platform requires students to pay high subscription fees. (True / False)\n5. Find a synonym in the text for: (starting/beginning) ............\n6. Choose a suitable title for this text.",
-          "score": 10,
-          "modelAnswer": "1. A nation-wide digital library platform for secondary students.\n2. Interactive science experiments, video lectures, and ministerial past papers.\n3. They can access top-tier revision materials from home without private tutoring fees.\n4. False.\n5. initiated.\n6. Digital Education in Iraq / The National Online Library."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Grammar & Passive Structures",
-          "text": "Rewrite (5) of the following sentences in the Passive Voice:\n1. The author wrote an inspiring novel. -> An inspiring novel ............\n2. Bedouins used falcons to hunt. -> Falcons ............\n3. Engineers build arched houses from reeds. -> Arched houses ............\n4. Thousands of tourists visit the ancient ruins of Babylon every spring. -> The ancient ruins of Babylon ............\n5. The clerk lost the essential travel documents yesterday. -> The essential travel documents ............\n6. Ali repaired the damaged laptop. -> The damaged laptop ............",
-          "score": 10,
-          "modelAnswer": "1. was written by the author.\n2. were used to hunt.\n3. are built from reeds by engineers.\n4. are visited by thousands of tourists every spring.\n5. were lost yesterday.\n6. was repaired by Ali."
-        }
-      ]
-    },
-    {
-      "id": "en_u4_q2",
-      "title": "Question 2: Vocabulary, Irregular Verbs & Punctuation",
-      "text": "Language skills, vocabulary in context, and punctuation accuracy:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 4,
-      "topic": "Vocabulary, Verb Forms & Punctuation",
-      "sourceType": "Ministerial Exam Standards",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Irregular Verbs & Opposites (10 Marks)",
-          "text": "1. Give the past participle (p.p.) of: (see -> seen) ; (speak -> ............) ; (write -> ............) ; (find -> ............)\n2. Form opposite adjectives using prefixes: (happy -> unhappy) ; (polite -> ............) ; (legal -> ............) ; (usual -> ............)\n3. Plural nouns: (car -> cars) ; (child -> ............) ; (tooth -> ............) ; (story -> ............)\n4. Adverbs from adjectives: (quick -> quickly) ; (easy -> ............) ; (good -> ............)",
-          "score": 10,
-          "modelAnswer": "1. spoken, written, found.\n2. impolite, illegal, unusual.\n3. children, teeth, stories.\n4. easily, well."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Punctuation & Writing (10 Marks)",
-          "text": "Punctuate the sentence correctly:\n\"can muna and huda speak french fluently no they can't\"\nWrite a short paragraph (50 words) describing your favorite school subject and why you find it exciting.",
-          "score": 10,
-          "modelAnswer": "Punctuation: \"Can Muna and Huda speak French fluently? No, they can't.\"\nParagraph: Award marks for grammatical cohesion, vocabulary, and relevance."
-        }
-      ]
-    }
-  ],
-  "5": [
-    {
-      "id": "en_u5_q1",
-      "title": "Question 1: Reading Comprehension (Iraqi Morning News & Sports Events)",
-      "text": "Reading Comprehension and Textbook Passages (Unit 5):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم واستيعاب",
-      "chapter": 5,
-      "topic": "The Media, Sports Champions & News Reports",
-      "sourceType": "Ministerial Exam Unit 5",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the unseen news report and answer (5) questions:\n\"Yesterday morning, the Iraqi Minister of Youth and Sports officially inaugurated a state-of-the-art sports stadium in Basra with a capacity of sixty-five thousand spectators. The opening ceremony was attended by distinguished international football stars and regional sports delegations. The minister emphasized that modern sports facilities help nurture young talents and foster national unity across all provinces of Iraq.\"\n1. Who inaugurated the new stadium in Basra yesterday morning?\n2. What is the spectator capacity of the new Basra stadium?\n3. Who attended the grand opening ceremony?\n4. What did the minister emphasize regarding sports facilities?\n5. The stadium was built exclusively for water sports. (True / False)\n6. Provide a concise newspaper headline for this report.",
-          "score": 10,
-          "modelAnswer": "1. The Iraqi Minister of Youth and Sports.\n2. Sixty-five thousand (65,000) spectators.\n3. Distinguished international football stars and regional sports delegations.\n4. That modern sports facilities help nurture young talents and foster national unity.\n5. False.\n6. Grand Opening of Basra's New Sports Stadium / Iraq Celebrates Sports Facility."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) questions from your textbook (Iraqi Morning News):\n1. Where did the Iraqi Education Minister arrive to attend the Arab Education Conference? (London / Cairo / Baghdad)\n2. What was the UK Sports Minister's meeting focused on?\n3. Who saved the young girl from a dangerous dog in the park? (A brave boy named John / Her teacher)\n4. What tool did the boy use to scare off the attacking animal? (A cricket bat / A stone)\n5. The governor of Basra welcomed the international guests at the airport. (True / False)\n6. The new sports city took ............... years to construct. (three / ten)",
-          "score": 10,
-          "modelAnswer": "1. London.\n2. Developing youth training exchanges between countries.\n3. A brave boy named John.\n4. A cricket bat.\n5. True.\n6. three years."
-        }
-      ]
-    },
-    {
-      "id": "en_u5_q2",
-      "title": "Question 2: Grammar & Past Tenses (Past Simple vs Past Continuous)",
-      "text": "Grammar and Language Functions (Unit 5):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 5,
-      "topic": "Past Continuous, Past Simple & Future Forms",
-      "sourceType": "Ministerial Exam Unit 5 Grammar",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Do as required between brackets (Choose 5 only)",
-          "text": "1. While Ali (walk) to the library, he met his old schoolmate. (Correct the verb form)\n2. They were playing football when it (begin) to thunder. (Correct the verb)\n3. I (read) a newspaper article when the telephone rang. (Past Continuous)\n4. She is going to (study / studying / studied) architecture at Baghdad University. (Choose)\n5. What (you do) at 7 o'clock yesterday evening? (Make a question in Past Continuous)\n6. The boys (not watch) television when their father arrived. (Past Continuous negative)",
-          "score": 10,
-          "modelAnswer": "1. was walking.\n2. began.\n3. was reading.\n4. study.\n5. What were you doing at 7 o'clock yesterday evening?\n6. were not watching."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Choose the correct option (Choose 5 only)",
-          "text": "1. The minister arrived in Cairo (at / in / on) 10 o'clock yesterday.\n2. She was talking on the phone (when / while / because) the car stopped.\n3. (While / As soon as / Before) we were swimming, someone stole our bags.\n4. I think our national team (will win / wins / winning) the championship.\n5. He (broke / was breaking / breaks) his leg while he was playing tennis.\n6. They (were travelling / travelled) to Nineveh when the tyre burst.",
-          "score": 10,
-          "modelAnswer": "1. at.\n2. when.\n3. While.\n4. will win.\n5. broke.\n6. were travelling."
-        }
-      ]
-    },
-    {
-      "id": "en_u5_q3",
-      "title": "Question 3: Media Vocabulary & Composition (A TV Programme Review)",
-      "text": "Media vocabulary and written composition:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "ابتكار",
-      "chapter": 5,
-      "topic": "Writing a TV Programme Review & Media Terms",
-      "sourceType": "Ministerial Exam Unit 5 Writing",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Media Vocabulary & Matching (10 Marks)",
-          "text": "Match the words with their definitions:\n[ reporter , talk show , documentary , sports programme ]\n1. A television broadcast giving factual information about real people or events: ...............\n2. A person who gathers news and interviews individuals for newspapers or TV: ...............\n3. A television show where famous guests are interviewed about their lives: ...............\n4. A broadcast covering athletic competitions and football matches: ...............",
-          "score": 10,
-          "modelAnswer": "1. documentary.\n2. reporter.\n3. talk show.\n4. sports programme."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Written Composition (10 Marks)",
-          "text": "Write a review (70-90 words) of an interesting TV programme you watched recently:\n(Mention the title and genre, what it was about, interesting facts you learned, and why you recommend it to other students).",
-          "score": 10,
-          "modelAnswer": "Marking Rubric:\n- Cohesion and content: 4 Marks\n- Grammatical range and past tenses: 3 Marks\n- Spelling and vocabulary: 3 Marks."
-        }
-      ]
-    }
-  ],
-  "6": [
-    {
-      "id": "en_u6_q1",
-      "title": "Question 1: Reading Comprehension (School of the Future & Ibn Al-Haytham)",
-      "text": "Reading Comprehension and Textbook Passage (Unit 6):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم وتحليل",
-      "chapter": 6,
-      "topic": "Schools of the Future & Great Scholars (Ibn Al-Haytham)",
-      "sourceType": "Ministerial Exam Unit 6",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the unseen passage and answer (5) questions:\n\"Artificial intelligence in modern classrooms is transforming education. Virtual learning environments enable students to conduct simulated nuclear physics and chemistry experiments without exposure to hazardous radiation or corrosive acids. Furthermore, AI tutoring software assesses each learner's individual pace, reinforcing weak areas and providing instant personalized explanations. Education specialists predict that future schools will combine online artificial intelligence modules with in-person mentoring.\"\n1. How do virtual learning environments benefit science students?\n2. What does AI tutoring software assess for each learner?\n3. Why are simulated experiments safer than handling real hazardous chemicals?\n4. What do specialists predict about future educational models?\n5. AI software will completely replace all human school teachers within two years. (True / False)\n6. Provide a suitable title for this text.",
-          "score": 10,
-          "modelAnswer": "1. They enable students to conduct simulated experiments safely without hazards.\n2. Each learner's individual pace, reinforcing weak areas with personalized explanations.\n3. Because they eliminate exposure to hazardous radiation or corrosive acids.\n4. That future schools will combine online AI modules with in-person mentoring.\n5. False.\n6. Artificial Intelligence in Classrooms / The Future of Education."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) questions from your textbook (Ibn Al-Haytham & Future Schools):\n1. Where and when was Ibn Al-Haytham born? (Basra, 965 AD / Baghdad, 1200 AD)\n2. What was Ibn Al-Haytham's most famous pioneering scientific work called? (Kitab al-Manazir / The Canon)\n3. Ibn Al-Haytham is celebrated as the father of modern ............... (optics / medicine / aviation)\n4. In the schools of the future, students will connect with other learners worldwide via ...............\n5. Super schools of the future will contain modern science parks and solar facilities. (True / False)\n6. What major hydraulic project on the River Nile was Ibn Al-Haytham invited to regulate?",
-          "score": 10,
-          "modelAnswer": "1. In Basra, in 965 AD.\n2. Kitab al-Manazir (The Book of Optics).\n3. optics (علم البصريات).\n4. the internet / virtual global classrooms.\n5. True.\n6. Regulating the flooding of the River Nile in Egypt."
-        }
-      ]
-    },
-    {
-      "id": "en_u6_q2",
-      "title": "Question 2: Grammar & Relative Clauses (Who, Which, That & Defining Clauses)",
-      "text": "Grammar and Language Functions (Unit 6):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 6,
-      "topic": "Relative Pronouns: Who, Which, That, Where, Whose",
-      "sourceType": "Ministerial Exam Unit 6 Grammar",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Join sentences using relative pronouns (Choose 5 only)",
-          "text": "1. That is the doctor. He performed the delicate heart surgery. (Use: 'who')\n2. I saw the modern solar car. It won the eco-friendly race. (Use: 'which' or 'that')\n3. That is the engineer ............... designed the Baghdad suspension bridge. (who / which / whose)\n4. The university ............... I studied engineering has outstanding laboratories. (where / which)\n5. The girl ............... bicycle was damaged in the accident received compensation. (whose / who)\n6. That is the famous book ............... Ibn Al-Haytham wrote about optics. (which / who)",
-          "score": 10,
-          "modelAnswer": "1. That is the doctor who performed the delicate heart surgery.\n2. I saw the modern solar car which (that) won the eco-friendly race.\n3. who.\n4. where.\n5. whose.\n6. which."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Defining Careers and Occupations (10 Marks)",
-          "text": "Define (5) of the following occupations using: \"A / An ............... is someone who ...............\":\n1. An architect (design buildings)\n2. A pilot (fly an airplane)\n3. A surgeon (operate on sick people in hospital)\n4. A tour guide (show tourists around historical monuments)\n5. A firefighter (put out fires and save people)\n6. A journalist (write articles for newspapers and magazines)",
-          "score": 10,
-          "modelAnswer": "1. An architect is someone who designs buildings.\n2. A pilot is someone who flies an airplane.\n3. A surgeon is someone who operates on sick people in hospital.\n4. A tour guide is someone who shows tourists around historical monuments.\n5. A firefighter is someone who puts out fires and saves people.\n6. A journalist is someone who writes articles for newspapers and magazines."
-        }
-      ]
-    },
-    {
-      "id": "en_u6_q3",
-      "title": "Question 3: Composition (Career of a Real Person / Professor's Story)",
-      "text": "Literature Focus and Written Composition:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "ابتكار",
-      "chapter": 6,
-      "topic": "Career of a Real Person & Life Lessons",
-      "sourceType": "Ministerial Exam Unit 6 Writing",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Story Time (Alumni Reunion / The Old Professor)",
-          "text": "Answer (5) questions about the story of the alumni visiting their old professor:\n1. Where were the alumni from, and why did they visit their retired university professor?\n2. What problem did all the successful alumni complain about to the professor?\n3. The professor brought coffee in different cups (some expensive porcelain, others cheap plastic). What point was he demonstrating?\n4. What is the difference between \"the coffee\" (true life) and \"the cups\" (wealth, status, jobs)?\n5. True happiness comes from enjoying life itself, not merely possessing the most expensive cup. (True / False)\n6. What moral lesson did the graduates take back home with them?",
-          "score": 10,
-          "modelAnswer": "1. They were from different Iraqi provinces (Dhi Qar, Baghdad, Kirkuk, Diyala); they visited him to pay respect and express gratitude.\n2. They complained about stress, anxiety, and high pressure in their careers and lives.\n3. That people automatically select the most attractive cups, even though the quality of the coffee remains identical.\n4. Coffee represents genuine life, health, and family; the cups are merely tools, wealth, and societal status.\n5. True.\n6. That the happiest people do not necessarily have the best of everything; they simply make the best of what they have."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Written Composition (10 Marks)",
-          "text": "Write a biography / career summary (70-90 words) of a real person you admire:\n(Include: Early childhood and education, key career achievements, obstacles overcome, and plans for the future).",
-          "score": 10,
-          "modelAnswer": "Marking Rubric:\n- Organization and biographical accuracy: 4 Marks\n- Sentence variety and relative clauses: 3 Marks\n- Spelling, grammar, and capitalisation: 3 Marks."
-        }
-      ]
-    }
-  ],
-  "7": [
-    {
-      "id": "en_u7_q1",
-      "title": "Question 1: Reading Comprehension (Libya and Sudan - African Countries)",
-      "text": "Reading Comprehension and Textbook Passage (Unit 7):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم واستيعاب",
-      "chapter": 7,
-      "topic": "Countries, Geography & The Olympic Games",
-      "sourceType": "Ministerial Exam Unit 7",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A)",
-          "text": "Read the unseen passage and answer (5) questions:\n\"Eco-tourism is expanding rapidly across the Mediterranean basin and North Africa. Instead of staying in crowded coastal luxury resorts, visitors increasingly opt for sustainable desert expeditions, staying with native families and exploring archaeological ruins such as Leptis Magna. Revenue generated from eco-tourism directly finances the protection of endangered desert gazelles and rare migratory bird reserves.\"\n1. What type of tourism is growing rapidly in the Mediterranean and North Africa?\n2. Where do eco-tourists choose to stay instead of large coastal resorts?\n3. What famous ancient archaeological site attracts visitors in North Africa?\n4. How does eco-tourism revenue help wildlife conservation?\n5. Eco-tourism completely destroys historical heritage monuments. (True / False)\n6. Provide an appropriate concise title for this text.",
-          "score": 10,
-          "modelAnswer": "1. Eco-tourism (sustainable tourism).\n2. They stay with native families and in sustainable desert expeditions.\n3. Leptis Magna (in Libya).\n4. It directly finances the protection of endangered gazelles and migratory bird reserves.\n5. False.\n6. The Rise of Eco-Tourism / Sustainable Travel in North Africa."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B)",
-          "text": "Answer or complete (5) questions from your textbook (Libya and Sudan):\n1. Libya is mostly desert, but it has fertile agricultural valleys in the north. (True / False)\n2. What is the modern capital of Sudan? (Khartoum / Tripoli / Benghazi)\n3. Sudan's main exports include cotton, gum arabic, and ............... (sugar / electronics)\n4. What ancient Roman city in Libya was an important seaport? (Leptis Magna / Babylon)\n5. The Blue Nile and White Nile join together at the city of ...............\n6. Libya produces large quantities of crude ............... (oil / coal)",
-          "score": 10,
-          "modelAnswer": "1. True.\n2. Khartoum.\n3. sugar (and animal livestock).\n4. Leptis Magna.\n5. Khartoum.\n6. oil (petroleum)."
-        }
-      ]
-    },
-    {
-      "id": "en_u7_q2",
-      "title": "Question 2: Grammar (Adverbs Order: Manner, Place, Time & Passive Voice)",
-      "text": "Grammar and Language Functions (Unit 7):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق",
-      "chapter": 7,
-      "topic": "Adverbs Order (Manner + Place + Time) & Passive Voice",
-      "sourceType": "Ministerial Exam Unit 7 Grammar",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Re-order adverbs correctly (Manner + Place + Time)",
-          "text": "Put the adverbs in the correct order for (5) of the following sentences:\n1. Ali played (in the garden / happily / yesterday). -> Ali played ...............\n2. The students sang (at school / loudly / this morning). -> The students sang ...............\n3. My friend drove (carefully / last night / on the highway). -> My friend drove ...............\n4. It rained (in Basra / heavily / last night). -> It rained ...............\n5. She recited the poem (beautifully / in the auditorium / yesterday). -> She recited the poem ...............\n6. The children walked (to school / quietly / this morning). -> The children walked ...............",
-          "score": 10,
-          "modelAnswer": "1. happily in the garden yesterday.\n2. loudly at school this morning.\n3. carefully on the highway last night.\n4. heavily in Basra last night.\n5. beautifully in the auditorium yesterday.\n6. quietly to school this morning."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Passive Voice & Prepositions (Choose 5 only)",
-          "text": "1. Crops such as cotton and barley (are grown / is grown / grew) by Sudanese farmers.\n2. Oil (was discovered / discovers / is discovering) in commercial quantities in Libya.\n3. Ancient pyramids (were built / built / was built) thousands of years ago in Meroe.\n4. He has lived in Baghdad (since / for / from) five years.\n5. We haven't seen our cousins (since / for / in) last September.\n6. The prize (was awarded / awarded / is award) to the fastest runner.",
-          "score": 10,
-          "modelAnswer": "1. are grown.\n2. was discovered.\n3. were built.\n4. for.\n5. since.\n6. was awarded."
-        }
-      ]
-    },
-    {
-      "id": "en_u7_q3",
-      "title": "Question 3: Spelling, Nationalities & Composition (Write About a Country)",
-      "text": "Spelling variations, nationalities, and written composition:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق وتعبير",
-      "chapter": 7,
-      "topic": "Nationalities, Countries & Composition",
-      "sourceType": "Ministerial Exam Unit 7 Writing",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Nationalities & Spelling (10 Marks)",
-          "text": "1. Write the nationalities: Iraq -> Iraqi ; England -> ............, Egypt -> ............, France -> ............\n2. Change into adverbs: polite -> politely ; easy -> ............, fast -> ............, good -> ............\n3. Opposites: wide -> narrow ; modern -> ............, safe -> ............\n4. Complete: Sudan -> Sudanese ; Japan -> ............ ; Bahrain -> ............",
-          "score": 10,
-          "modelAnswer": "1. English, Egyptian, French.\n2. easily, fast, well.\n3. old / ancient, dangerous.\n4. Japanese, Bahraini."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Written Composition (10 Marks)",
-          "text": "Write a paragraph (70-80 words) about a country of your choice (e.g. Iraq, Sudan, or Japan):\n(Mention geographical location, capital city, population, agricultural/industrial products, and famous tourist attractions).",
-          "score": 10,
-          "modelAnswer": "Marking Rubric:\n- Geographical and factual coherence: 4 Marks\n- Vocabulary range and adverbs: 3 Marks\n- Spelling, capitalisation and punctuation: 3 Marks."
-        }
-      ]
-    }
-  ],
-  "8": [
-    {
-      "id": "en_u8_q1",
-      "title": "Question 1: Comprehensive Baccalaureate Exam (Final Ministerial Review)",
-      "text": "Comprehensive Official Ministerial Examination (Full Syllabus):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "شامل",
-      "chapter": 8,
-      "topic": "Comprehensive Ministerial Exam Standards",
-      "sourceType": "Ministerial Final Baccalaureate Exam",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Unseen Comprehension",
-          "text": "Read the following passage carefully:\n\"Health experts consistently emphasize that regular sleep patterns are as vital for academic success as dedicated study hours. During deep sleep cycles, the human brain reorganizes newly acquired memories, solves complex mathematical puzzles, and clears metabolic waste. Teenagers who sleep eight hours per night demonstrate superior exam performance, sharper concentration, and lower stress levels.\"\n1. What do health experts compare sleep to in terms of importance?\n2. What processes happen in the human brain during deep sleep?\n3. How many hours of sleep per night do experts recommend for teenagers?\n4. What three benefits do well-rested students demonstrate in exams?\n5. Staying awake all night before an exam boosts your mental performance. (True / False)\n6. Give the passage a suitable title.",
-          "score": 10,
-          "modelAnswer": "1. They compare it to dedicated study hours.\n2. The brain reorganizes memories, solves complex puzzles, and clears waste.\n3. Eight (8) hours per night.\n4. Superior exam performance, sharper concentration, and lower stress levels.\n5. False.\n6. The Importance of Sleep for Students / Sleep and Academic Success."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Textbook Passages (Comprehensive)",
-          "text": "Answer or complete (5) questions:\n1. The Panther 3.0D comes with a warranty of ............... years. (four / two / ten)\n2. Falcons can kill large birds and animals by diving at immense speed. (True / False)\n3. Kareem read all of Al-Nawab's poems at least ............... times. (twice / once / never)\n4. Ibn Al-Haytham wrote more than two hundred works across various sciences. (True / False)\n5. Why do Marsh Arabs build their houses on floating reed beds?\n6. Lucy's clumsy brother put salt into his mother's tea. (True / False)",
-          "score": 10,
-          "modelAnswer": "1. four (4) years.\n2. True.\n3. twice.\n4. True.\n5. To adapt to the rising water levels in the marshes.\n6. True."
-        }
-      ]
-    },
-    {
-      "id": "en_u8_q2",
-      "title": "Question 2: Grammar & Functions (Comprehensive Ministerial Drill)",
-      "text": "Grammar questions from all units:",
-      "score": 20,
-      "difficulty": "متقدم",
-      "bloom": "تطبيق",
-      "chapter": 8,
-      "topic": "Comprehensive Grammar Review",
-      "sourceType": "Ministerial Final Exam Grammar",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Do as required (Choose 5 only)",
-          "text": "1. While Noor was reading, her little brother (turn off) the lamp. (Correct the verb)\n2. A plane is faster than a train. (Rewrite using: 'as ... as')\n3. If you study diligently, you (pass) the baccalaureate exams. (First Conditional)\n4. That is the architect ............... planned the new library. (who / which / whose)\n5. The mechanic repaired the car yesterday. (Change into Passive Voice)\n6. He is unfriendly. (Make it more polite: He is not very ...............)",
-          "score": 10,
-          "modelAnswer": "1. turned off.\n2. A train is not as fast as a plane.\n3. will pass.\n4. who.\n5. The car was repaired yesterday by the mechanic.\n6. friendly."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Choose the correct alternative (Choose 5 only)",
-          "text": "1. There (is / are) an ancient museum in Baghdad.\n2. How about (visiting / visit / visited) Babylon tomorrow?\n3. He has lived in Basra (since / for / in) 2018.\n4. I'd like (to go / go / going) to the swimming pool.\n5. The cheetah runs (fast / fastly / faster) than any mammal.\n6. Cars have seatbelts (to / so that / because) keep you safe.",
-          "score": 10,
-          "modelAnswer": "1. is.\n2. visiting.\n3. since.\n4. to go.\n5. faster.\n6. to."
-        }
-      ]
-    },
-    {
-      "id": "en_u8_q3",
-      "title": "Question 3: Final Written Composition (Choice of Two Topics)",
-      "text": "Official Ministerial Composition Section:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "ابتكار",
-      "chapter": 8,
-      "topic": "Final Ministerial Written Composition",
-      "sourceType": "Ministerial Exam Official Standard",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "Part (A): Topic Option 1",
-          "text": "Write an email (75-90 words) to a friend telling him/her about an invitation to a birthday party or graduation ceremony.\n(Include date, time, venue, what to bring, and why it will be memorable).",
-          "score": 10,
-          "modelAnswer": "Evaluate based on organization, correct salutation and sign-off, grammar, and spelling."
-        },
-        {
-          "id": "b2",
-          "title": "Part (B): Topic Option 2",
-          "text": "Write a short essay (75-90 words) giving advice to tourists visiting Iraq for the first time.\n(Include historical sites, delicious food, local traditions, best season to visit, and friendly hospitality).",
-          "score": 10,
-          "modelAnswer": "Evaluate based on task achievement, rich vocabulary, clear paragraphs, and punctuation."
-        }
-      ]
-    }
-  ]
-},
-    "social": {
-  "1": [
-    {
-      "id": "soc_ch1_q1",
-      "title": "موقع العراق الفلكي والجغرافي وتضاريس المنطقة الجبلية",
-      "text": "أجب عن الأسئلة الآتية في جغرافية العراق الطبيعية (الفصل الأول):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "معرفة وفهم",
-      "chapter": 1,
-      "topic": "الموقع والتضاريس والمنطقة الجبلية",
-      "sourceType": "وزاري 2023 دور أول + كتاب الاجتماعيات المنهجي",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "عرّف (خمسة) مما يأتي:\n1. هلگرد\n2. السهل الرسوبي\n3. بحر النجف\n4. هور الحمار\n5. مقلوب\n6. وادي حوران",
-          "score": 10,
-          "modelAnswer": "1. هلگرد: أعلى قمة جبلية في العراق ضمن سلسلة جبال حصاروست في المنطقة الجبلية الشمالية، يبلغ ارتفاعها 3600 متر فوق مستوى سطح البحر.\n2. السهل الرسوبي: أحد الأقسام التضاريسية في العراق يشغل 24% من مساحته، تكون بفعل الترسبات الطميية التي حملتها نهري دجلة والفرات، ويتميز بانبساطه الشديد وخصوبة تربته.\n3. بحر النجف: منخفض مائي وطبيعي يقع جنوب غرب مدينة النجف الأشرف، يمثل جزءاً من الأراضي المنخفضة المحاذية للهضبة الغربية.\n4. هور الحمار: من أكبر وأهم أهوار جنوب العراق يقع جنوب نهر الفرات في محافظتي ذي قار والبصرة، ويمتاز بأهميته البيئية والثروة السمكية والقصب.\n5. مقلوب: أحد التلال أو الجبال الواطئة التي تقع ضمن المنطقة شبه الجبلية (المتموجة) في محافظة نينوى.\n6. وادي حوران: أطول وأكبر وديان الهضبة الغربية في العراق، يمتد من الحدود السورية الأردنية حتى مجرى نهر الفرات."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "علل (ثلاثة) مما يأتي تعليلاً جغرافياً دقيقاً:\n1. يتميز موقع العراق الجغرافي بأهمية استراتيجية واقتصادية بالغة عبر التاريخ.\n2. تعد منطقة السهل الرسوبي أكثر مناطق العراق كثافة بالسكان والنشاط الاقتصادي.\n3. سيادة الطبيعة الصحراوية وقلة الغطاء النباتي في الهضبة الغربية.",
-          "score": 10,
-          "modelAnswer": "1. لأنه يعد ملتقى لقارات العالم القديم (آسيا وإفريقيا وأوروبا)، ومعبراً رئيسياً لطرق التجارة الدولية البرية والبحرية والجوية، وإشرافه على الخليج العربي.\n2. لانبساط سطحه، ووفرة المياه العذبة من دجلة والفرات، وخصوبة تربته الرسوبية، وملاءمته لمد شبكات النقل والزراعة وإنشاء المدن الكبرى.\n3. لسيادة المناخ الصحراوي الجاف، وشدة الجفاف وارتفاع درجات الحرارة والمدى الحراري اليومي والسنوي، وقلة سقوط الأمطار السنوية (أقل من 100 ملم)."
-        }
-      ]
-    },
-    {
-      "id": "soc_ch1_q2",
-      "title": "المنطقة المتموجة والهضبة الغربية وأقسام السطح",
-      "text": "أجب عن المقارنة والأسئلة التضاريسية الآتية:",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق ومقارنة",
-      "chapter": 1,
-      "topic": "أقسام السطح والسهل الرسوبي",
-      "sourceType": "وزاري مكرر",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "قارن بين المنطقة الجبلية والمنطقة المتموجة (شبه الجبلية) في العراق من حيث: النسبة المئوية من المساحة الكلية، الارتفاع، وأهم التلال والسهول.",
-          "score": 10,
-          "modelAnswer": "المقارنة:\n• المنطقة الجبلية: تشغل نحو 6% من مساحة العراق، ارتفاع جبالها يصل إلى 3600م (قمة هلگرد)، تضم جبال قنديل وحصاروست، وسهول مثل رانية وشهرزور وزاخو.\n• المنطقة المتموجة: تشغل نحو 15% من مساحة العراق، يتراوح ارتفاعها بين 200 إلى 1000م، تضم تلال حمرين ومكحول ومقلوب وسنجار، وسهولاً مثل ديبكة وأربيل وسهل نينوى."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "املأ الفراغات الآتية بما يناسبها:\n1. تبلغ مساحة العراق الكلية حوالي ............... كم².\n2. تمتد حدود العراق البرية مع ست دول، أطول هذه الحدود مع دولة ...............\n3. تحتل الهضبة الصحراوية الغربية النسبة الأكبر من مساحة العراق حيث تبلغ نحو ............... %.",
-          "score": 10,
-          "modelAnswer": "1. 435,052 كم².\n2. الجمهورية الإسلامية الإيرانية.\n3. 55%."
-        }
-      ]
-    }
-  ],
-  "2": [
-    {
-      "id": "soc_ch2_q1",
-      "title": "المناخ والنبات الطبيعي ومشاريع السيطرة والخزن",
-      "text": "أجب عن الأسئلة الآتية في مناخ ومياه العراق (الفصل الثاني):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تحليل واستنتاج",
-      "chapter": 2,
-      "topic": "المناخ والموارد المائية ومشاريع الري",
-      "sourceType": "وزاري 2022 دور ثاني + كتاب رسمي",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "وضح أهداف وأهمية مشاريع السيطرة والخزن المقامة على نهري دجلة والفرات في العراق، ثم اذكر السدود المقامة على روافد نهر دجلة الخمسة مع اسم كل رافد.",
-          "score": 10,
-          "modelAnswer": "1. أهمية مشاريع السيطرة والخزن:\n• حماية المدن والمناطق الزراعية من أخطار الفيضانات المدمرة.\n• خزن المياه الفائضة في موسم الفيضان (الربيع) لاستخدامها في موسم الصيهود (الصيف) لأغراض الشرب والزراعة.\n• توليد الطاقة الكهرومائية وتجميل البيئة وتنشيط السياحة وتربية الأسماك.\n2. السدود المقامة على الروافد:\n• الخابور: سدود صغيرة ومآخذ مياه.\n• الزاب الكبير: مشروع سد بخمة (مقترح).\n• الزاب الصغير: سد دوكان وخزانه.\n• العظيم: سد العظيم.\n• ديالى: سد دربندخان وسد حمرين."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "بيّن باختصار العوامل المؤثرة في مناخ العراق، مع توضيح سبب قلة الأمطار صيفاً وانعدامها تماماً في جميع أنحاء العراق.",
-          "score": 10,
-          "modelAnswer": "العوامل المؤثرة في مناخ العراق:\n1. الموقع الفلكي (بين خطي عرض 29° و37° شمالاً) وموقعه ضمن المنطقة المعتدلة الدافئة.\n2. الموقع الجغرافي والبعد عن البحار المفتوحة وسيادة صفة القارية.\n3. التضاريس وتباين الارتفاع بين الشمال والجنوب.\n• سبب انعدام الأمطار صيفاً: سيادة الضغط الجوي المرتفع المداري، وهبوب الرياح الشمالية الغربية الجافة الحارة، وخلو الجو من المنخفضات الجوية الرطبة مع ارتفاع درجات الحرارة وسيادة الجفاف الشديد."
-        }
-      ]
-    }
-  ],
-  "3": [
-    {
-      "id": "soc_ch3_q1",
-      "title": "جغرافية السكان والزراعة والثروة النفطية والصناعية",
-      "text": "أجب عما يأتي في النشاط الاقتصادي والسكان في العراق (الفصل الثالث):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تحليل وتركيب",
-      "chapter": 3,
-      "topic": "النفط، الكبريت، الفوسفات، والزراعة",
-      "sourceType": "وزاري 2024",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "صنّف حقول النفط في العراق جغرافياً إلى ثلاث مناطق رئيسية (الشمالية، الوسطى، الجنوبية) مع ذكر اسم حقلين نفطيين لكل منطقة.",
-          "score": 10,
-          "modelAnswer": "1. المنطقة الشمالية: وتضم حقول كركوك (بابا كركر، جمبور، باي حسن) وحقول نينوى (عين زالة، بطمة، القيارة).\n2. المنطقة الوسطى: وتضم حقول الأحدب وبدرة (واسط)، ونفط خانة (ديالى)، وحقل شرق بغداد.\n3. المنطقة الجنوبية: وتضم أعظم حقول العراق مثل الرميلة الشمالي والجنوبي، الزبير، غرب القرنة، مجنون، وحلفاية ونهر بن عمر."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "ما الأهمية الاقتصادية لمحصول النخيل وإنتاج التمور في العراق؟ وما أسباب تراجع أعداد النخيل في العقود الأخيرة والحلول المقترحة للنهوض به؟",
-          "score": 10,
-          "modelAnswer": "1. الأهمية الاقتصادية: مصدر غذائي رئيسي غني بالطاقة، سلعة تصديرية توفر عملة صعبة، توفير مادة أولية لصناعات دبس التمر والخل والكحول والأعلاف، توفير ظلال لحماية بساتين الفواكه والحمضيات.\n2. أسباب التراجع: الحروب المتكررة وتجريف البساتين، شح المياه وارتفاع ملوحة شط العرب، انتشار الآفات الزراعية مثل سوسة النخيل والدوباس، والزحف العمراني العشوائي.\n3. سبل النهوض: مكافحة الآفات بالطيران المسير، إدخال تقنيات الري بالتنقيط، دعم الفلاحين بفسائل نسيجية عالية الجودة، وتحديث مصانع التعبئة والتصنيع الغذائي."
-        }
-      ]
-    }
-  ],
-  "4": [
-    {
-      "id": "soc_ch4_q1",
-      "title": "العراق في العهد العثماني وحركة الإصلاح (مدحت باشا)",
-      "text": "أجب عن الأسئلة التاريخية الآتية في العهد العثماني (الفصل الرابع):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم وتحليل تاريخي",
-      "chapter": 4,
-      "topic": "الاحتلال العثماني وإصلاحات مدحت باشا",
-      "sourceType": "وزاري مكرر لسنوات متعددة",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "تولى الوالي المصلح (مدحت باشا) حكم بغداد عام 1869م وأحدث نقلة نوعية. عدد أهم خمسة إصلاحات قام بها في العراق بالتفصيل.",
-          "score": 10,
-          "modelAnswer": "إصلاحات مدحت باشا في العراق (1869 - 1872م):\n1. تطبيق قانون الأراضي (الطابو): بهدف القضاء على النزاعات العشائرية وتثبيت ملكية الأرض وتشجيع الاستقرار والزراعة.\n2. إصلاح المؤسسة العسكرية وتطبيق التجنيد الإجباري لتكوين جيش نظامي.\n3. إنشاء مطبعة الولاية وإصدار أول جريدة عراقية رسمية وهي جريدة (الزوراء) عام 1869م لنشر القوانين وتنوير المجتمع.\n4. تأسيس المدارس الحديثة مثل المدرسة الرشيدية العسكرية ومدرسة الصنائع لتخريج الكوادر الحرفية.\n5. تطوير المواصلات: مد خطوط التلغراف، وتسيير السفن النهرية بين بغداد والبصرة، وتأسيس شركة الترامواي لنقل الركاب بين بغداد والكاظمية."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "عرّف المصطلحات التاريخية الآتية:\n1. جريدة الزوراء\n2. نظام الطابو\n3. المماليك في العراق",
-          "score": 10,
-          "modelAnswer": "1. جريدة الزوراء: أول جريدة عراقية رسمية صدرت ببغداد في 15 حزيران 1869م باللغتين العربية والتركية في عهد مدحت باشا، وكانت تنشر الأخبار والمراسيم الحكومية وتسهم في التوعية الفكرية.\n2. نظام الطابو: قانون إصلاحي عقاري طبقه مدحت باشا لتسجيل وتثبيت ملكيات الأراضي الزراعية وتمليكها للأفراد والعشائر للحد من النزاعات.\n3. المماليك في العراق: فئة من الرقيق الأبيض استقدموا من بلاد الكرج والقوقاز وحكموا العراق شبه حكم ذاتي من عام 1750م حتى عودة السيطرة العثمانية المباشرة عام 1831م بمقتل داود باشا."
-        }
-      ]
-    }
-  ],
-  "5": [
-    {
-      "id": "soc_ch5_q1",
-      "title": "الاحتلال البريطاني وثورة العشرين الخالدة عام 1920م",
-      "text": "أجب عن الأسئلة الآتية في ملحمة ثورة العشرين وبناء الدولة العراقية (الفصل الخامس):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تحليل واستيعاب وطني",
-      "chapter": 5,
-      "topic": "الاحتلال البريطاني وثورة العشرين",
-      "sourceType": "وزاري 2023 دور ثاني",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "اندلعت شرارة ثورة العشرين الخالدة في 30 حزيران 1920م ضد الاستعمار البريطاني. اشرح السبب المباشر لاندلاعها، ثم بيّن دور المرجعية الدينية الرشيدة ورجال العشائر في استمرارها.",
-          "score": 10,
-          "modelAnswer": "1. السبب المباشر: قيام الحاكم البريطاني للرميثة (الميجر هيلي) بحبس الشيخ شعلان أبو الجون رئيس عشيرة الظوالم لرفضه الانصياع لأوامر المستعمر، فهبّ رجال عشيرته المسلحون واقتحموا السراي الحكومي وحرروا الشيخ شعلان بقوة السلاح في 30 حزيران 1920م لتنطلق الثورة الكبرى.\n2. دور المرجعية الدينية: أصدر المرجع الأعلى الشيخ محمد تقي الحيرازي فتواه الشهيرة التي أجازت استخدام السلاح لدفاع العراقيين عن استقلالهم وحقوقهم، وقدمت المرجعية الدعم الروحي والتنسيقي لتوحيد صفوف العشائر والمدن في كربلاء والنجف والفرات الأوسط وبغداد وكردستان وكافة أنحاء العراق."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "ما أهم نتائج ثورة العشرين الخالدة على الصعيدين العراقي والدولي؟",
-          "score": 10,
-          "modelAnswer": "أهم نتائج ثورة العشرين:\n1. إجبار بريطانيا على إنهاء الحكم العسكري المباشر والاعتراف بحق العراقيين في حكم بلادهم.\n2. تأسيس الدولة العراقية الحديثة وتشكيل أول حكومة مؤقتة برئاسة عبد الرحمن النقيب وتتويج الملك فيصل الأول ملكاً على العراق عام 1921م.\n3. أثبتت الثورة التلاحم الوطني بين جميع أطياف الشعب العراقي وعشائره بمختلف مكوناتهم لمواجهة المحتل.\n4. كشفت زيف الوعود البريطانية بالتحرير والاستقلال ووضعت القضية العراقية في صدارة الاهتمام الإقليمي والدولي."
-        }
-      ]
-    }
-  ],
-  "6": [
-    {
-      "id": "soc_ch6_q1",
-      "title": "التربية الوطنية، الدستور العراقي والحقوق والحريات",
-      "text": "أجب عما يأتي في مفاهيم التربية الوطنية والدستور العراقي (الفصل السادس):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "وعي وطني ومدني",
-      "chapter": 6,
-      "topic": "الدستور، السلطات الاتحادية والمواطنة",
-      "sourceType": "وزاري حديث",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "صنّف السلطات الاتحادية الثلاث في جمهورية العراق وفق الدستور الدائم، وبيّن اختصاصين رئيسيين لكل سلطة.",
-          "score": 10,
-          "modelAnswer": "السلطات الاتحادية الثلاث وفق الدستور العراقي:\n1. السلطة التشريعية (مجلس النواب): اختصاصها تشريع القوانين الاتحادية، والرقابة على أداء السلطة التنفيذية والمصادقة على المعاهدات والموازنة العامة.\n2. السلطة التنفيذية (مجلس الوزراء ورئيس الجمهورية): اختصاصها تخطيط وتنفيذ السياسة العامة للدولة، وإدارة الوزارات والمؤسسات، وإعداد مشروع الموازنة العامة.\n3. السلطة القضائية (المحاكم ومجلس القضاء الأعلى): سلطة مستقلة تماماً، اختصاصها الفصل في المنازعات وتطبيق العدالة وسيادة القانون وحماية الحقوق والحريات الدستورية."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "ما المقصود بالمواطنة الفاعلة؟ وكيف يساهم الطالب العراقي في الحفاظ على الممتلكات العامة والمشاركة في بناء الوطن؟",
-          "score": 10,
-          "modelAnswer": "المواطنة الفاعلة: هي مشاركة المواطن الواعية والمسؤولة في شؤون مجتمعه ووطنه، والشعور بالانتماء الصادق والالتزام بالقوانين وحماية الحقوق وأداء الواجبات.\nدور الطالب في بناء وطنه:\n• التفوق العلمي والحرص على اكتساب المعرفة لتسخيرها في خدمة الوطن.\n• المحافظة على الممتلكات العامة المدرسية والبيئية والمرافق الخدمية بوصفها ملكاً لكل الشعب.\n• تعزيز روح التسامح ونبذ الطائفية والتطرف والتمسك بوحدة الصف الوطني والتعاون مع الجميع."
-        }
-      ]
-    }
-  ]
-},
-    "economics": {
-  "1": [
-    {
-      "id": "econ_ch1_q1",
-      "title": "علم الاقتصاد والمشكلة الاقتصادية والندرة النسبية",
-      "text": "أجب عن الأسئلة الآتية في المفاهيم والمشكلة الاقتصادية (الفصل الأول):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "فهم وتحليل",
-      "chapter": 1,
-      "topic": "علم الاقتصاد والندرة والاختيار",
-      "sourceType": "وزاري 2023 دور أول",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "عرّف (خمسة) من المفاهيم الاقتصادية الآتية:\n1. المشكلة الاقتصادية\n2. الندرة النسبية\n3. الكفاءة الاقتصادية\n4. منحنى إمكانية الإنتاج\n5. السلع الاستهلاكية\n6. تكلفة الفرصة البديلة",
-          "score": 10,
-          "modelAnswer": "1. المشكلة الاقتصادية: هي حالة عدم التوازن بين الحاجات الإنسانية المتعددة والمتجددة والموارد الاقتصادية المحدودة المتاحة لإشباعها.\n2. الندرة النسبية: صفة ملازمة للموارد الاقتصادية تعني وجود المورد بكميات غير كافية لتلبية جميع الرغبات البشرية، وليست ندرة مطلقة.\n3. الكفاءة الاقتصادية: إشباع أكبر قدر ممكن من الحاجات بأقل قدر من الموارد الاقتصادية المتاحة وبأقل تكلفة ممكنة.\n4. منحنى إمكانية الإنتاج: منحنى بياني يوضح أقصى توليفة من السلع والخدمات يمكن لمجتمع ما إنتاجها باستخدام جميع موارده المتاحة بكفاءة تامة وبمستوى تكنولوجي معين.\n5. السلع الاستهلاكية: السلع التي تُشترى من قبل الأفراد والعائلات لإشباع حاجاتهم الإنسانية المباشرة والنهائية كالغذاء والملابس.\n6. تكلفة الفرصة البديلة: التكلفة المقدرة بما يتم التنازل عنه من إنتاج سلعة معينة للحصول على كمية إضافية من سلعة أخرى بديلة."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "علل ما يأتي تعليلاً اقتصادياً دقيقاً:\n1. تتصف الحاجات البشرية باللانهائية والتجدد المستمر.\n2. لا يعد الهواء والماء في حالتهما الطبيعية أموالاً اقتصادية.",
-          "score": 10,
-          "modelAnswer": "1. لأن إشباع حاجة معينة سرعان ما يولّد حاجات جديدة ومتطورة بتطور المجتمع البشري والتكنولوجيا والثقافة، فكلما أشبع الإنسان حاجة ظهرت غيرها.\n2. لأنهما سلع حرة ومجانية تتوافر في الطبيعة بكميات غير محدودة تفوق حاجات البشر ولا تتطلب جهداً أو ثمناً للحصول عليها، وبالتالي لا تتصف بالندرة الاقتصادية."
-        }
-      ]
-    }
-  ],
-  "2": [
-    {
-      "id": "econ_ch2_q1",
-      "title": "الناتج القومي والدخل القومي وطرق قياسه",
-      "text": "أجب عن المسألة والأسئلة الآتية في الدخل والناتج القومي (الفصل الثاني):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تطبيق وحساب رياضي",
-      "chapter": 2,
-      "topic": "الناتج القومي وطرق القياس",
-      "sourceType": "وزاري 2024",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "بيّن باختصار الطرق الثلاث المعتمدة لحساب الدخل القومي (طريقة الناتج النهائي أو القيمة المضافة، طريقة الدخول المكتسبة، طريقة الإنفاق).",
-          "score": 10,
-          "modelAnswer": "طرق حساب الدخل القومي:\n1. طريقة القيمة المضافة: يتم فيها جمع القيم المضافة التي تحققها جميع المشاريع والقطاعات الإنتاجية لتجنب مشكلة الحساب المزدوج.\n2. طريقة الدخول المكتسبة: تجمع عوائد عناصر الإنتاج التي ساهمت في العملية الإنتاجية خلال سنة (الأجور + الريع + الفوائد + الأرباح).\n3. طريقة الإنفاق: تجمع نفقات المجتمع الاستهلاكية والاستثمارية والحكومية وصافي التعامل الخارجي (الإنفاق الاستهلاكي الخاص + الإنفاق الاستثماري + الإنفاق الحكومي + (الصادرات - الواردات))."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "مسألة وزارية: إذا كان الدخل المتاح لشخص ما هو 1,000,000 دينار عراقي شهرياً، وكان ميله الحدي للاستهلاك (MPC) يساوي 0.75، احسب مقدار الزيادة في الاستهلاك ومقدار الزيادة في الادخار إذا زاد دخله بمقدار 200,000 دينار.",
-          "score": 10,
-          "modelAnswer": "الحل:\nالزيادة في الدخل (ΔY) = 200,000 دينار.\nMPS = 1 - MPC = 1 - 0.75 = 0.25 (الميل الحدي للادخار).\nالزيادة في الاستهلاك (ΔC) = ΔY × MPC = 200,000 × 0.75 = 150,000 دينار.\nالزيادة في الادخار (ΔS) = ΔY × MPS = 200,000 × 0.25 = 50,000 دينار.\nالتحقق: 150,000 + 50,000 = 200,000 دينار."
-        }
-      ]
-    }
-  ],
-  "3": [
-    {
-      "id": "econ_ch3_q1",
-      "title": "النقود، البنوك والسياسة النقدية والتضخم",
-      "text": "أجب عن الأسئلة الآتية في النقود والتضخم (الفصل الثالث والرابع):",
-      "score": 20,
-      "difficulty": "متوسط",
-      "bloom": "تحليل واستيعاب",
-      "chapter": 3,
-      "topic": "النقود والسياسة النقدية والتضخم",
-      "sourceType": "وزاري مكرر",
-      "branches": [
-        {
-          "id": "b1",
-          "title": "الفرع (أ)",
-          "text": "ما هي الوظائف الأربع الأساسية للنقود في الاقتصاد الحديث؟ اشرحها بإيجاز.",
-          "score": 10,
-          "modelAnswer": "وظائف النقود:\n1. وسيط للتبادل: تسهيل المبادلات التجارية والتخلص من صعوبات نظام المقايضة.\n2. مقياس للقيمة: تقاس بها أثمان جميع السلع والخدمات وتحدد بها القوائم المالية.\n3. مخزن للقيمة: وسيلة لحفظ الثروة وتأجيل الاستهلاك إلى المستقبل لقوة سيولتها.\n4. أداة للمدفوعات الآجلة: تسوية الديون والالتزامات المستقبلية والعقود الائتمانية."
-        },
-        {
-          "id": "b2",
-          "title": "الفرع (ب)",
-          "text": "عرّف التضخم الاقتصادي، واذكر أسبابه الرئيسية مع توضيح أداتين من أدوات البنك المركزي لمكافحة التضخم.",
-          "score": 10,
-          "modelAnswer": "1. التضخم: هو الارتفاع المستمر والملموس في المستوى العام لأسعار السلع والخدمات في بلد ما خلال فترة زمنية معينة مصحوباً بانخفاض القوة الشرائية للنقود.\n2. أسبابه: زيادة الطلب الكلي عن العرض الكلي (تضخم جذب الطلب)، زيادة تكاليف عناصر الإنتاج (تضخم دفع النفقة)، أو الإفراط في الإصدار النقدي.\n3. أدوات البنك المركزي:\n• رفع سعر الفائدة لإعادة امتصاص السيولة الزائدة وتشجيع الادخار وتقليل الاقتراض.\n• رفع نسبة الاحتياطي النقدي القانوني للبنوك التجارية للحد من قدرتها على خلق الائتمان."
-        }
-      ]
-    }
-  ]
-},
+  "english": {
+    "1": [
+      {
+        "id": "en_u1_q1",
+        "title": "Question 1: Reading Comprehension (Panther 3.0D - Car of the Year)",
+        "text": "Reading Comprehension and Textbook Passage (Unit 1):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم واستيعاب",
+        "chapter": 1,
+        "topic": "The Panther 3.0D and Car Specifications",
+        "sourceType": "Ministerial Exam - Garnet English for Iraq Unit 1",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the following unseen text and answer (5) questions:\n\"Modern electric cars have become popular worldwide as cities battle air pollution. In Baghdad and Basra, engineering teams are testing hybrid vehicles powered by both clean electricity and efficient fuel engines. These automobiles feature smart regenerative brakes that recharge batteries whenever the driver slows down. Many drivers find that maintenance costs drop significantly compared to traditional petrol models.\"\n1. Why are electric cars becoming popular worldwide?\n2. What two power sources do hybrid vehicles combine?\n3. How do regenerative brakes recharge the car's batteries?\n4. What advantage regarding maintenance costs do drivers discover?\n5. Electric cars produce more toxic emissions than old petrol engines. (True / False)\n6. Give the passage a short suitable title.",
+            "score": 10,
+            "modelAnswer": "1. Because cities are battling air pollution (they are cleaner).\n2. Clean electricity and efficient fuel engines.\n3. By converting braking energy whenever the vehicle slows down.\n4. Maintenance costs drop significantly compared to traditional petrol models.\n5. False.\n6. Modern Clean Vehicles / Electric Cars in Modern Cities."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) of the following from your textbook (Panther 3.0D):\n1. The Panther 3.0D has seats for ............... people. (six / eight / ten)\n2. Are the young men interested in the engine of the Panther 3.0D? (Yes, they are / No, they aren't)\n3. What safety features are installed in the Panther 3.0D?\n4. The Panther 3.0D actually looks very expensive, but it is quite ...............\n5. The Panther 3.0D does ............... kilometres to the litre. (12 / 20 / 8)\n6. Some people just stand and gaze at its beautiful shape. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. eight (8).\n2. Yes, they are.\n3. Airbags for the driver and passengers, and other safety features.\n4. cheap (or inexpensive).\n5. 12 kilometres to the litre.\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_u1_q2",
+        "title": "Question 2: Grammar & Functional Language (Giving Reasons & Descriptions)",
+        "text": "Grammar and Language Functions (Unit 1):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 1,
+        "topic": "Giving Reasons, Telling Time & Polite Descriptions",
+        "sourceType": "Ministerial Exam Official Standards",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Do as required between brackets (Choose 5 only)",
+            "text": "1. Modern cars have airbags (help you in a crash). (Give reason using: 'so that you can' or 'to')\n2. 15:40. (Tell the time in words)\n3. He is fat. (Make the sentence more polite: He is a bit ...............)\n4. There is an escalator in the mall. (Change into negative form)\n5. She is lazy. (Make it polite: She is not very ...............)\n6. Cars have air conditioning (keep cool). (Give reason using: 'to help you')",
+            "score": 10,
+            "modelAnswer": "1. Modern cars have airbags to help you in a crash. (or: so that you can be safe in a crash)\n2. It is three forty. (or: It is twenty minutes to four)\n3. He is a bit fat.\n4. There is not an escalator in the mall.\n5. She is not very hardworking.\n6. Cars have air conditioning to help you keep cool."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Choose the correct alternative (Choose 5 only)",
+            "text": "1. There (is / are) lots of shops in the central shopping complex.\n2. Cars have GPS (so that / because / to) drivers cannot get lost.\n3. The store (has / have) a large swimming pool on the top floor.\n4. He has got (straight black / black straight / straight a black) hair.\n5. (Is there / Are there) any sweet shops near your school?\n6. The Panther 3.0D is (really / quite) fast; you must be careful.",
+            "score": 10,
+            "modelAnswer": "1. are.\n2. so that.\n3. has.\n4. straight black.\n5. Are there.\n6. really."
+          }
+        ]
+      },
+      {
+        "id": "en_u1_q3",
+        "title": "Question 3: Vocabulary, Spelling & Written Component (Unit 1 Focus)",
+        "text": "Vocabulary definitions, spelling drills, and paragraph writing:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتعبير",
+        "chapter": 1,
+        "topic": "Compound Words, Spelling Opposites & Email Writing",
+        "sourceType": "Ministerial Exam Unit 1",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Match compound words and write missing spellings (10 Marks)",
+            "text": "1. Match words to form compound nouns: (sun / sweet / litter / disc) with (shop / bin / brakes / roof).\n2. Write the opposites: dangerous -> ............, old-fashioned -> ............, expensive -> ............\n3. Past tense forms: do -> did ; drive -> ............, spend -> ............\n4. Nationalities: Iraq -> Iraqi ; Japan -> ............, Lebanon -> ............",
+            "score": 10,
+            "modelAnswer": "1. sun-roof, sweet shop, litter bin, disc brakes.\n2. safe, modern, cheap.\n3. drove, spent.\n4. Japanese, Lebanese."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Written Composition (10 Marks)",
+            "text": "Write an email of (60-80 words) to your cousin describing your best friend:\n(Mention his/her name, general appearance, hair and eyes, personal qualities, and what activities you enjoy doing together).",
+            "score": 10,
+            "modelAnswer": "Marking Rubric:\n- Task completion and descriptive details: 4 Marks\n- Grammatical accuracy and vocabulary choice: 3 Marks\n- Spelling and punctuation: 2 Marks\n- Layout and presentation: 1 Mark."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_textbook_u1_zaid",
+        "title": "Question 1: Textbook Passages (Zaid Tariq & The Dolphins)",
+        "text": "Textbook Passages - Unit 1 (Zaid Tariq was floating when he felt something push him):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم واستيعاب",
+        "chapter": 1,
+        "topic": "Textbook Passage: Zaid Tariq and the Shark",
+        "questionCategory": "textbook_passage",
+        "sourceType": "Official Ministerial Exam - 6th Preparatory Unit 1",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Textbook Questions (Answer 5 only)",
+            "text": "1. What was Zaid Tariq doing when he saw the shark?\n2. What did the shark do to Tariq's arm?\n3. Why did Tariq start praying to God?\n4. What protected Tariq and frightened the shark away?\n5. Who heard Tariq's screams and rescued him by boat?\n6. Tariq was bitten by six dolphins. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. He was floating peacefully on an air bed 150 metres from the shore.\n2. It bit his arm.\n3. Because he thought he was dying.\n4. Six dolphins made a circle around him and frightened the shark away.\n5. Coastguard Jameel Elalawi.\n6. False (he was bitten by a shark, dolphins protected him)."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Mustapha Ahmed (Four Years Old - Diabetic Mother)",
+            "text": "1. Why was Mustapha puzzled when he woke up in the morning?\n2. What does Mustapha's mother Latifa suffer from?\n3. How did Mustapha know his mother needed sugar quickly?\n4. What did Mustapha bring his mother to drink?\n5. Who opened the front door for the paramedics?\n6. Latifa was proud of Mustapha because he was ............... and ............... (calm / intelligent).",
+            "score": 10,
+            "modelAnswer": "1. Because his mother usually came to his room to wake him and dress him, but she didn't come.\n2. She suffers from diabetes.\n3. He knew that when her blood sugar drops too low, she loses consciousness and needs something sweet.\n4. A can of sweet cola from the fridge.\n5. Mustapha himself (he stood on a chair to unlock the door).\n6. calm and intelligent."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_dropins_u1_health",
+        "title": "Question 3: Vocabulary in Context (Drop-ins / إسقاطات وزارية)",
+        "text": "Fill in the blanks with the most suitable word from the box below:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 1,
+        "topic": "Drop-ins: Health, Medical & Body Conditions",
+        "questionCategory": "drop_ins",
+        "sourceType": "Official Ministerial Exam - Question 3(A)",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Complete the sentences using words from the box (Choose 5 only)",
+            "text": "[ dizzy - sneeze - sore - ankle - swallowed - fractured - bandages ]\n\n1. I feel ...............; I think I am going to faint.\n2. I always ............... when I put pepper on my food.\n3. My throat is so ............... that I can hardly swallow.\n4. He twisted his ............... playing football yesterday afternoon.\n5. The X-ray showed that his leg bone was ............... in two places.\n6. The nurse wrapped clean ............... around the injured wrist.",
+            "score": 10,
+            "modelAnswer": "1. dizzy\n2. sneeze\n3. sore\n4. ankle\n5. fractured\n6. bandages"
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Complete using the following words from the box (Choose 5 only)",
+            "text": "[ bleeding - pain - temperature - medicine - burnt - skin - allergic ]\n\n1. She cut her finger with a sharp knife and it was ............... heavily.\n2. Have you taken any ............... for that severe migraine headache?\n3. He had a high ............... of 39 degrees Celsius.\n4. Are you ............... to any drugs such as penicillin?\n5. The ............... on his legs is very dry, so he needs this moisturising cream.\n6. I have a terrible ............... in my lower back.",
+            "score": 10,
+            "modelAnswer": "1. bleeding\n2. medicine\n3. temperature\n4. allergic\n5. skin\n6. pain"
+          }
+        ]
+      },
+      {
+        "id": "en_p6_spelling_synonyms",
+        "title": "Question 3: Spelling, Synonyms & Opposites (مرادفات وإملاء وزارية)",
+        "text": "Spelling Drills, Prefixes for Opposites, Abbreviations & Irregular Forms:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 1,
+        "topic": "Spelling: Prefixes, Abbreviations & Synonyms",
+        "questionCategory": "spelling_synonyms",
+        "sourceType": "Official Ministerial Exam - Question 3(C)",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Write the missing words correctly (Choose 5 only)",
+            "text": "1. correct -> incorrect ; legal -> ............\n2. patient -> impatient ; polite -> ............\n3. usual -> unusual ; fortunate -> ............\n4. regular -> irregular ; moral -> ............\n5. direct -> indirect ; efficient -> ............\n6. connect -> disconnect ; encourage -> ............",
+            "score": 10,
+            "modelAnswer": "1. illegal\n2. impolite\n3. unfortunate\n4. immoral\n5. inefficient\n6. discourage"
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Write the full words for the abbreviations or provide synonyms (5 only)",
+            "text": "1. 18 yrs. -> 18 years ; appt. -> ............\n2. co. -> company ; bldg. -> ............\n3. exp. -> experience ; freq. -> ............\n4. vacant -> empty ; baggage -> ............\n5. occurred -> happened ; alert -> ............\n6. see -> seen ; hide -> ............",
+            "score": 10,
+            "modelAnswer": "1. appointment\n2. building\n3. frequent\n4. luggage\n5. warn\n6. hidden"
+          }
+        ]
+      },
+      {
+        "id": "en_p6_composition_unit1_cigarette",
+        "title": "Question 5: Written Component (إنشاء: حظر إعلانات السجائر)",
+        "text": "Choose either Topic (A) or Topic (B) to write a composition (100 - 120 words):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وتركيب",
+        "chapter": 1,
+        "topic": "Composition: Cigarette Advertising Should Be Illegal",
+        "questionCategory": "composition",
+        "sourceType": "Official Ministerial Exam - Question 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Cigarette Advertising Should Be Illegal",
+            "text": "Write a short article of (100 to 120 words) for a magazine stating why cigarette advertising should be banned:\n- Smoking is harmful to smokers and passive smokers.\n- Cigarettes cause serious diseases (lung cancer, heart attacks, asthma).\n- Billboards and television adverts target children and teenagers.\n- Smoking wastes financial resources and burdens public hospitals.",
+            "score": 20,
+            "modelAnswer": "Model Answer & Marking Rubric:\n- Paragraph 1 (Introduction): Smoking is one of the leading causes of preventable deaths worldwide. Every day, thousands of young people start smoking due to alluring advertisements.\n- Paragraph 2 (Body - Health & Social impact): Cigarettes contain harmful chemicals and nicotine. Passive smokers, especially children, suffer from respiratory illnesses. Adverts portray smoking as glamorous and sophisticated, misleading vulnerable youth.\n- Paragraph 3 (Conclusion): Governments must ban cigarette adverts entirely and raise taxes on tobacco products to protect public health and future generations.\nDistribution: Ideas & structure: 8 marks, Grammar & vocabulary: 7 marks, Spelling & punctuation: 5 marks."
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "id": "en_u2_q1",
+        "title": "Question 1: Reading Comprehension (Lucy's TV Comedy - Samara's Family)",
+        "text": "Reading Comprehension and Textbook Passage (Unit 2):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم وتحليل",
+        "chapter": 2,
+        "topic": "TV Comedies & Lucy Fisher Interview",
+        "sourceType": "Ministerial Exam Unit 2",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the following text and answer (5) questions:\n\"Documentary television programmes have grown tremendously in popularity over the last decade. Unlike fictional dramas, nature documentaries present real-life behaviours of rare species in remote habitats such as the Amazon rainforest or polar ice caps. Cameramen often wait patiently for months in extreme weather conditions just to film a few minutes of breathtaking animal interaction. Scientists believe these films inspire young audiences to pursue ecological careers and support wildlife conservation.\"\n1. How do nature documentaries differ from fictional dramas?\n2. Where do documentary film crews travel to capture rare species?\n3. Why do cameramen wait for months in harsh conditions?\n4. What effect do wildlife films have on young audiences according to scientists?\n5. Cameramen work in luxurious indoor studios to film wild polar bears. (True / False)\n6. Suggest an appropriate title for this reading passage.",
+            "score": 10,
+            "modelAnswer": "1. They present real-life behaviours of rare species rather than fictional stories.\n2. To remote habitats such as the Amazon rainforest or polar ice caps.\n3. To film a few minutes of breathtaking animal interactions.\n4. They inspire them to pursue ecological careers and support wildlife conservation.\n5. False.\n6. The Power of Nature Documentaries / Filming Wild Animals."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) of the following from your textbook (Lucy's Family / Samara):\n1. Lucy plays the character of ............... in the comedy series.\n2. Samara's brother is ............... than her. (older / younger)\n3. What did Samara's clumsy brother put in his mother's cup of tea instead of sugar?\n4. Lucy's brother fell into the hotel swimming pool with all his clothes on. (True / False)\n5. Why did Lucy enjoy filming the latest episode of the series?\n6. Samara's brother spilled his drink at lunch and slipped in the puddle. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. Samara.\n2. younger.\n3. Salt.\n4. True.\n5. Because the family went away on a holiday and stayed in a fancy hotel.\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_u2_q2",
+        "title": "Question 2: Grammar & Functions (Preferences, Suggestions & Invitations)",
+        "text": "Grammar and Language Functions (Unit 2):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 2,
+        "topic": "Expressing Preferences, Making Suggestions & Invitations",
+        "sourceType": "Ministerial Exam Official Questions",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Do as required between brackets (Choose 5 only)",
+            "text": "1. Express your preference concerning going to the cinema. (Use: 'I'd love to')\n2. Make a suggestion to your friend about spending the weekend. (Use: 'How about ...')\n3. Invite your friend to attend your school graduation party. (Use: 'Would you like ...')\n4. \"Let's (watch / watching / watched) an action movie tonight.\" (Choose the correct verb)\n5. I'd like (to play / playing / play) tennis this afternoon. (Choose)\n6. Accept your friend's invitation to go to the park: ...............",
+            "score": 10,
+            "modelAnswer": "1. I'd love to go to the cinema.\n2. How about spending the weekend at the riverside? (or: at the park)\n3. Would you like to come to my school graduation party?\n4. watch (after Let's).\n5. to play (after I'd like).\n6. Yes, I'd love to. / That sounds great."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Choose the correct word between brackets (Choose 5 only)",
+            "text": "1. I prefer (reading / read / to read) historical novels in my free time.\n2. What's your favourite hobby? - I like (swim / swimming / swam).\n3. Would you like (to have / have / having) dinner with us tonight?\n4. How about (visiting / visit / visited) the national museum tomorrow?\n5. Let's (go / to go / going) for a boat trip on the Shatt Al-Arab.\n6. I'd rather (stay / to stay / staying) at home this evening.",
+            "score": 10,
+            "modelAnswer": "1. reading.\n2. swimming.\n3. to have.\n4. visiting.\n5. go.\n6. stay."
+          }
+        ]
+      },
+      {
+        "id": "en_u2_q3",
+        "title": "Question 3: Vocabulary, Story Time & Literature Focus (Unit 2)",
+        "text": "Story Time (Kareem - Lucky Customer 50) and Vocabulary:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتحليل",
+        "chapter": 2,
+        "topic": "Story Time: Kareem's Dream & Types of Books",
+        "sourceType": "Ministerial Exam Story Time",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Answer (5) questions about Story Time (Lucky Customer 50)",
+            "text": "1. Describe Kareem's character in three adjectives from the story.\n2. What was the name of the poetry collection Kareem wanted to purchase?\n3. Who was the famous Iraqi poet who wrote the collection?\n4. Why had Kareem been saving money for months?\n5. What surprised Kareem when he reached the front of the queue?\n6. What was Kareem's ultimate secret ambition in life?",
+            "score": 10,
+            "modelAnswer": "1. Hardworking, imaginative, and patient.\n2. Islands of Salt (جزر الملح).\n3. Muzaffar Al-Nawab.\n4. To be the first to buy the new book of poems.\n5. The shopkeeper rang a bell and cheered because Kareem was customer number 50.\n6. To become a famous poet himself."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Vocabulary & Punctuation (10 Marks)",
+            "text": "1. Fill in the blanks with suitable words: [ comedy , author , tragedy , review ]\n   a. A book or play that makes people laugh: ...............\n   b. The writer of a book or literary piece: ...............\n2. Punctuation: Re-write the sentence using proper capital letters and marks:\n   \"ali and ahmed don't like horror films do they\"",
+            "score": 10,
+            "modelAnswer": "1. a. comedy , b. author.\n2. \"Ali and Ahmed don't like horror films, do they?\""
+          }
+        ]
+      },
+      {
+        "id": "en_p6_textbook_u2_radar",
+        "title": "Question 1: Textbook Passages (Radar & Security Technology)",
+        "text": "Textbook Passages - Unit 2 (Radar and Police Officers' Duties):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم",
+        "chapter": 2,
+        "topic": "Textbook Passage: Radar & Police Duties",
+        "questionCategory": "textbook_passage",
+        "sourceType": "Official Ministerial Exam - 6th Preparatory Unit 2",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Answer or complete the following regarding Radar (Answer 5 only)",
+            "text": "1. When was radar invented and why was it used during World War II?\n2. How does a radar speed gun calculate the speed of a vehicle?\n3. What is a radar detector and what do some drivers use it for?\n4. Can radar speed guns take pictures of car license plates?\n5. Police officers must be trained to use radar guns properly. (True / False)\n6. Radar guns can work from moving police cars as well as stationary positions. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. During the Second World War to detect enemy aircraft and naval ships.\n2. By sending radio waves towards a car; when the waves bounce back, it measures the change in frequency.\n3. A device placed on dashboards that beeps when it detects radar guns so drivers can slow down.\n4. Yes, some advanced models take pictures and record speed simultaneously.\n5. True.\n6. True."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Police Officers' Duties (Answer 5 only)",
+            "text": "1. Why do police officers have many different duties?\n2. Mention two things traffic police officers do.\n3. Why must all passengers in a car wear their seat belts?\n4. How do police officers use fingerprints and footprints found at crime scenes?\n5. Police officers try to prevent crimes as well as solve them. (True / False)\n6. Directing traffic helps prevent accidents on busy roads. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. Because there are many different laws in society that need enforcement.\n2. They direct traffic and check that drivers do not speed.\n3. Because seat belts can prevent serious injuries in crashes.\n4. To identify and arrest suspects.\n5. True.\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_dropins_u2_security",
+        "title": "Question 3: Vocabulary in Context (Drop-ins / إسقاطات الأمان والوظائف)",
+        "text": "Fill in the blanks with the most suitable word from the box below:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 2,
+        "topic": "Drop-ins: Law, Security & Travel",
+        "questionCategory": "drop_ins",
+        "sourceType": "Official Ministerial Exam - Question 3(A)",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Complete the sentences with words from the box (Choose 5 only)",
+            "text": "[ vacant - unattended - baggage - dispose of - conveyor belt - declare - witness ]\n\n1. You must not leave your ............... at the airport or security will take it.\n2. The hotel room was ............... because the guests checked out early.\n3. Do you have anything valuable to ............... at customs?\n4. Put your luggage onto the ............... so the scanner can inspect it.\n5. The police interviewed a ............... who saw the bank robbery occur.\n6. You must safely ............... all flammable materials away from the house.",
+            "score": 10,
+            "modelAnswer": "1. unattended (or baggage)\n2. vacant\n3. declare\n4. conveyor belt\n5. witness\n6. dispose of"
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Complete with words from the box (Choose 5 only)",
+            "text": "[ fine - obey - crime scene - speed limit - investigate - footprints - register ]\n\n1. Drivers must not exceed the ............... on residential streets.\n2. You must pay a heavy ............... if you park your vehicle on yellow lines.\n3. Officers arrived at the ............... to collect hair and blood samples.\n4. Detectives found muddy ............... leading away from the backdoor.\n5. Citizens should always ............... the traffic laws to stay safe.\n6. The police will ............... the theft and find the stolen jewels.",
+            "score": 10,
+            "modelAnswer": "1. speed limit\n2. fine\n3. crime scene\n4. footprints\n5. obey\n6. investigate"
+          }
+        ]
+      },
+      {
+        "id": "en_p6_matching_collocations",
+        "title": "Question 3: Matching (توصيلات وزارية: متلازمات لغوية وتعريفات)",
+        "text": "Match words or phrases from List A with their corresponding completions in List B:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 2,
+        "topic": "Matching: Collocations & Conditional Clauses",
+        "questionCategory": "matching",
+        "sourceType": "Official Ministerial Exam - Question 3(B)",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Match the collocations from List A with List B (5 only)",
+            "text": "List A:\n1. open\n2. pay\n3. maintain\n4. catch\n5. commit\n6. attend\n\nList B:\na. interest on savings\nb. an account with the bank\nc. a bus to work\nd. a minimum balance\ne. a training conference\nf. a serious crime",
+            "score": 10,
+            "modelAnswer": "1 -> b (open an account with the bank)\n2 -> a (pay interest on savings)\n3 -> d (maintain a minimum balance)\n4 -> c (catch a bus to work)\n5 -> f (commit a serious crime)\n6 -> e (attend a training conference)"
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Match the jobs and their definitions (5 only)",
+            "text": "List A:\n1. Architect\n2. Lifeguard\n3. Tour guide\n4. Pilot\n5. Plumber\n6. Journalist\n\nList B:\na. is responsible for the safety of swimmers in a pool or beach\nb. designs buildings and commercial complexes\nc. writes articles for newspapers and magazines\nd. flies an aeroplane across domestic and international routes\ne. shows tourists around historical sites and museums\nf. fixes and installs water pipes and taps",
+            "score": 10,
+            "modelAnswer": "1 -> b (Architect designs buildings)\n2 -> a (Lifeguard responsible for swimmers' safety)\n3 -> e (Tour guide shows tourists around)\n4 -> d (Pilot flies an aeroplane)\n5 -> f (Plumber fixes water pipes)\n6 -> c (Journalist writes articles)"
+          }
+        ]
+      },
+      {
+        "id": "en_p6_composition_unit2_job_apply",
+        "title": "Question 5: Written Component (إنشاء: التقدم لوظيفة أمنية / حارس)",
+        "text": "Choose either Topic (A) or Topic (B) to write a formal composition (100 - 120 words):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وتركيب",
+        "chapter": 2,
+        "topic": "Composition: Applying for a Job / Security Guard",
+        "questionCategory": "composition",
+        "sourceType": "Official Ministerial Exam - Question 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Letter of Application for a Security Guard Position",
+            "text": "Write a formal letter of application (100-120 words) to Mr. Smith at SafeGuard Security applying for the advertised position of security officer:\n- State where you saw the advertisement.\n- Detail your qualifications, physical fitness, and language abilities.\n- Mention your relevant experience in monitoring CCTV and managing crowds.\n- Include when you are available for an interview.",
+            "score": 20,
+            "modelAnswer": "Model Answer & Marking Rubric:\n- Salutation: Dear Mr. Smith,\n- Opening: I am writing to apply for the position of security guard advertised in the Baghdad Morning Post on Sunday.\n- Qualifications & Fitness: I am twenty-two years old and hold a secondary school certificate. I am physically fit, observant, and speak fluent Arabic and English. I have two years' experience supervising CCTV monitors at a department store.\n- Closing: I have enclosed my CV and am available for an interview at any convenient time. Yours sincerely, Ahmed Ali.\nDistribution: Layout & style: 5 marks, Content & ideas: 8 marks, Accuracy: 7 marks."
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "id": "en_u3_q1",
+        "title": "Question 1: Reading Comprehension (The Marsh Arabs & Bedouin Falconry)",
+        "text": "Reading Comprehension and Textbook Passage (Unit 3):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم واستيعاب",
+        "chapter": 3,
+        "topic": "Wildlife, The Marsh Arabs & Falconry",
+        "sourceType": "Ministerial Exam Unit 3",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the unseen text and answer (5) questions:\n\"Falconry has existed in the Arabian Peninsula and Mesopotamia for thousands of years. Originally, Bedouins utilized falcons not as a luxury sport, but as a practical method to capture fresh meat like houbara and birds across dry desert terrains. Falcons can dive through the air at speeds exceeding 300 km/h, making them the fastest predators on earth. Today, falconry has transformed into a prestigious cultural heritage celebrated in regional tournaments and protected under wildlife conservation laws.\"\n1. Why did Bedouins originally practice falconry in the desert?\n2. What is the diving speed that a trained falcon can exceed?\n3. The falcon is the fastest living creature on earth. (True / False)\n4. What has falconry evolved into in modern times?\n5. Did Bedouins practice falconry merely as an expensive leisure hobby in the past?\n6. Give the passage a suitable concise title.",
+            "score": 10,
+            "modelAnswer": "1. As a practical method to hunt fresh meat like houbara and birds.\n2. Over 300 kilometres per hour (km/h).\n3. True.\n4. A prestigious cultural heritage celebrated in tournaments and protected by laws.\n5. No, they practiced it out of necessity to catch food.\n6. The Art and Heritage of Falconry / Falcons in Iraq and Arabia."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) questions from your textbook (The Marsh Arabs & Wildlife):\n1. Where can Marsh Arabs still be found in southern Iraq?\n2. What domestic animals do Marsh Arabs raise?\n3. Marsh Arabs live in arched houses constructed from ...............\n4. What traditional boats do Marsh Arabs use for transport? (Mashhoof and Tarrada / Yachts)\n5. Forty species of birds can be found in the Iraqi marshlands. (True / False)\n6. The draining of the marshes in the 1990s caused a catastrophic change in the ecosystem. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. In the marshes in the south-east of Iraq (Basra, Maysan, Dhi Qar).\n2. Domestic buffalo, sheep, and cattle.\n3. reeds.\n4. Mashhoof and Tarrada.\n5. True.\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_u3_q2",
+        "title": "Question 2: Grammar & Conditionals (Comparatives, As...as & If Sentences)",
+        "text": "Grammar and Language Functions (Unit 3):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 3,
+        "topic": "Comparatives, Superlatives & First / Second Conditionals",
+        "sourceType": "Ministerial Exam Unit 3 Grammar",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Do as required between brackets (Choose 5 only)",
+            "text": "1. A bear is bigger than a wolf. (Rewrite using: 'as ... as')\n2. Monkeys are more intelligent than sheep. (Rewrite: Sheep are less ...............)\n3. If people grow a lot taller, we (need) bigger houses. (Second Conditional: Correct the verb)\n4. If there were no spiders, there (be) more insects. (Second Conditional: Complete with would)\n5. Gold is more expensive than silver. (Rewrite using: 'Silver is not as ...')\n6. If the temperature rises further, the ice caps (melt). (First Conditional: Correct the verb)",
+            "score": 10,
+            "modelAnswer": "1. A wolf is not as big as a bear.\n2. Sheep are less intelligent than monkeys.\n3. would need.\n4. would be.\n5. Silver is not as expensive as gold.\n6. will melt."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Choose the correct alternative (Choose 5 only)",
+            "text": "1. A dawn is (more beautiful / beautifulest / most beautiful) than a night.\n2. Cows are (bigger / big / the biggest) than goats.\n3. If it (rains / rained / will rain) tomorrow, we will postpone the outdoor match.\n4. If I had a sports car, I (will / would / can) travel across the country.\n5. The cheetah is (the fastest / faster / fast) animal on dry land.\n6. Cities are (noisiest / noisier / as noisy) than rural villages.",
+            "score": 10,
+            "modelAnswer": "1. more beautiful.\n2. bigger.\n3. rains.\n4. would.\n5. the fastest.\n6. noisier."
+          }
+        ]
+      },
+      {
+        "id": "en_u3_q3",
+        "title": "Question 3: Literature Story Time & Composition (The Deer & Wildlife Fact File)",
+        "text": "Story Time (The Pregnant Deer) and Written Composition:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تحليل وابتكار",
+        "chapter": 3,
+        "topic": "Story Time: Nature's Lessons & Writing a Fact File",
+        "sourceType": "Ministerial Exam Unit 3 Writing",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Answer (5) questions about Story Time (The Deer in the Forest)",
+            "text": "1. Where did the pregnant deer go to give birth to her fawn?\n2. What natural danger threatened the deer from the front?\n3. What two dangerous predators/hunters appeared on her left and right?\n4. What did the deer do when faced with all these overwhelming dangers?\n5. How did nature help the deer survive the crisis?\n6. What moral lesson does this story teach humans about overcoming difficult moments?",
+            "score": 10,
+            "modelAnswer": "1. To a remote grass field near a fast-flowing river in the forest.\n2. A rushing, powerful river.\n3. A hunter with an arrow on her left, and a hungry stalking lion on her right.\n4. She stayed calm, focused on the birth of her new life, and did what she could control.\n5. Lightning struck and blinded the hunter, his arrow missed the deer and struck the lion, and heavy rain extinguished the wildfire.\n6. To stay calm, focus on your immediate duty, and trust that challenges can resolve with patience."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Written Composition (10 Marks)",
+            "text": "Write a fact file (70-80 words) about wildlife in the Iraqi Marshes:\n(Include: Habitat and geography, types of birds and animals, lifestyle of the people, threats and conservation).",
+            "score": 10,
+            "modelAnswer": "Marking Rubric:\n- Organization into clear fact-file sections: 4 Marks\n- Factual accuracy and vocabulary: 3 Marks\n- Grammar, punctuation, and capitalization: 3 Marks."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_textbook_u3_samir",
+        "title": "Question 1: Textbook Passages (Samira Al-Mahmoud - Conference Interpreter)",
+        "text": "Textbook Passages - Unit 3 (Working as a Conference Interpreter):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تحليل واستيعاب",
+        "chapter": 3,
+        "topic": "Textbook Passage: Samira Al-Mahmoud Conference Interpreter",
+        "questionCategory": "textbook_passage",
+        "sourceType": "Official Ministerial Exam - 6th Preparatory Unit 3",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Answer the following questions about Samira Al-Mahmoud (Answer 5 only)",
+            "text": "1. Where was Samira Al-Mahmoud born and what are her parents' origins?\n2. What language did Samira speak at home and what language at school in the UK?\n3. What degree did Samira earn before doing her postgraduate diploma in interpretation?\n4. Why should an interpreter listen to international news and read newspapers daily?\n5. Why is it vital for an interpreter to remain calm under severe pressure?\n6. It is not necessary for an interpreter to have a degree before obtaining an interpreting diploma. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. She was born in Britain, but both her parents are from Iraq.\n2. She spoke Arabic at home with her family, and English at school.\n3. A degree in Arabic from the University of London.\n4. To have good general knowledge and stay updated on world events and specialist terminology.\n5. To avoid panic and to be able to convey meaning accurately without pausing or losing track.\n6. False (an interpreter must have a university degree first)."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): True or False / Complete (5 only)",
+            "text": "1. An interpreter works in a soundproof ............... wearing headphones.\n2. Interpreters usually work in pairs so they can take turns every half hour. (True / False)\n3. A literal translation is always better than translating the meaning. (True / False)\n4. The most important quality in an interpreter is: (thinking fast / remaining calm under pressure / speaking five languages).\n5. Freelance work means working for one company permanently. (True / False)\n6. Samira prepared for the oil conference by reading about oil terminology. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. booth.\n2. True.\n3. False (literal translation can distort the intended meaning).\n4. remaining calm under pressure.\n5. False (freelance means working independently whenever and for whomever you choose).\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_composition_unit3_uk_study",
+        "title": "Question 5: Written Component (إنشاء: دراسة الإنكليزية في بريطانيا)",
+        "text": "Write an essay of (100 to 120 words) on the advantages of studying English in the UK:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير",
+        "chapter": 3,
+        "topic": "Composition: The Advantages of Studying English in Britain",
+        "questionCategory": "composition",
+        "sourceType": "Official Ministerial Exam - Question 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): The Advantages of Studying English in the UK",
+            "text": "Write an article describing why studying English in Britain is highly beneficial:\n- Immersing oneself in native English speech 24/7.\n- Staying with a host family to practice spontaneous conversation.\n- Watching British television and reading authentic local newspapers.\n- Exploring British culture and making international friends.",
+            "score": 20,
+            "modelAnswer": "Model Answer & Marking Rubric:\n- Introduction: Learning a foreign language in the country where it is natively spoken is the most effective way to achieve fluency.\n- Body: In the UK, students hear English spoken everywhere: on buses, in shops, and in classrooms. Staying with an English host family provides continuous opportunities to practice daily dialogue. Furthermore, watching British TV shows and reading English newspapers enriches one's vocabulary and pronunciation.\n- Conclusion: Although it can be challenging, studying in the UK accelerates fluency and broadens one's cultural horizons.\nRubric: Content: 8 marks, Style & grammar: 7 marks, Spelling: 5 marks."
+          }
+        ]
+      }
+    ],
+    "4": [
+      {
+        "id": "en_u4_q1",
+        "title": "Question 1: Reading Comprehension & Past Passive Voice (Consolidation Unit)",
+        "text": "Mid-term Consolidation and Review (Unit 4 / 5):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم وتطبيق",
+        "chapter": 4,
+        "topic": "Comprehensive Review & Passive Voice",
+        "sourceType": "Ministerial Exam Mid-term Review",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Unseen Comprehension",
+            "text": "Read the passage carefully and answer (5) questions:\n\"The Ministry of Education in Iraq has initiated a nation-wide digital library platform accessible to all secondary students. Over twenty thousand interactive science experiments, recorded video lectures by senior educators, and ministerial past papers have been catalogued. Students in remote governorates can now access top-tier revision materials from home without incurring private tutoring expenses.\"\n1. What initiative did the Iraqi Ministry of Education launch?\n2. Name two types of educational materials available on the platform.\n3. How does this digital library benefit students living in remote governorates?\n4. The platform requires students to pay high subscription fees. (True / False)\n5. Find a synonym in the text for: (starting/beginning) ............\n6. Choose a suitable title for this text.",
+            "score": 10,
+            "modelAnswer": "1. A nation-wide digital library platform for secondary students.\n2. Interactive science experiments, video lectures, and ministerial past papers.\n3. They can access top-tier revision materials from home without private tutoring fees.\n4. False.\n5. initiated.\n6. Digital Education in Iraq / The National Online Library."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Grammar & Passive Structures",
+            "text": "Rewrite (5) of the following sentences in the Passive Voice:\n1. The author wrote an inspiring novel. -> An inspiring novel ............\n2. Bedouins used falcons to hunt. -> Falcons ............\n3. Engineers build arched houses from reeds. -> Arched houses ............\n4. Thousands of tourists visit the ancient ruins of Babylon every spring. -> The ancient ruins of Babylon ............\n5. The clerk lost the essential travel documents yesterday. -> The essential travel documents ............\n6. Ali repaired the damaged laptop. -> The damaged laptop ............",
+            "score": 10,
+            "modelAnswer": "1. was written by the author.\n2. were used to hunt.\n3. are built from reeds by engineers.\n4. are visited by thousands of tourists every spring.\n5. were lost yesterday.\n6. was repaired by Ali."
+          }
+        ]
+      },
+      {
+        "id": "en_u4_q2",
+        "title": "Question 2: Vocabulary, Irregular Verbs & Punctuation",
+        "text": "Language skills, vocabulary in context, and punctuation accuracy:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 4,
+        "topic": "Vocabulary, Verb Forms & Punctuation",
+        "sourceType": "Ministerial Exam Standards",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Irregular Verbs & Opposites (10 Marks)",
+            "text": "1. Give the past participle (p.p.) of: (see -> seen) ; (speak -> ............) ; (write -> ............) ; (find -> ............)\n2. Form opposite adjectives using prefixes: (happy -> unhappy) ; (polite -> ............) ; (legal -> ............) ; (usual -> ............)\n3. Plural nouns: (car -> cars) ; (child -> ............) ; (tooth -> ............) ; (story -> ............)\n4. Adverbs from adjectives: (quick -> quickly) ; (easy -> ............) ; (good -> ............)",
+            "score": 10,
+            "modelAnswer": "1. spoken, written, found.\n2. impolite, illegal, unusual.\n3. children, teeth, stories.\n4. easily, well."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Punctuation & Writing (10 Marks)",
+            "text": "Punctuate the sentence correctly:\n\"can muna and huda speak french fluently no they can't\"\nWrite a short paragraph (50 words) describing your favorite school subject and why you find it exciting.",
+            "score": 10,
+            "modelAnswer": "Punctuation: \"Can Muna and Huda speak French fluently? No, they can't.\"\nParagraph: Award marks for grammatical cohesion, vocabulary, and relevance."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_literature_swing_canary",
+        "title": "Question 4: Literature Focus (The Swing & The Canary)",
+        "text": "Story Time and Literature Focus (Mohammed Khudhair & Katherine Mansfield):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تحليل أدبي",
+        "chapter": 4,
+        "topic": "Literature Focus: The Swing & The Canary",
+        "questionCategory": "literature_story",
+        "sourceType": "Official Ministerial Exam - 6th Preparatory Literature",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Mohammed Khudhair - 'The Swing' (الأرجوحة)",
+            "text": "1. Who is Mohammed Khudhair and where was he born?\n2. In which year and after which war did Mohammed Khudhair write 'The Swing'?\n3. What is the central moral message that 'The Swing' conveys to humanity?\n4. What did Sattar try to tell little Haleema about her father Ali?\n5. How did Sattar describe Ali's disappearance to Haleema on the swing?\n6. 'The Swing' promotes war and armed conflict. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. An Iraqi writer born in Basra in 1942.\n2. In the summer of 1967, after the war with Israel.\n3. That war destroys everything and leads only to death, misery, destruction, and deprivation.\n4. That her father died in battle and will never come back.\n5. He told her that her father is like smoke and that she can only see him when she closes her eyes.\n6. False (it condemns war completely)."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Katherine Mansfield - 'The Canary' (الكناري)",
+            "text": "1. Where was Katherine Mansfield born and why did she move to London?\n2. What did the woman in 'The Canary' feel when she heard the bird singing?\n3. How did the canary greet his mistress every morning?\n4. What did the woman think of the washerwoman's negative remarks about birds?\n5. What happened to the canary at the end of the story, and how did the woman react?\n6. The woman decided to buy another bird immediately after the canary died. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. Born in New Zealand in 1888; she moved to London to study music and become a professional writer.\n2. She felt completely comforted, loved, and no longer lonely.\n3. He hopped from perch to perch, tapped his beak on the bars, and sang sweetly.\n4. She disagreed with her because the bird was a wonderful, sensitive companion.\n5. The canary died; the woman was heartbroken and wept bitterly.\n6. False (she said she could never have another pet bird)."
+          }
+        ]
+      }
+    ],
+    "5": [
+      {
+        "id": "en_u5_q1",
+        "title": "Question 1: Reading Comprehension (Iraqi Morning News & Sports Events)",
+        "text": "Reading Comprehension and Textbook Passages (Unit 5):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم واستيعاب",
+        "chapter": 5,
+        "topic": "The Media, Sports Champions & News Reports",
+        "sourceType": "Ministerial Exam Unit 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the unseen news report and answer (5) questions:\n\"Yesterday morning, the Iraqi Minister of Youth and Sports officially inaugurated a state-of-the-art sports stadium in Basra with a capacity of sixty-five thousand spectators. The opening ceremony was attended by distinguished international football stars and regional sports delegations. The minister emphasized that modern sports facilities help nurture young talents and foster national unity across all provinces of Iraq.\"\n1. Who inaugurated the new stadium in Basra yesterday morning?\n2. What is the spectator capacity of the new Basra stadium?\n3. Who attended the grand opening ceremony?\n4. What did the minister emphasize regarding sports facilities?\n5. The stadium was built exclusively for water sports. (True / False)\n6. Provide a concise newspaper headline for this report.",
+            "score": 10,
+            "modelAnswer": "1. The Iraqi Minister of Youth and Sports.\n2. Sixty-five thousand (65,000) spectators.\n3. Distinguished international football stars and regional sports delegations.\n4. That modern sports facilities help nurture young talents and foster national unity.\n5. False.\n6. Grand Opening of Basra's New Sports Stadium / Iraq Celebrates Sports Facility."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) questions from your textbook (Iraqi Morning News):\n1. Where did the Iraqi Education Minister arrive to attend the Arab Education Conference? (London / Cairo / Baghdad)\n2. What was the UK Sports Minister's meeting focused on?\n3. Who saved the young girl from a dangerous dog in the park? (A brave boy named John / Her teacher)\n4. What tool did the boy use to scare off the attacking animal? (A cricket bat / A stone)\n5. The governor of Basra welcomed the international guests at the airport. (True / False)\n6. The new sports city took ............... years to construct. (three / ten)",
+            "score": 10,
+            "modelAnswer": "1. London.\n2. Developing youth training exchanges between countries.\n3. A brave boy named John.\n4. A cricket bat.\n5. True.\n6. three years."
+          }
+        ]
+      },
+      {
+        "id": "en_u5_q2",
+        "title": "Question 2: Grammar & Past Tenses (Past Simple vs Past Continuous)",
+        "text": "Grammar and Language Functions (Unit 5):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 5,
+        "topic": "Past Continuous, Past Simple & Future Forms",
+        "sourceType": "Ministerial Exam Unit 5 Grammar",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Do as required between brackets (Choose 5 only)",
+            "text": "1. While Ali (walk) to the library, he met his old schoolmate. (Correct the verb form)\n2. They were playing football when it (begin) to thunder. (Correct the verb)\n3. I (read) a newspaper article when the telephone rang. (Past Continuous)\n4. She is going to (study / studying / studied) architecture at Baghdad University. (Choose)\n5. What (you do) at 7 o'clock yesterday evening? (Make a question in Past Continuous)\n6. The boys (not watch) television when their father arrived. (Past Continuous negative)",
+            "score": 10,
+            "modelAnswer": "1. was walking.\n2. began.\n3. was reading.\n4. study.\n5. What were you doing at 7 o'clock yesterday evening?\n6. were not watching."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Choose the correct option (Choose 5 only)",
+            "text": "1. The minister arrived in Cairo (at / in / on) 10 o'clock yesterday.\n2. She was talking on the phone (when / while / because) the car stopped.\n3. (While / As soon as / Before) we were swimming, someone stole our bags.\n4. I think our national team (will win / wins / winning) the championship.\n5. He (broke / was breaking / breaks) his leg while he was playing tennis.\n6. They (were travelling / travelled) to Nineveh when the tyre burst.",
+            "score": 10,
+            "modelAnswer": "1. at.\n2. when.\n3. While.\n4. will win.\n5. broke.\n6. were travelling."
+          }
+        ]
+      },
+      {
+        "id": "en_u5_q3",
+        "title": "Question 3: Media Vocabulary & Composition (A TV Programme Review)",
+        "text": "Media vocabulary and written composition:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "ابتكار",
+        "chapter": 5,
+        "topic": "Writing a TV Programme Review & Media Terms",
+        "sourceType": "Ministerial Exam Unit 5 Writing",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Media Vocabulary & Matching (10 Marks)",
+            "text": "Match the words with their definitions:\n[ reporter , talk show , documentary , sports programme ]\n1. A television broadcast giving factual information about real people or events: ...............\n2. A person who gathers news and interviews individuals for newspapers or TV: ...............\n3. A television show where famous guests are interviewed about their lives: ...............\n4. A broadcast covering athletic competitions and football matches: ...............",
+            "score": 10,
+            "modelAnswer": "1. documentary.\n2. reporter.\n3. talk show.\n4. sports programme."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Written Composition (10 Marks)",
+            "text": "Write a review (70-90 words) of an interesting TV programme you watched recently:\n(Mention the title and genre, what it was about, interesting facts you learned, and why you recommend it to other students).",
+            "score": 10,
+            "modelAnswer": "Marking Rubric:\n- Cohesion and content: 4 Marks\n- Grammatical range and past tenses: 3 Marks\n- Spelling and vocabulary: 3 Marks."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_textbook_u5_holidays",
+        "title": "Question 1: Textbook Passages (Why Holidays Are So Important)",
+        "text": "Textbook Passages - Unit 5 (Health, Stress and the Vital Need for Vacations):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم",
+        "chapter": 5,
+        "topic": "Textbook Passage: Why are holidays so important?",
+        "questionCategory": "textbook_passage",
+        "sourceType": "Official Ministerial Exam - 6th Preparatory Unit 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Answer or complete the following (Answer 5 only)",
+            "text": "1. Why are holidays so vital for modern human health?\n2. What can the chronic stress of modern work and life cause to our bodies?\n3. Who are 'workaholics' and why do they not take regular holidays?\n4. What danger do workaholics cause to their personal relationships and families?\n5. Both the brain and the body need a complete change of pace and scenery. (True / False)\n6. Leaving your mobile phone turned on during a holiday is relaxing. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. Because the pressure of life and work can cause severe physical and psychological health problems.\n2. It can cause high blood pressure, heart attacks, strokes, and burnout.\n3. People who think their work is too important to leave in the hands of others.\n4. They neglect their families and friends, causing alienation and broken relationships.\n5. True.\n6. False (it keeps stress levels high)."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Complete with words from the text (5 only)",
+            "text": "1. The pace of modern life is so fast that we spend a large portion of time ...............\n2. If we do not give our bodies enough rest, they will eventually ............... us down.\n3. A holiday gives us a chance to spend quality time with ...............\n4. Some people discover too late that work is not the only thing in ...............\n5. Vacations are not a luxury; they are an absolute ............... for good health.\n6. A change of routine helps us look at our problems in a fresh ...............",
+            "score": 10,
+            "modelAnswer": "1. working.\n2. let.\n3. family and friends.\n4. life.\n5. necessity.\n6. way (or light)."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_composition_unit5_holiday",
+        "title": "Question 5: Written Component (إنشاء: عطلة رائعة قضيتها)",
+        "text": "Choose either Topic (A) or Topic (B) to write a descriptive composition (100 - 120 words):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير",
+        "chapter": 5,
+        "topic": "Composition: A Wonderful Holiday I Have Had",
+        "questionCategory": "composition",
+        "sourceType": "Official Ministerial Exam - Question 5",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): A Wonderful Holiday I Have Had",
+            "text": "Write a composition of (100 to 120 words) describing a memorable vacation:\n- Where you went, when, and who accompanied you.\n- The accommodation, weather, and scenic landscapes.\n- Memorable activities you engaged in (boat trips, historical tours, local food).\n- Why this holiday will remain unforgettable.",
+            "score": 20,
+            "modelAnswer": "Model Answer & Marking Rubric:\n- Introduction: Last summer, my family and I traveled to Erbil and the northern mountains of Kurdistan for an unforgettable ten-day holiday.\n- Body: The weather was refreshingly cool compared to Baghdad. We stayed at a hotel overlooking the majestic Gali Ali Bag waterfall. We visited ancient citadels, took cable cars up the mountains, and tasted delicious traditional kebabs and fresh bread. The local people were exceptionally hospitable.\n- Conclusion: This vacation gave us a much-needed break from our busy daily schedules and bonded our family together. I hope to return there soon.\nMarking Rubric: Organization: 7 marks, Vocabulary: 7 marks, Mechanics: 6 marks."
+          }
+        ]
+      }
+    ],
+    "6": [
+      {
+        "id": "en_u6_q1",
+        "title": "Question 1: Reading Comprehension (School of the Future & Ibn Al-Haytham)",
+        "text": "Reading Comprehension and Textbook Passage (Unit 6):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم وتحليل",
+        "chapter": 6,
+        "topic": "Schools of the Future & Great Scholars (Ibn Al-Haytham)",
+        "sourceType": "Ministerial Exam Unit 6",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the unseen passage and answer (5) questions:\n\"Artificial intelligence in modern classrooms is transforming education. Virtual learning environments enable students to conduct simulated nuclear physics and chemistry experiments without exposure to hazardous radiation or corrosive acids. Furthermore, AI tutoring software assesses each learner's individual pace, reinforcing weak areas and providing instant personalized explanations. Education specialists predict that future schools will combine online artificial intelligence modules with in-person mentoring.\"\n1. How do virtual learning environments benefit science students?\n2. What does AI tutoring software assess for each learner?\n3. Why are simulated experiments safer than handling real hazardous chemicals?\n4. What do specialists predict about future educational models?\n5. AI software will completely replace all human school teachers within two years. (True / False)\n6. Provide a suitable title for this text.",
+            "score": 10,
+            "modelAnswer": "1. They enable students to conduct simulated experiments safely without hazards.\n2. Each learner's individual pace, reinforcing weak areas with personalized explanations.\n3. Because they eliminate exposure to hazardous radiation or corrosive acids.\n4. That future schools will combine online AI modules with in-person mentoring.\n5. False.\n6. Artificial Intelligence in Classrooms / The Future of Education."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) questions from your textbook (Ibn Al-Haytham & Future Schools):\n1. Where and when was Ibn Al-Haytham born? (Basra, 965 AD / Baghdad, 1200 AD)\n2. What was Ibn Al-Haytham's most famous pioneering scientific work called? (Kitab al-Manazir / The Canon)\n3. Ibn Al-Haytham is celebrated as the father of modern ............... (optics / medicine / aviation)\n4. In the schools of the future, students will connect with other learners worldwide via ...............\n5. Super schools of the future will contain modern science parks and solar facilities. (True / False)\n6. What major hydraulic project on the River Nile was Ibn Al-Haytham invited to regulate?",
+            "score": 10,
+            "modelAnswer": "1. In Basra, in 965 AD.\n2. Kitab al-Manazir (The Book of Optics).\n3. optics (علم البصريات).\n4. the internet / virtual global classrooms.\n5. True.\n6. Regulating the flooding of the River Nile in Egypt."
+          }
+        ]
+      },
+      {
+        "id": "en_u6_q2",
+        "title": "Question 2: Grammar & Relative Clauses (Who, Which, That & Defining Clauses)",
+        "text": "Grammar and Language Functions (Unit 6):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 6,
+        "topic": "Relative Pronouns: Who, Which, That, Where, Whose",
+        "sourceType": "Ministerial Exam Unit 6 Grammar",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Join sentences using relative pronouns (Choose 5 only)",
+            "text": "1. That is the doctor. He performed the delicate heart surgery. (Use: 'who')\n2. I saw the modern solar car. It won the eco-friendly race. (Use: 'which' or 'that')\n3. That is the engineer ............... designed the Baghdad suspension bridge. (who / which / whose)\n4. The university ............... I studied engineering has outstanding laboratories. (where / which)\n5. The girl ............... bicycle was damaged in the accident received compensation. (whose / who)\n6. That is the famous book ............... Ibn Al-Haytham wrote about optics. (which / who)",
+            "score": 10,
+            "modelAnswer": "1. That is the doctor who performed the delicate heart surgery.\n2. I saw the modern solar car which (that) won the eco-friendly race.\n3. who.\n4. where.\n5. whose.\n6. which."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Defining Careers and Occupations (10 Marks)",
+            "text": "Define (5) of the following occupations using: \"A / An ............... is someone who ...............\":\n1. An architect (design buildings)\n2. A pilot (fly an airplane)\n3. A surgeon (operate on sick people in hospital)\n4. A tour guide (show tourists around historical monuments)\n5. A firefighter (put out fires and save people)\n6. A journalist (write articles for newspapers and magazines)",
+            "score": 10,
+            "modelAnswer": "1. An architect is someone who designs buildings.\n2. A pilot is someone who flies an airplane.\n3. A surgeon is someone who operates on sick people in hospital.\n4. A tour guide is someone who shows tourists around historical monuments.\n5. A firefighter is someone who puts out fires and saves people.\n6. A journalist is someone who writes articles for newspapers and magazines."
+          }
+        ]
+      },
+      {
+        "id": "en_u6_q3",
+        "title": "Question 3: Composition (Career of a Real Person / Professor's Story)",
+        "text": "Literature Focus and Written Composition:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "ابتكار",
+        "chapter": 6,
+        "topic": "Career of a Real Person & Life Lessons",
+        "sourceType": "Ministerial Exam Unit 6 Writing",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Story Time (Alumni Reunion / The Old Professor)",
+            "text": "Answer (5) questions about the story of the alumni visiting their old professor:\n1. Where were the alumni from, and why did they visit their retired university professor?\n2. What problem did all the successful alumni complain about to the professor?\n3. The professor brought coffee in different cups (some expensive porcelain, others cheap plastic). What point was he demonstrating?\n4. What is the difference between \"the coffee\" (true life) and \"the cups\" (wealth, status, jobs)?\n5. True happiness comes from enjoying life itself, not merely possessing the most expensive cup. (True / False)\n6. What moral lesson did the graduates take back home with them?",
+            "score": 10,
+            "modelAnswer": "1. They were from different Iraqi provinces (Dhi Qar, Baghdad, Kirkuk, Diyala); they visited him to pay respect and express gratitude.\n2. They complained about stress, anxiety, and high pressure in their careers and lives.\n3. That people automatically select the most attractive cups, even though the quality of the coffee remains identical.\n4. Coffee represents genuine life, health, and family; the cups are merely tools, wealth, and societal status.\n5. True.\n6. That the happiest people do not necessarily have the best of everything; they simply make the best of what they have."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Written Composition (10 Marks)",
+            "text": "Write a biography / career summary (70-90 words) of a real person you admire:\n(Include: Early childhood and education, key career achievements, obstacles overcome, and plans for the future).",
+            "score": 10,
+            "modelAnswer": "Marking Rubric:\n- Organization and biographical accuracy: 4 Marks\n- Sentence variety and relative clauses: 3 Marks\n- Spelling, grammar, and capitalisation: 3 Marks."
+          }
+        ]
+      },
+      {
+        "id": "en_p6_dropins_u6_banking",
+        "title": "Question 3: Vocabulary in Context (Drop-ins / إسقاطات البنوك والمال)",
+        "text": "Fill in the blanks with the most suitable word from the box below:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 6,
+        "topic": "Drop-ins: Banking & Finance",
+        "questionCategory": "drop_ins",
+        "sourceType": "Official Ministerial Exam - Question 3(A)",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Complete each sentence from the box (Choose 5 only)",
+            "text": "[ overdraft - balance - transaction - branch - withdrawal - instalment - statement ]\n\n1. I need to make a ............... of 100,000 Dinars from the ATM.\n2. The bank ............... shows all payments and receipts made this month.\n3. What is the current ............... in your savings account?\n4. Our company pays a monthly ............... of $500 for the commercial van.\n5. The central bank opened a new ............... near the university campus.\n6. If you spend more money than you have, you are in an ...............",
+            "score": 10,
+            "modelAnswer": "1. withdrawal\n2. statement\n3. balance\n4. instalment\n5. branch\n6. overdraft"
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Complete from the box (Choose 5 only)",
+            "text": "[ loan - invalid - expired - maintain - interest - down payment - fee ]\n\n1. His credit card was ............... because it had expired last month.\n2. You must make a 10% ............... before the bank approves the mortgage.\n3. The bank charges a nominal annual ............... for maintaining the gold card.\n4. Savings accounts pay higher ............... if you keep the money for two years.\n5. He applied for a personal ............... to pay for his master's degree.\n6. Customers must ............... a minimum balance of 250,000 Dinars.",
+            "score": 10,
+            "modelAnswer": "1. invalid (or expired)\n2. down payment\n3. fee\n4. interest\n5. loan\n6. maintain"
+          }
+        ]
+      }
+    ],
+    "7": [
+      {
+        "id": "en_u7_q1",
+        "title": "Question 1: Reading Comprehension (Libya and Sudan - African Countries)",
+        "text": "Reading Comprehension and Textbook Passage (Unit 7):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم واستيعاب",
+        "chapter": 7,
+        "topic": "Countries, Geography & The Olympic Games",
+        "sourceType": "Ministerial Exam Unit 7",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A)",
+            "text": "Read the unseen passage and answer (5) questions:\n\"Eco-tourism is expanding rapidly across the Mediterranean basin and North Africa. Instead of staying in crowded coastal luxury resorts, visitors increasingly opt for sustainable desert expeditions, staying with native families and exploring archaeological ruins such as Leptis Magna. Revenue generated from eco-tourism directly finances the protection of endangered desert gazelles and rare migratory bird reserves.\"\n1. What type of tourism is growing rapidly in the Mediterranean and North Africa?\n2. Where do eco-tourists choose to stay instead of large coastal resorts?\n3. What famous ancient archaeological site attracts visitors in North Africa?\n4. How does eco-tourism revenue help wildlife conservation?\n5. Eco-tourism completely destroys historical heritage monuments. (True / False)\n6. Provide an appropriate concise title for this text.",
+            "score": 10,
+            "modelAnswer": "1. Eco-tourism (sustainable tourism).\n2. They stay with native families and in sustainable desert expeditions.\n3. Leptis Magna (in Libya).\n4. It directly finances the protection of endangered gazelles and migratory bird reserves.\n5. False.\n6. The Rise of Eco-Tourism / Sustainable Travel in North Africa."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B)",
+            "text": "Answer or complete (5) questions from your textbook (Libya and Sudan):\n1. Libya is mostly desert, but it has fertile agricultural valleys in the north. (True / False)\n2. What is the modern capital of Sudan? (Khartoum / Tripoli / Benghazi)\n3. Sudan's main exports include cotton, gum arabic, and ............... (sugar / electronics)\n4. What ancient Roman city in Libya was an important seaport? (Leptis Magna / Babylon)\n5. The Blue Nile and White Nile join together at the city of ...............\n6. Libya produces large quantities of crude ............... (oil / coal)",
+            "score": 10,
+            "modelAnswer": "1. True.\n2. Khartoum.\n3. sugar (and animal livestock).\n4. Leptis Magna.\n5. Khartoum.\n6. oil (petroleum)."
+          }
+        ]
+      },
+      {
+        "id": "en_u7_q2",
+        "title": "Question 2: Grammar (Adverbs Order: Manner, Place, Time & Passive Voice)",
+        "text": "Grammar and Language Functions (Unit 7):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق",
+        "chapter": 7,
+        "topic": "Adverbs Order (Manner + Place + Time) & Passive Voice",
+        "sourceType": "Ministerial Exam Unit 7 Grammar",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Re-order adverbs correctly (Manner + Place + Time)",
+            "text": "Put the adverbs in the correct order for (5) of the following sentences:\n1. Ali played (in the garden / happily / yesterday). -> Ali played ...............\n2. The students sang (at school / loudly / this morning). -> The students sang ...............\n3. My friend drove (carefully / last night / on the highway). -> My friend drove ...............\n4. It rained (in Basra / heavily / last night). -> It rained ...............\n5. She recited the poem (beautifully / in the auditorium / yesterday). -> She recited the poem ...............\n6. The children walked (to school / quietly / this morning). -> The children walked ...............",
+            "score": 10,
+            "modelAnswer": "1. happily in the garden yesterday.\n2. loudly at school this morning.\n3. carefully on the highway last night.\n4. heavily in Basra last night.\n5. beautifully in the auditorium yesterday.\n6. quietly to school this morning."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Passive Voice & Prepositions (Choose 5 only)",
+            "text": "1. Crops such as cotton and barley (are grown / is grown / grew) by Sudanese farmers.\n2. Oil (was discovered / discovers / is discovering) in commercial quantities in Libya.\n3. Ancient pyramids (were built / built / was built) thousands of years ago in Meroe.\n4. He has lived in Baghdad (since / for / from) five years.\n5. We haven't seen our cousins (since / for / in) last September.\n6. The prize (was awarded / awarded / is award) to the fastest runner.",
+            "score": 10,
+            "modelAnswer": "1. are grown.\n2. was discovered.\n3. were built.\n4. for.\n5. since.\n6. was awarded."
+          }
+        ]
+      },
+      {
+        "id": "en_u7_q3",
+        "title": "Question 3: Spelling, Nationalities & Composition (Write About a Country)",
+        "text": "Spelling variations, nationalities, and written composition:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتعبير",
+        "chapter": 7,
+        "topic": "Nationalities, Countries & Composition",
+        "sourceType": "Ministerial Exam Unit 7 Writing",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Nationalities & Spelling (10 Marks)",
+            "text": "1. Write the nationalities: Iraq -> Iraqi ; England -> ............, Egypt -> ............, France -> ............\n2. Change into adverbs: polite -> politely ; easy -> ............, fast -> ............, good -> ............\n3. Opposites: wide -> narrow ; modern -> ............, safe -> ............\n4. Complete: Sudan -> Sudanese ; Japan -> ............ ; Bahrain -> ............",
+            "score": 10,
+            "modelAnswer": "1. English, Egyptian, French.\n2. easily, fast, well.\n3. old / ancient, dangerous.\n4. Japanese, Bahraini."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Written Composition (10 Marks)",
+            "text": "Write a paragraph (70-80 words) about a country of your choice (e.g. Iraq, Sudan, or Japan):\n(Mention geographical location, capital city, population, agricultural/industrial products, and famous tourist attractions).",
+            "score": 10,
+            "modelAnswer": "Marking Rubric:\n- Geographical and factual coherence: 4 Marks\n- Vocabulary range and adverbs: 3 Marks\n- Spelling, capitalisation and punctuation: 3 Marks."
+          }
+        ]
+      }
+    ],
+    "8": [
+      {
+        "id": "en_u8_q1",
+        "title": "Question 1: Comprehensive Baccalaureate Exam (Final Ministerial Review)",
+        "text": "Comprehensive Official Ministerial Examination (Full Syllabus):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "شامل",
+        "chapter": 8,
+        "topic": "Comprehensive Ministerial Exam Standards",
+        "sourceType": "Ministerial Final Baccalaureate Exam",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Unseen Comprehension",
+            "text": "Read the following passage carefully:\n\"Health experts consistently emphasize that regular sleep patterns are as vital for academic success as dedicated study hours. During deep sleep cycles, the human brain reorganizes newly acquired memories, solves complex mathematical puzzles, and clears metabolic waste. Teenagers who sleep eight hours per night demonstrate superior exam performance, sharper concentration, and lower stress levels.\"\n1. What do health experts compare sleep to in terms of importance?\n2. What processes happen in the human brain during deep sleep?\n3. How many hours of sleep per night do experts recommend for teenagers?\n4. What three benefits do well-rested students demonstrate in exams?\n5. Staying awake all night before an exam boosts your mental performance. (True / False)\n6. Give the passage a suitable title.",
+            "score": 10,
+            "modelAnswer": "1. They compare it to dedicated study hours.\n2. The brain reorganizes memories, solves complex puzzles, and clears waste.\n3. Eight (8) hours per night.\n4. Superior exam performance, sharper concentration, and lower stress levels.\n5. False.\n6. The Importance of Sleep for Students / Sleep and Academic Success."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Textbook Passages (Comprehensive)",
+            "text": "Answer or complete (5) questions:\n1. The Panther 3.0D comes with a warranty of ............... years. (four / two / ten)\n2. Falcons can kill large birds and animals by diving at immense speed. (True / False)\n3. Kareem read all of Al-Nawab's poems at least ............... times. (twice / once / never)\n4. Ibn Al-Haytham wrote more than two hundred works across various sciences. (True / False)\n5. Why do Marsh Arabs build their houses on floating reed beds?\n6. Lucy's clumsy brother put salt into his mother's tea. (True / False)",
+            "score": 10,
+            "modelAnswer": "1. four (4) years.\n2. True.\n3. twice.\n4. True.\n5. To adapt to the rising water levels in the marshes.\n6. True."
+          }
+        ]
+      },
+      {
+        "id": "en_u8_q2",
+        "title": "Question 2: Grammar & Functions (Comprehensive Ministerial Drill)",
+        "text": "Grammar questions from all units:",
+        "score": 20,
+        "difficulty": "متقدم",
+        "bloom": "تطبيق",
+        "chapter": 8,
+        "topic": "Comprehensive Grammar Review",
+        "sourceType": "Ministerial Final Exam Grammar",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Do as required (Choose 5 only)",
+            "text": "1. While Noor was reading, her little brother (turn off) the lamp. (Correct the verb)\n2. A plane is faster than a train. (Rewrite using: 'as ... as')\n3. If you study diligently, you (pass) the baccalaureate exams. (First Conditional)\n4. That is the architect ............... planned the new library. (who / which / whose)\n5. The mechanic repaired the car yesterday. (Change into Passive Voice)\n6. He is unfriendly. (Make it more polite: He is not very ...............)",
+            "score": 10,
+            "modelAnswer": "1. turned off.\n2. A train is not as fast as a plane.\n3. will pass.\n4. who.\n5. The car was repaired yesterday by the mechanic.\n6. friendly."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Choose the correct alternative (Choose 5 only)",
+            "text": "1. There (is / are) an ancient museum in Baghdad.\n2. How about (visiting / visit / visited) Babylon tomorrow?\n3. He has lived in Basra (since / for / in) 2018.\n4. I'd like (to go / go / going) to the swimming pool.\n5. The cheetah runs (fast / fastly / faster) than any mammal.\n6. Cars have seatbelts (to / so that / because) keep you safe.",
+            "score": 10,
+            "modelAnswer": "1. is.\n2. visiting.\n3. since.\n4. to go.\n5. faster.\n6. to."
+          }
+        ]
+      },
+      {
+        "id": "en_u8_q3",
+        "title": "Question 3: Final Written Composition (Choice of Two Topics)",
+        "text": "Official Ministerial Composition Section:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "ابتكار",
+        "chapter": 8,
+        "topic": "Final Ministerial Written Composition",
+        "sourceType": "Ministerial Exam Official Standard",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "Part (A): Topic Option 1",
+            "text": "Write an email (75-90 words) to a friend telling him/her about an invitation to a birthday party or graduation ceremony.\n(Include date, time, venue, what to bring, and why it will be memorable).",
+            "score": 10,
+            "modelAnswer": "Evaluate based on organization, correct salutation and sign-off, grammar, and spelling."
+          },
+          {
+            "id": "b2",
+            "title": "Part (B): Topic Option 2",
+            "text": "Write a short essay (75-90 words) giving advice to tourists visiting Iraq for the first time.\n(Include historical sites, delicious food, local traditions, best season to visit, and friendly hospitality).",
+            "score": 10,
+            "modelAnswer": "Evaluate based on task achievement, rich vocabulary, clear paragraphs, and punctuation."
+          }
+        ]
+      }
+    ]
+  },
+  "arabic": {
+    "1": [
+      {
+        "id": "ar_ch1_q1",
+        "title": "اشتقاق اسم الفاعل وعمله وشروطه ومعموله",
+        "text": "في قواعد اللغة العربية وموضوع (اسم الفاعل):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وإعراب",
+        "chapter": 1,
+        "topic": "اسم الفاعل وعمله",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشتق اسم فاعل من الأفعال الآتية مضبوطاً بالشكل التام: (صَامَ - أَنْفَقَ - قَضَى - اسْتَغْفَرَ).",
+            "score": 10,
+            "modelAnswer": "صَامَ (ثلاثي معتل الوسط): صَائِمٌ\nأَنْفَقَ (رباعي): مُنْفِقٌ (على وزن مضارعه بإبدال حرف المضارعة ميماً مضمومة وكسر ما قبل الآخر)\nقَضَى (ثلاثي ناقص): قَاضٍ (أو القَاضِي عند تعريفه بأل)\nاسْتَغْفَرَ (سداسي): مُسْتَغْفِرٌ"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "قال تعالى: ﴿وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ﴾. استخرج اسم الفاعل العامل، وبيّن سبب عمله، ثم اعرب معموله.",
+            "score": 10,
+            "modelAnswer": "اسم الفاعل العامل: (الْكَاظِمِينَ).\nسبب عمله: محلّى بـ (أل) التعريف، فيعمل دون قيد أو شرط وبلا حاجة لزمن حال أو استقبال.\nمعموله وإعرابه: (الْغَيْظَ): مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q2",
+        "title": "صيغ المبالغة وأوزانها الخمسة القياسية وعملها",
+        "text": "في المشتقات وموضوع (صيغ المبالغة):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تحليل وتطبيق",
+        "chapter": 1,
+        "topic": "صيغ المبالغة",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الأوزان القياسية الخمسة لصيغ المبالغة؟ اذكر وزناً لكل صيغة مع صياغة كلمة من الأفعال الآتية: (صَبَرَ - أَعْطَى - غَفَرَ - عَلِمَ - حَذِرَ).",
+            "score": 10,
+            "modelAnswer": "الأوزان والأمثلة:\n1) فَعَّال: غَفَّار (من غَفَرَ)\n2) مِفْعَال: مِعْطَاء (من أَعْطَى)\n3) فَعُول: صَبُور (من صَبَرَ)\n4) فَعِيل: عَلِيم (من عَلِمَ)\n5) فَعِل: حَذِر (من حَذِرَ)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "جملة: «المؤمنُ شَكُورٌ نِعْمَةَ ربِّهِ». عيّن صيغة المبالغة، وبيّن سبب عملها، ثم اعرب معمولها.",
+            "score": 10,
+            "modelAnswer": "صيغة المبالغة: (شَكُورٌ) على وزن (فَعُول).\nسبب عملها: نكرة منونة وقعت خبراً للمبتدأ (المؤمنُ) ودلت على الحال والاستقبال.\nمعمولها وإعرابه: (نِعْمَةَ): مفعول به لصيغة المبالغة منصوب وعلامة نصبه الفتحة الظاهرة، وهو مضاف."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q3",
+        "title": "اشتقاق اسم المفعول وعمله ونائب الفاعل",
+        "text": "في دراسة مشتق (اسم المفعول):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وإعراب",
+        "chapter": 1,
+        "topic": "اسم المفعول ونائب الفاعل",
+        "sourceType": "وزاري 2022 دور تمهيدي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشتق اسم مفعول من الأفعال المبنية للمجهول الآتية مع الضبط بالشكل: (كُتِبَ - قِيلَ - دُعِيَ - أُكْرِمَ).",
+            "score": 10,
+            "modelAnswer": "كُتِبَ: مَكْتُوبٌ (على وزن مَفْعُول)\nقِيلَ: مَقُولٌ (ثلاثي أجوف بحذف واو مفعول)\nدُعِيَ: مَدْعُوٌّ (ثلاثي ناقص بإدغام الواوين)\nأُكْرِمَ: مُكْرَمٌ (غير ثلاثي بإبدال حرف المضارعة ميماً مضمومة وفتح ما قبل الآخر)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "جملة: «أَمَعْرُوفٌ فَضْلُ المعلمِ؟». استخرج اسم المفعول، وبيّن سبب عمله، ثم اعرب معموله إعراباً مفصلاً.",
+            "score": 10,
+            "modelAnswer": "اسم المفعول: (مَعْرُوفٌ).\nسبب عمله: نكرة منونة سبقت باستفهام (الهمزة) ودلت على الحال والاستقبال.\nمعموله وإعرابه: (فَضْلُ): نائب فاعل لاسم المفعول مرفوع وعلامة رفعه الضمة الظاهرة، سدّ مَسَدَّ الخبر، وهو مضاف."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q4",
+        "title": "الميزان الصرفي للأفعال المعتلة والمحذوف منها أحرف",
+        "text": "في قواعد الصرف والميزان الصرفي:",
+        "score": 20,
+        "difficulty": "صعب",
+        "bloom": "تحليل وصرف",
+        "chapter": 1,
+        "topic": "الميزان الصرفي",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "زن الكلمات الآتية مبيناً ما حدث فيها من حذف أو زيادة بالحركات الدقيقة:\n(قِ - اسْعَ - قَاضٍ - يَرِثُ - انْتَصَرَ).",
+            "score": 10,
+            "modelAnswer": "قِ (أصلها وَقَى - حذفت فاء الفعل ولامه): زنتها (عِ)\nاسْعَ (أصلها سَعَى - حذفت لامه وزيدت همزة وصل): زنتها (افْعَ)\nقَاضٍ (أصلها قَاضِي - حذفت لامه وعوض بتنوين كسر): زنتها (فَاعٍ)\nيَرِثُ (أصلها وَرِثَ - حذفت فاؤه): زنتها (يَعِلُ)\nانْتَصَرَ (أصلها نَصَرَ - زيدت همزة وتاء): زنتها (افْتَعَلَ)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "رد الكلمات الآتية إلى جذورها الثلاثية (أفعالها الماضية): (ثِقَة - خُذْ - قُمْ - اتَّقِ).",
+            "score": 10,
+            "modelAnswer": "ثِقَة: من (وَثِقَ)\nخُذْ: من (أَخَذَ)\nقُمْ: من (قَامَ)\nاتَّقِ: من (وَقَى)"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q5",
+        "title": "شروط عمل المشتقات إذا كانت نكرة منونة",
+        "text": "في ضوابط عمل المشتقات عمل أفعالها:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتطبيق",
+        "chapter": 1,
+        "topic": "شروط عمل المشتقات",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "إذا كان اسم الفاعل أو صيغة المبالغة أو اسم المفعول نكرة مجردة من (أل)، فما هي الشروط التي يجب أن تتوفر فيه لكي يعمل عمل فعله؟ اذكر أربعة شروط مع التمثيل بجملة مفيدة لكل شرط.",
+            "score": 10,
+            "modelAnswer": "الشرط الأساسي: أن يدل على الحال أو الاستقبال (لا يدل على المضي)، وأن يعتمد على:\n1) أن يسبق بنفي: (ما طالبٌ الحقَّ خائبٌ).\n2) أن يسبق باستفهام: (أفاهمٌ أخوكَ الدرسَ؟).\n3) أن يقع خبراً: (خالدٌ قارئٌ القرآنَ).\n4) أن يقع صفة: (جاءَ رجلٌ راكبٌ فرساً).\n5) أو يقع حالاً أو منادى."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بيّن سبب عدم عمل اسم الفاعل في الجملة الآتية: «أنا كاتبٌ الدرسَ أمسِ». وما التغيير الواجب لجعله عاملاً؟",
+            "score": 10,
+            "modelAnswer": "السبب: لأنه دل على الزمن الماضي بوجود كلمة (أمسِ)، وشرط عمل النكرة المنونة أن تدل على الزمن الحاضر أو المستقبل.\nالتغيير لجعله عاملاً: حذف كلمة (أمسِ) لتصبح الجملة: «أنا كاتبٌ الدرسَ الآنَ / غداً» أو تعريفه بأل: «أنا الكاتبُ الدرسَ أمسِ»."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q6",
+        "title": "مصادر الأفعال الثلاثية القياسية والسماعية",
+        "text": "في الصرف العربي ومصادر الأفعال:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتصنيف",
+        "chapter": 1,
+        "topic": "مصادر الأفعال الثلاثية",
+        "sourceType": "وزاري 2021 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "هات مصادر الأفعال الثلاثية الآتية مبيناً دلالة كل مصدر منها:\n(صَاغَ - رَحَلَ - حَمِرَ - سَعَلَ - صَدَعَ).",
+            "score": 10,
+            "modelAnswer": "صَاغَ: صِيَاغَةً (على وزن فِعَالَة: يدل على حرفة أو صناعة)\nرَحَلَ: رَحِيلاً (على وزن فَعِيل: يدل على سير وانتقال)\nحَمِرَ: حُمْرَةً (على وزن فُعْلَة: يدل على لون صحيح العين)\nسَعَلَ: سُعَالاً (على وزن فُعَال: يدل على مرض وداء)\nصَدَعَ: صُدَاعاً (يدل على داء ومرض)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق بين المصدر واسم الفاعل من حيث الدلالة على الزمن والحدث والفاعل؟",
+            "score": 10,
+            "modelAnswer": "المصدر: يدل على الحدث مجرداً تماماً من الزمان ومن الفاعل (مثل: القِرَاءَة، الكِتَابَة).\nاسم الفاعل: يدل على الحدث وعلى الذات التي قامت بالفعل أو اتصفت به في زمان معين (مثل: القَارِئ، الكَاتِب)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q7",
+        "title": "مصادر الأفعال غير الثلاثية (الرباعية والخماسية والسداسية)",
+        "text": "في أوزان المصادر القياسية غير الثلاثية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وصرف",
+        "chapter": 1,
+        "topic": "مصادر غير الثلاثي",
+        "sourceType": "وزاري 2022 دور ثان",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "هات مصادر الأفعال الآتية واذكر القاعدة الصرفية لكل منها:\n(أَكْرَمَ - قَدَّمَ - جَادَلَ - زَلْزَلَ).",
+            "score": 10,
+            "modelAnswer": "أَكْرَمَ (أَفْعَلَ صحيح العين): إِكْرَاماً (على وزن إِفْعَال)\nقَدَّمَ (فَعَّلَ صحيح اللام): تَقْدِيماً (على وزن تَفْعِيل)\nجَادَلَ (فَاعَلَ): جِدَالاً ومُجَادَلَةً (على وزن فِعَال ومُفَاعَلَة)\nزَلْزَلَ (فَعْلَلَ مضاعف): زَلْزَلَةً وزِلْزَالاً (على وزن فَعْلَلَة وفِعْلاَل)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "هات مصادر الأفعال الخماسية والسداسية الآتية: (انْطَلَقَ - تَقَدَّمَ - اسْتَخْرَجَ - اسْتَقَامَ).",
+            "score": 10,
+            "modelAnswer": "انْطَلَقَ (مبدوء بهمزة وصل): انْطِلاقاً (بكسر الحرف الثالث وزيادة ألف قبل الآخر)\nتَقَدَّمَ (مبدوء بتاء زائدة): تَقَدُّماً (بضم ما قبل الآخر)\nاسْتَخْرَجَ: اسْتِخْرَاجاً (على وزن اسْتِفْعَال)\nاسْتَقَامَ (معتل العين بالألف): اسْتِقَامَةً (على وزن اسْتِفَالَة بحذف عينه والتعويض بتاء في الآخر)"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q8",
+        "title": "إعراب سد مسد الخبر في المشتقات المعتمدة على نفي واستفهام",
+        "text": "في دقائق الإعراب النحوي للمشتقات العاملة:",
+        "score": 20,
+        "difficulty": "صعب",
+        "bloom": "إعراب وتحليل",
+        "chapter": 1,
+        "topic": "سد مسد الخبر",
+        "sourceType": "وزاري مكرر للمتميزين",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اعرب الجملة الآتية إعراباً مفصلاً تاماً: «مَا نَاصِرٌ البَاطِلَ مؤمنٌ».",
+            "score": 10,
+            "modelAnswer": "مَا: حرف نفي لا عمل له.\nنَاصِرٌ: مبتدأ مرفوع وعلامة رفعه الضمة الظاهرة على آخره (وهو اسم فاعل عامل).\nالبَاطِلَ: مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره.\nمؤمنٌ: فاعل لاسم الفاعل سدّ مَسَدَّ الخبر مرفوع وعلامة رفعه الضمة الظاهرة على آخره."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "متى يُعرب معمول المشتق فاعلاً أو نائب فاعل (سدّ مَسَدَّ الخبر)؟",
+            "score": 10,
+            "modelAnswer": "إذا وقع المشتق النكرة المنونة في بداية الجملة مبتدأً مسبوقاً بنفي أو مسبوقاً باستفهام، فيحتاج المشتق إلى معموله المرفوع ليتمم معنى الجملة فيعرب المعمول فاعلاً لاسم الفاعل/صيغة المبالغة أو نائب فاعل لاسم المفعول سد مسد الخبر ليغني عن الخبر."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q9",
+        "title": "تحويل الفعل إلى اسم فاعل وصيغة مبالغة واسم مفعول",
+        "text": "في التطبيقات الصرفية التوليدية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتوليد",
+        "chapter": 1,
+        "topic": "توليد المشتقات",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "الفعل (رَحِمَ)، صغ منه:\n1) اسم فاعل وضعه في جملة مفيدة وهو عامل.\n2) صيغة مبالغة على وزن (فَعِيل) في جملة مفيدة.\n3) اسم مفعول وضعه في جملة مفيدة.",
+            "score": 10,
+            "modelAnswer": "1) اسم فاعل: رَاحِمٌ -> «ما راحمٌ الضعفاءَ إلا الكريمُ».\n2) صيغة مبالغة: رَحِيمٌ -> «إنَّ اللهَ رَحِيمٌ بعبادِهِ».\n3) اسم مفعول: مَرْحُومٌ -> «المرحومُ محبوبٌ في قومِهِ»."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "هل يشتق اسم المفعول من الفعل اللازم؟ وكيف يتم ذلك؟",
+            "score": 10,
+            "modelAnswer": "نعم، ولكن بشرط أن يأتي بعده شبه جملة (جار ومجرور أو ظرف) ليتم المعنى ويسد مسد نائب الفاعل، مثل: (جَلَسَ -> مَجْلُوسٌ عَلَيْهِ)، (ذَهَبَ -> مَذْهُوبٌ بِهِ)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q10",
+        "title": "تحدي التفريق بين اسم الفاعل واسم المفعول المتشابهين لفظاً",
+        "text": "في المشتقات المشتركة في الصيغة اللفظية:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تحليل وسياق",
+        "chapter": 1,
+        "topic": "المشتقات المتشابهة صياغة",
+        "sourceType": "أسئلة متميزين وزارية",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "كلمة (مُحْتَلّ) وكلمة (مُخْتَار)، كيف تفرق بين كونهما اسم فاعل أو اسم مفعول في الجملتين الآتيتين مبيناً القرينة السياقية والمعنوية:\n1) «الشعبُ الفلسطينيُّ مُحْتَلٌّ أرضُهُ».\n2) «الجيشُ الصهيونيُّ مُحْتَلٌّ أرضَ فلسطينَ».",
+            "score": 10,
+            "modelAnswer": "1) في الجملة الأولى: (مُحْتَلٌّ) اسم مفعول؛ لأن الشعب وقع عليه فعل الاحتلال (فعل مبني للمجهول)، و(أرضُهُ) نائب فاعل.\n2) في الجملة الثانية: (مُحْتَلٌّ) اسم فاعل؛ لأن الجيش هو الذي قام بفعل الاحتلال بنفسه (فعل مبني للمعلوم)، و(أرضَ) مفعول به لاسم الفاعل."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ميز بين اسم الفاعل واسم المفعول في: «أنا مُخْتَارٌ لزملائي» و «أنا مُخْتَارٌ من قبل زملائي».",
+            "score": 10,
+            "modelAnswer": "«أنا مُخْتَارٌ لزملائي»: اسم فاعل (أنا من قمت بالاختيار).\n«أنا مُخْتَارٌ من قبل زملائي»: اسم مفعول (وقع عليّ الاختيار من غيري)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q11",
+        "title": "أبواب الفعل الثلاثي المجرد الستة",
+        "text": "في ميزان الأفعال وحركات عين الفعل:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتصنيف",
+        "chapter": 1,
+        "topic": "أبواب الفعل الثلاثي",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اذكر أبواب الأفعال الثلاثية المجردة الستة مع البيت الشعري الحاصر لها.",
+            "score": 10,
+            "modelAnswer": "البيت الشعري: «فَتْحُ ضَمٍّ ، فَتْحُ كَسْرٍ ، فَتْحَتَانِ ... كَسْرُ فَتْحٍ ، ضَمُّ ضَمٍّ ، كَسْرَتَانِ».\nالأبواب:\n1) الباب الأول: فَعَلَ يَفْعُلُ (نَصَرَ يَنْصُرُ)\n2) الباب الثاني: فَعَلَ يَفْعِلُ (ضَرَبَ يَضْرِبُ)\n3) الباب الثالث: فَعَلَ يَفْعَلُ (فَتَحَ يَفْتَحُ)\n4) الباب الرابع: فَعِلَ يَفْعَلُ (فَرِحَ يَفْرَحُ)\n5) الباب الخامس: فَعُلَ يَفْعُلُ (كَرُمَ يَكْرُمُ)\n6) الباب السادس: فَعِلَ يَفْعِلُ (حَسِبَ يَحْسِبُ)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "رد الأفعال الآتية إلى أبوابها الصحيحة: (غَفَرَ يَغْفِرُ - دَخَلَ يَدْخُلُ - شَرِبَ يَشْرَبُ - جَبُنَ يَجْبُنُ).",
+            "score": 10,
+            "modelAnswer": "غَفَرَ يَغْفِرُ: الباب الثاني (فتح كسر)\nدَخَلَ يَدْخُلُ: الباب الأول (فتح ضم)\nشَرِبَ يَشْرَبُ: الباب الرابع (كسر فتح)\nجَبُنَ يَجْبُنُ: الباب الخامس (ضم ضم)"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q12",
+        "title": "اسم الفاعل المضاف وحكم معموله المجرور",
+        "text": "في الفروق النحوية بين الإعمال والإضافة:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "مقارنة وإعراب",
+        "chapter": 1,
+        "topic": "المشتق المضاف وغير المضاف",
+        "sourceType": "وزاري 2019 دور ثان",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قارن في الإعراب بين الكلمتين اللتين تحتهما خط في الجملتين الآتيتين:\n1) «هذا صَانِعُ <u>المَعْرُوفِ</u>».\n2) «هذا صَانِعٌ <u>المَعْرُوفَ</u>».",
+            "score": 10,
+            "modelAnswer": "1) <u>المَعْرُوفِ</u> في الأولى: مضاف إليه مجرور وعلامة جره الكسرة الظاهرة؛ لأن اسم الفاعل (صَانِعُ) غير منون فحذفت نونه للتخفيف وأضيف إلى معموله.\n2) <u>المَعْرُوفَ</u> في الثانية: مفعول به لاسم الفاعل المنون (صَانِعٌ) منصوب وعلامة نصبه الفتحة الظاهرة."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الأثر الإعرابي لتنوين اسم الفاعل في الجملة؟",
+            "score": 10,
+            "modelAnswer": "التنوين يمنع الإضافة ويدل على التمام ويفصل بين الكلمتين فيعمل اسم الفاعل عمل فعله فينصب مفعولاً به أو يرفع فاعلاً، بينما حذف التنوين يوجب الإضافة وجر الاسم التالي."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q13",
+        "title": "صيغ المبالغة في القرآن الكريم وبلاغتها",
+        "text": "في الشواهد القرآنية للمشتقات:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "استخراج وتفسير",
+        "chapter": 1,
+        "topic": "شواهد صيغ المبالغة",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال تعالى: ﴿وَلَا تُطِعْ كُلَّ حَلَّافٍ مَّهِينٍ * هَمَّازٍ مَّشَّاءٍ بِنَمِيمٍ * مَّنَّاعٍ لِّلْخَيْرِ مُعْتَدٍ أَثِيمٍ﴾. استخرج صيغ المبالغة الواردة في الآيات الكريمة واذكر أوزانها.",
+            "score": 10,
+            "modelAnswer": "1) حَلَّافٍ: على وزن (فَعَّال)\n2) هَمَّازٍ: على وزن (فَعَّال)\n3) مَشَّاءٍ: على وزن (فَعَّال)\n4) مَنَّاعٍ: على وزن (فَعَّال)\n5) أَثِيمٍ: على وزن (فَعِيل)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما المعنى البلاغي والدلالي الذي تؤديه صيغة المبالغة مقارنة باسم الفاعل الاعتيادي؟",
+            "score": 10,
+            "modelAnswer": "صيغة المبالغة تدل على الدلالة التي يدل عليها اسم الفاعل مع إفادة الكثرة والزيادة والمبالغة والتكرار في وقوع الفعل والاتصاف به لدرجة الثبوت."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q14",
+        "title": "اشتقاق اسم الفاعل والمفعول من الأفعال المزيدة",
+        "text": "في صياغة المشتقات من الأفعال فوق الثلاثية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وصرف",
+        "chapter": 1,
+        "topic": "اشتقاق غير الثلاثي",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "صغ اسم فاعل واسم مفعول من الأفعال المزيدة الآتية مع الضبط التام بالشكل:\n(انْتَخَبَ - دَحْرَجَ - أَعْلَنَ).",
+            "score": 10,
+            "modelAnswer": "انْتَخَبَ: اسم الفاعل: مُنْتَخِبٌ (بكسر الخاء)، اسم المفعول: مُنْتَخَبٌ (بفتح الخاء)\nدَحْرَجَ: اسم الفاعل: مُدَحْرِجٌ (بكسر الراء)، اسم المفعول: مُدَحْرَجٌ (بفتح الراء)\nأَعْلَنَ: اسم الفاعل: مُعْلِنٌ (بكسر اللام)، اسم المفعول: مُعْلَنٌ (بفتح اللام)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي القاعدة الصرفية العامة لاشتقاق اسم الفاعل واسم المفعول من الفعل غير الثلاثي؟",
+            "score": 10,
+            "modelAnswer": "نأتي بالمضارع، ثم نبدل حرف المضارعة ميماً مضمومة:\n- نكسر الحرف قبل الأخير في (اسم الفاعل).\n- نفتح الحرف قبل الأخير في (اسم المفعول)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch1_q15",
+        "title": "اختبار المتميزين الشامل في مشتقات الفصل الأول",
+        "text": "أجب عن المسألة النحوية والصرفية المتكاملة الآتية:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تقويم وتحليل",
+        "chapter": 1,
+        "topic": "اختبار التميز الشامل لمشتقات الفصل الأول",
+        "sourceType": "امتحانات المتميزين العامة",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال الشاعر: «أَلَمْ تَكُ في الدَّهْرِ مِطْعَامَ الضُّيُوفِ وَفَاتِحاً ... مَغَالِيقَ أَبْوَابِ المَكَارِمِ كُلَّهَا».\nاستخرج المشتقات العاملة الواردة في البيت، وحدد نوع كل مشتق ووزنه وإعراب معموله.",
+            "score": 10,
+            "modelAnswer": "1) (مِطْعَامَ): صيغة مبالغة على وزن (مِفْعَال)، معمولها (الضُّيُوفِ) مضاف إليه مجرور لفظاً مفعول به معنى.\n2) (فَاتِحاً): اسم فاعل على وزن (فَاعِل)، معموله (مَغَالِيقَ) مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق بين إعراب كلمة (كُلَّهَا) وتوكيدها في البيت الشعري؟",
+            "score": 10,
+            "modelAnswer": "(كُلَّهَا): توكيد معنوي منصوب وعلامة نصبه الفتحة الظاهرة وهو مضاف، والهاء ضمير متصل مبني في محل جر بالإضافة، يتبع المؤكد (مغاليق أبواب المكارم)."
+          }
+        ]
+      },
+      {
+        "id": "ar_essay_homeland",
+        "title": "السؤال الخامس: التعبير والإنشاء (حب الوطن والتضحية في سبيله)",
+        "text": "التعبير والإنشاء (20 درجة) - اكتب في أحد الموضوعين الآتيين مراعياً سلامة اللغة وتسلسل الأفكار وعلامات الترقيم:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وإبداع",
+        "chapter": 1,
+        "topic": "التعبير والإنشاء: الوطن والتضحية",
+        "questionCategory": "arabic_composition",
+        "sourceType": "الامتحان الوزاري المعتمد - التعبير والإنشاء",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال الشاعر:\n«بِلادِي وَإِن جَارَتْ عَلَيَّ عَزِيزَةٌ ... وَقَومِي وَإِن ضَنُّوا عَلَيَّ كِرَامُ»\n\nاكتب مقالاً أدبياً لا يقل عن صفحتين تبين فيه قدسية تراب الوطن، وواجب الأبناء في الدفاع عنه والمساهمة في بنائه وإعماره، مستشهداً بما تحفظ من القرآن الكريم والحديث النبوي الشريف وروائع الشعر العربي.",
+            "score": 20,
+            "modelAnswer": "معايير سلم التصحيح الوزاري المعتمد (20 درجة):\n1. جودة الاستهلال وبراعة المطلع (المقدمة المشوقة): 3 درجات.\n2. ترابط الأفكار وتسلسلها وعمق المعاني في صلب الموضوع: 7 درجات.\n3. حسن الاستشهاد (الآيات القرآنية، الأحاديث الشريفة، الأبيات الشعرية): 4 درجات.\n4. السلامة الإملائية والنحوية وتوظيف علامات الترقيم (النقطة، الفاصلة، علامات التنصيص): 4 درجات.\n5. الخاتمة البليغة وجمال الخط وتنظيم الصفحة: درجتان."
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "id": "ar_ch2_q1",
+        "title": "الصفة المشبهة باسم الفاعل وأوزانها وإعراب معمولها",
+        "text": "في دراسة مشتق (الصفة المشبهة باسم الفاعل):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وإعراب",
+        "chapter": 2,
+        "topic": "الصفة المشبهة وإعراب معمولها",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشتق صفة مشبهة من الأفعال الآتية مضبوطة بالشكل مع ذكر وزنها:\n(كَرُمَ - فَرِحَ - شَبِعَ - عَذُبَ).",
+            "score": 10,
+            "modelAnswer": "كَرُمَ: كَرِيمٌ (على وزن فَعِيل)\nفَرِحَ: فَرِحٌ (على وزن فَعِل)\nشَبِعَ: شَبْعَانُ ومؤنثها شَبْعَى (على وزن فَعْلان ومؤنثه فَعْلَى)\nعَذُبَ: عَذْبٌ (على وزن فَعْل)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "لمعمول الصفة المشبهة ثلاثة أوجه إعرابية، وضحها مع التمثيل بجملة: «العراقيُّ طَيِّبٌ ...» بضبط الكلمة التالية بثلاث حالات.",
+            "score": 10,
+            "modelAnswer": "الحالات الثلاث:\n1) الرفع على الفاعلية (إذا كان مضافاً لضمير): «العراقيُّ طَيِّبٌ <u>خُلُقُهُ</u>» (خلقُه: فاعل للصفة المشبهة مرفوع بالضمة).\n2) النصب على التمييز (إذا كان نكرة منونة): «العراقيُّ طَيِّبٌ <u>خُلُقاً</u>» (خلقاً: تمييز منصوب بالفتحة).\n3) الجر بالإضافة (إذا كان معرفاً بأل): «العراقيُّ طَيِّبُ <u>الخُلُقِ</u>» (الخلقِ: مضاف إليه مجرور بالكسرة)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q2",
+        "title": "اسم التفضيل وأركانه وحالاته الأربع وأحكام مطابقته",
+        "text": "في أسلوب التفضيل ومشتق (اسم التفضيل):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم ومقارنة",
+        "chapter": 2,
+        "topic": "اسم التفضيل وحالاته ومطابقته",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الحالات الأربع لاسم التفضيل في اللغة العربية؟ وما حكم مطابقته للمفضل في كل حالة؟",
+            "score": 10,
+            "modelAnswer": "الحالات والأحكام:\n1) مجرد من (أل) والإضافة: يلزم الإفراد والتذكير ويؤتى بعده بـ (من) (مثل: الصدقُ أنفعُ من الكذبِ).\n2) محلّى بـ (أل): يطابق المفضل في الإفراد والتثنية والجمع والتذكير والتأنيث ولا يؤتى بعده بـ (من) (مثل: اليدُ العليا خيرٌ من اليدِ السفلى).\n3) مضاف إلى نكرة: يلزم الإفراد والتذكير، ويطابق المضاف إليه المفضل (مثل: هذانِ أفضلُ رجلينِ).\n4) مضاف إلى معرفة: يجوز فيه الوجهان: ملازمة الإفراد والتذكير أو مطابقة المفضل (مثل: هؤلاء أفضلُ القومِ / أفاضلُ القومِ)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "عيّن أركان جملة التفضيل في الآية الكريمة: ﴿لَخَلْقُ السَّمَاوَاتِ وَالْأَرْضِ أَكْبَرُ مِنْ خَلْقِ النَّاسِ﴾.",
+            "score": 10,
+            "modelAnswer": "المفضل: (خَلْقُ السَّمَاوَاتِ وَالْأَرْضِ).\nاسم التفضيل: (أَكْبَرُ) على وزن (أَفْعَل).\nالمفضل عليه: (خَلْقِ النَّاسِ)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q3",
+        "title": "اسم الآلة القياسي والجامد وأوزانه",
+        "text": "في دراسة مشتق (اسم الآلة):",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتصنيف",
+        "chapter": 2,
+        "topic": "اسم الآلة القياسي والجامد",
+        "sourceType": "وزاري 2022 دور تمهيدي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الأوزان القياسية الأربعة لاسم الآلة المشتق؟ مثل لكل وزن بكلمة مضبوطة بالشكل.",
+            "score": 10,
+            "modelAnswer": "1) مِفْعَال: مِفْتَاح ، مِنْشَار ، مِقْيَاس\n2) مِفْعَل: مِبْرَد ، مِصْعَد ، مِدْفَع\n3) مِفْعَلَة: مِكْنَسَة ، مِلْعَقَة ، مِبْرَاة\n4) فَعَّالَة (الوزن الحديث المعتمد من المجمع): غَسَّالَة ، ثَلَّاجَة ، سَيَّارَة"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق بين اسم الآلة المشتق واسم الآلة الجامد؟ اذكر أربعة أسماء آلة جامدة مشهورة.",
+            "score": 10,
+            "modelAnswer": "المشتق: له فعل مشتق منه ويصاغ على أوزان قياسية معلومة (مثل: مِبْرَد من بَرَدَ).\nالجامد: غير مشتق من فعل وليس له أوزان قياسية ضابطة بل سُمع عن العرب هكذا.\nأمثلة الجامد: سَيْف ، قَلَم ، فَرْجَار ، رُمْح ، سِكِّين ، قَوْس."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q4",
+        "title": "اسما الزمان والمكان وصياغتهما من الثلاثي وغير الثلاثي",
+        "text": "في المشتقات الدالة على الزمان والمكان:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "صرف وتطبيق",
+        "chapter": 2,
+        "topic": "اسما الزمان والمكان",
+        "sourceType": "وزاري 2021 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "صغ اسم مكان أو زمان من الأفعال الآتية مبيناً الوزن وسبب الصياغة:\n(لَعِبَ - غَرَبَ - وَعَدَ - اسْتَوْدَعَ).",
+            "score": 10,
+            "modelAnswer": "لَعِبَ: مَلْعَبٌ (على وزن مَفْعَل: عين مضارعه مفتوحة يَلْعَبُ)\nغَرَبَ: مَغْرِبٌ (على وزن مَفْعِل: شاذ أو مكسور العين)\nوَعَدَ: مَوْعِدٌ (على وزن مَفْعِل: مثال واوي مكسور العين في المضارع يَعِدُ)\nاسْتَوْدَعَ: مُسْتَوْدَعٌ (غير ثلاثي على وزن اسم المفعول بإبدال حرف المضارعة ميماً مضمومة وفتح ما قبل الآخر)"
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "كيف نميز بين اسم الزمان واسم المكان واسم المفعول من غير الثلاثي إذا اتفقت في الصياغة (مثل: مُلْتَقَى)؟ وضح بالقرائن السياقية في جملتين مفيدتين.",
+            "score": 10,
+            "modelAnswer": "نميز بينها من خلال سياق المعنى والقرينة اللفظية في الجملة:\n1) اسم مكان: «النادي <u>مُلْتَقَى</u> الأصدقاءِ» (دلت على مكان اللقاء).\n2) اسم زمان: «يومُ الجمعةِ <u>مُلْتَقَى</u> العائلةِ» (دلت على زمان اللقاء).\n3) اسم مفعول: «الضيفُ <u>مُلْتَقَى</u> به بحفاوةٍ» (دلت على من وقع عليه فعل اللقاء)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q5",
+        "title": "شروط الفعل الذي يشتق منه اسم التفضيل مباشرة بطريقة قياسية",
+        "text": "في ضوابط صياغة اسم التفضيل:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وشروط",
+        "chapter": 2,
+        "topic": "شروط صياغة اسم التفضيل",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الشروط السبعة التي يجب أن تتوفر في الفعل ليصاغ منه اسم التفضيل مباشرة على وزن (أَفْعَل)؟ اذكر خمسة منها.",
+            "score": 10,
+            "modelAnswer": "1) أن يكون فعلاً ثلاثياً.\n2) تاماً (غير ناقص ككان وأخواتها).\n3) مثبتاً (غير منفي).\n4) متصرفاً (غير جامد كعسى وليس وبئس ونعم).\n5) مبنياً للمعلوم (غير مبني للمجهول).\n6) قابلاً للتفاوت والمفاضلة (لا يصاغ من مات وفني وهلك وغرق).\n7) ليس الوصف منه على (أفعل فعلاء) الدال على لون أو عيب أو حلية."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "كيف نأتي باسم التفضيل من الأفعال الآتية التي فقدت الشروط:\n1) (ازْدَحَمَ - غير ثلاثي).\n2) (خَضِرَ - الوصف منه على أفعل فعلاء الدال على لون)؟",
+            "score": 10,
+            "modelAnswer": "نأتي باسم تفضيل مساعد مستوفٍ للشروط مثل: (أَشَدّ، أَكْثَر، أَعْظَم) ثم نتبعه بالمصدر الصريح للفعل منصوباً على التمييز:\n1) ازْدَحَمَ: «شارعُ الرشيدِ <u>أَكْثَرُ ازْدِحَاماً</u> من غيرِهِ».\n2) خَضِرَ: «الحديقةُ <u>أَشَدُّ خُضْرَةً</u> من الحقلِ»."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q6",
+        "title": "قواعد الإملاء وعلامات الترقيم (الفاصلة والنقطتان وعلامة التنصيص)",
+        "text": "في مهارات الإملاء والترقيم المنهجية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتذكر",
+        "chapter": 2,
+        "topic": "علامات الترقيم",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اذكر موضعين لاستعمال كل من علامات الترقيم الآتية في الكتابة العربية:\n1) الفاصلة (،)\n2) النقطتان الرأسيتان (:)",
+            "score": 10,
+            "modelAnswer": "1) الفاصلة: أ) بين الجمل القصيرة المتصلة في المعنى، ب) بعد المنادى (مثل: يا عليُّ، اكتبْ)، ج) بين أقسام الشيء وأنواعه.\n2) النقطتان الرأسيتان: أ) بعد القول وشبهه (مثل: قالَ الحكيمُ:)، ب) بين الشيء وأقسامه وأنواعه (مثل: الكلمة ثلاثة أقسام: اسم وفعل وحرف)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "أين توضع (علامة التنصيص « ») و (القوسان الهلاليان) في النصوص المكتوبة؟",
+            "score": 10,
+            "modelAnswer": "علامة التنصيص « »: يوضع بينهما الكلام المقتبس بنصه وحروفه دون تغيير كالأحاديث النبوية وأقوال الحكماء.\nالقوسان ( ): توضع بينهما أرقام الآيات، أسماء السور، تواريخ السنوات، والعبارات التفسيرية والاحتراسية والدعائية كـ (عليه السلام) و (رضي الله عنه)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q7",
+        "title": "همزة الوصل وهمزة القطع والتفريق بينهما",
+        "text": "في قواعد رسم الهمزة في أوائل الكلمات:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "مقارنة وتطبيق",
+        "chapter": 2,
+        "topic": "همزتا الوصل والقطع",
+        "sourceType": "وزاري 2020 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما الفرق بين همزة الوصل وهمزة القطع من حيث النطق والكتابة؟",
+            "score": 10,
+            "modelAnswer": "همزة الوصل: همزة ينطق بها في ابتداء الكلام وتسقط نطقاً في درج الكلام ووصله، وتكتب ألفاً مجردة من الهمزة (ا).\nهمزة القطع: همزة ينطق بها دائماً في أول الكلام وفي درجه ووسطه، وتكتب برسم رأس عين فوق الألف مفتوحة ومضمومة (أَ ، أُ) وتحتها مكسورة (إِ)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بين نوع الهمزة وسبب كتابتها في الكلمات الآتية: (ابْن - إِكْرَام - اعْلَمْ - أَخَذَ).",
+            "score": 10,
+            "modelAnswer": "ابْن: همزة وصل (لأنه من الأسماء التسعة المسموعة عن العرب).\nإِكْرَام: همزة قطع (لأنه مصدر لفعل رباعي أَكْرَمَ).\nاعْلَمْ: همزة وصل (لأنه أمر لفعل ثلاثي عَلِمَ).\nأَخَذَ: همزة قطع (لأنه ماضٍ لفعل ثلاثي مبدوء بهمزة)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q8",
+        "title": "أدب ونصوص: الشاعر محمد مهدي الجواهري وحياته وقصيدته",
+        "text": "في الأدب العربي الحديث وتراجم الشعراء:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وحفظ",
+        "chapter": 2,
+        "topic": "الشاعر الجواهري وقصيدته",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "من هو الشاعر الملقب بـ (شاعر العرب الأكبر) و (متنبي العصر الحديث)؟ أين ولد ومتى توفي؟ وما اسم قصيدته المقررة في المنهج؟",
+            "score": 10,
+            "modelAnswer": "الشاعر: محمد مهدي الجواهري.\nولد في مدينة النجف الأشرف عام 1899 م، وتوفي في دمشق عام 1997 م.\nاسم قصيدته: (يا دجلة الخير)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اكتب أربعة أبيات مضبوطة بالشكل من قصيدة الجواهري (يا دجلة الخير).",
+            "score": 10,
+            "modelAnswer": "حَيَّيْتُ سَفْحَكِ عَنْ بُعْدٍ فَحَيِّينِي ... يَا دِجْلَةَ الخَيْرِ يَا أُمَّ البَسَاتِينِ\nحَيَّيْتُ سَفْحَكِ ظَمْآناً أَلُوذُ بِهِ ... لَوْذَ الرُّؤَامِ بِكَلْبِ الصَّيْدِ يَرْمِينِي\nيَا دِجْلَةَ الخَيْرِ يَا أَمْوَاجُ صَافِيَةً ... تَلُوحُ بَيْنَ الرُّوَى طَوْراً وَتَطْوِينِي\nيَا أُمَّ بَغْدَادَ مِنْ عَهْدٍ لِعَاصِمَةٍ ... تَمْضِي سَرَاعاً وَتَبْقَى فِيكِ تَحْمِينِي"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q9",
+        "title": "أدب ونصوص: معروف الرصافي وقصيدته (الأرملة المرضعة)",
+        "text": "في الشعر الاجتماعي وشعراء العراق:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وحفظ",
+        "chapter": 2,
+        "topic": "الرصافي والأرملة المرضعة",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هو اللقب الأدبي للشاعر معروف الرصافي؟ وبماذا تميز شعره وأسلوبه؟ وما موضوع قصيدته (الأرملة المرضعة)؟",
+            "score": 10,
+            "modelAnswer": "اللقب: شاعر العراق وشاعر الشعب والاجتماع.\nتميز شعره: بالرصانة والمتانة وسهولة الألفاظ واستخدام الشعر وسيلة للإصلاح الاجتماعي والدفاع عن الفقراء والمظلومين والتعليم.\nموضوع القصيدة: تصوير مأساة إنسانية حية لامرأة فقيرة مات زوجها وتركت مع طفلها الرضيع تصارع الفقر والجوع والبرد."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اكتب ثلاثة أبيات من قصيدة (الأرملة المرضعة) تبين فيها حالة المرأة وثيابها الرثة.",
+            "score": 10,
+            "modelAnswer": "لَقِيتُهَا لَيْتَنِي مَا كُنْتُ أَلْقَاهَا ... تَمْشِي وَقَدْ أَثْقَلَ الإِمْلاقُ مَمْشَاهَا\nأَثْوَابُهَا رَثَّةٌ وَالرِّجْلُ حَافِيَةٌ ... وَالدَّمْعُ تَذْرِفُهُ فِي الخَدِّ عَيْنَاهَا\nبَكَتْ مِنَ الفَقْرِ فَاحْمَرَّتْ مَدَامِعُهَا ... وَاصْفَرَّ كَالوَرْسِ مِنْ جُوعٍ مُحَيَّاهَا"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q10",
+        "title": "الصفة المشبهة الدالة على خلو أو امتلاء وعيب ولون",
+        "text": "في أوزان الصفة المشبهة ذات المؤنث الخاص:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتصنيف",
+        "chapter": 2,
+        "topic": "أوزان الصفة المشبهة",
+        "sourceType": "وزاري 2021 دور ثان",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "إذا كان الفعل الثلاثي من الباب الرابع (فَعِلَ يَفْعَلُ) لازماً، فما هي الأوزان الثلاثة التي تأتي عليها الصفة المشبهة منه؟ مثل لكل وزن مع مؤنثه.",
+            "score": 10,
+            "modelAnswer": "1) (أَفْعَل ومؤنثه فَعْلاء): فيما دل على لون أو عيب أو حلية (مثل: أَسْوَد سَوْدَاء ، أَعْرَج عَرْجَاء ، أَكْحَل كَحْلاء).\n2) (فَعْلان ومؤنثه فَعْلَى): فيما دل على خلو أو امتلاء (مثل: عَطْشَان عَطْشَى ، غَضْبَان غَضْبَى ، جَوْعَان جَوْعَى).\n3) (فَعِل ومؤنثه فَعِلَة): فيما دل على فرح أو حزن أو بطر (مثل: فَرِح فَرِحَة ، جَذِل جَذِلَة)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق بين اسم الفاعل والصفة المشبهة من حيث دلالة كل منهما على الثبوت والتجدد؟",
+            "score": 10,
+            "modelAnswer": "الصفة المشبهة: تدل على صفة ثابتة ثبوتاً دائماً أو شبه دائم في الموصوف لا تتغير بسرعة (مثل: كريم، شجاع، حسن).\nاسم الفاعل: يدل على صفة طارئة متجددة وغير ثابتة تحدث وتزول (مثل: كاتب، ضارب، قائم)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q11",
+        "title": "أدب ونصوص: نازك الملائكة والشعر الحر (قصيدة الشهيد)",
+        "text": "في حركة التجديد في الشعر العراقي:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وفهم",
+        "chapter": 2,
+        "topic": "نازك الملائكة والشعر الحر",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "من هي رائدة حركة الشعر الحر في العراق والعالم العربي؟ ما هي أول قصيدة كتبتها على نمط الشعر الحر عام 1947؟ وما اسم قصيدتها في المنهج؟",
+            "score": 10,
+            "modelAnswer": "الشاعرة: نازك الملائكة.\nأول قصيدة شعر حر: قصيدة (الكوليرا) عام 1947 م.\nاسم قصيدتها المقررة في المنهج: (الشهيد)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما المقصود بـ (الشعر الحر أو شعر التفعيلة)؟ وبماذا اختلف عن الشعر العمودي التقليدي؟",
+            "score": 10,
+            "modelAnswer": "الشعر الحر: نمط شعري حديث يلتزم بالتفعيلة الواحدة كنظام وزني موسيقي ولا يتقيد بعدد محدد من التفعيلات في كل شطر، وتتنوع فيه القوافي دون الالتزام بقافية واحدة موحدة كما في الشعر العمودي ذي الشطرين (الصدر والعجز)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q12",
+        "title": "أدب ونصوص: بدر شاكر السياب (قصيدة لأني غريب)",
+        "text": "في رواد الشعر الحديث وأدب الغربة والوطن:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وحفظ",
+        "chapter": 2,
+        "topic": "السياب وقصيدة لأني غريب",
+        "sourceType": "وزاري 2022 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "أين ولد الشاعر بدر شاكر السياب؟ وما هي أهم دواوينه الشعرية؟ وعن ماذا تعبر قصيدته (لأني غريب)؟",
+            "score": 10,
+            "modelAnswer": "ولد في قرية جيكور في محافظة البصرة عام 1926 م.\nدواوينه: (أنشودة المطر)، (أزهار ذابلة)، (منزل الأقنان)، (شناشيل ابنة الجلبي).\nموضوع القصيدة: تعبر عن شوقه العارم وحنينه الجارف لوطنه العراق وبلدته وأهله وهو يعاني من ألم الغربة والمرض في مستشفى الكويت."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اكتب أربعة أسطر شعرية من قصيدة (لأني غريب) للسياب.",
+            "score": 10,
+            "modelAnswer": "لأَنِّي غَرِيبْ ...\nلأَنَّ العِرَاقَ الحَبِيبْ ...\nبَعِيدٌ ، وَأَنِّي هُنَا فِي اشْتِيَاقْ ...\nإِلَيْهِ ، إِلَيْهَا ، أُنَادِي: عِرَاقْ ...\nفَيَرْجِعُ لِي مِنْ نِدَائِي نَحِيبْ"
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q13",
+        "title": "اسم التفضيل المضاف إلى معرفة والوجهان الجائزان",
+        "text": "في الأوجه الجائزة لصياغة اسم التفضيل:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وإعراب",
+        "chapter": 2,
+        "topic": "التفضيل المضاف لمعرفة",
+        "sourceType": "وزاري 2020 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "جملة: «فاطمةُ (...) الطالباتِ». ضع اسم التفضيل من (فَضُلَ) في الفراغ بالوجهين الجائزين واذكر السبب.",
+            "score": 10,
+            "modelAnswer": "الوجه الأول: «فاطمةُ <u>أَفْضَلُ</u> الطالباتِ» (ملازمة الإفراد والتذكير).\nالوجه الثاني: «فاطمةُ <u>فُضْلَى</u> الطالباتِ» (مطابقة المفضل في التأنيث والإفراد).\nالسبب: لأن اسم التفضيل مضاف إلى معرفة (الطالباتِ)، فيجوز فيه لغةً ملازمة الإفراد والتذكير أو مطابقة المفضل."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اجعل جملة: «العالمانِ أَعْلَمُ الرِّجَالِ» مطابقة للمفضل بالوجه الثاني.",
+            "score": 10,
+            "modelAnswer": "«العالمانِ <u>أَعْلَمَا</u> الرِّجَالِ» (بحذف النون للإضافة ومطابقة المثنى المذكر)."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q14",
+        "title": "النثر وفنونه والخطابة والمقالة في الأدب",
+        "text": "في الأشكال النثرية الأدبية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتصنيف",
+        "chapter": 2,
+        "topic": "فنون النثر الأدبي",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "يقسم النثر بصورة عامة إلى نوعين رئيسيين: (نثر فني ونثر غير فني). اذكر أقسام النثر الفني مع التمثيل لفنين منه.",
+            "score": 10,
+            "modelAnswer": "النثر الفني يقسم إلى:\n1) نثر إبداعي: يعتمد على الخيال والعاطفة والصور البلاغية المؤثرة (مثل: القصة، الرواية، المسرحية، المقالة الأدبية، الشعر المنثور).\n2) نثر وصفي: يعتمد على دراسة وتحليل النصوص الإبداعية وتفسيرها (مثل: النقد الأدبي، وتاريخ الأدب، والدراسات البلاغية)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي (المقالة الأدبية)؟ وما هي عناصرها البنائية الثلاثة؟",
+            "score": 10,
+            "modelAnswer": "المقالة الأدبية: قطعة نثرية محدودة الطول تعالج فكرة معينة أو قضية اجتماعية أو أدبية بأسلوب مشوق وجذاب.\nعناصرها البنائية:\n1) المقدمة: مدخل موجز يمهد للموضوع ويجذب القارئ.\n2) العرض (المتن): صلب المقالة الذي تشرح فيه الأفكار والأدلة بالتفصيل.\n3) الخاتمة: خلاصة موجزة تلخص الفكرة المركزية والهدف."
+          }
+        ]
+      },
+      {
+        "id": "ar_ch2_q15",
+        "title": "اختبار التميز الشامل لمشتقات وأدب الفصل الثاني",
+        "text": "أجب عن المسألة اللغوية والأدبية الشاملة:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تقويم وتحليل نقدي",
+        "chapter": 2,
+        "topic": "اختبار التميز الشامل للفصل الثاني",
+        "sourceType": "امتحانات المتميزين العامة",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "صمم فقرة أدبية موجزة في ثلاثة أسطر تتحدث فيها عن كرم العراقيين وشجاعتهم، بحيث تضمنها:\n1) صفة مشبهة على وزن (فَعِيل) معمولها مرفوع.\n2) اسم تفضيل مضاف لنكرة.\n3) اسم آلة قياسي.",
+            "score": 10,
+            "modelAnswer": "«العراقيُّ <u>شَهْمٌ</u> طَبْعُهُ، <u>كَرِيمٌ</u> أَصْلُهُ، وهو <u>أَشْجَعُ</u> رَجُلٍ في ميادين الدفاعِ عن حِمَى الوطن، يَحْمِلُ <u>مِفْتَاحَ</u> المَجْدِ وَيَصْنَعُ النَّصْرَ بِعَزِيمَةٍ لا تَلِينُ».\n(كريم: صفة مشبهة معمولها أصلُه مرفوع، أشجع رجل: تفضيل مضاف لنكرة، مفتاح: اسم آلة قياسي على وزن مفعال)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "علل: تمنع كلمة (أفضل) من الصرف (أي تجر بالفتحة بدل الكسرة) في قولنا: «مررتُ برجلٍ أَفْضَلَ منك».",
+            "score": 10,
+            "modelAnswer": "لأنها صفة على وزن (أَفْعَل) وهي ممنوعة من الصرف لعلتين (الوصفية ووزن الفعل)، فتجر بالفتحة نيابة عن الكسرة ما دامت مجردة من (أل) وغير مضافة."
+          }
+        ]
+      },
+      {
+        "id": "ar_essay_science_work",
+        "title": "السؤال الخامس: التعبير والإنشاء (العلم والعمل وأثرهما في بناء الحضارة)",
+        "text": "التعبير والإنشاء (20 درجة) - اكتب في أحد الموضوعين الآتيين بأسلوب أدبي رفيع:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وإبداع",
+        "chapter": 2,
+        "topic": "التعبير والإنشاء: العلم والعمل",
+        "questionCategory": "arabic_composition",
+        "sourceType": "الامتحان الوزاري المعتمد - التعبير والإنشاء",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قيل: «العلمُ بلا عملٍ كشجرٍ بلا ثمر، والعملُ بلا علمٍ كمسافرٍ في الظلام بلا دليل».\n\nانطلق من هذه المقولة لكتابة نص إنشائي متكامل توضح فيه كيف تتضافر المعرفة مع الجهد والإخلاص لنهضة الشعوب وتشييد الحضارات، معززاً أفكارك بالشواهد الأدبية والدينية المناسبة.",
+            "score": 20,
+            "modelAnswer": "سلّم الدرجات الوزاري (20 درجة):\n- المقدمة: بيان شرف العلم والعمل ومنزلتهما في الدين والحياة (3 درجات).\n- العرض: دور العلم في كشف الحقائق، واقترانه بالعمل الدؤوب لتحقيق التنمية ورفاهية الإنسان (8 درجات).\n- الشواهد: قوله تعالى ﴿وَقُلِ اعْمَلُوا فَسَيَرَى اللَّهُ عَمَلَكُمْ وَرَسُولُهُ وَالْمُؤْمِنُونَ﴾، وقول الشاعر: (العلم يبني بيوتاً لا عماد لها ... والجهل يهدم بيت العز والشرف) (4 درجات).\n- اللغة والإملاء والترقيم: (3 درجات).\n- الخاتمة والتنسيق: (درجتان)."
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "id": "ar_essay_morals_tolerance",
+        "title": "السؤال الخامس: التعبير والإنشاء (الأخلاق الفاضلة والتسامح الإنساني)",
+        "text": "التعبير والإنشاء (20 درجة) - صغ موضوعاً إنشائياً متماسكاً مستنداً إلى الرؤية الأخلاقية الإنسانية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وإبداع",
+        "chapter": 3,
+        "topic": "التعبير والإنشاء: مكارم الأخلاق والتسامح",
+        "questionCategory": "arabic_composition",
+        "sourceType": "الامتحان الوزاري المعتمد - التعبير والإنشاء",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال أحمد شوقي:\n«وَإِنَّمَا الأُمَمُ الأَخْلاقُ مَا بَقِيَتْ ... فَإِنْ هُمُ ذَهَبَتْ أَخْلاقُهُم ذَهَبُوا»\n\nتحدث في مقال إنشائي عميق عن أهمية مكارم الأخلاق والصدق والأمانة والتسامح في ترسيخ السلام المجتمعي وبناء الشخصية السوية، مبيناً أثر انتشار الفضائل في تماسك المجتمع وقوته.",
+            "score": 20,
+            "modelAnswer": "عناصر التقويم الوزاري:\n- الاستهلال: التمهيد لمفهوم الأخلاق كأساس لقيام الدول وسقوطها (3 درجات).\n- التحليل والمضمون: إبراز فضائل الصدق، الأمانة، التسامح، كظم الغيظ، ونبذ الكراهية (7 درجات).\n- الاستشهاد: حديث النبي ﷺ «إِنَّمَا بُعِثْتُ لِأُتَمِّمَ مَكَارِمَ الْأَخْلَاقِ»، وشعر شوقي وحافظ إبراهيم (4 درجات).\n- الصياغة البلاغية والسلامة النحوية: (4 درجات).\n- الخاتمة: (درجتان)."
+          }
+        ]
+      }
+    ],
+    "4": [
+      {
+        "id": "ar_essay_parents_gratitude",
+        "title": "السؤال الخامس: التعبير والإنشاء (بر الوالدين وعظيم حقهما)",
+        "text": "التعبير والإنشاء (20 درجة) - اكتب في بر الوالدين والاعتراف بفضلهما:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير ووفاء",
+        "chapter": 4,
+        "topic": "التعبير والإنشاء: بر الوالدين",
+        "questionCategory": "arabic_composition",
+        "sourceType": "الامتحان الوزاري المعتمد - التعبير والإنشاء",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال تعالى: ﴿وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا إِمَّا يَبْلُغَنَّ عِندَكَ الْكِبَرَ أَحَدُهُمَا أَوْ كِلَاهُمَا فَلَا تَقُل لَّهُمَا أُفٍّ وَلَا تَنْهَرْهُمَا وَقُل لَّهُمَا قَوْلًا كَرِيمًا﴾.\n\nانثر هذه المعاني القرآنية الجليلة في مقال يفيض بالمشاعر الصادقة، مستعرضاً تضحيات الأبوين وسهرهما، وواجب الأبناء في طاعتهما ورعايتهما في الكبر، مستشهداً بالأدب النبوي والشعري.",
+            "score": 20,
+            "modelAnswer": "معايير التصحيح الوزاري:\n- ديباجة الموضوع: الارتقاء بمكانة الوالدين واقتران حقهما بعبادة الخالق جل وعلا (4 درجات).\n- تفاصيل العرض: ذكر مشاعر الأمومة والتضحيات، ودور الأب في الكفاح وتأمين العيش الكريم (7 درجات).\n- الشواهد المنهجية: وصايا القرآن الكريم، حديث «الجنة تحت أقدام الأمهات»، وأبيات معروف الرصافي في فضل الأم (4 درجات).\n- الصياغة اللغوية والتصوير الأدبي: (3 درجات).\n- الخاتمة البليغة: (درجتان)."
+          }
+        ]
+      }
+    ],
+    "5": [
+      {
+        "id": "ar_essay_determination_patience",
+        "title": "السؤال الخامس: التعبير والإنشاء (الإرادة الصلبة والصبر في قهر الصعاب)",
+        "text": "التعبير والإنشاء (20 درجة) - اكتب في قوة العزيمة والإصرار:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تعبير وإبداع",
+        "chapter": 5,
+        "topic": "التعبير والإنشاء: الإرادة والصبر",
+        "questionCategory": "arabic_composition",
+        "sourceType": "الامتحان الوزاري المعتمد - التعبير والإنشاء",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال أبو القاسم الشابي:\n«وَمَنْ يَتَهَيَّبْ صُعُودَ الجِبَالِ ... يَعِشْ أَبَدَ الدَّهْرِ بَيْنَ الحُفَرْ»\n\nاكتب موضوعاً إنشائياً تحث فيه على التسلح بالإرادة القوية والصبر الجميل لمواجهة عقبات الحياة وتحدياتها، موضحاً كيف يبلغ الطموحون غاياتهم بالإصرار لا بالاتكال والتمني.",
+            "score": 20,
+            "modelAnswer": "معايير التقييم الوزاري:\n- المقدمة: بيان مفهوم الإرادة الحرة والتحدي الإيجابي (3 درجات).\n- العرض: أمثلة واقعية وتاريخية لشخصيات صنعت المجد بالصبر والكفاح (7 درجات).\n- الاستشهاد: قوله تعالى ﴿إِنَّ مَعَ الْعُسْرِ يُسْرًا﴾، وأبيات الشابي والمتنبي (4 درجات).\n- ترابط الجمل وسلامة الإملاء: (4 درجات).\n- الخاتمة: (درجتان)."
+          }
+        ]
+      }
+    ]
+  },
   "physics": {
     "1": [
       {
@@ -8556,6 +9567,90 @@
             "text": "علل: تكون خطوط المجال الكهربائي عمودية دائماً على سطوح الموصلات المشحونة.",
             "score": 10,
             "modelAnswer": "لأنه لو كان لخطوط المجال مركبة موازية للسطح لتسببت في تحريك الشحنات الحرة على سطح الموصل واستمرار تدفق تيار كهربائي سطحي وهذا ينافي حالة السكون الكهربائي الكهروستاتيكي، لذلك يجب أن تكون متعامدة تماماً على السطح."
+          }
+        ]
+      },
+      {
+        "id": "ph_act_charging_capacitor",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (نشاط شحن المتسعة الكهربائية)",
+        "text": "في الأنشطة والتجارب الوزارية المعتمدة لمادة الفيزياء:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتجربة",
+        "chapter": 1,
+        "topic": "نشاط: كيفية شحن المتسعة الكهربائية",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - الأنشطة والتجارب",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً يوضح (كيفية شحن المتسعة الكهربائية) مع رسم الدائرة الكهربائية الموضحة لذلك بالتفصيل، مبيناً:\n1. أدوات النشاط المستخدمة.\n2. خطوات العمل المنهجية.\n3. الاستنتاج العلمي المتحقق من التجربة.",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nبطارية ذات فولطية مناسبة، جلفانوميتر (G) صفره في وسط التدريجة، متسعة ذات صفيحتين متوازيتين (A, B)، مفتاح مزدوج (K)، مصباحان متماثلان (L1, L2)، مقاومة ثابتة (R)، وأسلاك توصيل.\n\nخطوات العمل:\n1. نربط الدائرة الكهربائية كما في المخطط، بحيث نجعل المفتاح (K) في الموقع (1)، وهذا يعني ربط المتسعة بالبطارية لتبدأ عملية الشحن.\n2. نلاحظ انحراف مؤشر الجلفانوميتر لحظياً إلى أحد جانبي الصفر ثم يعود بسرعة إلى الصفر، وفي الوقت نفسه نلاحظ توهج المصباح (L1) لبرهة قصيرة من الزمن ثم ينطفئ كأن البطارية غير موجودة في الدائرة.\n\nالاستنتاج العلمي:\nإن سبب عودة تيار الشحن إلى الصفر هو أن صفيحتي المتسعة تُشحنان إحداهما بشحنة موجبة والأخرى بسالبة، فيتولد فرق جهد كهربائي بين الصفيحتين (ΔV) يزداد تدريجياً حتى يتساوى مع فرق جهد البطارية (ΔV_battery)، وعندئذ ينعدم فرق الجهد على طرفي المقاومة فينعدم التيار في الدائرة، وتُعد المتسعة عند اكتمال شحنها مفتاحاً مفتوحاً في دوائر التيار المستمر."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "علل علمياً: تعد المتسعة الموضوعة في دائرة تيار مستمر مفتاحاً مفتوحاً بعد اكتمال شحنها؟",
+            "score": 8,
+            "modelAnswer": "لأنه بعد اكتمال شحن المتسعة يتساوى فرق جهد صفيحتيها مع فرق جهد البطارية، مما يجعل فرق الجهد بين طرفي المقاومة يساوي صفراً (ΔV_R = 0)، وبذلك ينعدم تيار الدائرة تماماً، فتعمل المتسعة عمل مفتاح مفتوح."
+          }
+        ]
+      },
+      {
+        "id": "ph_act_discharging_capacitor",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (نشاط تفريغ المتسعة الكهربائية)",
+        "text": "في الأنشطة والتجارب الوزارية المعتمدة لمادة الفيزياء:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتجربة",
+        "chapter": 1,
+        "topic": "نشاط: كيفية تفريغ المتسعة الكهربائية",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - الأنشطة والتجارب",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً عملياً يوضح (كيفية تفريغ المتسعة الكهربائية من شحنتها) موضحاً بالرسم البياني مخطط تيار التفريغ مع الزمن.",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nنفس أدوات نشاط الشحن (متسعة مشحونة، جلفانوميتر، مصباحان، مقاومة، مفتاح مزدوج، أسلاك توصيل).\n\nخطوات العمل:\n1. نحرك المفتاح المزدوج (K) إلى الموقع (2)، وهذا يعني وصل صفيحتي المتسعة ببعضهما بسلك موصل عبر المصباح (L2) والمقاومة والجلفانوميتر.\n2. نلاحظ انحراف مؤشر الجلفانوميتر لحظياً نحو الجانب المعاكس لاتجاه انحرافه عند الشحن ثم يعود بسرعة إلى الصفر، ونلاحظ توهج المصباح (L2) لبرهة قصيرة ثم ينطفئ.\n\nالاستنتاج العلمي:\nيتولد تيار لحظي في الدائرة يُسمى (تيار التفريغ) ينحدر بسرعة إلى الصفر بسبب تعادل شحنتي الصفيحتين عبر السلك الموصل، فيصبح فرق الجهد بين الصفيحتين مساوياً للصفر (ΔV = 0). تيار التفريغ يبدأ بقيمة عظمى لحظة غلق المفتاح (I_max = ΔV/R) ثم يهبط بسرعة إلى الصفر مع تلاشي الشحنة."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "احسب تيار التفريغ الأعظم إذا كان فرق جهد المتسعة لحظة التفريغ 12V ومقاومة الدائرة 20Ω.",
+            "score": 8,
+            "modelAnswer": "I_max = ΔV_AB / R\nI_max = 12 / 20 = 0.6 A (أمبير).\nهذا هو المقدار الأعظم لتيار التفريغ لحظة إغلاق الدائرة، ثم يتلاشى إلى الصفر بعد زمن قصير جداً."
+          }
+        ]
+      },
+      {
+        "id": "ph_act_dielectric_faraday",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (تأثير إدخال العازل الكهربائي - تجربة فرداي)",
+        "text": "في دراسة المتسعات وظاهرة العزل الكهربائي:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تحليل واستنتاج",
+        "chapter": 1,
+        "topic": "نشاط: تأثير إدخال العازل على سعة المتسعة وفرق الجهد",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - تجربة فرداي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً يوضح (تأثير إدخال مادة عازلة كهربائياً ثابت عزلها k بين صفيحتي متسعة مشحونة ومفصولة عن البطارية) مبيناً تأثيره في كل من فرق الجهد وسعة المتسعة (تجربة فرداي).",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nمتسعة ذات الصفيحتين المتوازيتين العازل بينهما هواء (غير مشحونة)، بطارية فولطيتها مناسبة، جهاز فولطميتر، لوح من مادة عازلة كهربائياً (ثابت عزلها k)، أسلاك توصيل.\n\nخطوات العمل:\n1. نربط صفيحتي المتسعة بقطبي البطارية لشحنها، ثم نفصل البطارية عنها.\n2. نربط الطرف الموجب للفولطميتر بالصفيحة الموجبة والطرف السالب بالصفيحة السالبة، فنلاحظ انحراف مؤشر الفولطميتر عند قراءة معينة تشير إلى مقدار فرق الجهد بين الصفيحتين (ΔV) في الهواء.\n3. نُدخل اللوح العازل بين صفيحتي المتسعة المشحونة والمفصولة.\n4. نلاحظ هبوطاً فورياً في قراءة مؤشر الفولطميتر (أي نقصان فرق الجهد الكهربائي بين الصفيحتين بنسبة k).\n\nالاستنتاج العلمي:\n1. إدخال المادة العازلة بين صفيحتي متسعة مفصولة يسبب نقصاناً في فرق الجهد الكهربائي بينهما بنسبة ثابت العزل: ΔV_k = ΔV / k.\n2. بما أن سعة المتسعة تعطى بالعلاقة C = Q / ΔV، وبما أن الشحنة Q ثابتة بسبب فصلها عن البطارية، فإن نقصان فرق الجهد يؤدي إلى زيادة سعة المتسعة بنسبة ثابت العزل: C_k = k · C."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "متسعة سعتها 10μF مشحونة ومفصولة فرق جهدها 60V، أُدخل لوح عازل فهبط فرق جهدها إلى 20V. احسب: 1) ثابت عزل المادة k، 2) سعة المتسعة بعد إدخال العازل C_k.",
+            "score": 8,
+            "modelAnswer": "1) k = ΔV / ΔV_k = 60 / 20 = 3 (ثابت العزل خالي من الوحدات).\n2) C_k = k · C = 3 × 10 = 30 μF (مايكروفاراد)."
           }
         ]
       }
@@ -8963,6 +10058,1134 @@
             "text": "علل: تتنافر الساقان المغناطيسيتان المعلقان تعليقاً حراً عند تقريب قطبيهما الشماليين من بعضهما.",
             "score": 10,
             "modelAnswer": "لأن خطوط المجال المغناطيسي الخارجة من القطبين الشماليين تسير في نفس الاتجاه وتتباعد لتفادي التقاطع فتنشأ بينهما قوى تنافر مغناطيسية تدفع الساقين بعيداً عن بعضهما استناداً لقاعدة: الأقطاب المتشابهة تتنافر."
+          }
+        ]
+      },
+      {
+        "id": "ph_act_faraday_induction",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (نشاط ظاهرة الحث الكهرومغناطيسي - تجربة فرداي)",
+        "text": "في مبحث الحث الكهرومغناطيسي وتوليد التيارات المحتثة:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتحليل",
+        "chapter": 2,
+        "topic": "نشاط: ظاهرة الحث الكهرومغناطيسي وتوليد تيار محتث",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - الفصل الثاني",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً يوضح (ظاهرة الحث الكهرومغناطيسي - تجربة فرداي) مستعملاً ملفين سلكيين وساقاً مغناطيسية وجلفانوميتر.",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nملفان سلكيان مجوفان أحدهما يمكن أن يدخل في جوف الآخر، جلفانوميتر صفره في الوسط، ساق مغناطيسية، بطارية، مفتاح كهربائي، وأسلاك توصيل.\n\nخطوات العمل:\n1. نربط طرفي أحد الملفين بالجلفانوميتر (الملف الثانوي):\n   - نقرب الساق المغناطيسية (قطبها الشمالي مثلاً) نحو وجه الملف: نلاحظ انحراف مؤشر الجلفانوميتر إلى أحد جانبي الصفر دلالة على انسياب تيار محتث.\n   - نثبت الساق المغناطيسية ساكنة أمام الملف: نلاحظ عودة المؤشر إلى الصفر (لا ينساب تيار محتث).\n   - نسحب الساق المغناطيسية مبتعدين بها عن وجه الملف: ينحرف المؤشر نحو الاتجاه المعاكس.\n2. نربط الملف الآخر (الابتدائي) ببطارية ومفتاح:\n   - نضع الملف الابتدائي داخل جوف الملف الثانوي.\n   - لحظة غلق المفتاح ينحرف مؤشر الجلفانوميتر لحظياً في اتجاه معين ثم يعود للصفر، ولحظة فتح المفتاح ينحرف في الاتجاه المضاد.\n\nالاستنتاج العلمي:\nتتولد قوة دافعة كهربائية محتثة (ε_ind) وينساب تيار محتث (I_ind) في دائرة كهربائية مقفلة فقط عندما يحصل تغير في الفيض المغناطيسي الذي يخترق تلك الدائرة لوحدة الزمن (ΔΦ_B / Δt ≠ 0)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هو العامل الأساسي والشرط لتوليد تيار محتث في حلقة موصلة مقفلة؟",
+            "score": 8,
+            "modelAnswer": "العامل الأساسي هو حصول تغير في الفيض المغناطيسي (ΔΦ_B) الذي يخترق الحلقة لوحدة الزمن (Δt)، فإذا كان الفيض ثابتاً (ΔΦ_B / Δt = 0) ينعدم التيار المحتث."
+          }
+        ]
+      },
+      {
+        "id": "ph_act_self_induction",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (نشاط ظاهرة الحث الذاتي وتوهج مصباح النيون)",
+        "text": "في ظاهرة الحث الذاتي والطاقة المغناطيسية المختزنة في ملف:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وتحليل",
+        "chapter": 2,
+        "topic": "نشاط: توليد قوة دافعة كهربائية محتثة ذاتية كبيرة على طرفي ملف",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - الحث الذاتي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً يوضح (توليد قوة دافعة كهربائية محتثة ذاتية كبيرة على طرفي ملف) تفسر به توهج مصباح النيون لبرهة قصيرة لحظة فتح المفتاح على الرغم من فصل البطارية.",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nبطارية ذات فولطية 9V، مفتاح، ملف سلكي جوفه قلب من الحديد المطاوع، مصباح نيون يحتاج إلى 80V ليتوهج، أسلاك توصيل.\n\nخطوات العمل:\n1. نربط الملف والبطارية والمفتاح على التوالي، ونربط مصباح النيون على التوازي مع الملف.\n2. نغلق الدائرة بواسطة المفتاح: نلاحظ عدم توهج مصباح النيون مطلقاً.\n3. نفتح المفتاح (نقطع الدائرة): نلاحظ توهج مصباح النيون بضوء ساطع لبرهة قصيرة جداً من الزمن ثم ينطفئ.\n\nالاستنتاج العلمي:\n1. لحظة غلق الدائرة لم يتوهج المصباح لأن الفولطية الموضوعة (9V) غير كافية لتوهجه (يحتاج 80V)، ولأن نمو التيار يكون بطيئاً بسبب تولد قوة دافعة كهربائية محتثة ذاتية معاكسة تعرقل نمو التيار (قانون لنز).\n2. لحظة فتح الدائرة، يتلاشى التيار بسرعة هائلة لوحدة الزمن (ΔI/Δt كبيرة جداً) فيتولد على طرفي الملف قوة دافعة كهربائية محتثة ذاتية (ε_ind) ذات قطبية طردية ومقدار كبير جداً يكفي لتوهج المصباح (تفوق 80V) وتتفرغ الطاقة المغناطيسية عبر المصباح."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "علل وزارياً: يكون زمن تلاشي التيار من مقداره الثابت إلى الصفر صغيراً جداً مقارنة بزمن نموه من الصفر إلى مقداره الثابت؟",
+            "score": 8,
+            "modelAnswer": "بسبب ظهور فجوة هوائية ومقاومة كبيرة جداً للدائرة لحظة فتح المفتاح، فيتلاشى التيار بسرعة خاطفة، بينما عند غلق المفتاح تتولد قوة دافعة كهربائية محتثة مضادة تبطئ وتعرقل نمو التيار."
+          }
+        ]
+      }
+    ],
+    "5": [
+      {
+        "id": "ph_act_photoelectric_effect",
+        "title": "السؤال الثاني: الأنشطة والتجارب العملية (نشاط الظاهرة الكهروضوئية وتيار الإشباع)",
+        "text": "في فيزياء الكم والظاهرة الكهروضوئية:",
+        "score": 20,
+        "difficulty": "متقدم",
+        "bloom": "تحليل واستنتاج",
+        "chapter": 5,
+        "topic": "نشاط: دراسة الظاهرة الكهروضوئية وتيار الإشباع وجهد الإيقاف",
+        "questionCategory": "physics_activity",
+        "sourceType": "الامتحان الوزاري المعتمد - الفيزياء الحديثة",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اشرح نشاطاً عملياً لدراسة (الظاهرة الكهروضوئية) مبيناً كيفية قياس كل من تيار الإشباع وجهد الإيقاف (جهد القطع V_s).",
+            "score": 12,
+            "modelAnswer": "أدوات النشاط:\nخلية كهروضوئية (أنبوبة مفرغة من الهواء ذات نافذة شفافة من الكوارتز وبداخلها لوحان باعث ومجمع)، فولطميتر، ملي أميتر، مصدر فولطية مستمرة يمكن تغيير جهده، مصدر ضوئي ذو تردد مؤثر (f > f_0).\n\nخطوات العمل والاستنتاج:\n1. نربط الخلية بالدائرة حيث يوصل اللوح الباعث بالقطب السالب والمجمع بالموجب.\n2. عند إضاءة الباعث بضوء ذي تردد مؤثر (أكبر من تردد العتبة)، نلاحظ انحراف الملي أميتر دلالة على انسياب تيار كهروضوئي ناتج عن انبعاث الإلكترونات الضوئية ووصولها إلى اللوح المجمع.\n3. عند زيادة الجهد الموجب للمجمع تدريجياً، يزداد التيار حتى يصل إلى قيمة عظمى ثابتة تُسمى (تيار الإشباع).\n4. عند زيادة شدة الضوء الساقط للضعف، يتضاعف تيار الإشباع.\n5. عندما نعكس قطبية المصدر (نجعل المجمع سالباً بالنسبة للباعث)، يتناقص التيار؛ وعند قيمة معينة للجهد السالب للمجمع يتوقف انسياب التيار تماماً (I = 0)، ويُسمى هذا الجهد بـ (جهد القطع أو الإيقاف V_s)، وهو مقياس للطاقة الحركية العظمى للإلكترونات المنبعثة (KE_max = e · V_s)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "على ماذا يعتمد جهد الإيقاف (V_s) في الظاهرة الكهروضوئية؟ وهل يتأثر بزيادة شدة الضوء الساقط؟",
+            "score": 8,
+            "modelAnswer": "يعتمد جهد الإيقاف على: 1) تردد الضوء الساقط (f)، 2) نوع مادة اللوح الباعث (دالة الشغل W أو تردد العتبة f_0).\nولا يتأثر إطلاقاً بزيادة شدة الضوء الساقط، لأن زيادة الشدة تزيد عدد الإلكترونات الضوئية المنبعثة (تيار الإشباع) ولا تغير طاقتها الحركية العظمى."
+          }
+        ]
+      }
+    ]
+  },
+  "islamic": {
+    "1": [
+      {
+        "id": "isl_ch1_q1",
+        "title": "أحكام المد المتصل والمد المنفصل ومد البدل",
+        "text": "في أحكام تلاوة القرآن الكريم ومبحث المدود:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتطبيق",
+        "chapter": 1,
+        "topic": "أحكام المدود الفرعية",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "عرّف كلاً من: (المد المتصل)، (المد المنفصل)، (مد البدل) مع ذكر مثال واحد ومقدار مد كل نوع منها.",
+            "score": 10,
+            "modelAnswer": "1) المد المتصل: أن يجتمع حرف المد والهمزة في كلمة واحدة، ويمد بمقدار (4 إلى 5 حركات) وجوباً (مثل: السَّمَاءِ، جِيءَ، سُوءَ).\n2) المد المنفصل: أن يأتي حرف المد في آخر الكلمة الأولى وتأتي الهمزة في أول الكلمة الثانية التي تليها مباشرة، ويمد بمقدار (4 إلى 5 حركات) جوازاً (مثل: يَا أَيُّهَا، إِنَّا أَعْطَيْنَاكَ، فِي أَنفُسِكُمْ).\n3) مد البدل: أن تتقدم الهمزة على حرف المد في كلمة واحدة ويكون مبدلاً من همزة ساكنة، ويمد بمقدار (حركتين) جوازاً كمد طبيعي (مثل: آمَنَ، أُوتِيَ، إِيمَاناً)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "عيّن نوع المد في الكلمات القرآنية الآتية مبيناً السبب:\n(شَاءَ - بِمَا أُنزِلَ - أُوتُوا - قُرُوءٍ).",
+            "score": 10,
+            "modelAnswer": "شَاءَ: مد متصل (لاجتماع حرف المد والألف والهمزة في كلمة واحدة).\nبِمَا أُنزِلَ: مد منفصل (لأن الألف في آخر بما والهمزة في أول أنزل).\nأُوتُوا: مد بدل (لتقدم الهمزة المضمومة على حرف المد الواو).\nقُرُوءٍ: مد متصل (لاجتماع الواو المدية والهمزة في كلمة واحدة)."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q2",
+        "title": "القرآن الكريم: سورة الحشر (الآيات المباركة وتفسيرها)",
+        "text": "من سورة الحشر المباركة، أجب عما يأتي:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "حفظ وتفسير",
+        "chapter": 1,
+        "topic": "سورة الحشر وتفسيرها",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب من قوله تعالى: ﴿سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ...﴾ إلى قوله تعالى: ﴿...وَاللَّهُ عَلَى كُلِّ شَيْءٍ قَدِيرٌ﴾ مضبوطاً بالشكل التام.",
+            "score": 10,
+            "modelAnswer": "﴿سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ * هُوَ الَّذِي أَخْرَجَ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ مِن دِيَارِهِمْ لِأَوَّلِ الْحَشْرِ مَا ظَنَنتُمْ أَن يَخْرُجُوا وَظَنُّوا أَنَّهُم مَّانِعَتُهُمْ حُصُونُهُم مِّنَ اللَّهِ فَأَتَاهُمُ اللَّهُ مِنْ حَيْثُ لَمْ يَحْتَسِبُوا وَقَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ يُخْرِبُونَ بُيُوتَهُم بِأَيْدِيهِمْ وَأَيْدِي الْمُؤْمِنِينَ فَاعْتَبِرُوا يَا أُولِي الْأَبْصَارِ * وَلَوْلَا أَن كَتَبَ اللَّهُ عَلَيْهِمُ الْجَلَاءَ لَعَذَّبَهُمْ فِي الدُّنْيَا وَلَهُمْ فِي الْآخِرَةِ عَذَابُ النَّارِ * ذَلِكَ بِأَنَّهُمْ شَاقُّوا اللَّهَ وَرَسُولَهُ وَمَن يُشَاقِّ اللَّهَ فَإِنَّ اللَّهَ شَدِيدُ الْعِقَابِ﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بيّن معاني المفردات القرآنية الآتية:\n(لِأَوَّلِ الْحَشْرِ - شَاقُّوا اللَّهَ - قَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ - فَمَا أَوْجَفْتُمْ).",
+            "score": 10,
+            "modelAnswer": "لِأَوَّلِ الْحَشْرِ: أول إخراج وجمع لهم وإجلائهم من ديارهم في المدينة المنورة (يهود بني النضير).\nشَاقُّوا اللَّهَ: خالفوا أمر الله ورسوله وعادوهما وحاربوا الدين.\nقَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ: ألقى وأوقع في قلوبهم الخوف والفزع الشديد.\nفَمَا أَوْجَفْتُمْ: ما أسرعتم ولا ركضتم ولا خضتم عليه بخيل ولا إبل."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q3",
+        "title": "أحكام اللام الشمسية واللام القمرية في القرآن الكريم",
+        "text": "في أحكام لام التعريف (أل):",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتصنيف",
+        "chapter": 1,
+        "topic": "اللام الشمسية واللام القمرية",
+        "sourceType": "وزاري 2022 دور تمهيدي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الحروف القمرية المجموعة في جملة مشهورة؟ وما حكم لام التعريف إذا دخلت عليها؟",
+            "score": 10,
+            "modelAnswer": "الحروف القمرية: مجموعة في عبارة: (ابْغِ حَجَّكَ وَخَفْ عَقِيمَهُ) وهي 14 حرفاً (أ، ب، غ، ح، ج، ك، و، خ، ف، ع، ق، ي، م، هـ).\nحكم اللام: الإظهار القمري (تلفظ اللام ساكنة واضحة دون إدغام)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "استخرج لام التعريف من النص القرآني وبيّن حكمها (إظهار أم إدغام) مع ذكر السبب:\n﴿وَالشَّمْسِ وَضُحَاهَا * وَالْقَمَرِ إِذَا تَلَاهَا * وَالنَّهَارِ إِذَا جَلَّاهَا﴾.",
+            "score": 10,
+            "modelAnswer": "الشَّمْسِ: إدغام شمسي (لأن حرف الشين شمسي فتتحول اللام إلى شين مشددة).\nالْقَمَرِ: إظهار قمري (لأن حرف القاف قمري من عبارة ابغ حجك وخف عقيمه).\nالنَّهَارِ: إدغام شمسي (لأن حرف النون شمسي)."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q4",
+        "title": "سورة النجم وتفسير الإسراء والمعراج وسدرة المنتهى",
+        "text": "في معجزات النبي الأكرم ﷺ وسورة النجم:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم وتفسير",
+        "chapter": 1,
+        "topic": "سورة النجم ومعانيها",
+        "sourceType": "وزاري 2021 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب من قوله تعالى: ﴿وَالنَّجْمِ إِذَا هَوَى...﴾ إلى قوله تعالى: ﴿...عِندَهَا جَنَّةُ الْمَأْوَى﴾ من سورة النجم المباركة.",
+            "score": 10,
+            "modelAnswer": "﴿وَالنَّجْمِ إِذَا هَوَى * مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوَى * وَمَا يَنطِقُ عَنِ الْهَوَى * إِنْ هُوَ إِلَّا وَحْيٌ يُوحَى * عَلَّمَهُ شَدِيدُ الْقُوَى * ذُو مِرَّةٍ فَاسْتَوَى * وَهُوَ بِالْأُفُقِ الْأَعْلَى * ثُمَّ دَنَا فَتَدَلَّى * فَكَانَ قَابَ قَوْسَيْنِ أَوْ أَدْنَى * فَأَوْحَى إِلَى عَبْدِهِ مَا أَوْحَى * مَا كَذَبَ الْفُؤَادُ مَا رَأَى * أَفَتُمَارُونَهُ عَلَى مَا يَرَى * وَلَقَدْ رَآهُ نَزْلَةً أُخْرَى * عِندَ سِدْرَةِ الْمُنتَهَى * عِندَهَا جَنَّةُ الْمَأْوَى﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما المقصود بـ (سِدْرَةِ الْمُنتَهَى)؟ ولماذا سميت بهذا الاسم وفق التفاسير المعتمدة؟",
+            "score": 10,
+            "modelAnswer": "سدرة المنتهى: شجرة عظيمة كريمة في السماء السابعة عن يمين العرش ينتهي عندها علم الخلائق وما يصعد من الأرض وما ينزل من السماء.\nسبب التسمية: لأنه ينتهي إليها ما يعرج به من الأرض فيقبض منها، وإليها ينتهي ما يهبط من أمر الله فيقبض منها، ولا يتجاوزها أحد من الملائكة المقربين."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q5",
+        "title": "المد الطبيعي (الأصلي) وحروفه وشروطه ومقداره",
+        "text": "في علم التجويد ومخارج الحروف:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتطبيق",
+        "chapter": 1,
+        "topic": "المد الطبيعي",
+        "sourceType": "كتاب التربية الإسلامية المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هو (المد الطبيعي الأصلي)؟ وما هي حروف المد الثلاثة مع ذكر شروطها وحركاتها المجانسة؟",
+            "score": 10,
+            "modelAnswer": "المد الطبيعي: هو المد الذي لا تقوم ذات حرف المد إلا به ولا يتوقف على سبب من همز أو سكون، ويمد بمقدار (حركتين).\nحروفه وشروطها:\n1) الألف الساكنة المفتوح ما قبلها (مثل: قَالَ).\n2) الواو الساكنة المضموم ما قبلها (مثل: يَقُولُ).\n3) الياء الساكنة المكسور ما قبلها (مثل: قِيلَ).\nوتجمع في كلمة: (نُوحِيهَا)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما مقدار الحركة في التجويد؟ وكيف يقدرها علماء القراءات؟",
+            "score": 10,
+            "modelAnswer": "الحركة: هي المقدار الزمني اللازم للنطق بحرف متحرك، ويقدرها العلماء بمقدار قبض الإصبع أو بسطه بحالة متوسطة دون سرعة مفرطة ولا تمطيط، فالمد حركتان يساوي نطق ألفين طبيعيتين."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q6",
+        "title": "أسماء الله الحسنى في أواخر سورة الحشر وعظمتها",
+        "text": "في العقيدة وتوحيد الأسماء والصفات:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتفسير",
+        "chapter": 1,
+        "topic": "أسماء الله الحسنى في سورة الحشر",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب الآيات الكريمة الثلاث الأخيرة من سورة الحشر الحاصرة لأسماء الله الحسنى: ﴿هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ...﴾ إلى نهاية السورة.",
+            "score": 10,
+            "modelAnswer": "﴿هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ هُوَ الرَّحْمَنُ الرَّحِيمُ * هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْمَلِكُ الْقُدُّوسُ السَّلَامُ الْمُؤْمِنُ الْمُهَيْمِنُ الْعَزِيزُ الْجَبَّارُ الْمُتَكَبِّرُ سُبْحَانَ اللَّهِ عَمَّا يُشْرِكُونَ * هُوَ اللَّهُ الْخَالِقُ الْبَارِئُ الْمُصَوِّرُ لَهُ الْأَسْمَاءُ الْحُسْنَى يُسَبِّحُ لَهُ مَا فِي السَّمَاوَاتِ وَالْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "وضح معنى الأسماء الكريمة الآتية:\n(الْقُدُّوسُ - الْمُهَيْمِنُ - الْبَارِئُ).",
+            "score": 10,
+            "modelAnswer": "الْقُدُّوسُ: الطاهر المنزه عن كل عيب ونقص وشبيه، المتصف بكل كمال وجلال.\nالْمُهَيْمِنُ: الرقيب الحافظ الشاهد على أعمال خلقه المطلع على سرائرهم القائم على كل نفس.\nالْبَارِئُ: الموجد والمنشئ للخلق من العدم بتناسق وإتقان دون مثال سابق."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q7",
+        "title": "حكم الراء (الترقيق والتفخيم) في القرآن الكريم",
+        "text": "في أحكام التلاوة وضبط الحروف:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق وحكم",
+        "chapter": 1,
+        "topic": "أحكام الراء",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "متى ترقق الراء في التلاوة؟ اذكر حالتين لترقيق الراء مع التمثيل لكل منهما بآية أو كلمة قرآنية.",
+            "score": 10,
+            "modelAnswer": "ترقق الراء في عدة حالات، منها:\n1) إذا كانت الراء مكسورة كسراً أصلياً (مثل: رِزْقاً، الرِّبَا).\n2) إذا كانت الراء ساكنة وقبلها كسر أصلي وليس بعدها حرف استعلاء في نفس الكلمة (مثل: فِرْعَوْنَ، مِرْيَة).\n3) إذا سكنت الراء للوقف وكان قبلها ياء ساكنة مدية أو لينة (مثل: بَصِير، خَيْر)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بيّن حكم الراء (تفخيم أم ترقيق) في الكلمات الآتية مع ذكر السبب:\n(رَبَّنَا - قِرْطَاس - نَاصِر - خَبِيرٌ [عند الوقف]).",
+            "score": 10,
+            "modelAnswer": "رَبَّنَا: تفخيم (لأن الراء مفتوحة).\nقِرْطَاس: تفخيم (لأن الراء ساكنة قبلها كسر أصلي ولكن جاء بعدها حرف استعلاء مفتوح الطاء في نفس الكلمة).\nنَاصِر: ترقيق (لأن الراء مكسورة).\nخَبِيرٌ (وقفاً): ترقيق (لأنها سكنت للوقف وسبقت بياء ساكنة مدية)."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q8",
+        "title": "القصص القرآني في سورة الحشر: إجلاء يهود بني النضير",
+        "text": "في أسباب النزول والدروس والعبر من السورة:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر واستنتاج",
+        "chapter": 1,
+        "topic": "غزوة بني النضير والدروس المستفادة",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي الأسباب التي دعت النبي ﷺ والمسلمين لمحاصرة وإجلاء يهود بني النضير من ديارهم في المدينة المنورة؟",
+            "score": 10,
+            "modelAnswer": "لأنهم نقضوا العهد والميثاق الذي بينهم وبين رسول الله ﷺ، وتآمروا على قتله بإلقاء صخرة عليه من فوق جدار أثناء جلوسه عندهم، وتحالفوا سراً مع المنافقين ومشركي قريش ضد أمن واستقرار الدولة الإسلامية."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما معنى قوله تعالى: ﴿يُخْرِبُونَ بُيُوتَهُم بِأَيْدِيهِمْ وَأَيْدِي الْمُؤْمِنِينَ فَاعْتَبِرُوا يَا أُولِي الْأَبْصَارِ﴾؟",
+            "score": 10,
+            "modelAnswer": "أي أن اليهود لما تيقنوا من الجلاء أخذوا يهدمون بيوتهم وينزعون الأبواب والشبابيك والأخشاب الثمينة ليحملوها معهم على الإبل ولا يتركوها للمسلمين، وكان المسلمون يهدمون ما بقي من حصونهم لقطع تحصنهم، وفي ذلك أعظم موعظة لأصحاب العقول بأن البغي والغدر لا يدومان."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q9",
+        "title": "أحكام النون الساكنة والتنوين (الإظهار والإدغام والإقلاب والإخفاء)",
+        "text": "في القواعد التجويدية العامة في تلاوة القرآن الكريم:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تصنيف وتطبيق",
+        "chapter": 1,
+        "topic": "أحكام النون الساكنة والتنوين",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "للنون الساكنة والتنوين أربعة أحكام، اذكرها مع حروف كل حكم منها.",
+            "score": 10,
+            "modelAnswer": "1) الإظهار الحلقي: حروف الحلق الستة (ء، هـ، ع، ح، غ، خ).\n2) الإدغام: حروف كلمة (يَرْمَلُون) الستة (ينقسم لبغنة في ينمو، وبغير غنة في اللام والراء).\n3) الإقلاب: حرف واحد وهو (الباء) بقلب النون أو التنوين ميماً مخفاة بغنة.\n4) الإخفاء الحقيقي: الحروف الخمسة عشر الباقية المجموعة في أوائل كلمات: (صِفْ ذَا ثَنَا كَمْ جَادَ شَخْصٌ قَدْ سَمَا دُمْ طَيِّباً زِدْ فِي تُقَىً ضَعْ ظَالِماً)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "استخرج الحكم التجويدي للنون الساكنة أو التنوين في الكلمات القرآنية الآتية:\n(مِنْ خَوْفٍ - أَنبِئْهُم - رَحِيمٌ غَفُورٌ - مِن يَقُولُ).",
+            "score": 10,
+            "modelAnswer": "مِنْ خَوْفٍ: إظهار حلقي (لمجيء الخاء بعد النون الساكنة).\nأَنبِئْهُم: إقلاب (لمجيء الباء بعد النون الساكنة وتقلب ميماً).\nرَحِيمٌ غَفُورٌ: إظهار حلقي (لمجيء الغين بعد التنوين).\nمِن يَقُولُ: إدغام بغنة (لمجيء الياء بعد النون الساكنة)."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q10",
+        "title": "تحدي استخراج أحكام المد من نص قرآني مركب",
+        "text": "في التطبيق العملي لأحكام التلاوة المنهجية:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تحليل واستخراج",
+        "chapter": 1,
+        "topic": "استخراج أحكام المدود",
+        "sourceType": "أسئلة متميزين وزارية",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال تعالى: ﴿وَآتَى الْمَالَ عَلَى حُبِّهِ ذَوِي الْقُرْبَى وَالْيَتَامَى وَالْمَسَاكِينَ وَابْنَ السَّبِيلِ وَالسَّائِلِينَ وَفِي الرِّقَابِ﴾.\nاستخرج من الآية الكريمة: مد بدل، مد متصل، وبين سبب كل منهما ومقداره.",
+            "score": 10,
+            "modelAnswer": "1) مد البدل: كلمة (وَآتَى)؛ لتقدم الهمزة على الألف المدية في كلمة واحدة، مقداره: حركتان.\n2) المد المتصل: كلمة (السَّائِلِينَ)؛ لمجيء الألف المدية وبعدها همزة في نفس الكلمة، مقداره: أربع أو خمس حركات وجوباً."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق التجويدي بين المد المنفصل ومد الصلة الكبرى؟",
+            "score": 10,
+            "modelAnswer": "المد المنفصل يكون حرف المد فيه ثابتاً في بنية الكلمة (ألف أو واو أو ياء) وبعده همزة قطع في كلمة أخرى، بينما مد الصلة الكبرى ينشأ من إشباع حركة هاء الضمير الغائب المفرد المذكر الواقعة بين متحركين وبعدها همزة قطع في الكلمة التالية ويمد حكمياً كالمنفصل 4-5 حركات."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q11",
+        "title": "الفيء وأحكام توزيعه في سورة الحشر",
+        "text": "في التشريعات المالية والاقتصادية الإسلامية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "فهم وتشريع",
+        "chapter": 1,
+        "topic": "أحكام الفيء في الإسلام",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هو (الفيء) شرعاً؟ وبماذا يختلف الفيء عن (الغنائم) في الإسلام؟",
+            "score": 10,
+            "modelAnswer": "الفيء: هو كل مال وصل إلى المسلمين من أموال الكفار بغير قتال ولا إيجاف خيل ولا ركاب كالأموال المتروكة عند الصلح أو الهروب.\nالغنائم: هي الأموال المأخوذة من الأعداء قهراً في أرض المعركة بقتال ومواجهة عسكرية."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "لمن يصرف الفيء وفق قوله تعالى: ﴿مَّا أَفَاءَ اللَّهُ عَلَى رَسُولِهِ مِنْ أَهْلِ الْقُرَى فَلِلَّهِ وَلِلرَّسُولِ وَلِذِي الْقُرْبَى وَالْيَتَامَى وَالْمَسَاكِينِ وَابْنِ السَّبِيلِ كَيْ لَا يَكُونَ دُولَةً بَيْنَ الْأَغْنِيَاءِ مِنكُمْ﴾؟ وما الحكمة الاجتماعية من ذلك؟",
+            "score": 10,
+            "modelAnswer": "المصارف: لله وللرسول في المصالح العامة للمسلمين، ولقرابة الرسول الفقراء (بنو هاشم)، واليتامى والمساكين والمسافر المنقطع.\nالحكمة: منع تكدس واحتكار الثروات ورؤوس الأموال في أيدي فئة قليلة من الأثرياء (كي لا يكون دولة بين الأغنياء) وتحقيق العدالة والتكافل الاجتماعي وتوزيع الخيرات على الفقراء."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q12",
+        "title": "خشوع القلب لعظمة القرآن الكريم وتدبره",
+        "text": "في الأثر الروحي والتربوي لآيات القرآن:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تفسير وعبرة",
+        "chapter": 1,
+        "topic": "لو أنزلنا هذا القرآن على جبل",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب قوله تعالى في سورة الحشر: ﴿لَوْ أَنزَلْنَا هَذَا الْقُرْآنَ عَلَى جَبَلٍ لَّرَأَيْتَهُ خَاشِعاً مُّتَصَدِّعاً مِّنْ خَشْيَةِ اللَّهِ...﴾ مع بيان التفسير الإيماني للآية الكريمة.",
+            "score": 10,
+            "modelAnswer": "﴿لَوْ أَنزَلْنَا هَذَا الْقُرْآنَ عَلَى جَبَلٍ لَّرَأَيْتَهُ خَاشِعاً مُّتَصَدِّعاً مِّنْ خَشْيَةِ اللَّهِ وَتِلْكَ الْأَمْثَالُ نَضْرِبُهَا لِلنَّاسِ لَعَلَّهُمْ يَتَفَكَّرُونَ﴾.\nالتفسير: يضرب الله مثلاً بعظمة القرآن وقوة تأثيره؛ فلو أن هذا القرآن خوطبت به الجبال الصلبة الصماء وفهمت وعده ووعيده لتصدعت وتشقت وتفتتت خوفاً وخضوعاً لله وهيبته، فكيف بالقلوب البشرية التي يجب أن تلين وتخشع وتتدبر آيات الله وأوامره."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي آداب تلاوة القرآن الكريم التي ينبغي على المسلم الالتزام بها؟",
+            "score": 10,
+            "modelAnswer": "1) الطهارة الكاملة واستقبال القبلة.\n2) الاستعاذة بالله من الشيطان الرجيم والبسملة.\n3) الترتيل والتمهل والتجويد.\n4) التدبر والخشوع والتفكر في معاني الآيات والبكاء أو التباكي عند آيات الوعيد وسؤال المغفرة."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q13",
+        "title": "التقوى ومحاسبة النفس في سورة الحشر",
+        "text": "في التزكية الأخلاقية والمراقبة الإلهية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "فهم وتطبيق",
+        "chapter": 1,
+        "topic": "محاسبة النفس ولتنظر نفس ما قدمت لغد",
+        "sourceType": "وزاري 2021 دور ثان",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال تعالى: ﴿يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ * وَلَا تَكُونُوا كَالَّذِينَ نَسُوا اللَّهَ فَأَنسَاهُمْ أَنفُسَهُمْ أُولَئِكَ هُمُ الْفَاسِقُونَ﴾. اشرح التوجيه الإلهي الوارد في الآيتين الكريمتين.",
+            "score": 10,
+            "modelAnswer": "التوجيه: يأمر الله عباده المؤمنين بتقواه بفعل الطاعات واجتناب النواهي، ومحاسبة أنفسهم يومياً والنظر فيما أعدوه من أعمال صالحة ليوم القيامة (لغد)، ويحذرهم من نسيان حق الله وأمره؛ لأن من نسي الله وتهاون في دينه عاقبه الله بأن أنساه مصالحه الحقيقية وهلاك نفسه في المعاصي."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "لماذا عبر القرآن الكريم عن يوم القيامة بلفظ (لِغَدٍ)؟",
+            "score": 10,
+            "modelAnswer": "للدلالة على قربه الشديد وحتميته المؤكدة؛ فكل ما هو آتٍ قريب كالغد، ولكي يستشعر المسلم أن لقاء الله واقع لا محالة ولا يفصله عنه إلا ساعات يسيرة من عمره."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q14",
+        "title": "القلقلة ومراتبها وحروفها في أحكام التجويد",
+        "text": "في تحسين تلاوة الحروف القرآنية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتطبيق",
+        "chapter": 1,
+        "topic": "حكم القلقلة ومراتبها",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هي (القلقلة) لغة واصطلاحاً؟ وما هي حروفها الخمسة؟ وما هما مراتب القلقلة الكبرى والصغرى؟",
+            "score": 10,
+            "modelAnswer": "القلقلة لغة: الحركة والاضطراب.\nاصطلاحاً: اضطراب مخرج الحرف الساكن عند النطق به حتى يسمع له نبرة قوية واضحة.\nحروفها: خمسة تجمع في كلمة: (قُطْبُ جَدٍّ).\nمراتبها:\n1) قلقلة كبرى: إذا كان حرف القلقلة في آخر الكلمة موقوفاً عليه (مثل: الفَلَقْ، كَسَبْ، الحَقّ).\n2) قلقلة صغرى: إذا كان حرف القلقلة في وسط الكلمة أو آخرها موصولاً (مثل: يَقْطَعُون، أَبْصَارِهِم، يَطْمَعُ)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بيّن مرتبة القلقلة في الآية الكريمة: ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ﴾ عند الوقف.",
+            "score": 10,
+            "modelAnswer": "الْفَلَقِ (عند الوقف): قلقلة كبرى (لسكون القاف المتطرفة في نهاية الآية).\nخَلَقَ (عند الوقف): قلقلة كبرى (لسكون القاف المتطرفة الموقوف عليها)."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch1_q15",
+        "title": "اختبار المتميزين الشامل في التلاوة وسور الفصل الأول",
+        "text": "أجب عن المسألة التجويدية والتفسيرية المتقدمة:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تقويم وتحليل مقارن",
+        "chapter": 1,
+        "topic": "اختبار التميز الشامل للتلاوة والقرآن الكريم",
+        "sourceType": "امتحانات المتميزين الوزارية",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "في قوله تعالى: ﴿وَلَقَدْ رَآهُ نَزْلَةً أُخْرَى * عِندَ سِدْرَةِ الْمُنتَهَى﴾، استخرج:\n1) كلمة فيها مد بدل مع التعليل.\n2) حكماً من أحكام النون الساكنة مع التعليل.\n3) كلمة فيها لام قمرية.",
+            "score": 10,
+            "modelAnswer": "1) مد بدل: (رَآهُ)؛ لتقدم الهمزة على الألف المدية.\n2) حكم النون الساكنة: (عِندَ)؛ إخفاء حقيقي لمجيء حرف الدال بعد النون الساكنة.\n3) لام قمرية: (الْمُنتَهَى)؛ لدخول اللام على حرف الميم القمري (ابغ حجك وخف عقيمه)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "قارن بين وصف القرآن للمهاجرين ووصفه للأنصار في سورة الحشر مبيناً فضائل كل فئة منهما.",
+            "score": 10,
+            "modelAnswer": "المهاجرون: وصفهم الله بالصدق والفقر ونصرة الله ورسوله وبأنهم أخرجوا من ديارهم وأموالهم يبتغون فضلاً من الله ورضواناً (أُولَئِكَ هُمُ الصَّادِقُونَ).\nالأنصار: وصفهم الله بالإيثار والمحبة وإيواء المهاجرين وسلامة صدورهم من الحسد والغيرة رغم حاجتهم وفقرهم (يُحِبُّونَ مَنْ هَاجَرَ إِلَيْهِمْ وَيُؤْثِرُونَ عَلَى أَنفُسِهِمْ وَلَوْ كَانَ بِهِمْ خَصَاصَةٌ وَمَن يُوقَ شُحَّ نَفْسِهِ فَأُولَئِكَ هُمُ الْمُفْلِحُونَ)."
+          }
+        ]
+      },
+      {
+        "id": "isl_surah_najm",
+        "title": "السؤال الأول: القرآن الكريم والحفظ (سورة النجم المباركة)",
+        "text": "من سورة النجم المباركة، أجب عما يأتي مضبوطاً بالشكل التام:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "حفظ وتفسير",
+        "chapter": 1,
+        "topic": "سورة النجم: نصوص الحفظ ومعاني الكلمات",
+        "questionCategory": "surah_recitation",
+        "sourceType": "الامتحان الوزاري المعتمد - السادس الإعدادي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب ما تحفظ من السورة الكريمة",
+            "text": "اكتب من سورة النجم المباركة من قوله تعالى:\n﴿وَالنَّجْمِ إِذَا هَوَىٰ﴾\nإلى قوله تعالى:\n﴿...عِندَهَا جَنَّةُ الْمَأْوَىٰ﴾\nواضبط أواخر الكلمات بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "بسم الله الرحمن الرحيم\n﴿وَالنَّجْمِ إِذَا هَوَىٰ * مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوَىٰ * وَمَا يَنطِقُ عَنِ الْهَوَىٰ * إِنْ هُوَ إِلَّا وَحْيٌ يُوحَىٰ * عَلَّمَهُ شَدِيدُ الْقُوَىٰ * ذُو مِرَّةٍ فَاسْتَوَىٰ * وَهُوَ بِالْأُفُقِ الْأَعْلَىٰ * ثُمَّ دَنَا فَتَدَلَّىٰ * فَكَانَ قَابَ قَوْسَيْنِ أَوْ أَدْنَىٰ * فَأَوْحَىٰ إِلَىٰ عَبْدِهِ مَا أَوْحَىٰ * مَا كَذَبَ الْفُؤَادُ مَا رَأَىٰ * أَفَتُمَارُونَهُ عَلَىٰ مَا يَرَىٰ * وَلَقَدْ رَآهُ نَزْلَةً أُخْرَىٰ * عِندَ سِدْرَةِ الْمُنتَهَىٰ * عِندَهَا جَنَّةُ الْمَأْوَىٰ﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): معاني الكلمات والتفسير",
+            "text": "1. بيّن معاني المفردات القرآنية الآتية: (إِذَا هَوَىٰ - ذُو مِرَّةٍ - قَابَ قَوْسَيْنِ - سِدْرَةِ الْمُنتَهَىٰ).\n2. ما المقصود بقوله تعالى: ﴿مَا كَذَبَ الْفُؤَادُ مَا رَأَىٰ﴾؟",
+            "score": 8,
+            "modelAnswer": "1. معاني المفردات:\n- إِذَا هَوَىٰ: غاب وسقط ونزل.\n- ذُو مِرَّةٍ: ذو قوة وخلق حسن وعقل تام وقوة وبأس شديد (وهو جبريل عليه السلام).\n- قَابَ قَوْسَيْنِ: مقدار مسافة وتر القوس أو ذراعين، كناية عن القرب الشديد.\n- سِدْرَةِ الْمُنتَهَىٰ: شجرة عظيمة مباركة في السماء السابعة ينتهي عندها ما يعرج به من الأرض وما يهبط به من السماء.\n2. التفسير:\nالمعنى: لم يكذب قلب النبي محمد ﷺ ما رآه بصره من جبريل عليه السلام في صورته الملائكية الحقيقية التي خلقه الله عليها، بل تيقن قلبه ورأى الحقيقة يقينياً لا لبس فيها."
+          }
+        ]
+      },
+      {
+        "id": "isl_surah_hashr",
+        "title": "السؤال الأول: القرآن الكريم والحفظ (سورة الحشر المباركة)",
+        "text": "من سورة الحشر المباركة، أجب عن الآيات ومعانيها:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "حفظ وتفسير",
+        "chapter": 1,
+        "topic": "سورة الحشر: نصوص الحفظ والتفسير",
+        "questionCategory": "surah_recitation",
+        "sourceType": "الامتحان الوزاري المعتمد - الثالث المتوسط والسادس",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب ما تحفظ من السورة الكريمة",
+            "text": "اكتب من قوله تعالى:\n﴿لَوْ أَنزَلْنَا هَٰذَا الْقُرْآنَ عَلَىٰ جَبَلٍ لَّرَأَيْتَهُ خَاشِعًا مُّتَصَدِّعًا مِّنْ خَشْيَةِ اللَّهِ...﴾\nإلى نهاية سورة الحشر المباركة مضبوطاً بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "بسم الله الرحمن الرحيم\n﴿لَوْ أَنزَلْنَا هَٰذَا الْقُرْآنَ عَلَىٰ جَبَلٍ لَّرَأَيْتَهُ خَاشِعًا مُّتَصَدِّعًا مِّنْ خَشْيَةِ اللَّهِ وَتِلْكَ الْأَمْثَالُ نَضْرِبُهَا لِلنَّاسِ لَعَلَّهُمْ يَتَفَكَّرُونَ * هُوَ اللَّهُ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ هُوَ الرَّحْمَٰنُ الرَّحِيمُ * هُوَ اللَّهُ الَّذِي لَا إِلَٰهَ إِلَّا هُوَ الْمَلِكُ الْقُدُّوسُ السَّلَامُ الْمُؤْمِنُ الْمُهَيْمِنُ الْعَزِيزُ الْجَبَّارُ الْمُتَكَبِّرُ سُبْحَانَ اللَّهِ عَمَّا يُشْرِكُونَ * هُوَ اللَّهُ الْخَالِقُ الْبَارِئُ الْمُصَوِّرُ لَهُ الْأَسْمَاءُ الْحُسْنَىٰ يُسَبِّحُ لَهُ مَا فِي السَّمَاوَاتِ وَالْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): معاني المفردات والأسماء الحسنى",
+            "text": "1. اذكر معاني المفردات الآتية: (مُّتَصَدِّعًا - الْقُدُّوسُ - الْمُهَيْمِنُ - الْبَارِئُ).\n2. ما الحكمة والغاية من ضرب الأمثال في القرآن الكريم؟",
+            "score": 8,
+            "modelAnswer": "1. معاني الكلمات:\n- مُّتَصَدِّعًا: متشققا من هيبة الله وعظمة كلامه.\n- الْقُدُّوسُ: المنزه والطاهر عن كل نقص وعيب.\n- الْمُهَيْمِنُ: الرقيب الحافظ الشاهد على جميع مخلوقاته.\n- الْبَارِئُ: المنشئ والموجد للأشياء من العدم وفق تدبير حكيم.\n2. الحكمة:\nلتقريب المعاني وتجسيد الحقائق للأفهام، وحث الناس على التفكر والاعتبار وخشية الله تعالى."
+          }
+        ]
+      },
+      {
+        "id": "isl_hadith_muhasaba",
+        "title": "السؤال الثاني: الحديث النبوي الشريف (في محاسبة النفس)",
+        "text": "في رحاب السنة النبوية المطهرة ومبحث الحديث الشريف:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "حفظ وفهم",
+        "chapter": 1,
+        "topic": "الحديث النبوي الشريف: محاسبة النفس والعمل للآخرة",
+        "questionCategory": "hadith_sharif",
+        "sourceType": "الامتحان الوزاري المعتمد - الحديث الشريف",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب نص الحديث الشريف كاملاً",
+            "text": "اكتب حديثاً نبوياً شريفاً في (محاسبة النفس) عن النبي ﷺ، واضبطه بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "قال رسول الله ﷺ:\n«الكَيِّسُ مَنْ دَانَ نَفْسَهُ وَعَمِلَ لِمَا بَعْدَ الْمَوْتِ، وَالْعَاجِزُ مَنْ أَتْبَعَ نَفْسَهُ هَوَاهَا وَتَمَنَّى عَلَى اللَّهِ الأَمَانِيَّ».\nصدق رسول الله ﷺ."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): معاني الكلمات وما يرشد إليه الحديث",
+            "text": "1. بيّن معاني المفردات الآتية: (الكَيِّسُ - دَانَ نَفْسَهُ - العَاجِزُ - تَمَنَّى عَلَى اللَّهِ الأَمَانِيَّ).\n2. اذكر أمرين من أبرز ما يرشد إليه الحديث النبوي الشريف.",
+            "score": 8,
+            "modelAnswer": "1. معاني المفردات:\n- الكَيِّسُ: العاقل الحكيم الفطن.\n- دَانَ نَفْسَهُ: حاسبها وقومها وسيطر على شهواتها ورغباتها.\n- العَاجِزُ: ضعيف الإرادة المقصر الذي يتبع شهواته.\n- تَمَنَّى عَلَى اللَّهِ الأَمَانِيَّ: تمنى الفوز بالجنة والمغفرة وهو مقيم على المعاصي تارك للعمل الصالح.\n2. ما يرشد إليه الحديث:\n- وجوب محاسبة الإنسان لنفسه يومياً قبل أن يُحاسب يوم القيامة.\n- العمل والجد والاجتهاد في طاعة الله هو السبيل الوحيد للنجاة، والتمني بلا عمل غرور وباطل."
+          }
+        ]
+      },
+      {
+        "id": "isl_tajweed_noon_tanween",
+        "title": "السؤال التمهيدي: أحكام التلاوة (أحكام النون الساكنة والتنوين)",
+        "text": "أحكام التلاوة القرآنية (النون الساكنة والتنوين):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق واستخراج",
+        "chapter": 1,
+        "topic": "أحكام النون الساكنة والتنوين مع ذكر السبب",
+        "questionCategory": "tajweed_rulings",
+        "sourceType": "الامتحان الوزاري المعتمد - أحكام التلاوة",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): استخرج خمسة أحكام من النص مع بيان النوع والسبب",
+            "text": "قال تعالى:\n﴿مَنْ جَاءَ بِالْحَسَنَةِ فَلَهُ عَشْرُ أَمْثَالِهَا وَمَنْ جَاءَ بِالسَّيِّئَةِ فَلَا يُجْزَىٰ إِلَّا مِثْلَهَا وَهُمْ لَا يُظْلَمُونَ * قُلْ إِنَّنِي هَدَانِي رَبِّي إِلَىٰ صِرَاطٍ مُسْتَقِيمٍ دِينًا قِيَمًا مِلَّةَ إِبْرَاهِيمَ حَنِيفًا وَمَا كَانَ مِنَ الْمُشْرِكِينَ﴾.\n\nاستخرج (خمسة) من أحكام النون الساكنة والتنوين في الآيتين الكريمتين مبيناً (نوع الحكم) و(السبب) في جدول منظم.",
+            "score": 10,
+            "modelAnswer": "الجدول الوزاري النموذجي لاستخراج أحكام التلاوة:\n1) (مَنْ جَاءَ): نوع الحكم: إخفاء حقيقي. السبب: لمجيء حرف الجيم (من حروف الإخفاء) بعد النون الساكنة.\n2) (عَشْرُ أَمْثَالِهَا): نوع الحكم: إظهار حلقي. السبب: لمجيء همزة القطع (من حروف الحلق) بعد تنوين الضم.\n3) (صِرَاطٍ مُسْتَقِيمٍ): نوع الحكم: إدغام بغنة. السبب: لمجيء حرف الميم (من حروف يرملون/ينمو) بعد تنوين الكسر.\n4) (مُسْتَقِيمٍ دِينًا): نوع الحكم: إخفاء حقيقي. السبب: لمجيء حرف الدال (من حروف الإخفاء) بعد تنوين الكسر.\n5) (دِينًا قِيَمًا): نوع الحكم: إخفاء حقيقي. السبب: لمجيء حرف القاف (من حروف الإخفاء) بعد تنوين الفتح.\n6) (حَنِيفًا وَمَا): نوع الحكم: إدغام بغنة. السبب: لمجيء حرف الواو بعد تنوين الفتح."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): تعريف الإقلاب والإظهار الحلقي مع الأمثلة",
+            "text": "عرّف كلاً من: (الإقلاب) و(الإظهار الحلقي) للنون الساكنة والتنوين، مع ذكر حرف كل منهما ومثال لكل منهما.",
+            "score": 10,
+            "modelAnswer": "1. الإقلاب:\nهو قلب النون الساكنة أو التنوين ميماً مخفاة بغنة بمقدار حركتين إذا جاء بعدها حرف (الباء) فقط.\nمثال: (مِن بَعْدِ)، (عَلِيمٌ بِذَاتِ الصُّدُورِ)، (أَنبِئْهُم).\n2. الإظهار الحلقي:\nهو إخراج النون الساكنة أو التنوين من مخرجها ناصعة واضحة دون غنة ظاهرة إذا جاء بعدها أحد حروف الحلق الستة المجموعة في أوائل الكلمات: (أخي هاك علماً حازه غير خاسر) وهي: (الهمزة، الهاء، العين، الحاء، الغين، الخاء).\nمثال: (مَنْ آمَنَ)، (يَنْهَوْنَ)، (عَزِيزٌ حَكِيمٌ)، (مِنْ غِلٍّ)."
+          }
+        ]
+      },
+      {
+        "id": "isl_tajweed_lam_and_madd",
+        "title": "السؤال التمهيدي: أحكام التلاوة (لام ال التعريف والمدود)",
+        "text": "في مباحث أحكام التلاوة القرآنية (لام ال والمد):",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تطبيق واستخراج",
+        "chapter": 1,
+        "topic": "أحكام لام ال التعريف والمدود مع بيان السبب",
+        "questionCategory": "tajweed_rulings",
+        "sourceType": "الامتحان الوزاري المعتمد - أحكام التلاوة",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): استخرج لام (ال) وبيّن حكمها مع السبب",
+            "text": "قال تعالى: ﴿الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ * الرَّحْمَٰنِ الرَّحِيمِ * مَالِكِ يَوْمِ الدِّينِ * إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ * اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ﴾.\n\nاستخرج (خمس) كلمات تبدأ بـ (ال) التعريف مبيناً حكم اللام فيها (إظهار قمري أو إدغام شمسي) مع ذكر السبب.",
+            "score": 10,
+            "modelAnswer": "جدول أحكام لام (ال) التعريف:\n1) (الْحَمْدُ): إظهار قمري. السبب: لدخول اللام على حرف الحاء (من عبارة: ابغ حجك وخف عقيمه).\n2) (الْعَالَمِينَ): إظهار قمري. السبب: لدخول اللام على حرف العين (حرف قمري).\n3) (الرَّحْمَٰنِ): إدغام شمسي. السبب: لدخول اللام على حرف الراء (حرف شمسي).\n4) (الرَّحِيمِ): إدغام شمسي. السبب: لدخول اللام على حرف الراء (حرف شمسي).\n5) (الدِّينِ): إدغام شمسي. السبب: لدخول اللام على حرف الدال (حرف شمسي).\n6) (الصِّرَاطَ): إدغام شمسي. السبب: لدخول اللام على حرف الصاد (حرف شمسي).\n7) (الْمُسْتَقِيمَ): إظهار قمري. السبب: لدخول اللام على حرف الميم (حرف قمري)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): استخراج وتعيين أحكام المد المتصل والمنفصل والبدل",
+            "text": "عيّن نوع المد في الكلمات القرآنية الآتية مبيناً السبب ومقدار المد:\n(السَّمَاءِ - يَا أَيُّهَا - آمَنُوا - سُوءَ - فِي أَنفُسِكُمْ).",
+            "score": 10,
+            "modelAnswer": "1) (السَّمَاءِ): مد متصل. مقداره: 4 أو 5 حركات وجوباً. السبب: لاجتماع حرف المد (الألف) والهمزة في كلمة واحدة.\n2) (يَا أَيُّهَا): مد منفصل. مقداره: 4 أو 5 حركات جوازاً. السبب: لوجود حرف المد (الألف) في آخر كلمة (يا) والهمزة في أول الكلمة التالية (أيها).\n3) (آمَنُوا): مد بدل. مقداره: حركتان كمد طبيعي. السبب: لتقدم الهمزة المفتوحة على حرف المد الألف.\n4) (سُوءَ): مد متصل. مقداره: 4 أو 5 حركات وجوباً. السبب: لاجتماع حرف المد (الواو) والهمزة في كلمة واحدة.\n5) (فِي أَنفُسِكُمْ): مد منفصل. مقداره: 4 أو 5 حركات جوازاً. السبب: لمجيء الياء المدية في آخر كلمة والهمزة في أول الكلمة التي تليها."
+          }
+        ]
+      }
+    ],
+    "2": [
+      {
+        "id": "isl_ch2_q1",
+        "title": "الحديث النبوي الشريف في (البر والتقوى وحسن الخلق)",
+        "text": "في السنة النبوية المطهرة ومنهاج الأخلاق الإسلامية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "حفظ وشرح",
+        "chapter": 2,
+        "topic": "حديث البر والإثم",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب نص الحديث النبوي الشريف عن النواس بن سمعان الأنصاري (رضي الله عنه) في (البر وحسن الخلق).",
+            "score": 10,
+            "modelAnswer": "عن النواس بن سمعان الأنصاري (رضي الله عنه) عن النبي ﷺ قال:\n«البِرُّ حُسْنُ الخُلُقِ ، وَالإِثْمُ مَا حَاكَ فِي نَفْسِكَ ، وَكَرِهْتَ أَنْ يَطَّلِعَ عَلَيْهِ النَّاسُ».\n[صدق رسول الله ﷺ]."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما معنى (البِرّ)؟ وما معنى (مَا حَاكَ فِي نَفْسِكَ)؟ وما هو المقياس الضميري الداخلي الذي وضعه النبي ﷺ لمعرفة المعصية؟",
+            "score": 10,
+            "modelAnswer": "البِرّ: كلمة جامعة لكل أعمال الخير والصلاح والإحسان والطاعات.\nمَا حَاكَ فِي نَفْسِكَ: ما تردد وترددت فيه النفس وشعرت نحوه بالشك والريبة والحرج والقلق وعدم الطمأنينة.\nالمقياس: هو الفطرة النقية والضمير الحي؛ فكل فعل يخجل الإنسان من أن يراه الناس الصالحون عليه ويورث في قلبه حزازة وضيقاً فهو إثم ومعصية يجب اجتنابها."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q2",
+        "title": "الحديث النبوي الشريف في (الشهيد وفضل الشهادة)",
+        "text": "في التضحية والجهاد في سبيل الوطن والحق:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "حفظ وتفسير",
+        "chapter": 2,
+        "topic": "حديث الشهيد ومكانته",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب نص الحديث النبوي الشريف في منزلة الشهيد وفضله في سبيل الله.",
+            "score": 10,
+            "modelAnswer": "عن رسول الله ﷺ قال:\n«مَا مِنْ مَكْلُومٍ يُكْلَمُ فِي سَبِيلِ اللَّهِ إِلَّا جَاءَ يَوْمَ القِيَامَةِ وَكَلْمُهُ يَدْمَى ، اللَّوْنُ لَوْنُ الدَّمِ ، وَالرِّيحُ رِيحُ المِسْكِ».\n[صدق رسول الله ﷺ]."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما معنى: (مَكْلُومٍ) و (كَلْمُهُ)؟ وما الحكمة من مجيء الشهيد يوم القيامة وجرحه ينضح بالمسك؟",
+            "score": 10,
+            "modelAnswer": "مَكْلُومٍ: مجروح ومصاب في معركة الدفاع عن الحق والوطن والمقدسات.\nكَلْمُهُ: جرحه وإصابته.\nالحكمة: تشريفاً وإكراماً له بين الخلائق في المحشر وإظهاراً لفضل تضحيته بدمه الزاكي فيكون دمه شاهداً له ومكافأة برائحة المسك الزكية."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q3",
+        "title": "أركان الإيمان والإيمان باليوم الآخر والبعث والحساب",
+        "text": "في أصول العقيدة الإسلامية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وفهم",
+        "chapter": 2,
+        "topic": "الإيمان باليوم الآخر",
+        "sourceType": "وزاري 2022 دور تمهيدي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما المقصود بـ (الإيمان باليوم الآخر)؟ وما هي الأدلة العقلية على حتمية البعث والنشور والجزاء؟",
+            "score": 10,
+            "modelAnswer": "الإيمان باليوم الآخر: هو التصديق الجازم واليقين المطلق بأن الله سيبعث الخلائق بعد موتهم ليحاسبهم على أعمالهم فيجازي المحسن بالجنة والمسيء بالنار.\nالأدلة العقلية: 1) مقتضى العدل الإلهي المطلق؛ ففي الدنيا ظالمون ومظلومون يموتون دون حساب فلا بد من يوم للعدالة ونيل الحقوق.\n2) قدرة الله على الإحياء الأول دليل قاطع على قدرته على الإعادة والنشور؛ فالذي خلق السماوات والأرض والإنسان أول مرة قادر على إعادته."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي الآثار النفسية والأخلاقية للإيمان باليوم الآخر على سلوك الفرد في المجتمع؟",
+            "score": 10,
+            "modelAnswer": "يردع الفرد عن ارتكاب المظالم والجرائم والفساد، ويبعث الطمأنينة والأمل في نفوس المظلومين والمبتلين، ويدفع المسلم إلى التسابق في فعل الخيرات وخدمة وطنه ومجتمعه طلباً للأجر الأخروي."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q4",
+        "title": "السيرة النبوية: صلح الحديبية وشروطه والفتح المبين",
+        "text": "في المحطات التاريخية للدعوة النبوية:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "تذكر وتحليل تاريخي",
+        "chapter": 2,
+        "topic": "صلح الحديبية ونتائجه",
+        "sourceType": "وزاري 2021 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "في أي سنة هجرية وقع صلح الحديبية؟ وما هي ثلاثة من أهم الشروط والبنود التي تضمنتها وثيقة الصلح بين النبي ﷺ وقريش؟",
+            "score": 10,
+            "modelAnswer": "سنة وقوعه: السنة السادسة للهجرة (6 هـ).\nأهم البنود والشروط:\n1) هدنة ووقف الحرب بين الطرفين لمدة عشر سنوات.\n2) يرجع المسلمون في هذا العام دون أداء العمرة، على أن يأتوا في العام القابل فيقضوا ثلاثة أيام بمكة مع سلاح الراكب فقط.\n3) من أحب أن يدخل في عهد محمد وعقده دخل فيه، ومن أحب أن يدخل في عهد قريش وعقدها دخل فيه.\n4) من أتى محمداً من قريش بغير إذن وليه رده إليهم، ومن جاء قريشاً من المسلمين لم يردوه."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "علل: سماه الله تعالى في القرآن الكريم بـ (الفتح المبين) في سورة الفتح ﴿إِنَّا فَتَحْنَا لَكَ فَتْحاً مُّبِيناً﴾ رغم اعتراض بعض الصحابة على ظاهره.",
+            "score": 10,
+            "modelAnswer": "لأنه كان أعظم نصر سياسي ودبلوماسي واعتراف رسمي بقوة الدولة الإسلامية؛ حيث أمنت الطرق واختلط الناس وسمع المشركون القرآن وانطلقت الدعوة بحرية ودخل في الإسلام خلال سنتي الهدنة أضعاف من دخلوا فيه في عشرين سنة، وكان توطئة ومقدمة لفتح مكة الكبرى دون إراقة دماء."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q5",
+        "title": "الحديث النبوي الشريف في (حرمة الغيبة والنميمة والستر)",
+        "text": "في الآفات اللسانية والأخلاق المنهي عنها:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "فهم ومقارنة",
+        "chapter": 2,
+        "topic": "الغيبة والنميمة وعقوبتهما",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما الفرق بين (الغيبة) و (النميمة) و (البهتان) في الشرع الإسلامي؟",
+            "score": 10,
+            "modelAnswer": "الغيبة: ذكرك أخاك المسلم في غيابه بما يكره من العيوب الحقيقية فيه (سواء في خَلقه أو دينه أو دنياه).\nالبهتان: ذكرك أخاك بما ليس فيه من الكذب والافتراء والباطل، وهو أشد ظلماً وإثماً من الغيبة.\nالنميمة: نقل الكلام السيئ والحديث بين شخصين أو طرفين بقصد الإفساد وإيقاع العداوة والبغضاء بينهما."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بماذا شبّه القرآن الكريم المغتاب في سورة الحجرات؟ وما هي الكفارة الواجبة على من اغتاب شخصاً؟",
+            "score": 10,
+            "modelAnswer": "التشبيه: شبهه بأشنع صورة وهي من يأكل لحم أخيه الميت: ﴿أَيُحِبُّ أَحَدُكُمْ أَن يَأْكُلَ لَحْمَ أَخِيهِ مَيْتاً فَكَرِهْتُمُوهُ﴾.\nالكفارة: التوبة الصادقة، الإقلاع الفوري والندم، الاستغفار للشخص المغتاب والدعاء له وذكره بمحاسنه في نفس المجالس، وطلب العفو والمسامحة منه إن أمكن دون أن تترتب على ذلك مفسدة أكبر."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q6",
+        "title": "السيرة النبوية: فتح مكة المكرمة وعفو النبي الشامل",
+        "text": "في انتصار الحق والتسامح النبوي الخالد:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وعبرة",
+        "chapter": 2,
+        "topic": "فتح مكة والعفو عند المقدرة",
+        "sourceType": "وزاري 2023 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "في أي سنة وشهر هجري تم فتح مكة المكرمة؟ وما السبب المباشر الذي جعل النبي ﷺ يسير بجيش المسلمين لفتحها؟",
+            "score": 10,
+            "modelAnswer": "تاريخ الفتح: في شهر رمضان المبارك من السنة الثامنة للهجرة (8 هـ).\nالسبب المباشر: نقض قريش لبنود صلح الحديبية؛ حيث أعانت حليفتها (بني بكر) بالسلاح والرجال على قبيلة (خزاعة) حليفة المسلمين وقتلوا منهم أناساً وهم آمنون داخل الحرم المكي."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ماذا قال النبي ﷺ لأهل مكة الذين آذوه وطردوه بعد أن دخل مكة فاتحاً منتصراً؟ وما الدرس الأخلاقي المستفاد؟",
+            "score": 10,
+            "modelAnswer": "قال لهم: «مَا تَرَوْنَ أَنِّي فَاعِلٌ بِكُمْ؟» قالوا: خيراً، أخ كريم وابن أخ كريم، فقال ﷺ كلمته الخالدة: «اذْهَبُوا فَأَنْتُمُ الطُّلَقَاءُ».\nالدرس: ضرب أروع الأمثلة في العفو عند المقدرة والتسامح والترفع عن الانتقام الشخصي وإرساء دعائم الرحمة الإنسانية والسلام."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q7",
+        "title": "بر الوالدين وحقوقهما في القرآن والسنة",
+        "text": "في الواجبات الأسرية والاجتماعية في الإسلام:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتذكر",
+        "chapter": 2,
+        "topic": "بر الوالدين وعقوقهما",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "لماذا قرن الله تعالى في القرآن الكريم عبادته وتوحيده بالإحسان إلى الوالدين في قوله: ﴿وَقَضَى رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَاناً﴾؟",
+            "score": 10,
+            "modelAnswer": "لبيان عظم حقهما ومكانتهما السامية في الشريعة، ولأن الوالدين هما السبب الظاهري في وجود الإنسان ورعايته وتربيته وبذلا صحتهما وراحتهما في سبيل إسعاده، فشكر المنعم الأكبر (الله) يستوجب شكر وسائط الإحسان والرعاية (الوالدين)."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اذكر أربعة من واجبات الأبناء تجاه والديهما في حياتهما وبعد مماتهما.",
+            "score": 10,
+            "modelAnswer": "في حياتهما: طاعتهما بالمعروف، خفض جناح الذل والرحمة لهما، التلطف في مخاطبتهما وتجنب التأفف (فلا تقل لهما أف ولا تنهرهما)، وتوفير النفقة والرعاية لهما عند الكبر.\nبعد مماتهما: كثرة الدعاء والاستغفار لهما، إخراج الصدقات عنهما، قضاء ديونهما ونذورهم، وصلة الرحم التي لا توصل إلا بهما وإكرام أصدقائهما."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q8",
+        "title": "الإيمان بالملائكة ووظائفهم وأصنافهم",
+        "text": "في الغيبيات وأركان العقيدة الإسلامية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتصنيف",
+        "chapter": 2,
+        "topic": "الإيمان بالملائكة الأبرار",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "مِمَّ خلق الله الملائكة؟ وما هي صفاتهم الخَلقية والخُلقية؟",
+            "score": 10,
+            "modelAnswer": "خلقوا من (نور)، وهم أجسام نورانية لطيفة قادرة على التشكل بالصور الكريمة، لا يأكلون ولا يشربون ولا ينامون ولا يتناسلون ومبرؤون من الشهوة والذنوب، لا يعصون الله ما أمرهم ويفعلون ما يؤمرون، ويسبحون الليل والنهار لا يفترون."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "اذكر المهمة الموكلة لكل ملك من الملائكة الآتية أسماؤهم:\n(جبرائيل - ميكائيل - إسرافيل - ملك الموت [عزرائيل]).",
+            "score": 10,
+            "modelAnswer": "جبرائيل (عليه السلام): النزول بالوحي من الله تعالى إلى الأنبياء والرسل.\nميكائيل (عليه السلام): موكل بالأرزاق والأمطار والنبات وتوزيعها بمشيئة الله.\nإسرافيل (عليه السلام): موكل بالنفخ في الصور للبعث والنشور والصعق.\nملك الموت: موكل بقبض أرواح الخلائق عند انقضاء آجالها."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q9",
+        "title": "خلق التواضع والتحذير من الكبر والغرور",
+        "text": "في الأخلاق الإسلامية الفاضلة:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "فهم ومقارنة",
+        "chapter": 2,
+        "topic": "التواضع والكبر",
+        "sourceType": "وزاري 2021 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما هو (التواضع)؟ وما هي فضيلته عند الله ورسوله مع الاستشهاد بحديث شريف؟",
+            "score": 10,
+            "modelAnswer": "التواضع: لين الجانب، وخفض الجناح، واحترام الناس وعدم التعالي عليهم بالنسب أو المال أو الجاه أو العلم.\nفضيلته: يرفع الله صاحبه في الدنيا والآخرة؛ قال رسول الله ﷺ: «مَا تَوَاضَعَ أَحَدٌ لِلَّهِ إِلَّا رَفَعَهُ اللَّهُ»."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هو (الكبر)؟ وما جزاء المتكبرين يوم القيامة؟",
+            "score": 10,
+            "modelAnswer": "الكبر: بطر الحق (رفض الحق ومحاربته) وغمط الناس (احتقارهم وازدراؤهم).\nجزاؤهم: يحشر المتكبرون يوم القيامة كأمثال الذر (النمل الصغير) يطؤهم الناس بأقدامهم لهوانهم على الله، ومأواهم جهنم وبئس المصير."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q10",
+        "title": "تحدي ربط السيرة بالعقيدة في غزوة خيبر وحصونها",
+        "text": "في بطولات الصحابة وتاريخ الفتوحات:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تذكر وتحليل مواقف",
+        "chapter": 2,
+        "topic": "غزوة خيبر والبطولة الإسلامية",
+        "sourceType": "أسئلة متميزين وزارية",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "في غزوة خيبر، ماذا قال رسول الله ﷺ ليلة فتح الحصن المنيع في شأن حامل الراية غداً؟ وعلى يد من تم فتح حصن القموص؟",
+            "score": 10,
+            "modelAnswer": "قال رسول الله ﷺ: «لَأُعْطِيَنَّ الرَّايَةَ غَداً رَجُلاً يُحِبُّ اللَّهَ وَرَسُولَهُ ، وَيُحِبُّهُ اللَّهُ وَرَسُولُهُ ، يَفْتَحُ اللَّهُ عَلَى يَدَيْهِ ، لَيْسَ بِفَرَّارٍ».\nتم الفتح: على يدي الإمام علي بن أبي طالب (عليه السلام) بعد أن تفل النبي في عينيه فبرئتا من الرمد وقلع باب الحصن وفتح الله به الحصون."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي الحكمة السياسية والعسكرية من تحييد وفتح حصون خيبر بعد صلح الحديبية مباشرة؟",
+            "score": 10,
+            "modelAnswer": "للقضاء على أكبر وكر للتآمر والتحريض على غزو المدينة المنورة وتمويل الجيوش ومحاربة المسلمين، ولتأمين حدود الدولة الإسلامية الشمالية والتفرغ لنشر الإسلام في شبه الجزيرة العربية."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q11",
+        "title": "أهمية الكلمة الطيبة ومسؤولية اللسان في الإسلام",
+        "text": "في الآداب والتوجيهات النبوية للحديث:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتذكر",
+        "chapter": 2,
+        "topic": "حفظ اللسان والكلمة الطيبة",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "قال رسول الله ﷺ: «مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَاليَوْمِ الآخِرِ فَلْيَقُلْ خَيْراً أَوْ لِيَصْمُتْ». ما هي التوجيهات الأخلاقية والاجتماعية التي يعلمنا إياها هذا الحديث الشريف؟",
+            "score": 10,
+            "modelAnswer": "1) ضبط اللسان والحذر من آفات الكلام كالكذب والسب والغيبة والنميمة.\n2) التكلم بالخير والكلمة الطيبة والإصلاح بين الناس أو التزام الصمت والسلامة.\n3) ربط استقامة الإيمان بصدق اللسان وسلامة القلب."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما المقصود بـ (الكلمة الطيبة صدقة)؟ اذكر مثالين للكلمة الطيبة في التعامل اليومي.",
+            "score": 10,
+            "modelAnswer": "أي أن الكلام الحسن واللطيف مع الناس يكتب للإنسان به أجر وثواب كالصدقة بالمال.\nأمثلة: رد السلام بابتسامة، جبر خواطر المنكسرين، الدعاء بالخير، وتقديم النصيحة بالحكمة والموعظة الحسنة."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q12",
+        "title": "الإيمان بالكتب السماوية ورسالات الأنبياء",
+        "text": "في أركان الإيمان والكتب المنزلة:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تذكر وتصنيف",
+        "chapter": 2,
+        "topic": "الكتب السماوية ورسلها",
+        "sourceType": "وزاري مكرر",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اذكر أسماء الكتب السماوية الأربعة المشهورة والرسل والأنبياء الذين نزلت عليهم.",
+            "score": 10,
+            "modelAnswer": "1) التوراة: نزلت على نبي الله موسى (عليه السلام).\n2) الزبور: نزل على نبي الله داود (عليه السلام).\n3) الإنجيل: نزل على نبي الله عيسى بن مريم (عليه السلام).\n4) القرآن الكريم: نزل على خاتم الأنبياء والمرسلين محمد ﷺ."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "بماذا امتاز القرآن الكريم عن سائر الكتب السماوية السابقة؟",
+            "score": 10,
+            "modelAnswer": "1) كتاب شامل وخاتم لجميع الرسالات ومهيمن عليها وصالح لكل زمان ومكان.\n2) معجزة خالدة ومحفوظة بحفظ الله التام من أي تحريف أو تبديل أو نقص ﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾.\n3) موجه للبشرية كافة وليس لقوم خاصين."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q13",
+        "title": "حق الجار ورعايته في الإسلام",
+        "text": "في التعايش والواجبات الإنسانية والاجتماعية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "تطبيق وتذكر",
+        "chapter": 2,
+        "topic": "حقوق الجار في الإسلام",
+        "sourceType": "وزاري 2020 دور أول",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "عن ابن عمر وعائشة (رضي الله عنهما) قالا: قال رسول الله ﷺ: «مَا زَالَ جِبْرِيلُ يُوصِينِي بِالجَارِ حَتَّى ظَنَنْتُ أَنَّهُ سَيُوَرِّثُهُ». اشرح مكانة الجار في الإسلام في ضوء الحديث الشريف.",
+            "score": 10,
+            "modelAnswer": "يبين الحديث المكانة العظيمة والمنزلة الرفيعة للجار؛ حيث تكررت وصية جبريل بالجار تكراراً جعل النبي ﷺ يظن أن الوحي سينزل بتشريع نصيب له في الميراث كالأقارب، مما يوجب الإحسان التام إليه وكف الأذى عنه."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي حقوق الجار الأربعة في الإسلام؟",
+            "score": 10,
+            "modelAnswer": "1) كف الأذى عنه بالقول والفعل وحفظ أسراره وعوراته.\n2) مواساته في المصائب وإعانته عند الفقر والحاجة.\n3) عيادته إذا مرض وتهنئته في المسرات وإجابة دعوته.\n4) الصبر على أذاه ومقابلة الإساءة بالإحسان."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q14",
+        "title": "الأمانة وحرمة الخيانة في الإسلام",
+        "text": "في الأخلاق المعاملاتية السامية:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "فهم ومقارنة",
+        "chapter": 2,
+        "topic": "أداء الأمانة وخيانة العهود",
+        "sourceType": "كتاب الطالب المنهجي",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "ما المقصود بـ (الأمانة)؟ وما هي أنواع الأمانات التي يحملها الإنسان المسلم في حياته؟",
+            "score": 10,
+            "modelAnswer": "الأمانة: أداء كل حق واجب والتزام الصدق والوفاء في الودائع والعهود والأعمال.\nأنواعها:\n1) أمانة الدين والعبادات والتكاليف الإلهية بين العبد وربه.\n2) أمانة الودائع والأموال والأعراض مع الناس.\n3) أمانة العمل والوظيفة العامة والإخلاص فيها دون إهمال أو رشوة.\n4) أمانة الكلمة وحفظ الأسرار والمجالس."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما هي علامات المنافق الثلاث كما بينها رسول الله ﷺ في الحديث الشريف؟",
+            "score": 10,
+            "modelAnswer": "قال رسول الله ﷺ: «آيَةُ المُنَافِقِ ثَلَاثٌ: إِذَا حَدَّثَ كَذَبَ ، وَإِذَا وَعَدَ أَخْلَفَ ، وَإِذَا اؤْتُمِنَ خَانَ»."
+          }
+        ]
+      },
+      {
+        "id": "isl_ch2_q15",
+        "title": "اختبار المتميزين الشامل في الحديث النبوي والسيرة والأخلاق",
+        "text": "أجب عن المسألة المتقدمة في السيرة والأخلاق الإسلامية:",
+        "score": 20,
+        "difficulty": "تحدي",
+        "bloom": "تقويم وتطبيق عملي",
+        "chapter": 2,
+        "topic": "اختبار التميز الشامل للسيرة والأخلاق",
+        "sourceType": "امتحانات المتميزين الوزارية",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ)",
+            "text": "اكتب فقرة متكاملة توضح فيها كيف استطاع النبي ﷺ من خلال أخلاقه العالية وسيرته في فتح مكة وصلح الحديبية أن يحول قلوب ألد أعدائه إلى جنود أوفياء ومخلصين للإسلام.",
+            "score": 10,
+            "modelAnswer": "من خلال التزامه الصارم بالعهود والمواثيق في صلح الحديبية ولو بدت صعبة، وتقديمه الحكمة والرحمة على سفك الدماء، وتتويج ذلك بعفوه الشامل في فتح مكة وإطلاقه أسرى قريش ومشركيها دون لوم ولا عقاب بعد عشرين عاماً من العداء، فملك قلوبهم بنبل التسامح وعظمة الخلق النبوي فدخل الناس في دين الله أفواجاً طوعاً ومحبة."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب)",
+            "text": "ما الفرق بين (الغضب المذموم) و (الغضب المحمود) في السلوك الإسلامي؟",
+            "score": 10,
+            "modelAnswer": "الغضب المذموم: هو الغضب انتصاراً للنفس والأهواء والشهوات الشخصية والانتقام بظلم وعدوان.\nالغضب المحمود: هو الغضب لله تعالى وللحق عند انتهاك حرمات الله ومحارمه وظلم الضعفاء لنصرة المظلوم والدفاع عن الدين والوطن دون تجاوز للحدود والعدالة."
+          }
+        ]
+      },
+      {
+        "id": "isl_surah_nisa",
+        "title": "السؤال الأول: القرآن الكريم والحفظ (سورة النساء - آيات الأمانة والعدل)",
+        "text": "من سورة النساء المباركة، أجب عما يأتي:",
+        "score": 20,
+        "difficulty": "متوسط",
+        "bloom": "حفظ وفهم",
+        "chapter": 2,
+        "topic": "سورة النساء: أداء الأمانات والعدل بين الناس",
+        "questionCategory": "surah_recitation",
+        "sourceType": "الامتحان الوزاري المعتمد",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب ما تحفظ من النص القرآني الكريم",
+            "text": "اكتب من قوله تعالى:\n﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا...﴾\nإلى قوله تعالى:\n﴿...وَكَانَ اللَّهُ بِمَا تَعْمَلُونَ خَبِيرًا﴾ مضبوطاً بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "بسم الله الرحمن الرحيم\n﴿إِنَّ اللَّهَ يَأْمُرُكُمْ أَن تُؤَدُّوا الْأَمَانَاتِ إِلَىٰ أَهْلِهَا وَإِذَا حَكَمْتُم بَيْنَ النَّاسِ أَن تَحْكُمُوا بِالْعَدْلِ إِنَّ اللَّهَ نِعِمَّا يَعِظُكُم بِهِ إِنَّ اللَّهَ كَانَ سَمِيعًا بَصِيرًا * يَا أَيُّهَا الَّذِينَ آمَنُوا أَطِيعُوا اللَّهَ وَأَطِيعُوا الرَّسُولَ وَأُولِي الْأَمْرِ مِنكُمْ فَإِن تَنَازَعْتُمْ فِي شَيْءٍ فَرُدُّوهُ إِلَى اللَّهِ وَالرَّسُولِ إِن كُنتُمْ تُؤْمِنُونَ بِاللَّهِ وَالْيَوْمِ الْآخِرِ ذَٰلِكَ خَيْرٌ وَأَحْسَنُ تَأْوِيلًا﴾."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): التفسير والواجبات",
+            "text": "1. ما هما الأمران الجليلان اللذان أمر الله تعالى بهما في بداية الآية الكريمة؟\n2. كيف نحسم النزاع والاختلاف عند وقوعه بين أبناء المجتمع وفق التوجيه القرآني؟",
+            "score": 8,
+            "modelAnswer": "1. الأمران هما:\n- أداء الأمانات والودائع والحقوق كاملة إلى أصحابها دون مماطلة أو خيانة.\n- الحكم بالقسط والعدل المطلق بين الناس دون تمييز أو محاباة.\n2. حسم النزاع:\nبرده والاحتكام فيه إلى كتاب الله تعالى (القرآن الكريم) وسنة نبيه محمد ﷺ، لضمان العدل ووحدة الصف وحفظ الحقوق."
+          }
+        ]
+      },
+      {
+        "id": "isl_hadith_cooperation",
+        "title": "السؤال الثاني: الحديث النبوي الشريف (في التعاون بين المسلمين)",
+        "text": "في الحديث النبوي الشريف وتكافل المجتمع الإسلامي:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "حفظ وتطبيق",
+        "chapter": 2,
+        "topic": "الحديث النبوي الشريف: التعاون والتكافل بين المسلمين",
+        "questionCategory": "hadith_sharif",
+        "sourceType": "الامتحان الوزاري المعتمد - الحديث الشريف",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب الحديث الشريف",
+            "text": "اكتب حديثاً نبوياً شريفاً عن النبي ﷺ في (التعاون والترابط بين المسلمين) واضبطه بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "قال رسول الله ﷺ:\n«مَثَلُ الْمُؤْمِنِينَ فِي تَوَادِّهِمْ وَتَرَاحُمِهِمْ وَتَعَاطُفِهِمْ مَثَلُ الْجَسَدِ إِذَا اشْتَكَى مِنْهُ عُضْوٌ تَدَاعَى لَهُ سَائِرُ الْجَسَدِ بِالسَّهَرِ وَالْحُمَّى».\nصدق رسول الله ﷺ."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): التوضيح وما يستفاد من الحديث",
+            "text": "1. بم شبّه النبي ﷺ المجتمع المؤمن في هذا الحديث الشريف؟ ولماذا؟\n2. اذكر نقطتين مما يرشد إليه الحديث الشريف.",
+            "score": 8,
+            "modelAnswer": "1. التشبيه:\nشبّههم بالجسد الواحد الحي في التضامن والتكامل؛ فكما أن الجسد كله يتألم ويصاب بالحمى والسهر إذا تألم عضو صغير فيه كالإصبع، كذلك يجب أن يشعر المسلمون بآلام بعضهم ويتسابقوا لعون المحتاجين.\n2. ما يرشد إليه الحديث:\n- ترسيخ أواصر المحبة والتعاطف والتكافل الاجتماعي بين أفراد المجتمع.\n- نبذ الأنانية والفرقة والشعور بالمسؤولية المشتركة تجاه الفقراء والمرضى."
+          }
+        ]
+      }
+    ],
+    "3": [
+      {
+        "id": "isl_hadith_sanctity_muslim",
+        "title": "السؤال الثاني: الحديث النبوي الشريف (في حرمة المسلم)",
+        "text": "في صيانة الحقوق الإنسانية وحرمة المسلم:",
+        "score": 20,
+        "difficulty": "سهل",
+        "bloom": "حفظ وفهم",
+        "chapter": 3,
+        "topic": "الحديث النبوي الشريف: حرمة المسلم ودمه وعرضه",
+        "questionCategory": "hadith_sharif",
+        "sourceType": "الامتحان الوزاري المعتمد - الحديث الشريف",
+        "branches": [
+          {
+            "id": "b1",
+            "title": "الفرع (أ): اكتب الحديث الشريف كاملاً",
+            "text": "اكتب حديثاً نبوياً شريفاً عن النبي ﷺ في (حرمة المسلم) واضبط كلماته بالشكل التام.",
+            "score": 12,
+            "modelAnswer": "قال رسول الله ﷺ:\n«كُلُّ الْمُسْلِمِ عَلَى الْمُسْلِمِ حَرَامٌ: دَمُهُ، وَمَالُهُ، وَعِرْضُهُ».\nصدق رسول الله ﷺ."
+          },
+          {
+            "id": "b2",
+            "title": "الفرع (ب): بيان المعنى وما يستفاد منه",
+            "text": "1. ما المقصود بـ (العِرض) في الحديث الشريف؟ وكيف يُصان؟\n2. بيّن حرمة التعدي على أموال الناس ودمائهم وما يترتب على ذلك.",
+            "score": 8,
+            "modelAnswer": "1. العِرض:\nهو سمعة الإنسان وكرامته وشرفه وكل ما يُحمد أو يُذم به في نفسه وأهله. ويُصان بترك الغيبة والنميمة والسب والبهتان وصيانة كرامة الآخرين.\n2. حرمة الدماء والأموال:\nالاعتداء على النفس والمال من أعظم الكبائر المحرمة في الإسلام، ويوجب القصاص والعقوبة الشديدة في الدنيا وغضب الله والعذاب الأليم في الآخرة، لأنه يهدد استقرار المجتمع وأمنه."
           }
         ]
       }
@@ -11416,822 +13639,6 @@
       }
     ]
   },
-  "arabic": {
-    "1": [
-      {
-        "id": "ar_ch1_q1",
-        "title": "اشتقاق اسم الفاعل وعمله وشروطه ومعموله",
-        "text": "في قواعد اللغة العربية وموضوع (اسم الفاعل):",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وإعراب",
-        "chapter": 1,
-        "topic": "اسم الفاعل وعمله",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اشتق اسم فاعل من الأفعال الآتية مضبوطاً بالشكل التام: (صَامَ - أَنْفَقَ - قَضَى - اسْتَغْفَرَ).",
-            "score": 10,
-            "modelAnswer": "صَامَ (ثلاثي معتل الوسط): صَائِمٌ\nأَنْفَقَ (رباعي): مُنْفِقٌ (على وزن مضارعه بإبدال حرف المضارعة ميماً مضمومة وكسر ما قبل الآخر)\nقَضَى (ثلاثي ناقص): قَاضٍ (أو القَاضِي عند تعريفه بأل)\nاسْتَغْفَرَ (سداسي): مُسْتَغْفِرٌ"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "قال تعالى: ﴿وَالْكَاظِمِينَ الْغَيْظَ وَالْعَافِينَ عَنِ النَّاسِ﴾. استخرج اسم الفاعل العامل، وبيّن سبب عمله، ثم اعرب معموله.",
-            "score": 10,
-            "modelAnswer": "اسم الفاعل العامل: (الْكَاظِمِينَ).\nسبب عمله: محلّى بـ (أل) التعريف، فيعمل دون قيد أو شرط وبلا حاجة لزمن حال أو استقبال.\nمعموله وإعرابه: (الْغَيْظَ): مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q2",
-        "title": "صيغ المبالغة وأوزانها الخمسة القياسية وعملها",
-        "text": "في المشتقات وموضوع (صيغ المبالغة):",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تحليل وتطبيق",
-        "chapter": 1,
-        "topic": "صيغ المبالغة",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الأوزان القياسية الخمسة لصيغ المبالغة؟ اذكر وزناً لكل صيغة مع صياغة كلمة من الأفعال الآتية: (صَبَرَ - أَعْطَى - غَفَرَ - عَلِمَ - حَذِرَ).",
-            "score": 10,
-            "modelAnswer": "الأوزان والأمثلة:\n1) فَعَّال: غَفَّار (من غَفَرَ)\n2) مِفْعَال: مِعْطَاء (من أَعْطَى)\n3) فَعُول: صَبُور (من صَبَرَ)\n4) فَعِيل: عَلِيم (من عَلِمَ)\n5) فَعِل: حَذِر (من حَذِرَ)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "جملة: «المؤمنُ شَكُورٌ نِعْمَةَ ربِّهِ». عيّن صيغة المبالغة، وبيّن سبب عملها، ثم اعرب معمولها.",
-            "score": 10,
-            "modelAnswer": "صيغة المبالغة: (شَكُورٌ) على وزن (فَعُول).\nسبب عملها: نكرة منونة وقعت خبراً للمبتدأ (المؤمنُ) ودلت على الحال والاستقبال.\nمعمولها وإعرابه: (نِعْمَةَ): مفعول به لصيغة المبالغة منصوب وعلامة نصبه الفتحة الظاهرة، وهو مضاف."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q3",
-        "title": "اشتقاق اسم المفعول وعمله ونائب الفاعل",
-        "text": "في دراسة مشتق (اسم المفعول):",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وإعراب",
-        "chapter": 1,
-        "topic": "اسم المفعول ونائب الفاعل",
-        "sourceType": "وزاري 2022 دور تمهيدي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اشتق اسم مفعول من الأفعال المبنية للمجهول الآتية مع الضبط بالشكل: (كُتِبَ - قِيلَ - دُعِيَ - أُكْرِمَ).",
-            "score": 10,
-            "modelAnswer": "كُتِبَ: مَكْتُوبٌ (على وزن مَفْعُول)\nقِيلَ: مَقُولٌ (ثلاثي أجوف بحذف واو مفعول)\nدُعِيَ: مَدْعُوٌّ (ثلاثي ناقص بإدغام الواوين)\nأُكْرِمَ: مُكْرَمٌ (غير ثلاثي بإبدال حرف المضارعة ميماً مضمومة وفتح ما قبل الآخر)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "جملة: «أَمَعْرُوفٌ فَضْلُ المعلمِ؟». استخرج اسم المفعول، وبيّن سبب عمله، ثم اعرب معموله إعراباً مفصلاً.",
-            "score": 10,
-            "modelAnswer": "اسم المفعول: (مَعْرُوفٌ).\nسبب عمله: نكرة منونة سبقت باستفهام (الهمزة) ودلت على الحال والاستقبال.\nمعموله وإعرابه: (فَضْلُ): نائب فاعل لاسم المفعول مرفوع وعلامة رفعه الضمة الظاهرة، سدّ مَسَدَّ الخبر، وهو مضاف."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q4",
-        "title": "الميزان الصرفي للأفعال المعتلة والمحذوف منها أحرف",
-        "text": "في قواعد الصرف والميزان الصرفي:",
-        "score": 20,
-        "difficulty": "صعب",
-        "bloom": "تحليل وصرف",
-        "chapter": 1,
-        "topic": "الميزان الصرفي",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "زن الكلمات الآتية مبيناً ما حدث فيها من حذف أو زيادة بالحركات الدقيقة:\n(قِ - اسْعَ - قَاضٍ - يَرِثُ - انْتَصَرَ).",
-            "score": 10,
-            "modelAnswer": "قِ (أصلها وَقَى - حذفت فاء الفعل ولامه): زنتها (عِ)\nاسْعَ (أصلها سَعَى - حذفت لامه وزيدت همزة وصل): زنتها (افْعَ)\nقَاضٍ (أصلها قَاضِي - حذفت لامه وعوض بتنوين كسر): زنتها (فَاعٍ)\nيَرِثُ (أصلها وَرِثَ - حذفت فاؤه): زنتها (يَعِلُ)\nانْتَصَرَ (أصلها نَصَرَ - زيدت همزة وتاء): زنتها (افْتَعَلَ)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "رد الكلمات الآتية إلى جذورها الثلاثية (أفعالها الماضية): (ثِقَة - خُذْ - قُمْ - اتَّقِ).",
-            "score": 10,
-            "modelAnswer": "ثِقَة: من (وَثِقَ)\nخُذْ: من (أَخَذَ)\nقُمْ: من (قَامَ)\nاتَّقِ: من (وَقَى)"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q5",
-        "title": "شروط عمل المشتقات إذا كانت نكرة منونة",
-        "text": "في ضوابط عمل المشتقات عمل أفعالها:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وتطبيق",
-        "chapter": 1,
-        "topic": "شروط عمل المشتقات",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "إذا كان اسم الفاعل أو صيغة المبالغة أو اسم المفعول نكرة مجردة من (أل)، فما هي الشروط التي يجب أن تتوفر فيه لكي يعمل عمل فعله؟ اذكر أربعة شروط مع التمثيل بجملة مفيدة لكل شرط.",
-            "score": 10,
-            "modelAnswer": "الشرط الأساسي: أن يدل على الحال أو الاستقبال (لا يدل على المضي)، وأن يعتمد على:\n1) أن يسبق بنفي: (ما طالبٌ الحقَّ خائبٌ).\n2) أن يسبق باستفهام: (أفاهمٌ أخوكَ الدرسَ؟).\n3) أن يقع خبراً: (خالدٌ قارئٌ القرآنَ).\n4) أن يقع صفة: (جاءَ رجلٌ راكبٌ فرساً).\n5) أو يقع حالاً أو منادى."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بيّن سبب عدم عمل اسم الفاعل في الجملة الآتية: «أنا كاتبٌ الدرسَ أمسِ». وما التغيير الواجب لجعله عاملاً؟",
-            "score": 10,
-            "modelAnswer": "السبب: لأنه دل على الزمن الماضي بوجود كلمة (أمسِ)، وشرط عمل النكرة المنونة أن تدل على الزمن الحاضر أو المستقبل.\nالتغيير لجعله عاملاً: حذف كلمة (أمسِ) لتصبح الجملة: «أنا كاتبٌ الدرسَ الآنَ / غداً» أو تعريفه بأل: «أنا الكاتبُ الدرسَ أمسِ»."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q6",
-        "title": "مصادر الأفعال الثلاثية القياسية والسماعية",
-        "text": "في الصرف العربي ومصادر الأفعال:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتصنيف",
-        "chapter": 1,
-        "topic": "مصادر الأفعال الثلاثية",
-        "sourceType": "وزاري 2021 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "هات مصادر الأفعال الثلاثية الآتية مبيناً دلالة كل مصدر منها:\n(صَاغَ - رَحَلَ - حَمِرَ - سَعَلَ - صَدَعَ).",
-            "score": 10,
-            "modelAnswer": "صَاغَ: صِيَاغَةً (على وزن فِعَالَة: يدل على حرفة أو صناعة)\nرَحَلَ: رَحِيلاً (على وزن فَعِيل: يدل على سير وانتقال)\nحَمِرَ: حُمْرَةً (على وزن فُعْلَة: يدل على لون صحيح العين)\nسَعَلَ: سُعَالاً (على وزن فُعَال: يدل على مرض وداء)\nصَدَعَ: صُدَاعاً (يدل على داء ومرض)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق بين المصدر واسم الفاعل من حيث الدلالة على الزمن والحدث والفاعل؟",
-            "score": 10,
-            "modelAnswer": "المصدر: يدل على الحدث مجرداً تماماً من الزمان ومن الفاعل (مثل: القِرَاءَة، الكِتَابَة).\nاسم الفاعل: يدل على الحدث وعلى الذات التي قامت بالفعل أو اتصفت به في زمان معين (مثل: القَارِئ، الكَاتِب)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q7",
-        "title": "مصادر الأفعال غير الثلاثية (الرباعية والخماسية والسداسية)",
-        "text": "في أوزان المصادر القياسية غير الثلاثية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وصرف",
-        "chapter": 1,
-        "topic": "مصادر غير الثلاثي",
-        "sourceType": "وزاري 2022 دور ثان",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "هات مصادر الأفعال الآتية واذكر القاعدة الصرفية لكل منها:\n(أَكْرَمَ - قَدَّمَ - جَادَلَ - زَلْزَلَ).",
-            "score": 10,
-            "modelAnswer": "أَكْرَمَ (أَفْعَلَ صحيح العين): إِكْرَاماً (على وزن إِفْعَال)\nقَدَّمَ (فَعَّلَ صحيح اللام): تَقْدِيماً (على وزن تَفْعِيل)\nجَادَلَ (فَاعَلَ): جِدَالاً ومُجَادَلَةً (على وزن فِعَال ومُفَاعَلَة)\nزَلْزَلَ (فَعْلَلَ مضاعف): زَلْزَلَةً وزِلْزَالاً (على وزن فَعْلَلَة وفِعْلاَل)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "هات مصادر الأفعال الخماسية والسداسية الآتية: (انْطَلَقَ - تَقَدَّمَ - اسْتَخْرَجَ - اسْتَقَامَ).",
-            "score": 10,
-            "modelAnswer": "انْطَلَقَ (مبدوء بهمزة وصل): انْطِلاقاً (بكسر الحرف الثالث وزيادة ألف قبل الآخر)\nتَقَدَّمَ (مبدوء بتاء زائدة): تَقَدُّماً (بضم ما قبل الآخر)\nاسْتَخْرَجَ: اسْتِخْرَاجاً (على وزن اسْتِفْعَال)\nاسْتَقَامَ (معتل العين بالألف): اسْتِقَامَةً (على وزن اسْتِفَالَة بحذف عينه والتعويض بتاء في الآخر)"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q8",
-        "title": "إعراب سد مسد الخبر في المشتقات المعتمدة على نفي واستفهام",
-        "text": "في دقائق الإعراب النحوي للمشتقات العاملة:",
-        "score": 20,
-        "difficulty": "صعب",
-        "bloom": "إعراب وتحليل",
-        "chapter": 1,
-        "topic": "سد مسد الخبر",
-        "sourceType": "وزاري مكرر للمتميزين",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اعرب الجملة الآتية إعراباً مفصلاً تاماً: «مَا نَاصِرٌ البَاطِلَ مؤمنٌ».",
-            "score": 10,
-            "modelAnswer": "مَا: حرف نفي لا عمل له.\nنَاصِرٌ: مبتدأ مرفوع وعلامة رفعه الضمة الظاهرة على آخره (وهو اسم فاعل عامل).\nالبَاطِلَ: مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره.\nمؤمنٌ: فاعل لاسم الفاعل سدّ مَسَدَّ الخبر مرفوع وعلامة رفعه الضمة الظاهرة على آخره."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "متى يُعرب معمول المشتق فاعلاً أو نائب فاعل (سدّ مَسَدَّ الخبر)؟",
-            "score": 10,
-            "modelAnswer": "إذا وقع المشتق النكرة المنونة في بداية الجملة مبتدأً مسبوقاً بنفي أو مسبوقاً باستفهام، فيحتاج المشتق إلى معموله المرفوع ليتمم معنى الجملة فيعرب المعمول فاعلاً لاسم الفاعل/صيغة المبالغة أو نائب فاعل لاسم المفعول سد مسد الخبر ليغني عن الخبر."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q9",
-        "title": "تحويل الفعل إلى اسم فاعل وصيغة مبالغة واسم مفعول",
-        "text": "في التطبيقات الصرفية التوليدية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وتوليد",
-        "chapter": 1,
-        "topic": "توليد المشتقات",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "الفعل (رَحِمَ)، صغ منه:\n1) اسم فاعل وضعه في جملة مفيدة وهو عامل.\n2) صيغة مبالغة على وزن (فَعِيل) في جملة مفيدة.\n3) اسم مفعول وضعه في جملة مفيدة.",
-            "score": 10,
-            "modelAnswer": "1) اسم فاعل: رَاحِمٌ -> «ما راحمٌ الضعفاءَ إلا الكريمُ».\n2) صيغة مبالغة: رَحِيمٌ -> «إنَّ اللهَ رَحِيمٌ بعبادِهِ».\n3) اسم مفعول: مَرْحُومٌ -> «المرحومُ محبوبٌ في قومِهِ»."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "هل يشتق اسم المفعول من الفعل اللازم؟ وكيف يتم ذلك؟",
-            "score": 10,
-            "modelAnswer": "نعم، ولكن بشرط أن يأتي بعده شبه جملة (جار ومجرور أو ظرف) ليتم المعنى ويسد مسد نائب الفاعل، مثل: (جَلَسَ -> مَجْلُوسٌ عَلَيْهِ)، (ذَهَبَ -> مَذْهُوبٌ بِهِ)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q10",
-        "title": "تحدي التفريق بين اسم الفاعل واسم المفعول المتشابهين لفظاً",
-        "text": "في المشتقات المشتركة في الصيغة اللفظية:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تحليل وسياق",
-        "chapter": 1,
-        "topic": "المشتقات المتشابهة صياغة",
-        "sourceType": "أسئلة متميزين وزارية",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "كلمة (مُحْتَلّ) وكلمة (مُخْتَار)، كيف تفرق بين كونهما اسم فاعل أو اسم مفعول في الجملتين الآتيتين مبيناً القرينة السياقية والمعنوية:\n1) «الشعبُ الفلسطينيُّ مُحْتَلٌّ أرضُهُ».\n2) «الجيشُ الصهيونيُّ مُحْتَلٌّ أرضَ فلسطينَ».",
-            "score": 10,
-            "modelAnswer": "1) في الجملة الأولى: (مُحْتَلٌّ) اسم مفعول؛ لأن الشعب وقع عليه فعل الاحتلال (فعل مبني للمجهول)، و(أرضُهُ) نائب فاعل.\n2) في الجملة الثانية: (مُحْتَلٌّ) اسم فاعل؛ لأن الجيش هو الذي قام بفعل الاحتلال بنفسه (فعل مبني للمعلوم)، و(أرضَ) مفعول به لاسم الفاعل."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ميز بين اسم الفاعل واسم المفعول في: «أنا مُخْتَارٌ لزملائي» و «أنا مُخْتَارٌ من قبل زملائي».",
-            "score": 10,
-            "modelAnswer": "«أنا مُخْتَارٌ لزملائي»: اسم فاعل (أنا من قمت بالاختيار).\n«أنا مُخْتَارٌ من قبل زملائي»: اسم مفعول (وقع عليّ الاختيار من غيري)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q11",
-        "title": "أبواب الفعل الثلاثي المجرد الستة",
-        "text": "في ميزان الأفعال وحركات عين الفعل:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وتصنيف",
-        "chapter": 1,
-        "topic": "أبواب الفعل الثلاثي",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اذكر أبواب الأفعال الثلاثية المجردة الستة مع البيت الشعري الحاصر لها.",
-            "score": 10,
-            "modelAnswer": "البيت الشعري: «فَتْحُ ضَمٍّ ، فَتْحُ كَسْرٍ ، فَتْحَتَانِ ... كَسْرُ فَتْحٍ ، ضَمُّ ضَمٍّ ، كَسْرَتَانِ».\nالأبواب:\n1) الباب الأول: فَعَلَ يَفْعُلُ (نَصَرَ يَنْصُرُ)\n2) الباب الثاني: فَعَلَ يَفْعِلُ (ضَرَبَ يَضْرِبُ)\n3) الباب الثالث: فَعَلَ يَفْعَلُ (فَتَحَ يَفْتَحُ)\n4) الباب الرابع: فَعِلَ يَفْعَلُ (فَرِحَ يَفْرَحُ)\n5) الباب الخامس: فَعُلَ يَفْعُلُ (كَرُمَ يَكْرُمُ)\n6) الباب السادس: فَعِلَ يَفْعِلُ (حَسِبَ يَحْسِبُ)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "رد الأفعال الآتية إلى أبوابها الصحيحة: (غَفَرَ يَغْفِرُ - دَخَلَ يَدْخُلُ - شَرِبَ يَشْرَبُ - جَبُنَ يَجْبُنُ).",
-            "score": 10,
-            "modelAnswer": "غَفَرَ يَغْفِرُ: الباب الثاني (فتح كسر)\nدَخَلَ يَدْخُلُ: الباب الأول (فتح ضم)\nشَرِبَ يَشْرَبُ: الباب الرابع (كسر فتح)\nجَبُنَ يَجْبُنُ: الباب الخامس (ضم ضم)"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q12",
-        "title": "اسم الفاعل المضاف وحكم معموله المجرور",
-        "text": "في الفروق النحوية بين الإعمال والإضافة:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "مقارنة وإعراب",
-        "chapter": 1,
-        "topic": "المشتق المضاف وغير المضاف",
-        "sourceType": "وزاري 2019 دور ثان",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قارن في الإعراب بين الكلمتين اللتين تحتهما خط في الجملتين الآتيتين:\n1) «هذا صَانِعُ <u>المَعْرُوفِ</u>».\n2) «هذا صَانِعٌ <u>المَعْرُوفَ</u>».",
-            "score": 10,
-            "modelAnswer": "1) <u>المَعْرُوفِ</u> في الأولى: مضاف إليه مجرور وعلامة جره الكسرة الظاهرة؛ لأن اسم الفاعل (صَانِعُ) غير منون فحذفت نونه للتخفيف وأضيف إلى معموله.\n2) <u>المَعْرُوفَ</u> في الثانية: مفعول به لاسم الفاعل المنون (صَانِعٌ) منصوب وعلامة نصبه الفتحة الظاهرة."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الأثر الإعرابي لتنوين اسم الفاعل في الجملة؟",
-            "score": 10,
-            "modelAnswer": "التنوين يمنع الإضافة ويدل على التمام ويفصل بين الكلمتين فيعمل اسم الفاعل عمل فعله فينصب مفعولاً به أو يرفع فاعلاً، بينما حذف التنوين يوجب الإضافة وجر الاسم التالي."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q13",
-        "title": "صيغ المبالغة في القرآن الكريم وبلاغتها",
-        "text": "في الشواهد القرآنية للمشتقات:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "استخراج وتفسير",
-        "chapter": 1,
-        "topic": "شواهد صيغ المبالغة",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قال تعالى: ﴿وَلَا تُطِعْ كُلَّ حَلَّافٍ مَّهِينٍ * هَمَّازٍ مَّشَّاءٍ بِنَمِيمٍ * مَّنَّاعٍ لِّلْخَيْرِ مُعْتَدٍ أَثِيمٍ﴾. استخرج صيغ المبالغة الواردة في الآيات الكريمة واذكر أوزانها.",
-            "score": 10,
-            "modelAnswer": "1) حَلَّافٍ: على وزن (فَعَّال)\n2) هَمَّازٍ: على وزن (فَعَّال)\n3) مَشَّاءٍ: على وزن (فَعَّال)\n4) مَنَّاعٍ: على وزن (فَعَّال)\n5) أَثِيمٍ: على وزن (فَعِيل)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما المعنى البلاغي والدلالي الذي تؤديه صيغة المبالغة مقارنة باسم الفاعل الاعتيادي؟",
-            "score": 10,
-            "modelAnswer": "صيغة المبالغة تدل على الدلالة التي يدل عليها اسم الفاعل مع إفادة الكثرة والزيادة والمبالغة والتكرار في وقوع الفعل والاتصاف به لدرجة الثبوت."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q14",
-        "title": "اشتقاق اسم الفاعل والمفعول من الأفعال المزيدة",
-        "text": "في صياغة المشتقات من الأفعال فوق الثلاثية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وصرف",
-        "chapter": 1,
-        "topic": "اشتقاق غير الثلاثي",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "صغ اسم فاعل واسم مفعول من الأفعال المزيدة الآتية مع الضبط التام بالشكل:\n(انْتَخَبَ - دَحْرَجَ - أَعْلَنَ).",
-            "score": 10,
-            "modelAnswer": "انْتَخَبَ: اسم الفاعل: مُنْتَخِبٌ (بكسر الخاء)، اسم المفعول: مُنْتَخَبٌ (بفتح الخاء)\nدَحْرَجَ: اسم الفاعل: مُدَحْرِجٌ (بكسر الراء)، اسم المفعول: مُدَحْرَجٌ (بفتح الراء)\nأَعْلَنَ: اسم الفاعل: مُعْلِنٌ (بكسر اللام)، اسم المفعول: مُعْلَنٌ (بفتح اللام)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي القاعدة الصرفية العامة لاشتقاق اسم الفاعل واسم المفعول من الفعل غير الثلاثي؟",
-            "score": 10,
-            "modelAnswer": "نأتي بالمضارع، ثم نبدل حرف المضارعة ميماً مضمومة:\n- نكسر الحرف قبل الأخير في (اسم الفاعل).\n- نفتح الحرف قبل الأخير في (اسم المفعول)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch1_q15",
-        "title": "اختبار المتميزين الشامل في مشتقات الفصل الأول",
-        "text": "أجب عن المسألة النحوية والصرفية المتكاملة الآتية:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تقويم وتحليل",
-        "chapter": 1,
-        "topic": "اختبار التميز الشامل لمشتقات الفصل الأول",
-        "sourceType": "امتحانات المتميزين العامة",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قال الشاعر: «أَلَمْ تَكُ في الدَّهْرِ مِطْعَامَ الضُّيُوفِ وَفَاتِحاً ... مَغَالِيقَ أَبْوَابِ المَكَارِمِ كُلَّهَا».\nاستخرج المشتقات العاملة الواردة في البيت، وحدد نوع كل مشتق ووزنه وإعراب معموله.",
-            "score": 10,
-            "modelAnswer": "1) (مِطْعَامَ): صيغة مبالغة على وزن (مِفْعَال)، معمولها (الضُّيُوفِ) مضاف إليه مجرور لفظاً مفعول به معنى.\n2) (فَاتِحاً): اسم فاعل على وزن (فَاعِل)، معموله (مَغَالِيقَ) مفعول به لاسم الفاعل منصوب وعلامة نصبه الفتحة الظاهرة على آخره."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق بين إعراب كلمة (كُلَّهَا) وتوكيدها في البيت الشعري؟",
-            "score": 10,
-            "modelAnswer": "(كُلَّهَا): توكيد معنوي منصوب وعلامة نصبه الفتحة الظاهرة وهو مضاف، والهاء ضمير متصل مبني في محل جر بالإضافة، يتبع المؤكد (مغاليق أبواب المكارم)."
-          }
-        ]
-      }
-    ],
-    "2": [
-      {
-        "id": "ar_ch2_q1",
-        "title": "الصفة المشبهة باسم الفاعل وأوزانها وإعراب معمولها",
-        "text": "في دراسة مشتق (الصفة المشبهة باسم الفاعل):",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وإعراب",
-        "chapter": 2,
-        "topic": "الصفة المشبهة وإعراب معمولها",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اشتق صفة مشبهة من الأفعال الآتية مضبوطة بالشكل مع ذكر وزنها:\n(كَرُمَ - فَرِحَ - شَبِعَ - عَذُبَ).",
-            "score": 10,
-            "modelAnswer": "كَرُمَ: كَرِيمٌ (على وزن فَعِيل)\nفَرِحَ: فَرِحٌ (على وزن فَعِل)\nشَبِعَ: شَبْعَانُ ومؤنثها شَبْعَى (على وزن فَعْلان ومؤنثه فَعْلَى)\nعَذُبَ: عَذْبٌ (على وزن فَعْل)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "لمعمول الصفة المشبهة ثلاثة أوجه إعرابية، وضحها مع التمثيل بجملة: «العراقيُّ طَيِّبٌ ...» بضبط الكلمة التالية بثلاث حالات.",
-            "score": 10,
-            "modelAnswer": "الحالات الثلاث:\n1) الرفع على الفاعلية (إذا كان مضافاً لضمير): «العراقيُّ طَيِّبٌ <u>خُلُقُهُ</u>» (خلقُه: فاعل للصفة المشبهة مرفوع بالضمة).\n2) النصب على التمييز (إذا كان نكرة منونة): «العراقيُّ طَيِّبٌ <u>خُلُقاً</u>» (خلقاً: تمييز منصوب بالفتحة).\n3) الجر بالإضافة (إذا كان معرفاً بأل): «العراقيُّ طَيِّبُ <u>الخُلُقِ</u>» (الخلقِ: مضاف إليه مجرور بالكسرة)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q2",
-        "title": "اسم التفضيل وأركانه وحالاته الأربع وأحكام مطابقته",
-        "text": "في أسلوب التفضيل ومشتق (اسم التفضيل):",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "فهم ومقارنة",
-        "chapter": 2,
-        "topic": "اسم التفضيل وحالاته ومطابقته",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الحالات الأربع لاسم التفضيل في اللغة العربية؟ وما حكم مطابقته للمفضل في كل حالة؟",
-            "score": 10,
-            "modelAnswer": "الحالات والأحكام:\n1) مجرد من (أل) والإضافة: يلزم الإفراد والتذكير ويؤتى بعده بـ (من) (مثل: الصدقُ أنفعُ من الكذبِ).\n2) محلّى بـ (أل): يطابق المفضل في الإفراد والتثنية والجمع والتذكير والتأنيث ولا يؤتى بعده بـ (من) (مثل: اليدُ العليا خيرٌ من اليدِ السفلى).\n3) مضاف إلى نكرة: يلزم الإفراد والتذكير، ويطابق المضاف إليه المفضل (مثل: هذانِ أفضلُ رجلينِ).\n4) مضاف إلى معرفة: يجوز فيه الوجهان: ملازمة الإفراد والتذكير أو مطابقة المفضل (مثل: هؤلاء أفضلُ القومِ / أفاضلُ القومِ)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "عيّن أركان جملة التفضيل في الآية الكريمة: ﴿لَخَلْقُ السَّمَاوَاتِ وَالْأَرْضِ أَكْبَرُ مِنْ خَلْقِ النَّاسِ﴾.",
-            "score": 10,
-            "modelAnswer": "المفضل: (خَلْقُ السَّمَاوَاتِ وَالْأَرْضِ).\nاسم التفضيل: (أَكْبَرُ) على وزن (أَفْعَل).\nالمفضل عليه: (خَلْقِ النَّاسِ)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q3",
-        "title": "اسم الآلة القياسي والجامد وأوزانه",
-        "text": "في دراسة مشتق (اسم الآلة):",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتصنيف",
-        "chapter": 2,
-        "topic": "اسم الآلة القياسي والجامد",
-        "sourceType": "وزاري 2022 دور تمهيدي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الأوزان القياسية الأربعة لاسم الآلة المشتق؟ مثل لكل وزن بكلمة مضبوطة بالشكل.",
-            "score": 10,
-            "modelAnswer": "1) مِفْعَال: مِفْتَاح ، مِنْشَار ، مِقْيَاس\n2) مِفْعَل: مِبْرَد ، مِصْعَد ، مِدْفَع\n3) مِفْعَلَة: مِكْنَسَة ، مِلْعَقَة ، مِبْرَاة\n4) فَعَّالَة (الوزن الحديث المعتمد من المجمع): غَسَّالَة ، ثَلَّاجَة ، سَيَّارَة"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق بين اسم الآلة المشتق واسم الآلة الجامد؟ اذكر أربعة أسماء آلة جامدة مشهورة.",
-            "score": 10,
-            "modelAnswer": "المشتق: له فعل مشتق منه ويصاغ على أوزان قياسية معلومة (مثل: مِبْرَد من بَرَدَ).\nالجامد: غير مشتق من فعل وليس له أوزان قياسية ضابطة بل سُمع عن العرب هكذا.\nأمثلة الجامد: سَيْف ، قَلَم ، فَرْجَار ، رُمْح ، سِكِّين ، قَوْس."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q4",
-        "title": "اسما الزمان والمكان وصياغتهما من الثلاثي وغير الثلاثي",
-        "text": "في المشتقات الدالة على الزمان والمكان:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "صرف وتطبيق",
-        "chapter": 2,
-        "topic": "اسما الزمان والمكان",
-        "sourceType": "وزاري 2021 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "صغ اسم مكان أو زمان من الأفعال الآتية مبيناً الوزن وسبب الصياغة:\n(لَعِبَ - غَرَبَ - وَعَدَ - اسْتَوْدَعَ).",
-            "score": 10,
-            "modelAnswer": "لَعِبَ: مَلْعَبٌ (على وزن مَفْعَل: عين مضارعه مفتوحة يَلْعَبُ)\nغَرَبَ: مَغْرِبٌ (على وزن مَفْعِل: شاذ أو مكسور العين)\nوَعَدَ: مَوْعِدٌ (على وزن مَفْعِل: مثال واوي مكسور العين في المضارع يَعِدُ)\nاسْتَوْدَعَ: مُسْتَوْدَعٌ (غير ثلاثي على وزن اسم المفعول بإبدال حرف المضارعة ميماً مضمومة وفتح ما قبل الآخر)"
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "كيف نميز بين اسم الزمان واسم المكان واسم المفعول من غير الثلاثي إذا اتفقت في الصياغة (مثل: مُلْتَقَى)؟ وضح بالقرائن السياقية في جملتين مفيدتين.",
-            "score": 10,
-            "modelAnswer": "نميز بينها من خلال سياق المعنى والقرينة اللفظية في الجملة:\n1) اسم مكان: «النادي <u>مُلْتَقَى</u> الأصدقاءِ» (دلت على مكان اللقاء).\n2) اسم زمان: «يومُ الجمعةِ <u>مُلْتَقَى</u> العائلةِ» (دلت على زمان اللقاء).\n3) اسم مفعول: «الضيفُ <u>مُلْتَقَى</u> به بحفاوةٍ» (دلت على من وقع عليه فعل اللقاء)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q5",
-        "title": "شروط الفعل الذي يشتق منه اسم التفضيل مباشرة بطريقة قياسية",
-        "text": "في ضوابط صياغة اسم التفضيل:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وشروط",
-        "chapter": 2,
-        "topic": "شروط صياغة اسم التفضيل",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الشروط السبعة التي يجب أن تتوفر في الفعل ليصاغ منه اسم التفضيل مباشرة على وزن (أَفْعَل)؟ اذكر خمسة منها.",
-            "score": 10,
-            "modelAnswer": "1) أن يكون فعلاً ثلاثياً.\n2) تاماً (غير ناقص ككان وأخواتها).\n3) مثبتاً (غير منفي).\n4) متصرفاً (غير جامد كعسى وليس وبئس ونعم).\n5) مبنياً للمعلوم (غير مبني للمجهول).\n6) قابلاً للتفاوت والمفاضلة (لا يصاغ من مات وفني وهلك وغرق).\n7) ليس الوصف منه على (أفعل فعلاء) الدال على لون أو عيب أو حلية."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "كيف نأتي باسم التفضيل من الأفعال الآتية التي فقدت الشروط:\n1) (ازْدَحَمَ - غير ثلاثي).\n2) (خَضِرَ - الوصف منه على أفعل فعلاء الدال على لون)؟",
-            "score": 10,
-            "modelAnswer": "نأتي باسم تفضيل مساعد مستوفٍ للشروط مثل: (أَشَدّ، أَكْثَر، أَعْظَم) ثم نتبعه بالمصدر الصريح للفعل منصوباً على التمييز:\n1) ازْدَحَمَ: «شارعُ الرشيدِ <u>أَكْثَرُ ازْدِحَاماً</u> من غيرِهِ».\n2) خَضِرَ: «الحديقةُ <u>أَشَدُّ خُضْرَةً</u> من الحقلِ»."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q6",
-        "title": "قواعد الإملاء وعلامات الترقيم (الفاصلة والنقطتان وعلامة التنصيص)",
-        "text": "في مهارات الإملاء والترقيم المنهجية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتذكر",
-        "chapter": 2,
-        "topic": "علامات الترقيم",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اذكر موضعين لاستعمال كل من علامات الترقيم الآتية في الكتابة العربية:\n1) الفاصلة (،)\n2) النقطتان الرأسيتان (:)",
-            "score": 10,
-            "modelAnswer": "1) الفاصلة: أ) بين الجمل القصيرة المتصلة في المعنى، ب) بعد المنادى (مثل: يا عليُّ، اكتبْ)، ج) بين أقسام الشيء وأنواعه.\n2) النقطتان الرأسيتان: أ) بعد القول وشبهه (مثل: قالَ الحكيمُ:)، ب) بين الشيء وأقسامه وأنواعه (مثل: الكلمة ثلاثة أقسام: اسم وفعل وحرف)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "أين توضع (علامة التنصيص « ») و (القوسان الهلاليان) في النصوص المكتوبة؟",
-            "score": 10,
-            "modelAnswer": "علامة التنصيص « »: يوضع بينهما الكلام المقتبس بنصه وحروفه دون تغيير كالأحاديث النبوية وأقوال الحكماء.\nالقوسان ( ): توضع بينهما أرقام الآيات، أسماء السور، تواريخ السنوات، والعبارات التفسيرية والاحتراسية والدعائية كـ (عليه السلام) و (رضي الله عنه)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q7",
-        "title": "همزة الوصل وهمزة القطع والتفريق بينهما",
-        "text": "في قواعد رسم الهمزة في أوائل الكلمات:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "مقارنة وتطبيق",
-        "chapter": 2,
-        "topic": "همزتا الوصل والقطع",
-        "sourceType": "وزاري 2020 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما الفرق بين همزة الوصل وهمزة القطع من حيث النطق والكتابة؟",
-            "score": 10,
-            "modelAnswer": "همزة الوصل: همزة ينطق بها في ابتداء الكلام وتسقط نطقاً في درج الكلام ووصله، وتكتب ألفاً مجردة من الهمزة (ا).\nهمزة القطع: همزة ينطق بها دائماً في أول الكلام وفي درجه ووسطه، وتكتب برسم رأس عين فوق الألف مفتوحة ومضمومة (أَ ، أُ) وتحتها مكسورة (إِ)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بين نوع الهمزة وسبب كتابتها في الكلمات الآتية: (ابْن - إِكْرَام - اعْلَمْ - أَخَذَ).",
-            "score": 10,
-            "modelAnswer": "ابْن: همزة وصل (لأنه من الأسماء التسعة المسموعة عن العرب).\nإِكْرَام: همزة قطع (لأنه مصدر لفعل رباعي أَكْرَمَ).\nاعْلَمْ: همزة وصل (لأنه أمر لفعل ثلاثي عَلِمَ).\nأَخَذَ: همزة قطع (لأنه ماضٍ لفعل ثلاثي مبدوء بهمزة)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q8",
-        "title": "أدب ونصوص: الشاعر محمد مهدي الجواهري وحياته وقصيدته",
-        "text": "في الأدب العربي الحديث وتراجم الشعراء:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وحفظ",
-        "chapter": 2,
-        "topic": "الشاعر الجواهري وقصيدته",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "من هو الشاعر الملقب بـ (شاعر العرب الأكبر) و (متنبي العصر الحديث)؟ أين ولد ومتى توفي؟ وما اسم قصيدته المقررة في المنهج؟",
-            "score": 10,
-            "modelAnswer": "الشاعر: محمد مهدي الجواهري.\nولد في مدينة النجف الأشرف عام 1899 م، وتوفي في دمشق عام 1997 م.\nاسم قصيدته: (يا دجلة الخير)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اكتب أربعة أبيات مضبوطة بالشكل من قصيدة الجواهري (يا دجلة الخير).",
-            "score": 10,
-            "modelAnswer": "حَيَّيْتُ سَفْحَكِ عَنْ بُعْدٍ فَحَيِّينِي ... يَا دِجْلَةَ الخَيْرِ يَا أُمَّ البَسَاتِينِ\nحَيَّيْتُ سَفْحَكِ ظَمْآناً أَلُوذُ بِهِ ... لَوْذَ الرُّؤَامِ بِكَلْبِ الصَّيْدِ يَرْمِينِي\nيَا دِجْلَةَ الخَيْرِ يَا أَمْوَاجُ صَافِيَةً ... تَلُوحُ بَيْنَ الرُّوَى طَوْراً وَتَطْوِينِي\nيَا أُمَّ بَغْدَادَ مِنْ عَهْدٍ لِعَاصِمَةٍ ... تَمْضِي سَرَاعاً وَتَبْقَى فِيكِ تَحْمِينِي"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q9",
-        "title": "أدب ونصوص: معروف الرصافي وقصيدته (الأرملة المرضعة)",
-        "text": "في الشعر الاجتماعي وشعراء العراق:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وحفظ",
-        "chapter": 2,
-        "topic": "الرصافي والأرملة المرضعة",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هو اللقب الأدبي للشاعر معروف الرصافي؟ وبماذا تميز شعره وأسلوبه؟ وما موضوع قصيدته (الأرملة المرضعة)؟",
-            "score": 10,
-            "modelAnswer": "اللقب: شاعر العراق وشاعر الشعب والاجتماع.\nتميز شعره: بالرصانة والمتانة وسهولة الألفاظ واستخدام الشعر وسيلة للإصلاح الاجتماعي والدفاع عن الفقراء والمظلومين والتعليم.\nموضوع القصيدة: تصوير مأساة إنسانية حية لامرأة فقيرة مات زوجها وتركت مع طفلها الرضيع تصارع الفقر والجوع والبرد."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اكتب ثلاثة أبيات من قصيدة (الأرملة المرضعة) تبين فيها حالة المرأة وثيابها الرثة.",
-            "score": 10,
-            "modelAnswer": "لَقِيتُهَا لَيْتَنِي مَا كُنْتُ أَلْقَاهَا ... تَمْشِي وَقَدْ أَثْقَلَ الإِمْلاقُ مَمْشَاهَا\nأَثْوَابُهَا رَثَّةٌ وَالرِّجْلُ حَافِيَةٌ ... وَالدَّمْعُ تَذْرِفُهُ فِي الخَدِّ عَيْنَاهَا\nبَكَتْ مِنَ الفَقْرِ فَاحْمَرَّتْ مَدَامِعُهَا ... وَاصْفَرَّ كَالوَرْسِ مِنْ جُوعٍ مُحَيَّاهَا"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q10",
-        "title": "الصفة المشبهة الدالة على خلو أو امتلاء وعيب ولون",
-        "text": "في أوزان الصفة المشبهة ذات المؤنث الخاص:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وتصنيف",
-        "chapter": 2,
-        "topic": "أوزان الصفة المشبهة",
-        "sourceType": "وزاري 2021 دور ثان",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "إذا كان الفعل الثلاثي من الباب الرابع (فَعِلَ يَفْعَلُ) لازماً، فما هي الأوزان الثلاثة التي تأتي عليها الصفة المشبهة منه؟ مثل لكل وزن مع مؤنثه.",
-            "score": 10,
-            "modelAnswer": "1) (أَفْعَل ومؤنثه فَعْلاء): فيما دل على لون أو عيب أو حلية (مثل: أَسْوَد سَوْدَاء ، أَعْرَج عَرْجَاء ، أَكْحَل كَحْلاء).\n2) (فَعْلان ومؤنثه فَعْلَى): فيما دل على خلو أو امتلاء (مثل: عَطْشَان عَطْشَى ، غَضْبَان غَضْبَى ، جَوْعَان جَوْعَى).\n3) (فَعِل ومؤنثه فَعِلَة): فيما دل على فرح أو حزن أو بطر (مثل: فَرِح فَرِحَة ، جَذِل جَذِلَة)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق بين اسم الفاعل والصفة المشبهة من حيث دلالة كل منهما على الثبوت والتجدد؟",
-            "score": 10,
-            "modelAnswer": "الصفة المشبهة: تدل على صفة ثابتة ثبوتاً دائماً أو شبه دائم في الموصوف لا تتغير بسرعة (مثل: كريم، شجاع، حسن).\nاسم الفاعل: يدل على صفة طارئة متجددة وغير ثابتة تحدث وتزول (مثل: كاتب، ضارب، قائم)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q11",
-        "title": "أدب ونصوص: نازك الملائكة والشعر الحر (قصيدة الشهيد)",
-        "text": "في حركة التجديد في الشعر العراقي:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وفهم",
-        "chapter": 2,
-        "topic": "نازك الملائكة والشعر الحر",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "من هي رائدة حركة الشعر الحر في العراق والعالم العربي؟ ما هي أول قصيدة كتبتها على نمط الشعر الحر عام 1947؟ وما اسم قصيدتها في المنهج؟",
-            "score": 10,
-            "modelAnswer": "الشاعرة: نازك الملائكة.\nأول قصيدة شعر حر: قصيدة (الكوليرا) عام 1947 م.\nاسم قصيدتها المقررة في المنهج: (الشهيد)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما المقصود بـ (الشعر الحر أو شعر التفعيلة)؟ وبماذا اختلف عن الشعر العمودي التقليدي؟",
-            "score": 10,
-            "modelAnswer": "الشعر الحر: نمط شعري حديث يلتزم بالتفعيلة الواحدة كنظام وزني موسيقي ولا يتقيد بعدد محدد من التفعيلات في كل شطر، وتتنوع فيه القوافي دون الالتزام بقافية واحدة موحدة كما في الشعر العمودي ذي الشطرين (الصدر والعجز)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q12",
-        "title": "أدب ونصوص: بدر شاكر السياب (قصيدة لأني غريب)",
-        "text": "في رواد الشعر الحديث وأدب الغربة والوطن:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وحفظ",
-        "chapter": 2,
-        "topic": "السياب وقصيدة لأني غريب",
-        "sourceType": "وزاري 2022 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "أين ولد الشاعر بدر شاكر السياب؟ وما هي أهم دواوينه الشعرية؟ وعن ماذا تعبر قصيدته (لأني غريب)؟",
-            "score": 10,
-            "modelAnswer": "ولد في قرية جيكور في محافظة البصرة عام 1926 م.\nدواوينه: (أنشودة المطر)، (أزهار ذابلة)، (منزل الأقنان)، (شناشيل ابنة الجلبي).\nموضوع القصيدة: تعبر عن شوقه العارم وحنينه الجارف لوطنه العراق وبلدته وأهله وهو يعاني من ألم الغربة والمرض في مستشفى الكويت."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اكتب أربعة أسطر شعرية من قصيدة (لأني غريب) للسياب.",
-            "score": 10,
-            "modelAnswer": "لأَنِّي غَرِيبْ ...\nلأَنَّ العِرَاقَ الحَبِيبْ ...\nبَعِيدٌ ، وَأَنِّي هُنَا فِي اشْتِيَاقْ ...\nإِلَيْهِ ، إِلَيْهَا ، أُنَادِي: عِرَاقْ ...\nفَيَرْجِعُ لِي مِنْ نِدَائِي نَحِيبْ"
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q13",
-        "title": "اسم التفضيل المضاف إلى معرفة والوجهان الجائزان",
-        "text": "في الأوجه الجائزة لصياغة اسم التفضيل:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وإعراب",
-        "chapter": 2,
-        "topic": "التفضيل المضاف لمعرفة",
-        "sourceType": "وزاري 2020 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "جملة: «فاطمةُ (...) الطالباتِ». ضع اسم التفضيل من (فَضُلَ) في الفراغ بالوجهين الجائزين واذكر السبب.",
-            "score": 10,
-            "modelAnswer": "الوجه الأول: «فاطمةُ <u>أَفْضَلُ</u> الطالباتِ» (ملازمة الإفراد والتذكير).\nالوجه الثاني: «فاطمةُ <u>فُضْلَى</u> الطالباتِ» (مطابقة المفضل في التأنيث والإفراد).\nالسبب: لأن اسم التفضيل مضاف إلى معرفة (الطالباتِ)، فيجوز فيه لغةً ملازمة الإفراد والتذكير أو مطابقة المفضل."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اجعل جملة: «العالمانِ أَعْلَمُ الرِّجَالِ» مطابقة للمفضل بالوجه الثاني.",
-            "score": 10,
-            "modelAnswer": "«العالمانِ <u>أَعْلَمَا</u> الرِّجَالِ» (بحذف النون للإضافة ومطابقة المثنى المذكر)."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q14",
-        "title": "النثر وفنونه والخطابة والمقالة في الأدب",
-        "text": "في الأشكال النثرية الأدبية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتصنيف",
-        "chapter": 2,
-        "topic": "فنون النثر الأدبي",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "يقسم النثر بصورة عامة إلى نوعين رئيسيين: (نثر فني ونثر غير فني). اذكر أقسام النثر الفني مع التمثيل لفنين منه.",
-            "score": 10,
-            "modelAnswer": "النثر الفني يقسم إلى:\n1) نثر إبداعي: يعتمد على الخيال والعاطفة والصور البلاغية المؤثرة (مثل: القصة، الرواية، المسرحية، المقالة الأدبية، الشعر المنثور).\n2) نثر وصفي: يعتمد على دراسة وتحليل النصوص الإبداعية وتفسيرها (مثل: النقد الأدبي، وتاريخ الأدب، والدراسات البلاغية)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي (المقالة الأدبية)؟ وما هي عناصرها البنائية الثلاثة؟",
-            "score": 10,
-            "modelAnswer": "المقالة الأدبية: قطعة نثرية محدودة الطول تعالج فكرة معينة أو قضية اجتماعية أو أدبية بأسلوب مشوق وجذاب.\nعناصرها البنائية:\n1) المقدمة: مدخل موجز يمهد للموضوع ويجذب القارئ.\n2) العرض (المتن): صلب المقالة الذي تشرح فيه الأفكار والأدلة بالتفصيل.\n3) الخاتمة: خلاصة موجزة تلخص الفكرة المركزية والهدف."
-          }
-        ]
-      },
-      {
-        "id": "ar_ch2_q15",
-        "title": "اختبار التميز الشامل لمشتقات وأدب الفصل الثاني",
-        "text": "أجب عن المسألة اللغوية والأدبية الشاملة:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تقويم وتحليل نقدي",
-        "chapter": 2,
-        "topic": "اختبار التميز الشامل للفصل الثاني",
-        "sourceType": "امتحانات المتميزين العامة",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "صمم فقرة أدبية موجزة في ثلاثة أسطر تتحدث فيها عن كرم العراقيين وشجاعتهم، بحيث تضمنها:\n1) صفة مشبهة على وزن (فَعِيل) معمولها مرفوع.\n2) اسم تفضيل مضاف لنكرة.\n3) اسم آلة قياسي.",
-            "score": 10,
-            "modelAnswer": "«العراقيُّ <u>شَهْمٌ</u> طَبْعُهُ، <u>كَرِيمٌ</u> أَصْلُهُ، وهو <u>أَشْجَعُ</u> رَجُلٍ في ميادين الدفاعِ عن حِمَى الوطن، يَحْمِلُ <u>مِفْتَاحَ</u> المَجْدِ وَيَصْنَعُ النَّصْرَ بِعَزِيمَةٍ لا تَلِينُ».\n(كريم: صفة مشبهة معمولها أصلُه مرفوع، أشجع رجل: تفضيل مضاف لنكرة، مفتاح: اسم آلة قياسي على وزن مفعال)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "علل: تمنع كلمة (أفضل) من الصرف (أي تجر بالفتحة بدل الكسرة) في قولنا: «مررتُ برجلٍ أَفْضَلَ منك».",
-            "score": 10,
-            "modelAnswer": "لأنها صفة على وزن (أَفْعَل) وهي ممنوعة من الصرف لعلتين (الوصفية ووزن الفعل)، فتجر بالفتحة نيابة عن الكسرة ما دامت مجردة من (أل) وغير مضافة."
-          }
-        ]
-      }
-    ]
-  },
   "science": {
     "1": [
       {
@@ -13047,825 +14454,8 @@
         ]
       }
     ]
-  },
-  "islamic": {
-    "1": [
-      {
-        "id": "isl_ch1_q1",
-        "title": "أحكام المد المتصل والمد المنفصل ومد البدل",
-        "text": "في أحكام تلاوة القرآن الكريم ومبحث المدود:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتطبيق",
-        "chapter": 1,
-        "topic": "أحكام المدود الفرعية",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "عرّف كلاً من: (المد المتصل)، (المد المنفصل)، (مد البدل) مع ذكر مثال واحد ومقدار مد كل نوع منها.",
-            "score": 10,
-            "modelAnswer": "1) المد المتصل: أن يجتمع حرف المد والهمزة في كلمة واحدة، ويمد بمقدار (4 إلى 5 حركات) وجوباً (مثل: السَّمَاءِ، جِيءَ، سُوءَ).\n2) المد المنفصل: أن يأتي حرف المد في آخر الكلمة الأولى وتأتي الهمزة في أول الكلمة الثانية التي تليها مباشرة، ويمد بمقدار (4 إلى 5 حركات) جوازاً (مثل: يَا أَيُّهَا، إِنَّا أَعْطَيْنَاكَ، فِي أَنفُسِكُمْ).\n3) مد البدل: أن تتقدم الهمزة على حرف المد في كلمة واحدة ويكون مبدلاً من همزة ساكنة، ويمد بمقدار (حركتين) جوازاً كمد طبيعي (مثل: آمَنَ، أُوتِيَ، إِيمَاناً)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "عيّن نوع المد في الكلمات القرآنية الآتية مبيناً السبب:\n(شَاءَ - بِمَا أُنزِلَ - أُوتُوا - قُرُوءٍ).",
-            "score": 10,
-            "modelAnswer": "شَاءَ: مد متصل (لاجتماع حرف المد والألف والهمزة في كلمة واحدة).\nبِمَا أُنزِلَ: مد منفصل (لأن الألف في آخر بما والهمزة في أول أنزل).\nأُوتُوا: مد بدل (لتقدم الهمزة المضمومة على حرف المد الواو).\nقُرُوءٍ: مد متصل (لاجتماع الواو المدية والهمزة في كلمة واحدة)."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q2",
-        "title": "القرآن الكريم: سورة الحشر (الآيات المباركة وتفسيرها)",
-        "text": "من سورة الحشر المباركة، أجب عما يأتي:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "حفظ وتفسير",
-        "chapter": 1,
-        "topic": "سورة الحشر وتفسيرها",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب من قوله تعالى: ﴿سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ...﴾ إلى قوله تعالى: ﴿...وَاللَّهُ عَلَى كُلِّ شَيْءٍ قَدِيرٌ﴾ مضبوطاً بالشكل التام.",
-            "score": 10,
-            "modelAnswer": "﴿سَبَّحَ لِلَّهِ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ * هُوَ الَّذِي أَخْرَجَ الَّذِينَ كَفَرُوا مِنْ أَهْلِ الْكِتَابِ مِن دِيَارِهِمْ لِأَوَّلِ الْحَشْرِ مَا ظَنَنتُمْ أَن يَخْرُجُوا وَظَنُّوا أَنَّهُم مَّانِعَتُهُمْ حُصُونُهُم مِّنَ اللَّهِ فَأَتَاهُمُ اللَّهُ مِنْ حَيْثُ لَمْ يَحْتَسِبُوا وَقَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ يُخْرِبُونَ بُيُوتَهُم بِأَيْدِيهِمْ وَأَيْدِي الْمُؤْمِنِينَ فَاعْتَبِرُوا يَا أُولِي الْأَبْصَارِ * وَلَوْلَا أَن كَتَبَ اللَّهُ عَلَيْهِمُ الْجَلَاءَ لَعَذَّبَهُمْ فِي الدُّنْيَا وَلَهُمْ فِي الْآخِرَةِ عَذَابُ النَّارِ * ذَلِكَ بِأَنَّهُمْ شَاقُّوا اللَّهَ وَرَسُولَهُ وَمَن يُشَاقِّ اللَّهَ فَإِنَّ اللَّهَ شَدِيدُ الْعِقَابِ﴾."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بيّن معاني المفردات القرآنية الآتية:\n(لِأَوَّلِ الْحَشْرِ - شَاقُّوا اللَّهَ - قَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ - فَمَا أَوْجَفْتُمْ).",
-            "score": 10,
-            "modelAnswer": "لِأَوَّلِ الْحَشْرِ: أول إخراج وجمع لهم وإجلائهم من ديارهم في المدينة المنورة (يهود بني النضير).\nشَاقُّوا اللَّهَ: خالفوا أمر الله ورسوله وعادوهما وحاربوا الدين.\nقَذَفَ فِي قُلُوبِهِمُ الرُّعْبَ: ألقى وأوقع في قلوبهم الخوف والفزع الشديد.\nفَمَا أَوْجَفْتُمْ: ما أسرعتم ولا ركضتم ولا خضتم عليه بخيل ولا إبل."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q3",
-        "title": "أحكام اللام الشمسية واللام القمرية في القرآن الكريم",
-        "text": "في أحكام لام التعريف (أل):",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتصنيف",
-        "chapter": 1,
-        "topic": "اللام الشمسية واللام القمرية",
-        "sourceType": "وزاري 2022 دور تمهيدي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الحروف القمرية المجموعة في جملة مشهورة؟ وما حكم لام التعريف إذا دخلت عليها؟",
-            "score": 10,
-            "modelAnswer": "الحروف القمرية: مجموعة في عبارة: (ابْغِ حَجَّكَ وَخَفْ عَقِيمَهُ) وهي 14 حرفاً (أ، ب، غ، ح، ج، ك، و، خ، ف، ع، ق، ي، م، هـ).\nحكم اللام: الإظهار القمري (تلفظ اللام ساكنة واضحة دون إدغام)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "استخرج لام التعريف من النص القرآني وبيّن حكمها (إظهار أم إدغام) مع ذكر السبب:\n﴿وَالشَّمْسِ وَضُحَاهَا * وَالْقَمَرِ إِذَا تَلَاهَا * وَالنَّهَارِ إِذَا جَلَّاهَا﴾.",
-            "score": 10,
-            "modelAnswer": "الشَّمْسِ: إدغام شمسي (لأن حرف الشين شمسي فتتحول اللام إلى شين مشددة).\nالْقَمَرِ: إظهار قمري (لأن حرف القاف قمري من عبارة ابغ حجك وخف عقيمه).\nالنَّهَارِ: إدغام شمسي (لأن حرف النون شمسي)."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q4",
-        "title": "سورة النجم وتفسير الإسراء والمعراج وسدرة المنتهى",
-        "text": "في معجزات النبي الأكرم ﷺ وسورة النجم:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "فهم وتفسير",
-        "chapter": 1,
-        "topic": "سورة النجم ومعانيها",
-        "sourceType": "وزاري 2021 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب من قوله تعالى: ﴿وَالنَّجْمِ إِذَا هَوَى...﴾ إلى قوله تعالى: ﴿...عِندَهَا جَنَّةُ الْمَأْوَى﴾ من سورة النجم المباركة.",
-            "score": 10,
-            "modelAnswer": "﴿وَالنَّجْمِ إِذَا هَوَى * مَا ضَلَّ صَاحِبُكُمْ وَمَا غَوَى * وَمَا يَنطِقُ عَنِ الْهَوَى * إِنْ هُوَ إِلَّا وَحْيٌ يُوحَى * عَلَّمَهُ شَدِيدُ الْقُوَى * ذُو مِرَّةٍ فَاسْتَوَى * وَهُوَ بِالْأُفُقِ الْأَعْلَى * ثُمَّ دَنَا فَتَدَلَّى * فَكَانَ قَابَ قَوْسَيْنِ أَوْ أَدْنَى * فَأَوْحَى إِلَى عَبْدِهِ مَا أَوْحَى * مَا كَذَبَ الْفُؤَادُ مَا رَأَى * أَفَتُمَارُونَهُ عَلَى مَا يَرَى * وَلَقَدْ رَآهُ نَزْلَةً أُخْرَى * عِندَ سِدْرَةِ الْمُنتَهَى * عِندَهَا جَنَّةُ الْمَأْوَى﴾."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما المقصود بـ (سِدْرَةِ الْمُنتَهَى)؟ ولماذا سميت بهذا الاسم وفق التفاسير المعتمدة؟",
-            "score": 10,
-            "modelAnswer": "سدرة المنتهى: شجرة عظيمة كريمة في السماء السابعة عن يمين العرش ينتهي عندها علم الخلائق وما يصعد من الأرض وما ينزل من السماء.\nسبب التسمية: لأنه ينتهي إليها ما يعرج به من الأرض فيقبض منها، وإليها ينتهي ما يهبط من أمر الله فيقبض منها، ولا يتجاوزها أحد من الملائكة المقربين."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q5",
-        "title": "المد الطبيعي (الأصلي) وحروفه وشروطه ومقداره",
-        "text": "في علم التجويد ومخارج الحروف:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتطبيق",
-        "chapter": 1,
-        "topic": "المد الطبيعي",
-        "sourceType": "كتاب التربية الإسلامية المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هو (المد الطبيعي الأصلي)؟ وما هي حروف المد الثلاثة مع ذكر شروطها وحركاتها المجانسة؟",
-            "score": 10,
-            "modelAnswer": "المد الطبيعي: هو المد الذي لا تقوم ذات حرف المد إلا به ولا يتوقف على سبب من همز أو سكون، ويمد بمقدار (حركتين).\nحروفه وشروطها:\n1) الألف الساكنة المفتوح ما قبلها (مثل: قَالَ).\n2) الواو الساكنة المضموم ما قبلها (مثل: يَقُولُ).\n3) الياء الساكنة المكسور ما قبلها (مثل: قِيلَ).\nوتجمع في كلمة: (نُوحِيهَا)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما مقدار الحركة في التجويد؟ وكيف يقدرها علماء القراءات؟",
-            "score": 10,
-            "modelAnswer": "الحركة: هي المقدار الزمني اللازم للنطق بحرف متحرك، ويقدرها العلماء بمقدار قبض الإصبع أو بسطه بحالة متوسطة دون سرعة مفرطة ولا تمطيط، فالمد حركتان يساوي نطق ألفين طبيعيتين."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q6",
-        "title": "أسماء الله الحسنى في أواخر سورة الحشر وعظمتها",
-        "text": "في العقيدة وتوحيد الأسماء والصفات:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وتفسير",
-        "chapter": 1,
-        "topic": "أسماء الله الحسنى في سورة الحشر",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب الآيات الكريمة الثلاث الأخيرة من سورة الحشر الحاصرة لأسماء الله الحسنى: ﴿هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ...﴾ إلى نهاية السورة.",
-            "score": 10,
-            "modelAnswer": "﴿هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ هُوَ الرَّحْمَنُ الرَّحِيمُ * هُوَ اللَّهُ الَّذِي لَا إِلَهَ إِلَّا هُوَ الْمَلِكُ الْقُدُّوسُ السَّلَامُ الْمُؤْمِنُ الْمُهَيْمِنُ الْعَزِيزُ الْجَبَّارُ الْمُتَكَبِّرُ سُبْحَانَ اللَّهِ عَمَّا يُشْرِكُونَ * هُوَ اللَّهُ الْخَالِقُ الْبَارِئُ الْمُصَوِّرُ لَهُ الْأَسْمَاءُ الْحُسْنَى يُسَبِّحُ لَهُ مَا فِي السَّمَاوَاتِ وَالْأَرْضِ وَهُوَ الْعَزِيزُ الْحَكِيمُ﴾."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "وضح معنى الأسماء الكريمة الآتية:\n(الْقُدُّوسُ - الْمُهَيْمِنُ - الْبَارِئُ).",
-            "score": 10,
-            "modelAnswer": "الْقُدُّوسُ: الطاهر المنزه عن كل عيب ونقص وشبيه، المتصف بكل كمال وجلال.\nالْمُهَيْمِنُ: الرقيب الحافظ الشاهد على أعمال خلقه المطلع على سرائرهم القائم على كل نفس.\nالْبَارِئُ: الموجد والمنشئ للخلق من العدم بتناسق وإتقان دون مثال سابق."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q7",
-        "title": "حكم الراء (الترقيق والتفخيم) في القرآن الكريم",
-        "text": "في أحكام التلاوة وضبط الحروف:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تطبيق وحكم",
-        "chapter": 1,
-        "topic": "أحكام الراء",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "متى ترقق الراء في التلاوة؟ اذكر حالتين لترقيق الراء مع التمثيل لكل منهما بآية أو كلمة قرآنية.",
-            "score": 10,
-            "modelAnswer": "ترقق الراء في عدة حالات، منها:\n1) إذا كانت الراء مكسورة كسراً أصلياً (مثل: رِزْقاً، الرِّبَا).\n2) إذا كانت الراء ساكنة وقبلها كسر أصلي وليس بعدها حرف استعلاء في نفس الكلمة (مثل: فِرْعَوْنَ، مِرْيَة).\n3) إذا سكنت الراء للوقف وكان قبلها ياء ساكنة مدية أو لينة (مثل: بَصِير، خَيْر)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بيّن حكم الراء (تفخيم أم ترقيق) في الكلمات الآتية مع ذكر السبب:\n(رَبَّنَا - قِرْطَاس - نَاصِر - خَبِيرٌ [عند الوقف]).",
-            "score": 10,
-            "modelAnswer": "رَبَّنَا: تفخيم (لأن الراء مفتوحة).\nقِرْطَاس: تفخيم (لأن الراء ساكنة قبلها كسر أصلي ولكن جاء بعدها حرف استعلاء مفتوح الطاء في نفس الكلمة).\nنَاصِر: ترقيق (لأن الراء مكسورة).\nخَبِيرٌ (وقفاً): ترقيق (لأنها سكنت للوقف وسبقت بياء ساكنة مدية)."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q8",
-        "title": "القصص القرآني في سورة الحشر: إجلاء يهود بني النضير",
-        "text": "في أسباب النزول والدروس والعبر من السورة:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر واستنتاج",
-        "chapter": 1,
-        "topic": "غزوة بني النضير والدروس المستفادة",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي الأسباب التي دعت النبي ﷺ والمسلمين لمحاصرة وإجلاء يهود بني النضير من ديارهم في المدينة المنورة؟",
-            "score": 10,
-            "modelAnswer": "لأنهم نقضوا العهد والميثاق الذي بينهم وبين رسول الله ﷺ، وتآمروا على قتله بإلقاء صخرة عليه من فوق جدار أثناء جلوسه عندهم، وتحالفوا سراً مع المنافقين ومشركي قريش ضد أمن واستقرار الدولة الإسلامية."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما معنى قوله تعالى: ﴿يُخْرِبُونَ بُيُوتَهُم بِأَيْدِيهِمْ وَأَيْدِي الْمُؤْمِنِينَ فَاعْتَبِرُوا يَا أُولِي الْأَبْصَارِ﴾؟",
-            "score": 10,
-            "modelAnswer": "أي أن اليهود لما تيقنوا من الجلاء أخذوا يهدمون بيوتهم وينزعون الأبواب والشبابيك والأخشاب الثمينة ليحملوها معهم على الإبل ولا يتركوها للمسلمين، وكان المسلمون يهدمون ما بقي من حصونهم لقطع تحصنهم، وفي ذلك أعظم موعظة لأصحاب العقول بأن البغي والغدر لا يدومان."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q9",
-        "title": "أحكام النون الساكنة والتنوين (الإظهار والإدغام والإقلاب والإخفاء)",
-        "text": "في القواعد التجويدية العامة في تلاوة القرآن الكريم:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تصنيف وتطبيق",
-        "chapter": 1,
-        "topic": "أحكام النون الساكنة والتنوين",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "للنون الساكنة والتنوين أربعة أحكام، اذكرها مع حروف كل حكم منها.",
-            "score": 10,
-            "modelAnswer": "1) الإظهار الحلقي: حروف الحلق الستة (ء، هـ، ع، ح، غ، خ).\n2) الإدغام: حروف كلمة (يَرْمَلُون) الستة (ينقسم لبغنة في ينمو، وبغير غنة في اللام والراء).\n3) الإقلاب: حرف واحد وهو (الباء) بقلب النون أو التنوين ميماً مخفاة بغنة.\n4) الإخفاء الحقيقي: الحروف الخمسة عشر الباقية المجموعة في أوائل كلمات: (صِفْ ذَا ثَنَا كَمْ جَادَ شَخْصٌ قَدْ سَمَا دُمْ طَيِّباً زِدْ فِي تُقَىً ضَعْ ظَالِماً)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "استخرج الحكم التجويدي للنون الساكنة أو التنوين في الكلمات القرآنية الآتية:\n(مِنْ خَوْفٍ - أَنبِئْهُم - رَحِيمٌ غَفُورٌ - مِن يَقُولُ).",
-            "score": 10,
-            "modelAnswer": "مِنْ خَوْفٍ: إظهار حلقي (لمجيء الخاء بعد النون الساكنة).\nأَنبِئْهُم: إقلاب (لمجيء الباء بعد النون الساكنة وتقلب ميماً).\nرَحِيمٌ غَفُورٌ: إظهار حلقي (لمجيء الغين بعد التنوين).\nمِن يَقُولُ: إدغام بغنة (لمجيء الياء بعد النون الساكنة)."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q10",
-        "title": "تحدي استخراج أحكام المد من نص قرآني مركب",
-        "text": "في التطبيق العملي لأحكام التلاوة المنهجية:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تحليل واستخراج",
-        "chapter": 1,
-        "topic": "استخراج أحكام المدود",
-        "sourceType": "أسئلة متميزين وزارية",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قال تعالى: ﴿وَآتَى الْمَالَ عَلَى حُبِّهِ ذَوِي الْقُرْبَى وَالْيَتَامَى وَالْمَسَاكِينَ وَابْنَ السَّبِيلِ وَالسَّائِلِينَ وَفِي الرِّقَابِ﴾.\nاستخرج من الآية الكريمة: مد بدل، مد متصل، وبين سبب كل منهما ومقداره.",
-            "score": 10,
-            "modelAnswer": "1) مد البدل: كلمة (وَآتَى)؛ لتقدم الهمزة على الألف المدية في كلمة واحدة، مقداره: حركتان.\n2) المد المتصل: كلمة (السَّائِلِينَ)؛ لمجيء الألف المدية وبعدها همزة في نفس الكلمة، مقداره: أربع أو خمس حركات وجوباً."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق التجويدي بين المد المنفصل ومد الصلة الكبرى؟",
-            "score": 10,
-            "modelAnswer": "المد المنفصل يكون حرف المد فيه ثابتاً في بنية الكلمة (ألف أو واو أو ياء) وبعده همزة قطع في كلمة أخرى، بينما مد الصلة الكبرى ينشأ من إشباع حركة هاء الضمير الغائب المفرد المذكر الواقعة بين متحركين وبعدها همزة قطع في الكلمة التالية ويمد حكمياً كالمنفصل 4-5 حركات."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q11",
-        "title": "الفيء وأحكام توزيعه في سورة الحشر",
-        "text": "في التشريعات المالية والاقتصادية الإسلامية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "فهم وتشريع",
-        "chapter": 1,
-        "topic": "أحكام الفيء في الإسلام",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هو (الفيء) شرعاً؟ وبماذا يختلف الفيء عن (الغنائم) في الإسلام؟",
-            "score": 10,
-            "modelAnswer": "الفيء: هو كل مال وصل إلى المسلمين من أموال الكفار بغير قتال ولا إيجاف خيل ولا ركاب كالأموال المتروكة عند الصلح أو الهروب.\nالغنائم: هي الأموال المأخوذة من الأعداء قهراً في أرض المعركة بقتال ومواجهة عسكرية."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "لمن يصرف الفيء وفق قوله تعالى: ﴿مَّا أَفَاءَ اللَّهُ عَلَى رَسُولِهِ مِنْ أَهْلِ الْقُرَى فَلِلَّهِ وَلِلرَّسُولِ وَلِذِي الْقُرْبَى وَالْيَتَامَى وَالْمَسَاكِينِ وَابْنِ السَّبِيلِ كَيْ لَا يَكُونَ دُولَةً بَيْنَ الْأَغْنِيَاءِ مِنكُمْ﴾؟ وما الحكمة الاجتماعية من ذلك؟",
-            "score": 10,
-            "modelAnswer": "المصارف: لله وللرسول في المصالح العامة للمسلمين، ولقرابة الرسول الفقراء (بنو هاشم)، واليتامى والمساكين والمسافر المنقطع.\nالحكمة: منع تكدس واحتكار الثروات ورؤوس الأموال في أيدي فئة قليلة من الأثرياء (كي لا يكون دولة بين الأغنياء) وتحقيق العدالة والتكافل الاجتماعي وتوزيع الخيرات على الفقراء."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q12",
-        "title": "خشوع القلب لعظمة القرآن الكريم وتدبره",
-        "text": "في الأثر الروحي والتربوي لآيات القرآن:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تفسير وعبرة",
-        "chapter": 1,
-        "topic": "لو أنزلنا هذا القرآن على جبل",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب قوله تعالى في سورة الحشر: ﴿لَوْ أَنزَلْنَا هَذَا الْقُرْآنَ عَلَى جَبَلٍ لَّرَأَيْتَهُ خَاشِعاً مُّتَصَدِّعاً مِّنْ خَشْيَةِ اللَّهِ...﴾ مع بيان التفسير الإيماني للآية الكريمة.",
-            "score": 10,
-            "modelAnswer": "﴿لَوْ أَنزَلْنَا هَذَا الْقُرْآنَ عَلَى جَبَلٍ لَّرَأَيْتَهُ خَاشِعاً مُّتَصَدِّعاً مِّنْ خَشْيَةِ اللَّهِ وَتِلْكَ الْأَمْثَالُ نَضْرِبُهَا لِلنَّاسِ لَعَلَّهُمْ يَتَفَكَّرُونَ﴾.\nالتفسير: يضرب الله مثلاً بعظمة القرآن وقوة تأثيره؛ فلو أن هذا القرآن خوطبت به الجبال الصلبة الصماء وفهمت وعده ووعيده لتصدعت وتشقت وتفتتت خوفاً وخضوعاً لله وهيبته، فكيف بالقلوب البشرية التي يجب أن تلين وتخشع وتتدبر آيات الله وأوامره."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي آداب تلاوة القرآن الكريم التي ينبغي على المسلم الالتزام بها؟",
-            "score": 10,
-            "modelAnswer": "1) الطهارة الكاملة واستقبال القبلة.\n2) الاستعاذة بالله من الشيطان الرجيم والبسملة.\n3) الترتيل والتمهل والتجويد.\n4) التدبر والخشوع والتفكر في معاني الآيات والبكاء أو التباكي عند آيات الوعيد وسؤال المغفرة."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q13",
-        "title": "التقوى ومحاسبة النفس في سورة الحشر",
-        "text": "في التزكية الأخلاقية والمراقبة الإلهية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "فهم وتطبيق",
-        "chapter": 1,
-        "topic": "محاسبة النفس ولتنظر نفس ما قدمت لغد",
-        "sourceType": "وزاري 2021 دور ثان",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قال تعالى: ﴿يَا أَيُّهَا الَّذِينَ آمَنُوا اتَّقُوا اللَّهَ وَلْتَنظُرْ نَفْسٌ مَّا قَدَّمَتْ لِغَدٍ وَاتَّقُوا اللَّهَ إِنَّ اللَّهَ خَبِيرٌ بِمَا تَعْمَلُونَ * وَلَا تَكُونُوا كَالَّذِينَ نَسُوا اللَّهَ فَأَنسَاهُمْ أَنفُسَهُمْ أُولَئِكَ هُمُ الْفَاسِقُونَ﴾. اشرح التوجيه الإلهي الوارد في الآيتين الكريمتين.",
-            "score": 10,
-            "modelAnswer": "التوجيه: يأمر الله عباده المؤمنين بتقواه بفعل الطاعات واجتناب النواهي، ومحاسبة أنفسهم يومياً والنظر فيما أعدوه من أعمال صالحة ليوم القيامة (لغد)، ويحذرهم من نسيان حق الله وأمره؛ لأن من نسي الله وتهاون في دينه عاقبه الله بأن أنساه مصالحه الحقيقية وهلاك نفسه في المعاصي."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "لماذا عبر القرآن الكريم عن يوم القيامة بلفظ (لِغَدٍ)؟",
-            "score": 10,
-            "modelAnswer": "للدلالة على قربه الشديد وحتميته المؤكدة؛ فكل ما هو آتٍ قريب كالغد، ولكي يستشعر المسلم أن لقاء الله واقع لا محالة ولا يفصله عنه إلا ساعات يسيرة من عمره."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q14",
-        "title": "القلقلة ومراتبها وحروفها في أحكام التجويد",
-        "text": "في تحسين تلاوة الحروف القرآنية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وتطبيق",
-        "chapter": 1,
-        "topic": "حكم القلقلة ومراتبها",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هي (القلقلة) لغة واصطلاحاً؟ وما هي حروفها الخمسة؟ وما هما مراتب القلقلة الكبرى والصغرى؟",
-            "score": 10,
-            "modelAnswer": "القلقلة لغة: الحركة والاضطراب.\nاصطلاحاً: اضطراب مخرج الحرف الساكن عند النطق به حتى يسمع له نبرة قوية واضحة.\nحروفها: خمسة تجمع في كلمة: (قُطْبُ جَدٍّ).\nمراتبها:\n1) قلقلة كبرى: إذا كان حرف القلقلة في آخر الكلمة موقوفاً عليه (مثل: الفَلَقْ، كَسَبْ، الحَقّ).\n2) قلقلة صغرى: إذا كان حرف القلقلة في وسط الكلمة أو آخرها موصولاً (مثل: يَقْطَعُون، أَبْصَارِهِم، يَطْمَعُ)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بيّن مرتبة القلقلة في الآية الكريمة: ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ * مِن شَرِّ مَا خَلَقَ﴾ عند الوقف.",
-            "score": 10,
-            "modelAnswer": "الْفَلَقِ (عند الوقف): قلقلة كبرى (لسكون القاف المتطرفة في نهاية الآية).\nخَلَقَ (عند الوقف): قلقلة كبرى (لسكون القاف المتطرفة الموقوف عليها)."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch1_q15",
-        "title": "اختبار المتميزين الشامل في التلاوة وسور الفصل الأول",
-        "text": "أجب عن المسألة التجويدية والتفسيرية المتقدمة:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تقويم وتحليل مقارن",
-        "chapter": 1,
-        "topic": "اختبار التميز الشامل للتلاوة والقرآن الكريم",
-        "sourceType": "امتحانات المتميزين الوزارية",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "في قوله تعالى: ﴿وَلَقَدْ رَآهُ نَزْلَةً أُخْرَى * عِندَ سِدْرَةِ الْمُنتَهَى﴾، استخرج:\n1) كلمة فيها مد بدل مع التعليل.\n2) حكماً من أحكام النون الساكنة مع التعليل.\n3) كلمة فيها لام قمرية.",
-            "score": 10,
-            "modelAnswer": "1) مد بدل: (رَآهُ)؛ لتقدم الهمزة على الألف المدية.\n2) حكم النون الساكنة: (عِندَ)؛ إخفاء حقيقي لمجيء حرف الدال بعد النون الساكنة.\n3) لام قمرية: (الْمُنتَهَى)؛ لدخول اللام على حرف الميم القمري (ابغ حجك وخف عقيمه)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "قارن بين وصف القرآن للمهاجرين ووصفه للأنصار في سورة الحشر مبيناً فضائل كل فئة منهما.",
-            "score": 10,
-            "modelAnswer": "المهاجرون: وصفهم الله بالصدق والفقر ونصرة الله ورسوله وبأنهم أخرجوا من ديارهم وأموالهم يبتغون فضلاً من الله ورضواناً (أُولَئِكَ هُمُ الصَّادِقُونَ).\nالأنصار: وصفهم الله بالإيثار والمحبة وإيواء المهاجرين وسلامة صدورهم من الحسد والغيرة رغم حاجتهم وفقرهم (يُحِبُّونَ مَنْ هَاجَرَ إِلَيْهِمْ وَيُؤْثِرُونَ عَلَى أَنفُسِهِمْ وَلَوْ كَانَ بِهِمْ خَصَاصَةٌ وَمَن يُوقَ شُحَّ نَفْسِهِ فَأُولَئِكَ هُمُ الْمُفْلِحُونَ)."
-          }
-        ]
-      }
-    ],
-    "2": [
-      {
-        "id": "isl_ch2_q1",
-        "title": "الحديث النبوي الشريف في (البر والتقوى وحسن الخلق)",
-        "text": "في السنة النبوية المطهرة ومنهاج الأخلاق الإسلامية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "حفظ وشرح",
-        "chapter": 2,
-        "topic": "حديث البر والإثم",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب نص الحديث النبوي الشريف عن النواس بن سمعان الأنصاري (رضي الله عنه) في (البر وحسن الخلق).",
-            "score": 10,
-            "modelAnswer": "عن النواس بن سمعان الأنصاري (رضي الله عنه) عن النبي ﷺ قال:\n«البِرُّ حُسْنُ الخُلُقِ ، وَالإِثْمُ مَا حَاكَ فِي نَفْسِكَ ، وَكَرِهْتَ أَنْ يَطَّلِعَ عَلَيْهِ النَّاسُ».\n[صدق رسول الله ﷺ]."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما معنى (البِرّ)؟ وما معنى (مَا حَاكَ فِي نَفْسِكَ)؟ وما هو المقياس الضميري الداخلي الذي وضعه النبي ﷺ لمعرفة المعصية؟",
-            "score": 10,
-            "modelAnswer": "البِرّ: كلمة جامعة لكل أعمال الخير والصلاح والإحسان والطاعات.\nمَا حَاكَ فِي نَفْسِكَ: ما تردد وترددت فيه النفس وشعرت نحوه بالشك والريبة والحرج والقلق وعدم الطمأنينة.\nالمقياس: هو الفطرة النقية والضمير الحي؛ فكل فعل يخجل الإنسان من أن يراه الناس الصالحون عليه ويورث في قلبه حزازة وضيقاً فهو إثم ومعصية يجب اجتنابها."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q2",
-        "title": "الحديث النبوي الشريف في (الشهيد وفضل الشهادة)",
-        "text": "في التضحية والجهاد في سبيل الوطن والحق:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "حفظ وتفسير",
-        "chapter": 2,
-        "topic": "حديث الشهيد ومكانته",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب نص الحديث النبوي الشريف في منزلة الشهيد وفضله في سبيل الله.",
-            "score": 10,
-            "modelAnswer": "عن رسول الله ﷺ قال:\n«مَا مِنْ مَكْلُومٍ يُكْلَمُ فِي سَبِيلِ اللَّهِ إِلَّا جَاءَ يَوْمَ القِيَامَةِ وَكَلْمُهُ يَدْمَى ، اللَّوْنُ لَوْنُ الدَّمِ ، وَالرِّيحُ رِيحُ المِسْكِ».\n[صدق رسول الله ﷺ]."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما معنى: (مَكْلُومٍ) و (كَلْمُهُ)؟ وما الحكمة من مجيء الشهيد يوم القيامة وجرحه ينضح بالمسك؟",
-            "score": 10,
-            "modelAnswer": "مَكْلُومٍ: مجروح ومصاب في معركة الدفاع عن الحق والوطن والمقدسات.\nكَلْمُهُ: جرحه وإصابته.\nالحكمة: تشريفاً وإكراماً له بين الخلائق في المحشر وإظهاراً لفضل تضحيته بدمه الزاكي فيكون دمه شاهداً له ومكافأة برائحة المسك الزكية."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q3",
-        "title": "أركان الإيمان والإيمان باليوم الآخر والبعث والحساب",
-        "text": "في أصول العقيدة الإسلامية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وفهم",
-        "chapter": 2,
-        "topic": "الإيمان باليوم الآخر",
-        "sourceType": "وزاري 2022 دور تمهيدي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما المقصود بـ (الإيمان باليوم الآخر)؟ وما هي الأدلة العقلية على حتمية البعث والنشور والجزاء؟",
-            "score": 10,
-            "modelAnswer": "الإيمان باليوم الآخر: هو التصديق الجازم واليقين المطلق بأن الله سيبعث الخلائق بعد موتهم ليحاسبهم على أعمالهم فيجازي المحسن بالجنة والمسيء بالنار.\nالأدلة العقلية: 1) مقتضى العدل الإلهي المطلق؛ ففي الدنيا ظالمون ومظلومون يموتون دون حساب فلا بد من يوم للعدالة ونيل الحقوق.\n2) قدرة الله على الإحياء الأول دليل قاطع على قدرته على الإعادة والنشور؛ فالذي خلق السماوات والأرض والإنسان أول مرة قادر على إعادته."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي الآثار النفسية والأخلاقية للإيمان باليوم الآخر على سلوك الفرد في المجتمع؟",
-            "score": 10,
-            "modelAnswer": "يردع الفرد عن ارتكاب المظالم والجرائم والفساد، ويبعث الطمأنينة والأمل في نفوس المظلومين والمبتلين، ويدفع المسلم إلى التسابق في فعل الخيرات وخدمة وطنه ومجتمعه طلباً للأجر الأخروي."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q4",
-        "title": "السيرة النبوية: صلح الحديبية وشروطه والفتح المبين",
-        "text": "في المحطات التاريخية للدعوة النبوية:",
-        "score": 20,
-        "difficulty": "متوسط",
-        "bloom": "تذكر وتحليل تاريخي",
-        "chapter": 2,
-        "topic": "صلح الحديبية ونتائجه",
-        "sourceType": "وزاري 2021 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "في أي سنة هجرية وقع صلح الحديبية؟ وما هي ثلاثة من أهم الشروط والبنود التي تضمنتها وثيقة الصلح بين النبي ﷺ وقريش؟",
-            "score": 10,
-            "modelAnswer": "سنة وقوعه: السنة السادسة للهجرة (6 هـ).\nأهم البنود والشروط:\n1) هدنة ووقف الحرب بين الطرفين لمدة عشر سنوات.\n2) يرجع المسلمون في هذا العام دون أداء العمرة، على أن يأتوا في العام القابل فيقضوا ثلاثة أيام بمكة مع سلاح الراكب فقط.\n3) من أحب أن يدخل في عهد محمد وعقده دخل فيه، ومن أحب أن يدخل في عهد قريش وعقدها دخل فيه.\n4) من أتى محمداً من قريش بغير إذن وليه رده إليهم، ومن جاء قريشاً من المسلمين لم يردوه."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "علل: سماه الله تعالى في القرآن الكريم بـ (الفتح المبين) في سورة الفتح ﴿إِنَّا فَتَحْنَا لَكَ فَتْحاً مُّبِيناً﴾ رغم اعتراض بعض الصحابة على ظاهره.",
-            "score": 10,
-            "modelAnswer": "لأنه كان أعظم نصر سياسي ودبلوماسي واعتراف رسمي بقوة الدولة الإسلامية؛ حيث أمنت الطرق واختلط الناس وسمع المشركون القرآن وانطلقت الدعوة بحرية ودخل في الإسلام خلال سنتي الهدنة أضعاف من دخلوا فيه في عشرين سنة، وكان توطئة ومقدمة لفتح مكة الكبرى دون إراقة دماء."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q5",
-        "title": "الحديث النبوي الشريف في (حرمة الغيبة والنميمة والستر)",
-        "text": "في الآفات اللسانية والأخلاق المنهي عنها:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "فهم ومقارنة",
-        "chapter": 2,
-        "topic": "الغيبة والنميمة وعقوبتهما",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما الفرق بين (الغيبة) و (النميمة) و (البهتان) في الشرع الإسلامي؟",
-            "score": 10,
-            "modelAnswer": "الغيبة: ذكرك أخاك المسلم في غيابه بما يكره من العيوب الحقيقية فيه (سواء في خَلقه أو دينه أو دنياه).\nالبهتان: ذكرك أخاك بما ليس فيه من الكذب والافتراء والباطل، وهو أشد ظلماً وإثماً من الغيبة.\nالنميمة: نقل الكلام السيئ والحديث بين شخصين أو طرفين بقصد الإفساد وإيقاع العداوة والبغضاء بينهما."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بماذا شبّه القرآن الكريم المغتاب في سورة الحجرات؟ وما هي الكفارة الواجبة على من اغتاب شخصاً؟",
-            "score": 10,
-            "modelAnswer": "التشبيه: شبهه بأشنع صورة وهي من يأكل لحم أخيه الميت: ﴿أَيُحِبُّ أَحَدُكُمْ أَن يَأْكُلَ لَحْمَ أَخِيهِ مَيْتاً فَكَرِهْتُمُوهُ﴾.\nالكفارة: التوبة الصادقة، الإقلاع الفوري والندم، الاستغفار للشخص المغتاب والدعاء له وذكره بمحاسنه في نفس المجالس، وطلب العفو والمسامحة منه إن أمكن دون أن تترتب على ذلك مفسدة أكبر."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q6",
-        "title": "السيرة النبوية: فتح مكة المكرمة وعفو النبي الشامل",
-        "text": "في انتصار الحق والتسامح النبوي الخالد:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وعبرة",
-        "chapter": 2,
-        "topic": "فتح مكة والعفو عند المقدرة",
-        "sourceType": "وزاري 2023 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "في أي سنة وشهر هجري تم فتح مكة المكرمة؟ وما السبب المباشر الذي جعل النبي ﷺ يسير بجيش المسلمين لفتحها؟",
-            "score": 10,
-            "modelAnswer": "تاريخ الفتح: في شهر رمضان المبارك من السنة الثامنة للهجرة (8 هـ).\nالسبب المباشر: نقض قريش لبنود صلح الحديبية؛ حيث أعانت حليفتها (بني بكر) بالسلاح والرجال على قبيلة (خزاعة) حليفة المسلمين وقتلوا منهم أناساً وهم آمنون داخل الحرم المكي."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ماذا قال النبي ﷺ لأهل مكة الذين آذوه وطردوه بعد أن دخل مكة فاتحاً منتصراً؟ وما الدرس الأخلاقي المستفاد؟",
-            "score": 10,
-            "modelAnswer": "قال لهم: «مَا تَرَوْنَ أَنِّي فَاعِلٌ بِكُمْ؟» قالوا: خيراً، أخ كريم وابن أخ كريم، فقال ﷺ كلمته الخالدة: «اذْهَبُوا فَأَنْتُمُ الطُّلَقَاءُ».\nالدرس: ضرب أروع الأمثلة في العفو عند المقدرة والتسامح والترفع عن الانتقام الشخصي وإرساء دعائم الرحمة الإنسانية والسلام."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q7",
-        "title": "بر الوالدين وحقوقهما في القرآن والسنة",
-        "text": "في الواجبات الأسرية والاجتماعية في الإسلام:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتذكر",
-        "chapter": 2,
-        "topic": "بر الوالدين وعقوقهما",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "لماذا قرن الله تعالى في القرآن الكريم عبادته وتوحيده بالإحسان إلى الوالدين في قوله: ﴿وَقَضَى رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَاناً﴾؟",
-            "score": 10,
-            "modelAnswer": "لبيان عظم حقهما ومكانتهما السامية في الشريعة، ولأن الوالدين هما السبب الظاهري في وجود الإنسان ورعايته وتربيته وبذلا صحتهما وراحتهما في سبيل إسعاده، فشكر المنعم الأكبر (الله) يستوجب شكر وسائط الإحسان والرعاية (الوالدين)."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اذكر أربعة من واجبات الأبناء تجاه والديهما في حياتهما وبعد مماتهما.",
-            "score": 10,
-            "modelAnswer": "في حياتهما: طاعتهما بالمعروف، خفض جناح الذل والرحمة لهما، التلطف في مخاطبتهما وتجنب التأفف (فلا تقل لهما أف ولا تنهرهما)، وتوفير النفقة والرعاية لهما عند الكبر.\nبعد مماتهما: كثرة الدعاء والاستغفار لهما، إخراج الصدقات عنهما، قضاء ديونهما ونذورهم، وصلة الرحم التي لا توصل إلا بهما وإكرام أصدقائهما."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q8",
-        "title": "الإيمان بالملائكة ووظائفهم وأصنافهم",
-        "text": "في الغيبيات وأركان العقيدة الإسلامية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتصنيف",
-        "chapter": 2,
-        "topic": "الإيمان بالملائكة الأبرار",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "مِمَّ خلق الله الملائكة؟ وما هي صفاتهم الخَلقية والخُلقية؟",
-            "score": 10,
-            "modelAnswer": "خلقوا من (نور)، وهم أجسام نورانية لطيفة قادرة على التشكل بالصور الكريمة، لا يأكلون ولا يشربون ولا ينامون ولا يتناسلون ومبرؤون من الشهوة والذنوب، لا يعصون الله ما أمرهم ويفعلون ما يؤمرون، ويسبحون الليل والنهار لا يفترون."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "اذكر المهمة الموكلة لكل ملك من الملائكة الآتية أسماؤهم:\n(جبرائيل - ميكائيل - إسرافيل - ملك الموت [عزرائيل]).",
-            "score": 10,
-            "modelAnswer": "جبرائيل (عليه السلام): النزول بالوحي من الله تعالى إلى الأنبياء والرسل.\nميكائيل (عليه السلام): موكل بالأرزاق والأمطار والنبات وتوزيعها بمشيئة الله.\nإسرافيل (عليه السلام): موكل بالنفخ في الصور للبعث والنشور والصعق.\nملك الموت: موكل بقبض أرواح الخلائق عند انقضاء آجالها."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q9",
-        "title": "خلق التواضع والتحذير من الكبر والغرور",
-        "text": "في الأخلاق الإسلامية الفاضلة:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "فهم ومقارنة",
-        "chapter": 2,
-        "topic": "التواضع والكبر",
-        "sourceType": "وزاري 2021 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما هو (التواضع)؟ وما هي فضيلته عند الله ورسوله مع الاستشهاد بحديث شريف؟",
-            "score": 10,
-            "modelAnswer": "التواضع: لين الجانب، وخفض الجناح، واحترام الناس وعدم التعالي عليهم بالنسب أو المال أو الجاه أو العلم.\nفضيلته: يرفع الله صاحبه في الدنيا والآخرة؛ قال رسول الله ﷺ: «مَا تَوَاضَعَ أَحَدٌ لِلَّهِ إِلَّا رَفَعَهُ اللَّهُ»."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هو (الكبر)؟ وما جزاء المتكبرين يوم القيامة؟",
-            "score": 10,
-            "modelAnswer": "الكبر: بطر الحق (رفض الحق ومحاربته) وغمط الناس (احتقارهم وازدراؤهم).\nجزاؤهم: يحشر المتكبرون يوم القيامة كأمثال الذر (النمل الصغير) يطؤهم الناس بأقدامهم لهوانهم على الله، ومأواهم جهنم وبئس المصير."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q10",
-        "title": "تحدي ربط السيرة بالعقيدة في غزوة خيبر وحصونها",
-        "text": "في بطولات الصحابة وتاريخ الفتوحات:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تذكر وتحليل مواقف",
-        "chapter": 2,
-        "topic": "غزوة خيبر والبطولة الإسلامية",
-        "sourceType": "أسئلة متميزين وزارية",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "في غزوة خيبر، ماذا قال رسول الله ﷺ ليلة فتح الحصن المنيع في شأن حامل الراية غداً؟ وعلى يد من تم فتح حصن القموص؟",
-            "score": 10,
-            "modelAnswer": "قال رسول الله ﷺ: «لَأُعْطِيَنَّ الرَّايَةَ غَداً رَجُلاً يُحِبُّ اللَّهَ وَرَسُولَهُ ، وَيُحِبُّهُ اللَّهُ وَرَسُولُهُ ، يَفْتَحُ اللَّهُ عَلَى يَدَيْهِ ، لَيْسَ بِفَرَّارٍ».\nتم الفتح: على يدي الإمام علي بن أبي طالب (عليه السلام) بعد أن تفل النبي في عينيه فبرئتا من الرمد وقلع باب الحصن وفتح الله به الحصون."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي الحكمة السياسية والعسكرية من تحييد وفتح حصون خيبر بعد صلح الحديبية مباشرة؟",
-            "score": 10,
-            "modelAnswer": "للقضاء على أكبر وكر للتآمر والتحريض على غزو المدينة المنورة وتمويل الجيوش ومحاربة المسلمين، ولتأمين حدود الدولة الإسلامية الشمالية والتفرغ لنشر الإسلام في شبه الجزيرة العربية."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q11",
-        "title": "أهمية الكلمة الطيبة ومسؤولية اللسان في الإسلام",
-        "text": "في الآداب والتوجيهات النبوية للحديث:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتذكر",
-        "chapter": 2,
-        "topic": "حفظ اللسان والكلمة الطيبة",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "قال رسول الله ﷺ: «مَنْ كَانَ يُؤْمِنُ بِاللَّهِ وَاليَوْمِ الآخِرِ فَلْيَقُلْ خَيْراً أَوْ لِيَصْمُتْ». ما هي التوجيهات الأخلاقية والاجتماعية التي يعلمنا إياها هذا الحديث الشريف؟",
-            "score": 10,
-            "modelAnswer": "1) ضبط اللسان والحذر من آفات الكلام كالكذب والسب والغيبة والنميمة.\n2) التكلم بالخير والكلمة الطيبة والإصلاح بين الناس أو التزام الصمت والسلامة.\n3) ربط استقامة الإيمان بصدق اللسان وسلامة القلب."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما المقصود بـ (الكلمة الطيبة صدقة)؟ اذكر مثالين للكلمة الطيبة في التعامل اليومي.",
-            "score": 10,
-            "modelAnswer": "أي أن الكلام الحسن واللطيف مع الناس يكتب للإنسان به أجر وثواب كالصدقة بالمال.\nأمثلة: رد السلام بابتسامة، جبر خواطر المنكسرين، الدعاء بالخير، وتقديم النصيحة بالحكمة والموعظة الحسنة."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q12",
-        "title": "الإيمان بالكتب السماوية ورسالات الأنبياء",
-        "text": "في أركان الإيمان والكتب المنزلة:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تذكر وتصنيف",
-        "chapter": 2,
-        "topic": "الكتب السماوية ورسلها",
-        "sourceType": "وزاري مكرر",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اذكر أسماء الكتب السماوية الأربعة المشهورة والرسل والأنبياء الذين نزلت عليهم.",
-            "score": 10,
-            "modelAnswer": "1) التوراة: نزلت على نبي الله موسى (عليه السلام).\n2) الزبور: نزل على نبي الله داود (عليه السلام).\n3) الإنجيل: نزل على نبي الله عيسى بن مريم (عليه السلام).\n4) القرآن الكريم: نزل على خاتم الأنبياء والمرسلين محمد ﷺ."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "بماذا امتاز القرآن الكريم عن سائر الكتب السماوية السابقة؟",
-            "score": 10,
-            "modelAnswer": "1) كتاب شامل وخاتم لجميع الرسالات ومهيمن عليها وصالح لكل زمان ومكان.\n2) معجزة خالدة ومحفوظة بحفظ الله التام من أي تحريف أو تبديل أو نقص ﴿إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ﴾.\n3) موجه للبشرية كافة وليس لقوم خاصين."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q13",
-        "title": "حق الجار ورعايته في الإسلام",
-        "text": "في التعايش والواجبات الإنسانية والاجتماعية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "تطبيق وتذكر",
-        "chapter": 2,
-        "topic": "حقوق الجار في الإسلام",
-        "sourceType": "وزاري 2020 دور أول",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "عن ابن عمر وعائشة (رضي الله عنهما) قالا: قال رسول الله ﷺ: «مَا زَالَ جِبْرِيلُ يُوصِينِي بِالجَارِ حَتَّى ظَنَنْتُ أَنَّهُ سَيُوَرِّثُهُ». اشرح مكانة الجار في الإسلام في ضوء الحديث الشريف.",
-            "score": 10,
-            "modelAnswer": "يبين الحديث المكانة العظيمة والمنزلة الرفيعة للجار؛ حيث تكررت وصية جبريل بالجار تكراراً جعل النبي ﷺ يظن أن الوحي سينزل بتشريع نصيب له في الميراث كالأقارب، مما يوجب الإحسان التام إليه وكف الأذى عنه."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي حقوق الجار الأربعة في الإسلام؟",
-            "score": 10,
-            "modelAnswer": "1) كف الأذى عنه بالقول والفعل وحفظ أسراره وعوراته.\n2) مواساته في المصائب وإعانته عند الفقر والحاجة.\n3) عيادته إذا مرض وتهنئته في المسرات وإجابة دعوته.\n4) الصبر على أذاه ومقابلة الإساءة بالإحسان."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q14",
-        "title": "الأمانة وحرمة الخيانة في الإسلام",
-        "text": "في الأخلاق المعاملاتية السامية:",
-        "score": 20,
-        "difficulty": "سهل",
-        "bloom": "فهم ومقارنة",
-        "chapter": 2,
-        "topic": "أداء الأمانة وخيانة العهود",
-        "sourceType": "كتاب الطالب المنهجي",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "ما المقصود بـ (الأمانة)؟ وما هي أنواع الأمانات التي يحملها الإنسان المسلم في حياته؟",
-            "score": 10,
-            "modelAnswer": "الأمانة: أداء كل حق واجب والتزام الصدق والوفاء في الودائع والعهود والأعمال.\nأنواعها:\n1) أمانة الدين والعبادات والتكاليف الإلهية بين العبد وربه.\n2) أمانة الودائع والأموال والأعراض مع الناس.\n3) أمانة العمل والوظيفة العامة والإخلاص فيها دون إهمال أو رشوة.\n4) أمانة الكلمة وحفظ الأسرار والمجالس."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما هي علامات المنافق الثلاث كما بينها رسول الله ﷺ في الحديث الشريف؟",
-            "score": 10,
-            "modelAnswer": "قال رسول الله ﷺ: «آيَةُ المُنَافِقِ ثَلَاثٌ: إِذَا حَدَّثَ كَذَبَ ، وَإِذَا وَعَدَ أَخْلَفَ ، وَإِذَا اؤْتُمِنَ خَانَ»."
-          }
-        ]
-      },
-      {
-        "id": "isl_ch2_q15",
-        "title": "اختبار المتميزين الشامل في الحديث النبوي والسيرة والأخلاق",
-        "text": "أجب عن المسألة المتقدمة في السيرة والأخلاق الإسلامية:",
-        "score": 20,
-        "difficulty": "تحدي",
-        "bloom": "تقويم وتطبيق عملي",
-        "chapter": 2,
-        "topic": "اختبار التميز الشامل للسيرة والأخلاق",
-        "sourceType": "امتحانات المتميزين الوزارية",
-        "branches": [
-          {
-            "id": "b1",
-            "title": "الفرع (أ)",
-            "text": "اكتب فقرة متكاملة توضح فيها كيف استطاع النبي ﷺ من خلال أخلاقه العالية وسيرته في فتح مكة وصلح الحديبية أن يحول قلوب ألد أعدائه إلى جنود أوفياء ومخلصين للإسلام.",
-            "score": 10,
-            "modelAnswer": "من خلال التزامه الصارم بالعهود والمواثيق في صلح الحديبية ولو بدت صعبة، وتقديمه الحكمة والرحمة على سفك الدماء، وتتويج ذلك بعفوه الشامل في فتح مكة وإطلاقه أسرى قريش ومشركيها دون لوم ولا عقاب بعد عشرين عاماً من العداء، فملك قلوبهم بنبل التسامح وعظمة الخلق النبوي فدخل الناس في دين الله أفواجاً طوعاً ومحبة."
-          },
-          {
-            "id": "b2",
-            "title": "الفرع (ب)",
-            "text": "ما الفرق بين (الغضب المذموم) و (الغضب المحمود) في السلوك الإسلامي؟",
-            "score": 10,
-            "modelAnswer": "الغضب المذموم: هو الغضب انتصاراً للنفس والأهواء والشهوات الشخصية والانتقام بظلم وعدوان.\nالغضب المحمود: هو الغضب لله تعالى وللحق عند انتهاك حرمات الله ومحارمه وظلم الضعفاء لنصرة المظلوم والدفاع عن الدين والوطن دون تجاوز للحدود والعدالة."
-          }
-        ]
-      }
-    ]
   }
 };
-
 
   // 1. Master Grade Stage & Key Normalizer
   function normalizeGradeStage(gradeStr) {
@@ -13920,7 +14510,7 @@
     return { stage: 'intermediate', key: 'intermediate_3', name: 'الصف الثالث المتوسط' };
   }
 
-  // 2. Subject Key Normalizer (Full Ministerial Multi-Disciplinary Support)
+  // 2. Subject Key Normalizer
   function normalizeSubjectKey(subjectStr) {
     if (!subjectStr) return 'arabic';
     const s = subjectStr.toString().toLowerCase().trim();
@@ -13937,32 +14527,32 @@
     return 'arabic';
   }
 
-  // 3. Deep Natural Language Teacher Notes Parser
+  // 3. Deep Natural Language Teacher Notes Parser (All 10+ Diverse Question Patterns)
   function parseTeacherNotes(notes) {
     if (!notes || typeof notes !== 'string' || !notes.trim()) {
       return { hasNotes: false, raw: '', chapters: [], styles: [], topics: [], keywords: [] };
     }
     const cleanNotes = notes.trim();
-    const lower = cleanNotes.toLowerCase();
 
     // Chapter detection
     const chapters = [];
     const chapterMap = [
-      { num: 1, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الأول|الاول|1|الأولى|الاولى)/i },
-      { num: 2, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الثاني|الثانية|2)/i },
-      { num: 3, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الثالث|الثالثة|3)/i },
-      { num: 4, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الرابع|الرابعة|4)/i },
-      { num: 5, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الخامس|الخامسة|5)/i },
-      { num: 6, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(السادس|السادسة|6)/i },
-      { num: 7, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(السابع|السابعة|7)/i },
-      { num: 8, pat: /(الفصل|فصل|الوحدة|وحدة)\s*(الثامن|الثامنة|8)/i }
+      { num: 1, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الأول|الاول|1|الأولى|الاولى|one)/i },
+      { num: 2, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الثاني|الثانية|2|two)/i },
+      { num: 3, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الثالث|الثالثة|3|three)/i },
+      { num: 4, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الرابع|الرابعة|4|four)/i },
+      { num: 5, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الخامس|الخامسة|5|five)/i },
+      { num: 6, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(السادس|السادسة|6|six)/i },
+      { num: 7, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(السابع|السابعة|7|seven)/i },
+      { num: 8, pat: /(الفصل|فصل|الوحدة|وحدة|unit)\s*(الثامن|الثامنة|8|eight)/i }
     ];
     chapterMap.forEach(item => {
       if (item.pat.test(cleanNotes)) chapters.push(item.num);
     });
 
-    // Style detection
+    // Style & Question Pattern detection
     const styles = [];
+    // General patterns
     if (/تعاليل|علل|أسباب|فسر/i.test(cleanNotes)) styles.push('reasoning');
     if (/تعاريف|عرف|مصطلحات|مفهوم/i.test(cleanNotes)) styles.push('definition');
     if (/مقارن|قارن|ما الفرق|مقارنات/i.test(cleanNotes)) styles.push('comparison');
@@ -13971,6 +14561,18 @@
     if (/فراغات|املأ الفراغ|اكمل/i.test(cleanNotes)) styles.push('fill_blanks');
     if (/صح وخطأ|صحح الخطأ/i.test(cleanNotes)) styles.push('true_false');
     if (/اختيار|اختر|خيارات/i.test(cleanNotes)) styles.push('mcq');
+
+    // Advanced Specific User-Requested Patterns
+    if (/قطع الكتاب|قطعة الكتاب|قطعة كتاب|textbook passage|story time|زيد طارق|مصطفى احمد|الرادار|سميرة المحمود|الأرجوحة|الكناري/i.test(cleanNotes)) styles.push('textbook_passage');
+    if (/قطعة خارجية|قطعة استيعابية|reading comprehension|unseen passage|unseen text|قطعه خارجيه/i.test(cleanNotes)) styles.push('unseen_passage');
+    if (/انشاء|إنشاء|تعبير|موضوع تعبير|composition|essay|writing|email describing|letter of application|انشاء باللغه العربيه|انشاء انكليزي/i.test(cleanNotes)) styles.push('composition');
+    if (/اسقاطات|إسقاطات|drop ins|drop-ins|كلمات من الصندوق|كلمات الصندوق/i.test(cleanNotes)) styles.push('drop_ins');
+    if (/مرادفات|مرادف|معاكسات|تعاكيس|أضداد|اضداد|إملاء|املاء|spelling|synonyms|opposites|prefixes/i.test(cleanNotes)) styles.push('spelling_synonyms');
+    if (/توصيل|توصيلات|صل بين|ربط|قائمتين|matching|match column/i.test(cleanNotes)) styles.push('matching');
+    if (/نشاط|أنشطة|تجربة|تجارب|خطوات العمل|أدوات النشاط|استنتاج|شحن المتسعة|فرداي|الحث الذاتي/i.test(cleanNotes)) styles.push('physics_activity');
+    if (/سورة|حفظ السورة|اكتب ما تحفظ|استظهار|سورة النجم|سورة الحشر|سورة النساء|سورة الإسراء|سورة البقرة|سورة لقمان|سورة الحجرات/i.test(cleanNotes)) styles.push('surah_recitation');
+    if (/حديث|حديث شريف|الحديث النبوي|قال رسول الله|محاسبة النفس|التعاون بين المسلمين|حسن الخلق|حرمة المسلم/i.test(cleanNotes)) styles.push('hadith_sharif');
+    if (/أحكام التلاوة|احكام التلاوة|أحكام التلاوه|تلاوة|تجويد|نون ساكنة|تنوين|إظهار|إدغام|إقلاب|إخفاء|لام ال|المدود|مد متصل|مد منفصل/i.test(cleanNotes)) styles.push('tajweed_rulings');
 
     // Extract significant keywords
     const ignoredWords = new Set([
@@ -13995,7 +14597,7 @@
   function scoreQuestion(q, parsedNotes) {
     if (!parsedNotes.hasNotes) return 0;
     let score = 0;
-    const qStr = `${q.title} ${q.text} ${q.topic || ''} ${(q.branches || []).map(b => b.text).join(' ')}`.toLowerCase();
+    const qStr = `${q.title} ${q.text} ${q.topic || ''} ${q.questionCategory || ''} ${(q.branches || []).map(b => b.text).join(' ')}`.toLowerCase();
 
     // Chapter exact match
     if (parsedNotes.chapters.length > 0 && q.chapter) {
@@ -14006,8 +14608,20 @@
       }
     }
 
-    // Style match
+    // Style match with high priority for user patterns
     parsedNotes.styles.forEach(st => {
+      if (q.questionCategory === st) score += 350;
+      if (st === 'composition' && (q.questionCategory === 'composition' || q.questionCategory === 'arabic_composition' || qStr.includes('إنشاء') || qStr.includes('تعبير') || qStr.includes('composition'))) score += 300;
+      if (st === 'drop_ins' && (q.questionCategory === 'drop_ins' || qStr.includes('drop-ins') || qStr.includes('إسقاطات'))) score += 300;
+      if (st === 'spelling_synonyms' && (q.questionCategory === 'spelling_synonyms' || qStr.includes('spelling') || qStr.includes('مرادفات') || qStr.includes('إملاء'))) score += 300;
+      if (st === 'matching' && (q.questionCategory === 'matching' || qStr.includes('matching') || qStr.includes('توصيل'))) score += 300;
+      if (st === 'textbook_passage' && (q.questionCategory === 'textbook_passage' || qStr.includes('textbook') || qStr.includes('قطع الكتاب'))) score += 300;
+      if (st === 'unseen_passage' && (qStr.includes('unseen') || qStr.includes('خارجية'))) score += 300;
+      if (st === 'physics_activity' && (q.questionCategory === 'physics_activity' || qStr.includes('نشاط') || qStr.includes('تجربة'))) score += 350;
+      if (st === 'surah_recitation' && (q.questionCategory === 'surah_recitation' || qStr.includes('سورة') || qStr.includes('اكتب ما تحفظ'))) score += 350;
+      if (st === 'hadith_sharif' && (q.questionCategory === 'hadith_sharif' || qStr.includes('حديث'))) score += 350;
+      if (st === 'tajweed_rulings' && (q.questionCategory === 'tajweed_rulings' || qStr.includes('أحكام التلاوة') || qStr.includes('تلاوة'))) score += 350;
+
       if (st === 'reasoning' && (qStr.includes('علل') || qStr.includes('ما سبب') || q.type === 'reasoning')) score += 80;
       if (st === 'definition' && (qStr.includes('عرف') || qStr.includes('ما المقصود') || q.type === 'definition')) score += 80;
       if (st === 'comparison' && (qStr.includes('قارن') || qStr.includes('ما الفرق') || q.type === 'comparison')) score += 80;
@@ -14028,85 +14642,193 @@
     return score;
   }
 
-  // 5. Dynamic Question Synthesizer (Tailored to Teacher Notes)
+  // 5. Dynamic Question Synthesizer (Tailored to Specific Request Styles)
   function synthesizeQuestionForTeacherNotes(parsedNotes, gradeInfo, subjectKey, qIndex) {
     const rawNote = parsedNotes.raw.trim();
     const ord = getArabicOrdinal(qIndex + 1);
 
-    // Topic title from keywords or chapter
     let topicName = parsedNotes.keywords.slice(0, 3).join(' و ');
     if (!topicName && parsedNotes.chapters.length > 0) {
       topicName = `الفصل ${getArabicOrdinal(parsedNotes.chapters[0])}`;
     }
-    if (!topicName) topicName = 'المفاهيم والمسائل المنهجية';
+    if (!topicName) topicName = 'المفاهيم والأنشطة المنهجية المقررة';
 
-    const questionArchetypes = [
-      {
-        theme: `التعاليل والتفسيرات العلمية الدقيقة في (${topicName})`,
-        b1: `علل وزارياً ما يأتي مع التوضيح العلمي الدقيق لموضوع (${topicName}): بيّن السبب والنتيجة المترتبة.`,
-        b2: `ما العوامل المؤثرة على تلك الظاهرة في المنهاج الدراسي؟ وضح تأثير كل عامل.`,
-        ans1: `التفسير والتعليل العلمي الوزاري المباشر لموضوع (${topicName}).`,
-        ans2: `تأثير العوامل المباشرة وفق المعايير والضوابط المنهجية المعتمدة.`
-      },
-      {
-        theme: `المسائل الحسابية والقوانين الرياضية في (${topicName})`,
-        b1: `مسألة وزارية: احسب القيمة المطلوبة بتطبيق القانون الرياضي الخاص بـ (${topicName}) خطوة بخطوة.`,
-        b2: `ماذا يحدث للناتج إذا تضاعفت إحدى القيم المؤثرة أو تغيرت الظروف المحيطة؟ وضح رياضياً.`,
-        ans1: `كتابة القانون الرياضي والتعويض بالأرقام وحساب الناتج بوحدة القياس الدولية الصحيحة.`,
-        ans2: `التوضيح الرياضي للعلاقة الطردية أو العكسية استناداً للقانون المنهجي.`
-      },
-      {
-        theme: `المقارنات والجداول العلمية المنهجية في (${topicName})`,
-        b1: `قارن في جدول منظم ودقيق بين المفهومين الرئيسيين في (${topicName}) من حيث الخواص والاستعمال.`,
-        b2: `أعطِ مثالاً تطبيقياً عملياً لكل منهما في البيئة أو المنهاج الدراسي مع بيان الأهمية.`,
-        ans1: `جدول مقارنة علمي شامل يوضح الفروق الجوهرية والخصائص المميزة.`,
-        ans2: `أمثلة توضيحية واقعية مستمدة من نصوص الكتاب الوزاري المقرر.`
-      },
-      {
-        theme: `المفاهيم والتعاريف والأنشطة المعملية في (${topicName})`,
-        b1: `عرّف المصطلحين الأساسيين في (${topicName}) مبيناً الوظيفة أو الدلالة العلمية لكل منهما.`,
-        b2: `اشرح نشاطاً عملياً أو تجربة منهجية توضح سلوك الظاهرة مع ذكر الأدوات والاستنتاج.`,
-        ans1: `التعريفان الدقيقان وفق المعجم العلمي والمنهاج الوزاري.`,
-        ans2: `خطوات التجربة: الأدوات، طريقة العمل، والملاحظة والاستنتاج العملي.`
-      },
-      {
-        theme: `أسئلة التحدي والتفكير الاستنتاجي في (${topicName})`,
-        b1: `سؤال فكري استنتاجي للمتميزين: كيف تفسر السلوك غير المعتاد للظاهرة في (${topicName})؟`,
-        b2: `ما هو التنبؤ العلمي الدقيق عند تغير المتغيرات الأساسية؟ علل استنتاجك علمياً.`,
-        ans1: `التحليل الفكري المتقدم والربط بين القوانين والمفاهيم.`,
-        ans2: `التنبؤ المنطقي المدعوم بالأدلة والبراهين المنهجية الرسمية.`
-      }
-    ];
+    // Style-specific synthesizer
+    if (parsedNotes.styles.includes('physics_activity') || (subjectKey === 'physics' && qIndex === 1)) {
+      return {
+        id: `syn_phys_act_${Date.now()}_${qIndex}`,
+        title: `السؤال الثاني: الأنشطة والتجارب المنهجية (نشاط تطبيقي في ${topicName})`,
+        text: `في الأنشطة والتجارب العلمية المقررة لموضوع (${topicName}):`,
+        score: 20,
+        difficulty: 'متوسط',
+        bloom: 'تطبيق وتجربة',
+        chapter: parsedNotes.chapters[0] || 1,
+        topic: `نشاط عملي: ${topicName}`,
+        questionCategory: 'physics_activity',
+        sourceType: 'الأنشطة الوزارية المعتمدة',
+        branches: [
+          {
+            id: 'b1',
+            title: 'الفرع (أ): خطوات النشاط العملي',
+            text: `اشرح نشاطاً عملياً يوضح كيفية دراسة ظاهرة (${topicName}) في المختبر المدرسي مبيناً بالتفصيل: 1) أدوات النشاط المستعملة، 2) خطوات العمل بالتسلسل، 3) الاستنتاج العلمي المتحقق مع رسم مخطط الدائرة الكهربائية أو التجريبية.`,
+            score: 12,
+            modelAnswer: `أدوات النشاط: الأجهزة والمصادر المعملية المناسبة لموضوع (${topicName}). الخطوات: الربط والتشغيل وملاحظة المؤشرات وقراءات الأجهزة. الاستنتاج: الصياغة الرياضية والقانون العلمي المفسر للظاهرة.`
+          },
+          {
+            id: 'b2',
+            title: 'الفرع (ب): التفسير والتعليل العلمي',
+            text: `علل علمياً ما يأتي مع التوضيح: ما هو السلوك الفيزيائي المتوقع عند مضاعفة المتغيرات الأساسية في تجربة (${topicName})؟`,
+            score: 8,
+            modelAnswer: `التفسير الفيزيائي الدقيق استناداً إلى القوانين المنهجية المعتمدة في الكتاب الوزاري.`
+          }
+        ]
+      };
+    }
 
-    const archetype = questionArchetypes[qIndex % questionArchetypes.length];
+    if (parsedNotes.styles.includes('composition') && subjectKey === 'arabic') {
+      return {
+        id: `syn_arab_essay_${Date.now()}_${qIndex}`,
+        title: `السؤال الخامس: التعبير والإنشاء (في رحاب ${topicName})`,
+        text: `التعبير والإنشاء (20 درجة) - اكتب في أحد الموضوعين بأسلوب أدبي بليغ مراعياً قواعد اللغة وعلامات الترقيم:`,
+        score: 20,
+        difficulty: 'متوسط',
+        bloom: 'تعبير وإبداع',
+        chapter: parsedNotes.chapters[0] || 1,
+        topic: `إنشاء: ${topicName}`,
+        questionCategory: 'arabic_composition',
+        sourceType: 'الامتحان الوزاري المعتمد - التعبير',
+        branches: [
+          {
+            id: 'b1',
+            title: 'الفرع (أ)',
+            text: `انطلق من الفكرة النبيلة لموضوع (${topicName}) لكتابة مقال إنشائي متكامل العناصر (مقدمة، عرض، خاتمة)، مبرزاً آثاره الإيجابية في بناء الفرد ورفعة الوطن، معززاً كتابتك بما تحفظ من القرآن الكريم والحديث الشريف وشواهد الشعر العربي.`,
+            score: 20,
+            modelAnswer: `معايير التصحيح الوزاري: براعة المطلع وحسن التمهيد (3 درجات)، سلامة المعاني وتسلسل الأفكار (7 درجات)، دقة الاستشهاد القرآني والشعري (4 درجات)، السلامة النحوية والإملائية (4 درجات)، بلاغة الخاتمة وحسن الخط (درجتان).`
+          }
+        ]
+      };
+    }
 
-    let branchA = {
-      id: `syn_b1_${Date.now()}_${qIndex}_${Math.random().toString(36).substr(2, 4)}`,
-      title: 'الفرع (أ)',
-      text: archetype.b1,
-      score: 10,
-      modelAnswer: archetype.ans1
-    };
+    if (parsedNotes.styles.includes('surah_recitation') || (subjectKey === 'islamic' && qIndex === 1)) {
+      return {
+        id: `syn_isl_surah_${Date.now()}_${qIndex}`,
+        title: `السؤال الأول: القرآن الكريم والحفظ (استظهار الآيات المباركة)`,
+        text: `في نصوص الحفظ والتفسير القرآني لموضوع (${topicName}):`,
+        score: 20,
+        difficulty: 'متوسط',
+        bloom: 'حفظ وفهم',
+        chapter: parsedNotes.chapters[0] || 1,
+        topic: `سورة مقررة: ${topicName}`,
+        questionCategory: 'surah_recitation',
+        sourceType: 'الامتحان الوزاري المعتمد - القرآن الكريم',
+        branches: [
+          {
+            id: 'b1',
+            title: 'الفرع (أ): اكتب ما تحفظ من السورة المباركة',
+            text: `اكتب من الآيات القرآنية المقررة للحفظ في منهاج (${topicName}) مضبوطاً بالشكل التام مراعياً صحة الكلمات وحركات الإعراب.`,
+            score: 12,
+            modelAnswer: `النص القرآني الكريم المحفوظ نصاً مع الضبط التام لأواخر الكلمات بالحركات.`
+          },
+          {
+            id: 'b2',
+            title: 'الفرع (ب): معاني المفردات والتفسير',
+            text: `بيّن معاني المفردات القرآنية الآتية الواردة في الآيات المحفوظة واشرح المعنى الإجمالي لقوله تعالى في النص.`,
+            score: 8,
+            modelAnswer: `المعاني الدقيقة للمفردات وفق التفسير المنهجي المعتمد لوزارة التربية.`
+          }
+        ]
+      };
+    }
 
-    let branchB = {
-      id: `syn_b2_${Date.now()}_${qIndex}_${Math.random().toString(36).substr(2, 4)}`,
-      title: 'الفرع (ب)',
-      text: archetype.b2,
-      score: 10,
-      modelAnswer: archetype.ans2
-    };
+    if (parsedNotes.styles.includes('hadith_sharif') || (subjectKey === 'islamic' && qIndex === 2)) {
+      return {
+        id: `syn_isl_hadith_${Date.now()}_${qIndex}`,
+        title: `السؤال الثاني: الحديث النبوي الشريف (في مكارم الأخلاق والواجبات)`,
+        text: `في السنة النبوية المطهرة والحديث الشريف المقترح في (${topicName}):`,
+        score: 20,
+        difficulty: 'متوسط',
+        bloom: 'حفظ وتطبيق',
+        chapter: parsedNotes.chapters[0] || 1,
+        topic: `حديث شريف: ${topicName}`,
+        questionCategory: 'hadith_sharif',
+        sourceType: 'الامتحان الوزاري المعتمد - الحديث الشريف',
+        branches: [
+          {
+            id: 'b1',
+            title: 'الفرع (أ): اكتب نص الحديث الشريف',
+            text: `اكتب حديثاً نبوياً شريفاً للحفظ عن النبي ﷺ في موضوع (${topicName}) واضبطه بالشكل التام.`,
+            score: 12,
+            modelAnswer: `متن الحديث النبوي الشريف مضبوطاً بالشكل التام بدقة تامة دون زيادة أو نقصان.`
+          },
+          {
+            id: 'b2',
+            title: 'الفرع (ب): ما يرشد إليه الحديث',
+            text: `1. اذكر أمرين أساسيين يرشد إليهما هذا الحديث الشريف.\n2. كيف نترجم توجيهات الحديث في سلوكنا اليومي والمجتمعي؟`,
+            score: 8,
+            modelAnswer: `النقاط الإرشادية والتربوية المستنبطة من الحديث الشريف وأثرها في صلاح الفرد والمجتمع.`
+          }
+        ]
+      };
+    }
 
+    if (parsedNotes.styles.includes('tajweed_rulings') || (subjectKey === 'islamic' && qIndex === 0)) {
+      return {
+        id: `syn_isl_tajweed_${Date.now()}_${qIndex}`,
+        title: `السؤال التمهيدي: أحكام التلاوة القرآنية (أحكام النون والتنوين واللام والمدود)`,
+        text: `في أحكام تلاوة القرآن الكريم ومبحث التجويد:`,
+        score: 20,
+        difficulty: 'متوسط',
+        bloom: 'تطبيق واستخراج',
+        chapter: parsedNotes.chapters[0] || 1,
+        topic: `أحكام التلاوة: ${topicName}`,
+        questionCategory: 'tajweed_rulings',
+        sourceType: 'الامتحان الوزاري المعتمد - أحكام التلاوة',
+        branches: [
+          {
+            id: 'b1',
+            title: 'الفرع (أ): استخراج أحكام التلاوة مع السبب',
+            text: `استخرج (خمسة) أحكام للتلاوة (النون الساكنة والتنوين أو لام ال أو المدود) مبيناً (نوع الحكم) و(السبب) في جدول منظم ودقيق.`,
+            score: 10,
+            modelAnswer: `جدول الاستخراج: الكلمة القرآنية، نوع الحكم التجويدي، والسبب العلمي المعتمد في قواعد التلاوة.`
+          },
+          {
+            id: 'b2',
+            title: 'الفرع (ب): القواعد والتعاريف التجويدية',
+            text: `عرّف اثنين من أحكام التلاوة المقررة في منهاجك مع ذكر مثال لكل منهما وحروفه الخاصة.`,
+            score: 10,
+            modelAnswer: `التعريفان الدقيقان مع ذكر الحروف والأمثلة القرآنية الصحيحة.`
+          }
+        ]
+      };
+    }
+
+    // Default Archetype
     return {
       id: `ai_syn_teacher_q${qIndex + 1}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-      title: archetype.theme,
-      text: `في موضوع (${topicName})، ${archetype.theme}، أجب عما يأتي:`,
+      title: `السؤال ${ord}: المفاهيم والمسائل المنهجية في (${topicName})`,
+      text: `في موضوع (${topicName}) وفق المعايير الوزارية المقررة، أجب عما يأتي:`,
       score: 20,
       difficulty: 'متوسط',
-      bloom: 'تطبيق',
+      bloom: 'تطبيق وتحليل',
       chapter: parsedNotes.chapters[0] || 1,
       topic: topicName,
       sourceType: 'توجيه المدرس والأنشطة المنهجية (توليد مخصص)',
-      branches: [branchA, branchB],
+      branches: [
+        {
+          id: 'b1',
+          title: 'الفرع (أ)',
+          text: `علل وزارياً وفسر بالتفصيل العلمي الظاهرة المتعلقة بـ (${topicName}) مع بيان القوانين والمبادئ الحاكمة.`,
+          score: 10,
+          modelAnswer: `التفسير والتعليل العلمي الوزاري الدقيق لموضوع (${topicName}).`
+        },
+        {
+          id: 'b2',
+          title: 'الفرع (ب)',
+          text: `أجب عن المسألة أو التطبيق العملي لموضوع (${topicName}) خطوة بخطوة مع كتابة القوانين ووحدات القياس.`,
+          score: 10,
+          modelAnswer: `خطوات الحل الرياضي والتعويض والناتج النهائي بوحدات القياس الدولية المعتمدة.`
+        }
+      ],
       modelAnswer: `سلّم الدرجات والجواب النموذجي المخصص لموضوع (${topicName}) وفق المعايير الوزارية الرسمية.`
     };
   }
@@ -14146,17 +14868,14 @@
     const isEnglish = (subjectKey === 'english') || 
                       (subjectName && (subjectName.toLowerCase().includes('eng') || subjectName.includes('إنكل') || subjectName.includes('انكل')));
 
-    // Signature helper to prevent any duplicate questions
     function getSignature(q) {
       if (!q) return '';
       return `${(q.topic || '').trim()}__${(q.text || '').slice(0, 35).trim()}__${(q.branches && q.branches[0] ? q.branches[0].text.slice(0, 25) : '')}`;
     }
 
-    // 1. Sort pool by relevance to teacher notes and active chapters
+    // Dynamic rotation based on click entropy + version code
     let sortedPool = [...pool];
-
-    // Dynamic rotation based on click entropy + version code to guarantee brand new questions on every single click
-    const versionShift = versionCode === 'A' ? 0 : (versionCode === 'B' ? 4 : 8);
+    const versionShift = versionCode === 'A' ? 0 : (versionCode === 'B' ? 5 : 10);
     const clickOffset = (currentClick * 3 + versionShift) % Math.max(1, sortedPool.length);
     if (sortedPool.length > 0) {
       sortedPool = sortedPool.slice(clickOffset).concat(sortedPool.slice(0, clickOffset));
@@ -14168,6 +14887,7 @@
       [sortedPool[i], sortedPool[j]] = [sortedPool[j], sortedPool[i]];
     }
 
+    // Sort by relevance to notes & chapters
     if (activeChapters.length > 0 || parsedNotes.hasNotes) {
       sortedPool.sort((a, b) => {
         let scoreB = scoreQuestion(b, parsedNotes);
@@ -14180,64 +14900,183 @@
       });
     }
 
-    // 2. If teacher notes explicitly requested topics/chapters, inject a synthesized question if top match score is low
-    if (parsedNotes.hasNotes) {
-      const topScore = sortedPool[0] ? scoreQuestion(sortedPool[0], parsedNotes) : 0;
-      if (topScore < 100 || parsedNotes.keywords.length > 0) {
-        const synQ = synthesizeQuestionForTeacherNotes(parsedNotes, gradeInfo, subjectKey, 0);
-        if (activeChapters.length > 0 && !activeChapters.includes(synQ.chapter)) {
-          synQ.chapter = activeChapters[0];
-          synQ.title = isEnglish 
-            ? `Question 1: Specialized Tasks and Activities [Unit ${activeChapters[0]}]`
-            : `السؤال الأول: تطبيقات وأنشطة (الفصل ${getArabicOrdinal(activeChapters[0])})`;
-        }
-        const sig = getSignature(synQ);
-        if (!usedLocalSignatures.has(sig)) {
-          selectedQuestions.push(synQ);
+    // Special Helper: Try selecting a question matching a specific predicate
+    function pickMatching(predicate) {
+      for (let i = 0; i < sortedPool.length; i++) {
+        const candidate = sortedPool[i];
+        const sig = getSignature(candidate);
+        if (usedLocalSignatures.has(sig) || usedGlobalSignatures.has(sig)) continue;
+        if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) continue;
+        if (predicate(candidate)) {
           usedLocalSignatures.add(sig);
           usedGlobalSignatures.add(sig);
+          return JSON.parse(JSON.stringify(candidate));
         }
+      }
+      return null;
+    }
+
+    // -----------------------------------------------------------------
+    // Intelligent Ministerial Exam Structuring
+    // -----------------------------------------------------------------
+    if (isEnglish) {
+      // Slot 1: Reading Comprehension & Textbook Passages
+      const q1Candidate = pickMatching(q => 
+        q.questionCategory === 'textbook_passage' || 
+        (q.title && q.title.toLowerCase().includes('reading comprehension')) ||
+        (q.topic && q.topic.toLowerCase().includes('textbook'))
+      );
+      if (q1Candidate) {
+        // Inject fresh Unseen Reading Passage for Part A
+        if (typeof UNSEEN_PASSAGES_BANK !== 'undefined' && UNSEEN_PASSAGES_BANK.length > 0) {
+          const passageIdx = (currentClick * 2 + (versionCode === 'A' ? 0 : (versionCode === 'B' ? 1 : 2))) % UNSEEN_PASSAGES_BANK.length;
+          const selectedPassage = UNSEEN_PASSAGES_BANK[passageIdx];
+          if (q1Candidate.branches && q1Candidate.branches.length > 0) {
+            q1Candidate.branches[0].text = selectedPassage.text;
+            q1Candidate.branches[0].modelAnswer = selectedPassage.modelAnswer;
+          }
+        }
+        selectedQuestions.push(q1Candidate);
+      }
+
+      // Slot 2: Grammar & Language Functions
+      const q2Candidate = pickMatching(q => 
+        (q.title && q.title.toLowerCase().includes('grammar')) ||
+        (q.topic && q.topic.toLowerCase().includes('grammar')) ||
+        (q.text && q.text.toLowerCase().includes('bracket'))
+      );
+      if (q2Candidate) selectedQuestions.push(q2Candidate);
+
+      // Slot 3: Vocabulary, Drop-ins, Matching & Spelling
+      const q3Candidate = pickMatching(q => 
+        q.questionCategory === 'drop_ins' || 
+        q.questionCategory === 'matching' || 
+        q.questionCategory === 'spelling_synonyms' ||
+        (q.title && q.title.toLowerCase().includes('vocabulary'))
+      );
+      if (q3Candidate) selectedQuestions.push(q3Candidate);
+
+      // Slot 4: Literature Focus & Story Time
+      const q4Candidate = pickMatching(q => 
+        q.questionCategory === 'literature_story' || 
+        (q.title && q.title.toLowerCase().includes('literature')) ||
+        (q.topic && q.topic.toLowerCase().includes('swing')) ||
+        (q.topic && q.topic.toLowerCase().includes('canary')) ||
+        (q.title && q.title.toLowerCase().includes('story time'))
+      );
+      if (q4Candidate) selectedQuestions.push(q4Candidate);
+
+      // Slot 5: Written Component / Composition
+      const q5Candidate = pickMatching(q => 
+        q.questionCategory === 'composition' || 
+        (q.title && q.title.toLowerCase().includes('composition')) ||
+        (q.title && q.title.toLowerCase().includes('written component')) ||
+        (q.topic && q.topic.toLowerCase().includes('composition'))
+      );
+      if (q5Candidate) selectedQuestions.push(q5Candidate);
+
+    } else if (subjectKey === 'arabic') {
+      // Slot 5 specifically reserved for Arabic Composition (التعبير والإنشاء)
+      const essayQ = pickMatching(q => 
+        q.questionCategory === 'arabic_composition' || 
+        (q.title && q.title.includes('التعبير والإنشاء')) ||
+        (q.topic && q.topic.includes('التعبير والإنشاء'))
+      );
+
+      // Slots 1-4 for Grammar, Parsing, Literature & Rhetoric
+      for (let i = 0; i < sortedPool.length && selectedQuestions.length < 4; i++) {
+        const candidate = sortedPool[i];
+        const sig = getSignature(candidate);
+        if (usedLocalSignatures.has(sig) || usedGlobalSignatures.has(sig)) continue;
+        if (candidate.questionCategory === 'arabic_composition') continue;
+        if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) continue;
+        selectedQuestions.push(JSON.parse(JSON.stringify(candidate)));
+        usedLocalSignatures.add(sig);
+        usedGlobalSignatures.add(sig);
+      }
+
+      if (essayQ) {
+        selectedQuestions.push(essayQ);
+      }
+
+    } else if (subjectKey === 'physics') {
+      // Slot 2 specifically reserved for Physics Practical Activities & Experiments (الأنشطة والتجارب)
+      const expQ = pickMatching(q => 
+        q.questionCategory === 'physics_activity' || 
+        (q.title && q.title.includes('الأنشطة والتجارب')) ||
+        (q.topic && q.topic.includes('نشاط'))
+      );
+
+      // Fill Slot 1 with Problems/Laws
+      const probQ = pickMatching(q => 
+        q.questionCategory !== 'physics_activity' && 
+        ((q.title && q.title.includes('قانون')) || (q.title && q.title.includes('مسائل')) || (q.topic && q.topic.includes('كولوم')) || (q.topic && q.topic.includes('متسع')))
+      );
+      if (probQ) selectedQuestions.push(probQ);
+      if (expQ) selectedQuestions.push(expQ);
+
+      // Fill remaining slots with reasoning, comparisons, concepts
+      for (let i = 0; i < sortedPool.length && selectedQuestions.length < questionsCount; i++) {
+        const candidate = sortedPool[i];
+        const sig = getSignature(candidate);
+        if (usedLocalSignatures.has(sig) || usedGlobalSignatures.has(sig)) continue;
+        if (candidate.questionCategory === 'physics_activity' && expQ) continue;
+        if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) continue;
+        selectedQuestions.push(JSON.parse(JSON.stringify(candidate)));
+        usedLocalSignatures.add(sig);
+        usedGlobalSignatures.add(sig);
+      }
+
+    } else if (subjectKey === 'islamic') {
+      // Slot 1: Tajweed Rulings (أحكام التلاوة)
+      const tajweedQ = pickMatching(q => 
+        q.questionCategory === 'tajweed_rulings' || 
+        (q.title && q.title.includes('أحكام التلاوة')) ||
+        (q.topic && q.topic.includes('المد')) || (q.topic && q.topic.includes('تلاوة'))
+      );
+      if (tajweedQ) selectedQuestions.push(tajweedQ);
+
+      // Slot 2: Quran Surah Recitation (القرآن الكريم والحفظ)
+      const surahQ = pickMatching(q => 
+        q.questionCategory === 'surah_recitation' || 
+        (q.title && q.title.includes('القرآن الكريم والحفظ')) ||
+        (q.title && q.title.includes('سورة'))
+      );
+      if (surahQ) selectedQuestions.push(surahQ);
+
+      // Slot 3: Hadith Sharif (الحديث النبوي الشريف)
+      const hadithQ = pickMatching(q => 
+        q.questionCategory === 'hadith_sharif' || 
+        (q.title && q.title.includes('الحديث النبوي')) ||
+        (q.topic && q.topic.includes('حديث'))
+      );
+      if (hadithQ) selectedQuestions.push(hadithQ);
+
+      // Remaining slots for Fiqh, Tahdheeb, Islamic Studies
+      for (let i = 0; i < sortedPool.length && selectedQuestions.length < questionsCount; i++) {
+        const candidate = sortedPool[i];
+        const sig = getSignature(candidate);
+        if (usedLocalSignatures.has(sig) || usedGlobalSignatures.has(sig)) continue;
+        if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) continue;
+        selectedQuestions.push(JSON.parse(JSON.stringify(candidate)));
+        usedLocalSignatures.add(sig);
+        usedGlobalSignatures.add(sig);
       }
     }
 
-    // 3. Fill questions from pool ensuring strict zero duplication and chapter match
+    // General Fallback Fill if any slots are unfilled
     for (let i = 0; i < sortedPool.length && selectedQuestions.length < questionsCount; i++) {
       const candidate = sortedPool[i];
       const sig = getSignature(candidate);
+      if (usedLocalSignatures.has(sig) || usedGlobalSignatures.has(sig)) continue;
+      if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) continue;
 
-      // Skip if already used in this exam model
-      if (usedLocalSignatures.has(sig)) continue;
-
-      // STRICT ZERO DUPLICATION: Never reuse questions across Model A, B, and C
-      if (usedGlobalSignatures.has(sig)) {
-        continue;
-      }
-
-      // If activeChapters is specified, prefer questions strictly matching those chapters
-      if (activeChapters.length > 0 && candidate.chapter && !activeChapters.includes(candidate.chapter)) {
-        const remainingMatching = sortedPool.slice(i + 1).some(c => c.chapter && activeChapters.includes(c.chapter) && !usedLocalSignatures.has(getSignature(c)));
-        if (remainingMatching) continue;
-      }
-
-      // Clone question
-      const cloned = JSON.parse(JSON.stringify(candidate));
-
-      // Dynamic Unseen Reading Comprehension Rotation for English:
-      if (isEnglish && (cloned.topic === 'The Panther 3.0D and Car Specifications' || (cloned.branches && cloned.branches[0] && cloned.branches[0].text.includes('unseen text')))) {
-        if (typeof UNSEEN_PASSAGES_BANK !== 'undefined' && UNSEEN_PASSAGES_BANK.length > 0) {
-          const passageIdx = (currentClick + (versionCode === 'A' ? 0 : (versionCode === 'B' ? 2 : 4))) % UNSEEN_PASSAGES_BANK.length;
-          const selectedPassage = UNSEEN_PASSAGES_BANK[passageIdx];
-          cloned.branches[0].text = selectedPassage.text;
-          cloned.branches[0].modelAnswer = selectedPassage.modelAnswer;
-        }
-      }
-
-      selectedQuestions.push(cloned);
+      selectedQuestions.push(JSON.parse(JSON.stringify(candidate)));
       usedLocalSignatures.add(sig);
       usedGlobalSignatures.add(sig);
     }
 
-    // 4. If pool had fewer questions matching the chapters, synthesize ministerial questions strictly for activeChapters
+    // Synthesize if pool was exhausted
     let synCounter = 0;
     while (selectedQuestions.length < questionsCount) {
       const targetCh = (activeChapters && activeChapters.length > 0)
@@ -14271,7 +15110,7 @@
       synCounter++;
     }
 
-    // 5. Finalize Question titles, IDs, scores, and version tags
+    // Finalize Question titles, IDs, scores, and version tags
     selectedQuestions.forEach((q, idx) => {
       q.id = `ai_gen_${versionCode.toLowerCase()}_q${idx + 1}_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
       q.versionTag = isEnglish ? `Model (${versionCode})` : `النموذج (${versionCode})`;
@@ -14386,7 +15225,6 @@
     const subjectKey = normalizeSubjectKey(subject);
     const parsedNotes = parseTeacherNotes(teacherNotes);
 
-    // Dynamic click entropy: advances every click so consecutive button clicks ALWAYS output fresh questions
     let currentClick = 0;
     if (typeof clickSeed === 'number') {
       currentClick = clickSeed;
@@ -14424,12 +15262,10 @@
     const isAllChapters = !selectedChapters || selectedChapters.includes('all') || selectedChapters.length === 0;
     let activeChapters = isAllChapters ? [] : selectedChapters.map(n => parseInt(n)).filter(n => !isNaN(n));
 
-    // If teacherNotes explicitly mentions chapters and activeChapters is empty, extract from notes
     if (activeChapters.length === 0 && parsedNotes.chapters.length > 0) {
       activeChapters = [...parsedNotes.chapters];
     }
 
-    // Filter question pool strictly to requested chapters if specified
     let pool = rawPool;
     if (activeChapters.length > 0) {
       const matched = rawPool.filter(q => {
@@ -14445,7 +15281,6 @@
       }
     }
 
-    // Set of globally used signatures across Version A, B, and C
     const usedGlobalSignatures = new Set();
 
     // Version A: Standard Comprehensive Ministerial Model
@@ -14465,7 +15300,7 @@
       currentClick
     });
 
-    // Version B: Applied & Numerical Focus Model (Distinct Non-Overlapping Questions)
+    // Version B: Applied & Practice Focus Model
     const versionB = generateSingleVersion({
       versionCode: 'B',
       versionName: 'النموذج (B) - النمط التطبيقي والمسائل',
@@ -14482,7 +15317,7 @@
       currentClick
     });
 
-    // Version C: Critical Thinking & High Achievers Model (Distinct Non-Overlapping Questions)
+    // Version C: High Achievers & Critical Thinking Model
     const versionC = generateSingleVersion({
       versionCode: 'C',
       versionName: 'النموذج (C) - أسئلة المتميزين والتفكير الناقد',
@@ -14529,6 +15364,7 @@
   window.AiCurriculumEngine = {
     CHAPTER_QUESTION_CATALOG,
     CURRICULA_DATABASE,
+    UNSEEN_PASSAGES_BANK,
     generateTripleExamVersions,
     normalizeGradeStage,
     normalizeSubjectKey,

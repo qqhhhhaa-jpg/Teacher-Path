@@ -1,0 +1,1299 @@
+/**
+ * ==============================================================================
+ * مسار المعلم | سجل المتابعة اليومية وحسن السلوك والغياب للطلاب
+ * Student Daily Conduct, Attendance & Formative Evaluation Suite
+ * ==============================================================================
+ * يشمل:
+ * 1. رصد الحضور والغياب والإجازات والتأخر اليومي بدقة
+ * 2. تقييم المشاركة والتفاعل الصفي أثناء سير الدرس
+ * 3. متابعة إنجاز الواجبات البيتية والدفاتر المدرسية
+ * 4. رصد درجات التقييم والنشاط اليومي (من 10)
+ * 5. توثيق السلوك والانضباط الصفي والملاحظات الميدانية
+ * 6. الربط والمزامنة التلقائية مع أسماء طلاب سجل الدرجات
+ * 7. إحصائيات يومية فورية وطباعة كشف المتابعة والسلوك A4 معتمد للإشراف
+ * ==============================================================================
+ */
+
+(function () {
+  'use strict';
+
+  const STORAGE_KEY_BEHAVIOR = 'masar_student_behavior_records';
+  const STORAGE_KEY_ROSTERS = 'masar_student_rosters';
+
+  // State
+  let behaviorRecords = {};
+  let rosters = [];
+  let activeRosterId = 'roster_1';
+  let activeDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  let statusFilter = 'all'; // 'all', 'present', 'absent', 'excused', 'participated', 'no_hw'
+  let searchQuery = '';
+
+  // Arabic day names
+  const ARABIC_DAYS = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+
+  /**
+   * Initialize Behavior Module
+   */
+  function initStudentBehaviorModule() {
+    loadRosters();
+    loadBehaviorRecords();
+    initDateControls();
+    ensureRecordForActiveDate();
+    renderClassSelector();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+
+    // Hook tab button click to refresh
+    const tabBtn = document.getElementById('mainTabStudentBehaviorBtn');
+    if (tabBtn) {
+      tabBtn.addEventListener('click', () => {
+        loadRosters();
+        ensureRecordForActiveDate();
+        renderClassSelector();
+        renderStats();
+        renderTable();
+      });
+    }
+  }
+
+  /**
+   * Load Rosters from shared student rosters storage
+   */
+  function loadRosters() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_ROSTERS);
+      if (raw) {
+        rosters = JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn('Could not parse shared rosters for behavior module:', e);
+    }
+
+    if (!Array.isArray(rosters) || rosters.length === 0) {
+      // Check if grades module has rosters created by teacher
+      try {
+        const gradesRaw = localStorage.getItem('masar_teacher_grades_rosters_v1');
+        if (gradesRaw) {
+          const parsed = JSON.parse(gradesRaw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            rosters = parsed.map(r => ({
+              id: r.id,
+              name: r.name,
+              meta: {
+                school: r.schoolName || 'اسم المدرسة',
+                subject: r.subject || 'الرياضيات',
+                grade: r.gradeLevel || 'المرحلة',
+                section: r.section || 'أ',
+                teacher: r.teacherName || 'أستاذ المادة',
+                academicYear: r.academicYear || '2024 - 2025'
+              },
+              gradeLevel: r.gradeLevel || 'المرحلة',
+              section: r.section || 'أ',
+              subject: r.subject || 'الرياضيات',
+              students: (r.students || []).map((st, i) => ({
+                id: st.id || `std_${i + 1}`,
+                seat: parseInt(st.seatNumber) || i + 1,
+                name: st.name
+              }))
+            }));
+            localStorage.setItem(STORAGE_KEY_ROSTERS, JSON.stringify(rosters));
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (!Array.isArray(rosters) || rosters.length === 0) {
+      rosters = [
+        {
+          id: 'roster_1',
+          name: 'الصف الثالث المتوسط - شعبة (أ)',
+          meta: {
+            school: 'ثانوية المتميزين للبنين',
+            subject: 'الرياضيات',
+            grade: 'الثالث المتوسط',
+            section: 'أ',
+            teacher: 'أستاذ المادة',
+            academicYear: '2024 - 2025'
+          },
+          students: []
+        }
+      ];
+    }
+
+    // Validate active roster
+    const exists = rosters.some(r => r.id === activeRosterId);
+    if (!exists && rosters.length > 0) {
+      activeRosterId = rosters[0].id;
+    }
+  }
+
+  /**
+   * Load Behavior Records
+   */
+  function loadBehaviorRecords() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_BEHAVIOR);
+      if (raw) {
+        behaviorRecords = JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn('Could not parse behavior records:', e);
+    }
+    if (!behaviorRecords || typeof behaviorRecords !== 'object') {
+      behaviorRecords = {};
+    }
+  }
+
+  /**
+   * Save Behavior Records to LocalStorage
+   */
+  function saveBehaviorRecords(showToast = false) {
+    try {
+      localStorage.setItem(STORAGE_KEY_BEHAVIOR, JSON.stringify(behaviorRecords));
+      if (typeof window.scheduleCloudAutoSync === 'function') {
+        window.scheduleCloudAutoSync();
+      }
+      updateSaveStatusBadge('saved');
+      if (showToast && typeof window.showToast === 'function') {
+        window.showToast('تم حفظ سجل المتابعة والسلوك بنجاح 📋', 'success');
+      }
+    } catch (e) {
+      console.error('Failed to save behavior records:', e);
+      updateSaveStatusBadge('dirty');
+    }
+  }
+
+  function updateSaveStatusBadge(status) {
+    const badge = document.getElementById('sbSaveStatusBadge');
+    if (!badge) return;
+    if (status === 'saved') {
+      badge.className = 'sb-status-badge sb-status-saved';
+      badge.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> محفوظ تلقائياً';
+    } else if (status === 'dirty') {
+      badge.className = 'sb-status-badge sb-status-dirty';
+      badge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> غير محفوظ';
+    }
+  }
+
+  /**
+   * Record Key Generator
+   */
+  function getRecordKey(date, rosterId) {
+    return `${rosterId}_${date}`;
+  }
+
+  /**
+   * Get Active Roster
+   */
+  function getActiveRoster() {
+    return rosters.find(r => r.id === activeRosterId) || rosters[0];
+  }
+
+  /**
+   * Ensure a record exists for the selected date and class
+   */
+  function ensureRecordForActiveDate() {
+    const key = getRecordKey(activeDate, activeRosterId);
+    const roster = getActiveRoster();
+    if (!roster) return;
+
+    if (!behaviorRecords[key]) {
+      // Create new daily session based on roster students
+      behaviorRecords[key] = {
+        date: activeDate,
+        rosterId: activeRosterId,
+        className: roster.name || 'الصف',
+        subject: (roster.meta && roster.meta.subject) || roster.subject || 'الرياضيات',
+        period: 'الأولى',
+        topic: 'متابعة الدرس الصفي',
+        notes: '',
+        students: (roster.students || []).map((st, idx) => ({
+          studentId: st.id || `std_${idx + 1}`,
+          seat: st.seat || idx + 1,
+          name: st.name || `طالب ${idx + 1}`,
+          attendance: 'present', // 'present' | 'absent' | 'excused' | 'late'
+          participation: 'active', // 'excellent' | 'active' | 'average' | 'none'
+          homework: 'done', // 'done' | 'partial' | 'not_done'
+          conduct: 'excellent', // 'excellent' | 'good' | 'needs_attention' | 'warning'
+          score: 10,
+          notes: ''
+        }))
+      };
+      saveBehaviorRecords(false);
+    } else {
+      if (!behaviorRecords[key].className && roster.name) {
+        behaviorRecords[key].className = roster.name;
+      }
+      if (!behaviorRecords[key].rosterId) {
+        behaviorRecords[key].rosterId = activeRosterId;
+      }
+      if (!behaviorRecords[key].date) {
+        behaviorRecords[key].date = activeDate;
+      }
+      // Sync any newly added students from roster
+      const currentMap = new Map();
+      (behaviorRecords[key].students || []).forEach(st => currentMap.set((st.name || '').trim(), st));
+
+      let hasNew = false;
+      (roster.students || []).forEach((rst, idx) => {
+        const cleanName = (rst.name || '').trim();
+        if (cleanName && !currentMap.has(cleanName)) {
+          behaviorRecords[key].students.push({
+            studentId: rst.id || `std_${idx + 1}`,
+            seat: rst.seat || idx + 1,
+            name: rst.name,
+            attendance: 'present',
+            participation: 'active',
+            homework: 'done',
+            conduct: 'excellent',
+            score: 10,
+            notes: ''
+          });
+          hasNew = true;
+        }
+      });
+      if (hasNew) saveBehaviorRecords(false);
+    }
+  }
+
+  /**
+   * Date Controls
+   */
+  function initDateControls() {
+    const dateInput = document.getElementById('sbActiveDateInput');
+    if (dateInput) {
+      dateInput.value = activeDate;
+      dateInput.addEventListener('change', (e) => {
+        if (e.target.value) {
+          activeDate = e.target.value;
+          ensureRecordForActiveDate();
+          renderHeaderInfo();
+          renderStats();
+          renderTable();
+        }
+      });
+    }
+    updateDayNameDisplay();
+  }
+
+  function updateDayNameDisplay() {
+    const dayLabel = document.getElementById('sbDayNameLabel');
+    if (!dayLabel) return;
+    try {
+      const d = new Date(activeDate);
+      const dayIndex = d.getDay();
+      dayLabel.textContent = ARABIC_DAYS[dayIndex] || 'اليوم';
+    } catch {
+      dayLabel.textContent = 'اليوم';
+    }
+  }
+
+  /**
+   * Class Selector Rendering
+   */
+  function renderClassSelector() {
+    const select = document.getElementById('sbClassSelectDropdown');
+    if (!select) return;
+    select.innerHTML = '';
+    rosters.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = `${r.name || 'صف'} (${(r.students || []).length} طالب)`;
+      if (r.id === activeRosterId) opt.selected = true;
+      select.appendChild(opt);
+    });
+  }
+
+  /**
+   * Header Information
+   */
+  function renderHeaderInfo() {
+    updateDayNameDisplay();
+    const roster = getActiveRoster();
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    const currentClassName = (record && record.className) || (roster && roster.name) || 'الصف الثالث المتوسط';
+
+    const titleEl = document.getElementById('sbActiveHeadingTitle');
+    if (titleEl) {
+      titleEl.textContent = `سجل المتابعة والسلوك — ${currentClassName}`;
+    }
+
+    const classNameInput = document.getElementById('sbClassNameInput');
+    if (classNameInput) {
+      classNameInput.value = currentClassName;
+    }
+
+    const subjectInput = document.getElementById('sbSubjectInput');
+    if (subjectInput && record) subjectInput.value = record.subject || '';
+
+    const periodInput = document.getElementById('sbPeriodInput');
+    if (periodInput && record) periodInput.value = record.period || 'الأولى';
+
+    const topicInput = document.getElementById('sbTopicInput');
+    if (topicInput && record) topicInput.value = record.topic || '';
+  }
+
+  /**
+   * Calculate and Render Statistics
+   */
+  function renderStats() {
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    if (!record || !Array.isArray(record.students)) return;
+
+    const list = record.students;
+    const total = list.length;
+    let present = 0, absent = 0, excused = 0, late = 0;
+    let participated = 0, hwDone = 0;
+
+    list.forEach(st => {
+      if (st.attendance === 'present') present++;
+      else if (st.attendance === 'absent') absent++;
+      else if (st.attendance === 'excused') excused++;
+      else if (st.attendance === 'late') late++;
+
+      if (st.participation === 'excellent' || st.participation === 'active') participated++;
+      if (st.homework === 'done') hwDone++;
+    });
+
+    const attendedTotal = present + late;
+    const attendanceRate = total > 0 ? Math.round((attendedTotal / total) * 100) : 0;
+
+    // DOM Elements
+    const totalEl = document.getElementById('sbStatTotal');
+    if (totalEl) totalEl.textContent = total;
+
+    const rateEl = document.getElementById('sbStatRate');
+    if (rateEl) rateEl.textContent = `${attendanceRate}%`;
+
+    const progEl = document.getElementById('sbStatProgressBar');
+    if (progEl) progEl.style.width = `${attendanceRate}%`;
+
+    const presentEl = document.getElementById('sbStatPresent');
+    if (presentEl) presentEl.textContent = present;
+
+    const absentEl = document.getElementById('sbStatAbsent');
+    if (absentEl) absentEl.textContent = absent;
+
+    const excusedEl = document.getElementById('sbStatExcused');
+    if (excusedEl) excusedEl.textContent = excused;
+
+    const partEl = document.getElementById('sbStatParticipated');
+    if (partEl) partEl.textContent = participated;
+
+    const subEl = document.getElementById('sbStatRateSub');
+    if (subEl) {
+      subEl.innerHTML = `حاضر: <strong style="color: #059669;">${present}</strong> | غائب: <strong style="color: #dc2626;">${absent}</strong> | متأخر: <strong>${late}</strong>`;
+    }
+  }
+
+  /**
+   * Filter and Search students
+   */
+  function getFilteredStudents() {
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    if (!record || !Array.isArray(record.students)) return [];
+
+    return record.students.filter(st => {
+      // Search
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        const matchesName = st.name.toLowerCase().includes(q);
+        const matchesSeat = String(st.seat).includes(q);
+        if (!matchesName && !matchesSeat) return false;
+      }
+
+      // Filter
+      if (statusFilter === 'all') return true;
+      if (statusFilter === 'present') return st.attendance === 'present';
+      if (statusFilter === 'absent') return st.attendance === 'absent';
+      if (statusFilter === 'excused') return st.attendance === 'excused';
+      if (statusFilter === 'participated') return st.participation === 'excellent' || st.participation === 'active';
+      if (statusFilter === 'no_hw') return st.homework === 'not_done';
+
+      return true;
+    });
+  }
+
+  /**
+   * Render Master Table
+   */
+  function renderTable() {
+    const tbody = document.getElementById('sbBehaviorTableBody');
+    if (!tbody) return;
+
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    if (!record) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding: 2rem; color: #64748b;">لا توجد سجلات لهذا اليوم. اضغط مزامنة أو إضافة طلاب.</td></tr>';
+      return;
+    }
+
+    const students = getFilteredStudents();
+
+    if (students.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="padding: 2rem; color: #64748b;">لا يوجد طلاب يطابقون خيارات البحث أو التصفية الحالية.</td></tr>';
+      return;
+    }
+
+    const countLabel = document.getElementById('sbVisibleCountLabel');
+    if (countLabel) {
+      countLabel.textContent = `عرض ${students.length} من أصل ${record.students.length} طالب`;
+    }
+
+    let html = '';
+
+    students.forEach((st, idx) => {
+      // Real index in full array
+      const realIndex = record.students.findIndex(s => s.name === st.name);
+
+      // Attendance Pill Badges
+      const attPills = `
+        <div class="sb-att-group" data-idx="${realIndex}">
+          <button type="button" class="sb-att-btn ${st.attendance === 'present' ? 'active-present' : ''}" onclick="window.sbSetAttendance(${realIndex}, 'present')" title="حاضر في الدرس">حاضر 🟢</button>
+          <button type="button" class="sb-att-btn ${st.attendance === 'absent' ? 'active-absent' : ''}" onclick="window.sbSetAttendance(${realIndex}, 'absent')" title="غائب عن الدرس">غائب 🔴</button>
+          <button type="button" class="sb-att-btn ${st.attendance === 'excused' ? 'active-excused' : ''}" onclick="window.sbSetAttendance(${realIndex}, 'excused')" title="مجاز بإجازة رسمية">مجاز 🟡</button>
+          <button type="button" class="sb-att-btn ${st.attendance === 'late' ? 'active-late' : ''}" onclick="window.sbSetAttendance(${realIndex}, 'late')" title="تأخر عن الحصة">متأخر 🟠</button>
+        </div>
+      `;
+
+      // Participation Dropdown
+      const partSelect = `
+        <select class="sb-table-select sb-select-part" onchange="window.sbUpdateField(${realIndex}, 'participation', this.value)">
+          <option value="excellent" ${st.participation === 'excellent' ? 'selected' : ''}>🌟 متميز جداً</option>
+          <option value="active" ${st.participation === 'active' ? 'selected' : ''}>👍 مشارك ومتفاعل</option>
+          <option value="average" ${st.participation === 'average' ? 'selected' : ''}>➖ مشاركة متوسطة</option>
+          <option value="none" ${st.participation === 'none' ? 'selected' : ''}>❌ لم يشارك</option>
+        </select>
+      `;
+
+      // Homework Dropdown
+      const hwSelect = `
+        <select class="sb-table-select sb-select-hw" onchange="window.sbUpdateField(${realIndex}, 'homework', this.value)">
+          <option value="done" ${st.homework === 'done' ? 'selected' : ''}>📘 كامل ومتقن</option>
+          <option value="partial" ${st.homework === 'partial' ? 'selected' : ''}>📙 منجز جزئياً</option>
+          <option value="not_done" ${st.homework === 'not_done' ? 'selected' : ''}>📕 غير منجز / نسي الدفتر</option>
+        </select>
+      `;
+
+      // Conduct Dropdown
+      const conductSelect = `
+        <select class="sb-table-select sb-select-conduct" onchange="window.sbUpdateField(${realIndex}, 'conduct', this.value)">
+          <option value="excellent" ${st.conduct === 'excellent' ? 'selected' : ''}>🌟 مثالي ومؤدب</option>
+          <option value="good" ${st.conduct === 'good' ? 'selected' : ''}>🟢 منضبط ومحترم</option>
+          <option value="needs_attention" ${st.conduct === 'needs_attention' ? 'selected' : ''}>⚠️ يحتاج تنبيه</option>
+          <option value="warning" ${st.conduct === 'warning' ? 'selected' : ''}>⛔ مخالف / استدعاء</option>
+        </select>
+      `;
+
+      // Daily Score Input (0 to 10)
+      const scoreInput = `
+        <div class="sb-score-control">
+          <input type="number" min="0" max="10" step="1" class="sb-score-input" value="${st.score !== undefined ? st.score : 10}" 
+                 onchange="window.sbUpdateField(${realIndex}, 'score', Number(this.value))">
+          <span style="font-size: 0.72rem; color: #94a3b8; font-weight: 700;">/10</span>
+        </div>
+      `;
+
+      // Notes Input
+      const notesInput = `
+        <input type="text" class="sb-notes-input" placeholder="ملاحظة أو سبب الغياب أو نشاط بارز..." 
+               value="${(st.notes || '').replace(/"/g, '&quot;')}" 
+               onchange="window.sbUpdateField(${realIndex}, 'notes', this.value)">
+      `;
+
+      // Row construction
+      html += `
+        <tr class="sb-row ${st.attendance === 'absent' ? 'row-absent' : ''}">
+          <td class="sb-cell-seq"><span class="sb-seq-badge">${idx + 1}</span></td>
+          <td class="sb-cell-name">
+            <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem;">${st.name}</div>
+            <small style="color: #94a3b8; font-size: 0.72rem;">قيد: ${st.seat || idx + 1}</small>
+          </td>
+          <td>${attPills}</td>
+          <td>${partSelect}</td>
+          <td>${hwSelect}</td>
+          <td>${conductSelect}</td>
+          <td>${scoreInput}</td>
+          <td>${notesInput}</td>
+          <td>
+            <button type="button" class="btn btn-sm btn-outline" style="border: none; color: #ef4444; padding: 4px 6px;" 
+                    onclick="window.sbDeleteStudent(${realIndex})" title="حذف الطالب من جلسة اليوم">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    });
+
+    tbody.innerHTML = html;
+  }
+
+  /**
+   * Field Updaters
+   */
+  window.sbSetAttendance = function (realIndex, status) {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key] || !behaviorRecords[key].students[realIndex]) return;
+
+    behaviorRecords[key].students[realIndex].attendance = status;
+    saveBehaviorRecords(false);
+    renderStats();
+    renderTable();
+  };
+
+  window.sbUpdateField = function (realIndex, field, value) {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key] || !behaviorRecords[key].students[realIndex]) return;
+
+    behaviorRecords[key].students[realIndex][field] = value;
+    saveBehaviorRecords(false);
+    renderStats();
+  };
+
+  window.sbDeleteStudent = function (realIndex) {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) return;
+
+    const st = behaviorRecords[key].students[realIndex];
+    if (!st) return;
+
+    if (confirm(`هل أنت متأكد من حذف الطالب (${st.name}) من كشف هذا اليوم فقط؟`)) {
+      behaviorRecords[key].students.splice(realIndex, 1);
+      saveBehaviorRecords(false);
+      renderStats();
+      renderTable();
+    }
+  };
+
+  /**
+   * Batch Actions
+   */
+  window.sbMarkAllPresent = function () {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) return;
+
+    behaviorRecords[key].students.forEach(st => {
+      st.attendance = 'present';
+    });
+    saveBehaviorRecords(true);
+    renderStats();
+    renderTable();
+    if (typeof window.showToast === 'function') {
+      window.showToast('تم تسجيل حضور جميع الطلاب بنقرة واحدة ✅', 'success');
+    }
+  };
+
+  window.sbSyncRosterStudents = function () {
+    loadRosters();
+    const roster = getActiveRoster();
+    if (!roster) return;
+
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) {
+      ensureRecordForActiveDate();
+    } else {
+      const existingNames = new Set(behaviorRecords[key].students.map(s => s.name.trim()));
+      let added = 0;
+      roster.students.forEach((st, idx) => {
+        if (!existingNames.has(st.name.trim())) {
+          behaviorRecords[key].students.push({
+            studentId: st.id || `std_${idx + 1}`,
+            seat: st.seat || idx + 1,
+            name: st.name,
+            attendance: 'present',
+            participation: 'active',
+            homework: 'done',
+            conduct: 'excellent',
+            score: 10,
+            notes: ''
+          });
+          added++;
+        }
+      });
+      saveBehaviorRecords(true);
+      if (typeof window.showToast === 'function') {
+        window.showToast(`تمت مزامنة ${added} طالب جديد من سجل الدرجات 🔄`, 'info');
+      }
+    }
+    renderStats();
+    renderTable();
+  };
+
+  window.sbSelectClass = function (rosterId) {
+    activeRosterId = rosterId;
+    ensureRecordForActiveDate();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+  };
+
+  window.sbSetStatusFilter = function (filter) {
+    statusFilter = filter;
+    document.querySelectorAll('.sb-filter-pill').forEach(pill => {
+      pill.classList.toggle('active', pill.getAttribute('data-filter') === filter);
+    });
+    renderTable();
+  };
+
+  window.sbOnSearchInput = function (val) {
+    searchQuery = (val || '').trim();
+    renderTable();
+  };
+
+  window.sbSyncMeta = function () {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) return;
+
+    const s = document.getElementById('sbSubjectInput');
+    if (s) behaviorRecords[key].subject = s.value;
+
+    const p = document.getElementById('sbPeriodInput');
+    if (p) behaviorRecords[key].period = p.value;
+
+    const t = document.getElementById('sbTopicInput');
+    if (t) behaviorRecords[key].topic = t.value;
+
+    saveBehaviorRecords(false);
+  };
+
+  /**
+   * Add Single Student to today's session
+   */
+  window.sbAddSingleStudent = function () {
+    const name = prompt('أدخل اسم الطالب الثلاثي أو الرباعي:');
+    if (!name || !name.trim()) return;
+
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) ensureRecordForActiveDate();
+
+    const students = behaviorRecords[key].students;
+    const nextSeat = students.length + 1;
+
+    students.push({
+      studentId: `std_${Date.now()}`,
+      seat: nextSeat,
+      name: name.trim(),
+      attendance: 'present',
+      participation: 'active',
+      homework: 'done',
+      conduct: 'excellent',
+      score: 10,
+      notes: ''
+    });
+
+    saveBehaviorRecords(true);
+    renderStats();
+    renderTable();
+  };
+
+  /**
+   * Export to CSV
+   */
+  window.sbExportCsv = function () {
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    const roster = getActiveRoster();
+    if (!record || !record.students.length) {
+      alert('لا توجد بيانات لتصديرها.');
+      return;
+    }
+
+    let csv = '\uFEFF'; // UTF-8 BOM
+    csv += `"سجل المتابعة اليومية وحسن السلوك - ${roster ? roster.name : ''}"\n`;
+    csv += `"التاريخ:","${activeDate}","اليوم:","${ARABIC_DAYS[new Date(activeDate).getDay()] || ''}","المادة:","${record.subject || ''}","الحصة:","${record.period || ''}"\n\n`;
+    csv += `"ت","اسم الطالب","حالة الحضور","المشاركة الصفية","الواجب البيتي","السلوك والانضباط","الدرجة اليومية","ملاحظات المعلم"\n`;
+
+    record.students.forEach((st, idx) => {
+      const attMap = { present: 'حاضر', absent: 'غائب', excused: 'مجاز', late: 'متأخر' };
+      const partMap = { excellent: 'متميز', active: 'متفاعل', average: 'متوسط', none: 'لم يشارك' };
+      const hwMap = { done: 'كامل ومتقن', partial: 'جزئي', not_done: 'غير منجز' };
+      const conductMap = { excellent: 'مثالي', good: 'منضبط', needs_attention: 'يحتاج تنبيه', warning: 'مخالف' };
+
+      csv += `"${idx + 1}","${st.name}","${attMap[st.attendance] || ''}","${partMap[st.participation] || ''}","${hwMap[st.homework] || ''}","${conductMap[st.conduct] || ''}","${st.score || 10}","${(st.notes || '').replace(/"/g, '""')}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `سجل_المتابعة_والسلوك_${activeDate}_${roster ? roster.name.replace(/\s+/g, '_') : 'الصف'}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  /**
+   * Official A4 Printable Report (كشف رسمي معتمد للإشراف المدرسي)
+   */
+  window.sbPrintOfficialReport = function () {
+    const key = getRecordKey(activeDate, activeRosterId);
+    const record = behaviorRecords[key];
+    const roster = getActiveRoster();
+    if (!record || !record.students.length) {
+      alert('لا توجد بيانات للطباعة.');
+      return;
+    }
+
+    const meta = roster.meta || {};
+    const school = meta.school || 'ثانوية المتميزين للبنين';
+    const teacher = meta.teacher || 'أستاذ المادة';
+    const subject = record.subject || meta.subject || 'الرياضيات';
+    const grade = meta.grade || 'الثالث المتوسط';
+    const section = meta.section || 'أ';
+    const dayName = ARABIC_DAYS[new Date(activeDate).getDay()] || 'اليوم';
+
+    // Stats
+    let present = 0, absent = 0, excused = 0, late = 0;
+    record.students.forEach(st => {
+      if (st.attendance === 'present') present++;
+      else if (st.attendance === 'absent') absent++;
+      else if (st.attendance === 'excused') excused++;
+      else if (st.attendance === 'late') late++;
+    });
+
+    let rowsHtml = '';
+    record.students.forEach((st, idx) => {
+      const attMap = {
+        present: '<span style="color: #059669; font-weight: 800;">حاضر ✔</span>',
+        absent: '<span style="color: #dc2626; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px;">غائب ✖</span>',
+        excused: '<span style="color: #d97706; font-weight: 800;">مجاز 📋</span>',
+        late: '<span style="color: #ea580c; font-weight: 800;">متأخر ⏱</span>'
+      };
+      const partMap = { excellent: '🌟 متميز', active: '👍 متفاعل', average: '➖ متوسط', none: '❌ لم يشارك' };
+      const hwMap = { done: '📘 منجز', partial: '📙 جزئي', not_done: '📕 غير منجز' };
+      const conductMap = { excellent: '🌟 مثالي', good: '🟢 منضبط', needs_attention: '⚠️ تنبيه', warning: '⛔ مخالف' };
+
+      rowsHtml += `
+        <tr>
+          <td style="text-align: center; font-weight: 800;">${idx + 1}</td>
+          <td style="text-align: right; font-weight: 800; padding: 6px 8px;">${st.name}</td>
+          <td style="text-align: center;">${attMap[st.attendance] || ''}</td>
+          <td style="text-align: center;">${partMap[st.participation] || ''}</td>
+          <td style="text-align: center;">${hwMap[st.homework] || ''}</td>
+          <td style="text-align: center;">${conductMap[st.conduct] || ''}</td>
+          <td style="text-align: center; font-weight: 900; font-size: 1rem;">${st.score !== undefined ? st.score : 10}</td>
+          <td style="text-align: right; font-size: 0.8rem; color: #475569;">${st.notes || '—'}</td>
+        </tr>
+      `;
+    });
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      alert('يرجى السماح بالنوافذ المنبثقة للطباعة.');
+      return;
+    }
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>كشف المتابعة اليومية وحسن السلوك — ${school}</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+        <style>
+          @page { size: A4 portrait; margin: 12mm; }
+          body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; color: #000; direction: rtl; background: #fff; }
+          .header-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+          .header-table td { vertical-align: middle; }
+          .title-box { text-align: center; }
+          .title-main { font-size: 1.25rem; font-weight: 900; margin: 2px 0; }
+          .title-sub { font-size: 0.88rem; font-weight: 700; color: #333; }
+          .meta-strip { display: flex; justify-content: space-between; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700; }
+          .stats-strip { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.82rem; }
+          .stat-pill { border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa; }
+          table.data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 15px; }
+          table.data-table th, table.data-table td { border: 1px solid #334155; padding: 5px 6px; }
+          table.data-table th { background: #f1f5f9; font-weight: 900; }
+          .signatures { display: flex; justify-content: space-between; margin-top: 20px; padding: 0 20px; font-weight: 800; font-size: 0.88rem; }
+          .sig-box { text-align: center; width: 180px; }
+        </style>
+      </head>
+      <body>
+        <table class="header-table">
+          <tr>
+            <td style="width: 28%; font-size: 0.82rem; font-weight: 700; line-height: 1.6;">
+              جمهورية العراق<br>
+              وزارة التربية<br>
+              المديرية العامة للتربية<br>
+              <strong>${school}</strong>
+            </td>
+            <td class="title-box" style="width: 44%;">
+              <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية" style="width: 52px; height: 52px; object-fit: contain; margin-bottom: 2px;">
+              <div class="title-main">سجل المتابعة والتقييم اليومي وحسن السلوك</div>
+              <div class="title-sub">كشف رسمي معتمد للإشراف التربوي والإدارة المدرسية</div>
+            </td>
+            <td style="width: 28%; text-align: left; font-size: 0.82rem; font-weight: 700; line-height: 1.6;">
+              اليوم: <strong>${dayName}</strong><br>
+              التاريخ: <strong>${activeDate}</strong><br>
+              الصف: <strong>${grade} (${section})</strong><br>
+              المادة: <strong>${subject}</strong>
+            </td>
+          </tr>
+        </table>
+
+        <div class="meta-strip">
+          <div>الحصة: <strong>${record.period || 'الأولى'}</strong></div>
+          <div>عنوان الدرس / الموضوع: <strong>${record.topic || 'سير الدرس اليومي'}</strong></div>
+          <div>مدرس المادة: <strong>${teacher}</strong></div>
+        </div>
+
+        <div class="stats-strip">
+          <div class="stat-pill">العدد الكلي: <strong>${record.students.length}</strong></div>
+          <div class="stat-pill" style="border-color: #10b981; color: #059669;">الحاضرون: <strong>${present}</strong></div>
+          <div class="stat-pill" style="border-color: #ef4444; color: #dc2626;">الغائبون: <strong>${absent}</strong></div>
+          <div class="stat-pill" style="border-color: #f59e0b; color: #d97706;">المجازون: <strong>${excused}</strong></div>
+          <div class="stat-pill">نسبة الحضور: <strong>${record.students.length > 0 ? Math.round(((present + late) / record.students.length) * 100) : 0}%</strong></div>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width: 32px;">ت</th>
+              <th>اسم الطالب الثلاثي والرباعي</th>
+              <th style="width: 80px;">الحضور</th>
+              <th style="width: 85px;">المشاركة</th>
+              <th style="width: 85px;">الواجب البيتي</th>
+              <th style="width: 85px;">السلوك والمواظبة</th>
+              <th style="width: 55px;">الدرجة</th>
+              <th>ملاحظات المعلم / أسباب الغياب</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <div class="signatures">
+          <div class="sig-box">
+            <div>مدرس / معلم المادة</div>
+            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">${teacher}</div>
+          </div>
+          <div class="sig-box">
+            <div>المشرف التربوي الزائر</div>
+            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">التوقيع والختم</div>
+          </div>
+          <div class="sig-box">
+            <div>مدير المدرسة</div>
+            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">الختم والتوقيع الرسمي</div>
+          </div>
+        </div>
+
+        <script>
+          window.onload = function() { window.print(); };
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  };
+
+  // Auto Init on DOM Ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStudentBehaviorModule);
+  } else {
+    initStudentBehaviorModule();
+  }
+
+  /**
+   * Direct Full Control on Class Name (التحكم الكامل باسم الصف والشعبة)
+   */
+  window.sbOnClassNameChange = function (newVal) {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) ensureRecordForActiveDate();
+    const record = behaviorRecords[key];
+    if (record) {
+      record.className = newVal;
+      const titleEl = document.getElementById('sbActiveHeadingTitle');
+      if (titleEl) {
+        titleEl.textContent = `سجل المتابعة والسلوك — ${newVal || 'الصف'}`;
+      }
+      const roster = getActiveRoster();
+      if (roster) {
+        roster.name = newVal;
+        const select = document.getElementById('sbClassSelectDropdown');
+        if (select && select.selectedOptions && select.selectedOptions[0]) {
+          select.selectedOptions[0].textContent = `${newVal} (${(roster.students || []).length} طالب)`;
+        }
+      }
+      saveBehaviorRecords(false);
+    }
+  };
+
+  /**
+   * Direct Save Behavior Record (حفظ سجل المتابعة وحسن السلوك في الأرشيف)
+   */
+  window.sbSaveRecordDirectly = function (showToast = true) {
+    const key = getRecordKey(activeDate, activeRosterId);
+    if (!behaviorRecords[key]) {
+      ensureRecordForActiveDate();
+    }
+    const record = behaviorRecords[key];
+    const roster = getActiveRoster();
+
+    // Read values from DOM inputs if present
+    const cNameInput = document.getElementById('sbClassNameInput');
+    const subjInput = document.getElementById('sbSubjectInput');
+    const periodInput = document.getElementById('sbPeriodInput');
+    const topicInput = document.getElementById('sbTopicInput');
+
+    if (cNameInput && cNameInput.value.trim()) {
+      record.className = cNameInput.value.trim();
+      if (roster) roster.name = record.className;
+    } else if (!record.className && roster) {
+      record.className = roster.name;
+    }
+
+    if (subjInput && subjInput.value.trim()) record.subject = subjInput.value.trim();
+    if (periodInput && periodInput.value.trim()) record.period = periodInput.value.trim();
+    if (topicInput && topicInput.value.trim()) record.topic = topicInput.value.trim();
+
+    record.date = activeDate;
+    record.rosterId = activeRosterId;
+
+    // Save behavior records
+    saveBehaviorRecords(false);
+
+    // Save rosters
+    try {
+      localStorage.setItem(STORAGE_KEY_ROSTERS, JSON.stringify(rosters));
+    } catch (e) {
+      console.warn('Could not save rosters:', e);
+    }
+
+    if (typeof window.scheduleCloudAutoSync === 'function') {
+      window.scheduleCloudAutoSync();
+    }
+
+    renderHeaderInfo();
+    renderClassSelector();
+
+    if (showToast && typeof window.showToast === 'function') {
+      window.showToast('تم حفظ كشف السلوك والمتابعة في الأرشيف بنجاح! 🗄️✅', 'success');
+    }
+  };
+
+  /**
+   * Save and navigate to Daily Report (حفظ السجل والانتقال للتقرير اليومي)
+   */
+  window.sbSaveAndGoToReport = function () {
+    window.sbSaveRecordDirectly(false);
+    if (typeof window.showToast === 'function') {
+      window.showToast('تم حفظ سجل المتابعة وحسن السلوك بنجاح! جاري الانتقال إلى واجهة التقرير اليومي... 📋', 'success');
+    }
+    setTimeout(() => {
+      if (typeof window.switchToReportTab === 'function') {
+        window.switchToReportTab(true);
+      }
+    }, 350);
+  };
+
+  /**
+   * Modal to Create New Class / Section for Student Behavior (إضافة صف أو شعبة جديدة)
+   */
+  window.sbOpenCreateClassModal = function () {
+    const modal = document.getElementById('sbCreateClassModal');
+    if (modal) {
+      modal.classList.add('open');
+      const gradeInp = document.getElementById('sbNewClassGradeInput');
+      const secInp = document.getElementById('sbNewClassSectionInput');
+      const subjInp = document.getElementById('sbNewClassSubjectInput');
+      const nameInp = document.getElementById('sbNewClassNameInput');
+
+      if (gradeInp) gradeInp.value = '';
+      if (secInp) secInp.value = '';
+      if (subjInp) {
+        const curRoster = getActiveRoster();
+        subjInp.value = (curRoster && curRoster.meta && curRoster.meta.subject) || (curRoster && curRoster.subject) || 'الرياضيات';
+      }
+      if (nameInp) nameInp.value = '';
+
+      setTimeout(() => {
+        if (gradeInp) gradeInp.focus();
+      }, 150);
+    }
+  };
+
+  window.sbCloseCreateClassModal = function () {
+    const modal = document.getElementById('sbCreateClassModal');
+    if (modal) modal.classList.remove('open');
+  };
+
+  window.sbSubmitCreateClass = function () {
+    const gradeInp = document.getElementById('sbNewClassGradeInput');
+    const secInp = document.getElementById('sbNewClassSectionInput');
+    const subjInp = document.getElementById('sbNewClassSubjectInput');
+    const nameInp = document.getElementById('sbNewClassNameInput');
+
+    const grade = gradeInp ? gradeInp.value.trim() : '';
+    const section = secInp ? secInp.value.trim() : '';
+    const subject = subjInp ? subjInp.value.trim() : 'الرياضيات';
+    const customName = nameInp ? nameInp.value.trim() : '';
+
+    if (!customName && (!grade || !section)) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('يرجى تحديد المرحلة والشعبة أو كتابة اسم الصف أولاً!', 'warning');
+      }
+      return;
+    }
+
+    const finalName = customName || `الصف ${grade} - شعبة (${section})`;
+    const newId = 'roster_' + Date.now();
+
+    const curRoster = getActiveRoster();
+    const newRoster = {
+      id: newId,
+      name: finalName,
+      meta: {
+        school: (curRoster && curRoster.meta && curRoster.meta.school) || (curRoster && curRoster.schoolName) || 'اسم المدرسة',
+        subject: subject,
+        grade: grade || 'المرحلة الدراسية',
+        section: section || 'أ',
+        teacher: (curRoster && curRoster.meta && curRoster.meta.teacher) || (curRoster && curRoster.teacherName) || 'أستاذ المادة',
+        academicYear: '2024 - 2025'
+      },
+      gradeLevel: grade || 'المرحلة الدراسية',
+      section: section || 'أ',
+      subject: subject,
+      students: []
+    };
+
+    rosters.push(newRoster);
+    activeRosterId = newId;
+
+    try {
+      localStorage.setItem(STORAGE_KEY_ROSTERS, JSON.stringify(rosters));
+    } catch (e) {}
+
+    // Initialize daily record for this new class
+    ensureRecordForActiveDate();
+    saveBehaviorRecords(false);
+
+    window.sbCloseCreateClassModal();
+    renderClassSelector();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+
+    if (typeof window.showToast === 'function') {
+      window.showToast(`تم إنشاء صف (${finalName}) بنجاح! يمكنك الآن رصد المتابعة والغياب أو إضافة طلاب 🏫✨`, 'success');
+    }
+  };
+
+  /**
+   * Delete Active Class / Section from Behavior Module
+   */
+  window.sbDeleteActiveClass = function () {
+    if (!rosters || rosters.length <= 1) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('لا يمكن حذف هذا الصف لأنه الصف الوحيد المتبقي!', 'warning');
+      }
+      return;
+    }
+    const curRoster = getActiveRoster();
+    const curName = curRoster ? curRoster.name : 'هذا الصف';
+    if (!confirm(`هل أنت متأكد من رغبتك في حذف "${curName}"؟`)) {
+      return;
+    }
+    const deletedId = activeRosterId;
+    rosters = rosters.filter(r => r.id !== deletedId);
+    activeRosterId = rosters[0].id;
+    try {
+      localStorage.setItem(STORAGE_KEY_ROSTERS, JSON.stringify(rosters));
+    } catch(e) {}
+    
+    ensureRecordForActiveDate();
+    saveBehaviorRecords(false);
+    renderClassSelector();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+
+    if (typeof window.showToast === 'function') {
+      window.showToast(`تم حذف الصف (${curName}) بنجاح! 🗑️`, 'info');
+    }
+  };
+
+  /**
+   * Behavior Archive Modal Implementation
+   */
+  window.sbOpenBehaviorArchiveModal = function () {
+    loadRosters();
+    loadBehaviorRecords();
+    const modal = document.getElementById('sbBehaviorArchiveModal');
+    if (modal) {
+      modal.classList.add('open');
+      const searchInput = document.getElementById('sbArchiveSearchInput');
+      if (searchInput) searchInput.value = '';
+      window.sbRenderBehaviorArchiveList('');
+    }
+  };
+
+  window.sbCloseBehaviorArchiveModal = function () {
+    const modal = document.getElementById('sbBehaviorArchiveModal');
+    if (modal) modal.classList.remove('open');
+  };
+
+  window.sbFilterArchiveRecords = function (query) {
+    window.sbRenderBehaviorArchiveList(query);
+  };
+
+  window.sbRenderBehaviorArchiveList = function (filterQuery = '') {
+    const container = document.getElementById('sbBehaviorArchiveList');
+    const countLabel = document.getElementById('sbArchiveCountLabel');
+    if (!container) return;
+
+    const q = (filterQuery || '').trim().toLowerCase();
+    const keys = Object.keys(behaviorRecords || {}).sort().reverse();
+
+    const filteredKeys = keys.filter(k => {
+      const rec = behaviorRecords[k];
+      if (!rec) return false;
+      if (!q) return true;
+      const r = rosters.find(ros => ros.id === rec.rosterId);
+      const cName = (rec.className || (r && r.name) || '').toLowerCase();
+      const sName = (rec.subject || '').toLowerCase();
+      const dName = (rec.date || '').toLowerCase();
+      return cName.includes(q) || sName.includes(q) || dName.includes(q);
+    });
+
+    if (countLabel) {
+      countLabel.textContent = `${filteredKeys.length} جلسات في الأرشيف (من إجمالي ${keys.length})`;
+    }
+
+    if (filteredKeys.length === 0) {
+      container.innerHTML = `
+        <div style="text-align: center; padding: 2rem; background: #f8fafc; border: 1.5px dashed #cbd5e1; border-radius: 12px; color: #64748b;">
+          <i class="fa-solid fa-box-open" style="font-size: 2.2rem; color: #94a3b8; margin-bottom: 8px;"></i>
+          <div style="font-weight: 800; font-size: 0.95rem; color: #334155;">لا توجد جلسات متابعة تطابق البحث</div>
+          <small>يتم حفظ جلسات المتابعة تلقائياً عند تسجيل الحضور والغياب أو الضغط على "حفظ في الأرشيف"</small>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = filteredKeys.map(k => {
+      const rec = behaviorRecords[k];
+      const r = rosters.find(ros => ros.id === rec.rosterId);
+      const cName = rec.className || (r && r.name) || 'الصف غير محدد';
+      const students = rec.students || [];
+
+      let present = 0, absent = 0, excused = 0, late = 0;
+      students.forEach(st => {
+        if (st.attendance === 'present') present++;
+        else if (st.attendance === 'absent') absent++;
+        else if (st.attendance === 'excused') excused++;
+        else if (st.attendance === 'late') late++;
+      });
+
+      const total = students.length;
+      const attRate = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
+      
+      let dayName = 'اليوم';
+      try {
+        const d = new Date(rec.date);
+        dayName = ARABIC_DAYS[d.getDay()] || 'اليوم';
+      } catch {}
+
+      const isCurrentSession = (rec.date === activeDate && rec.rosterId === activeRosterId);
+
+      return `
+        <div class="sb-archive-card ${isCurrentSession ? 'active-session-card' : ''}" style="background: #ffffff; border: 1.5px solid ${isCurrentSession ? '#0284c7' : '#e2e8f0'}; border-radius: 12px; padding: 1rem 1.15rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 44px; height: 44px; border-radius: 10px; background: ${isCurrentSession ? 'rgba(2,132,199,0.15)' : 'rgba(16,185,129,0.15)'}; color: ${isCurrentSession ? '#0284c7' : '#059669'}; display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <h4 style="margin: 0; font-size: 0.96rem; font-weight: 900; color: #0f172a;">${escapeHtml(cName)}</h4>
+                <span class="badge-tag" style="background: #f0f9ff; color: #0284c7; font-weight: 800; font-size: 0.72rem;">${dayName} ${rec.date}</span>
+                ${isCurrentSession ? '<span class="badge-tag" style="background: #ecfdf5; color: #059669; font-weight: 800; font-size: 0.7rem;">الجلسة المفتوحة حالياً 🟢</span>' : ''}
+              </div>
+              <div style="font-size: 0.78rem; color: #64748b; margin-top: 3px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <span><i class="fa-solid fa-book" style="color: #f59e0b;"></i> المادة: <b>${escapeHtml(rec.subject || '-')}</b></span>
+                <span><i class="fa-solid fa-clock" style="color: #6366f1;"></i> الحصة: <b>${escapeHtml(rec.period || 'الأولى')}</b></span>
+                <span><i class="fa-solid fa-users" style="color: #3b82f6;"></i> المقيدون: <b>${total}</b></span>
+                <span><i class="fa-solid fa-circle-check" style="color: #059669;"></i> حضور: <b>${present + late}</b></span>
+                <span><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i> غياب: <b>${absent}</b></span>
+                <span><i class="fa-solid fa-percent" style="color: #059669;"></i> نسبة الحضور: <b>${attRate}%</b></span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm btn-primary" onclick="window.sbSelectSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; padding: 0.35rem 0.75rem;">
+              <i class="fa-solid fa-folder-open"></i> فتح الكشف
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.sbPrintSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="border-color: #7c3aed; color: #7c3aed; font-weight: 700; padding: 0.35rem 0.75rem;" title="طباعة كشف هذا اليوم A4">
+              <i class="fa-solid fa-print"></i> طباعة A4
+            </button>
+            <button type="button" class="btn btn-sm btn-outline" onclick="window.sbDeleteSessionFromArchive('${k}')" style="color: #dc2626; border-color: rgba(220,38,38,0.3); padding: 0.35rem 0.6rem;" title="حذف هذا الكشف من الأرشيف">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  };
+
+  window.sbSelectSessionFromArchive = function (date, rosterId) {
+    activeDate = date;
+    activeRosterId = rosterId;
+    const dateInput = document.getElementById('sbActiveDateInput');
+    if (dateInput) dateInput.value = date;
+    ensureRecordForActiveDate();
+    renderClassSelector();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+    window.sbCloseBehaviorArchiveModal();
+    if (typeof window.showToast === 'function') {
+      window.showToast(`تم فتح كشف يوم ${date} بنجاح 📂`, 'success');
+    }
+  };
+
+  window.sbPrintSessionFromArchive = function (date, rosterId) {
+    activeDate = date;
+    activeRosterId = rosterId;
+    const dateInput = document.getElementById('sbActiveDateInput');
+    if (dateInput) dateInput.value = date;
+    ensureRecordForActiveDate();
+    renderClassSelector();
+    renderHeaderInfo();
+    renderStats();
+    renderTable();
+    window.sbCloseBehaviorArchiveModal();
+    window.sbPrintOfficialReport();
+  };
+
+  window.sbExportSessionFromArchive = function (date, rosterId) {
+    activeDate = date;
+    activeRosterId = rosterId;
+    window.sbExportCsv();
+  };
+
+  window.sbDeleteSessionFromArchive = function (key) {
+    if (!confirm('هل أنت متأكد من حذف هذا الكشف اليومي من الأرشيف نهائياً؟')) {
+      return;
+    }
+    delete behaviorRecords[key];
+    saveBehaviorRecords(false);
+    ensureRecordForActiveDate();
+    renderStats();
+    renderTable();
+    window.sbRenderBehaviorArchiveList('');
+    if (typeof window.showToast === 'function') {
+      window.showToast('تم حذف الكشف من الأرشيف بنجاح 🗑️', 'info');
+    }
+  };
+
+  // Export module globally
+  window.StudentBehaviorModule = {
+    init: initStudentBehaviorModule,
+    save: saveBehaviorRecords,
+    getActiveRecord: () => behaviorRecords[getRecordKey(activeDate, activeRosterId)],
+    getRecords: () => behaviorRecords
+  };
+})();

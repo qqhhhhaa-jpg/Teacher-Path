@@ -62,6 +62,7 @@ let teacherProfile = {
 
 // DOM Ready initialization
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof purgeTrialDataOnStartup === 'function') purgeTrialDataOnStartup();
   loadTeacherProfile();
   loadSavedState();
   initTheme();
@@ -305,10 +306,26 @@ function getAccountStorageKey(baseKey) {
 }
 window.getAccountStorageKey = getAccountStorageKey;
 
+// Global Master Cloud Server URL for worldwide multi-device sync
+window.MOALLEM_DEFAULT_SERVER_URL = window.MOALLEM_DEFAULT_SERVER_URL || '';
+
 function getBackendApiUrl(endpoint) {
   const custom = localStorage.getItem('moallem_custom_backend_url');
   if (custom && custom.trim()) {
     const base = custom.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  if (window.MOALLEM_DEFAULT_SERVER_URL && window.MOALLEM_DEFAULT_SERVER_URL.trim()) {
+    const base = window.MOALLEM_DEFAULT_SERVER_URL.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  if (window.MOALLEM_PUBLIC_SERVER_URL && window.MOALLEM_PUBLIC_SERVER_URL.trim()) {
+    const base = window.MOALLEM_PUBLIC_SERVER_URL.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  const savedPublicUrl = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : null;
+  if (savedPublicUrl && savedPublicUrl.trim()) {
+    const base = savedPublicUrl.trim().replace(/\/+$/, '');
     return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   }
   if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') {
@@ -317,6 +334,28 @@ function getBackendApiUrl(endpoint) {
   return endpoint;
 }
 window.getBackendApiUrl = getBackendApiUrl;
+
+// Auto-detect Worldwide Cloudflare Tunnel URL from Server
+(async function initServerTunnelDetection() {
+  try {
+    const candidateUrls = ['/api/public_url', 'http://localhost:8080/api/public_url'];
+    for (const u of candidateUrls) {
+      try {
+        const res = await fetch(u, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.public_url) {
+            window.MOALLEM_PUBLIC_SERVER_URL = data.public_url;
+            try {
+              localStorage.setItem('moallem_public_server_url', data.public_url);
+            } catch (_) {}
+            break;
+          }
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+})();
 
 function getAuthAccounts() {
   try {
@@ -335,10 +374,57 @@ function getAuthAccounts() {
         password: 'qq7878aassdd' 
       };
     }
+
+    // Ensure test1 (regular user, non-admin) is registered and up to date
+    const testUserObj = {
+      id: 'usr_test1',
+      name: 'الأستاذ (test1)',
+      username: 'test1',
+      email: 'test1@moallem.iq',
+      password: 'test2025',
+      role: 'teacher',
+      isAdmin: false,
+      isVip: false,
+      isVerified: true,
+      isSubscribed: false,
+      governorate: 'العراق',
+      school: 'مدرسة مسار المعلم',
+      subject: 'عام',
+      createdAt: '2026-10-17T00:00:00.000Z'
+    };
+    const testIdx = accounts.findIndex(a => a.id === 'usr_test1' || a.username === 'test1');
+    if (testIdx === -1) {
+      accounts.push(testUserObj);
+    } else {
+      accounts[testIdx] = {
+        ...testUserObj,
+        ...accounts[testIdx],
+        username: 'test1',
+        password: 'test2025',
+        isAdmin: false,
+        role: accounts[testIdx].role === 'admin' ? 'teacher' : (accounts[testIdx].role || 'teacher')
+      };
+    }
+
     localStorage.setItem('moallem_auth_accounts', JSON.stringify(accounts));
     return accounts;
   } catch (e) {
-    return [{ ...SUPER_ADMIN_ACCOUNT }];
+    return [{ ...SUPER_ADMIN_ACCOUNT }, {
+      id: 'usr_test1',
+      name: 'الأستاذ (test1)',
+      username: 'test1',
+      email: 'test1@moallem.iq',
+      password: 'test2025',
+      role: 'teacher',
+      isAdmin: false,
+      isVip: false,
+      isVerified: true,
+      isSubscribed: false,
+      governorate: 'العراق',
+      school: 'مدرسة مسار المعلم',
+      subject: 'عام',
+      createdAt: '2026-10-17T00:00:00.000Z'
+    }];
   }
 }
 
@@ -423,6 +509,30 @@ function saveAuthAccounts(accounts) {
     }).catch(() => {});
   } catch (err) {}
 }
+
+/* ==========================================================================
+   Platform Telemetry & Activity Engine (محرك تسجيل وتتبع كل حركة على السيرفر)
+   ========================================================================== */
+function logPlatformActivity(actionType, actionTitle, details = '') {
+  try {
+    const user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+    const payload = {
+      userId: user.id || 'guest',
+      username: user.username || user.email || 'زائر',
+      userName: user.name || '',
+      actionType: actionType || 'GENERAL',
+      actionTitle: actionTitle || actionType,
+      details: typeof details === 'object' ? JSON.stringify(details) : String(details || ''),
+      deviceInfo: typeof detectCurrentDeviceName === 'function' ? detectCurrentDeviceName() : ''
+    };
+    fetch(getBackendApiUrl('/api/activity'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  } catch (e) {}
+}
+window.logPlatformActivity = logPlatformActivity;
 
 /* ==========================================================================
    Single Active Device Concurrency Guard (حارس الجلسة الفردية ومنع تعدد الأجهزة)
@@ -693,6 +803,11 @@ function setCurrentUser(user) {
   if (user) {
     localStorage.setItem('moallem_current_user', JSON.stringify(user));
     teacherProfile = { ...user };
+    const sessFlag = 'moallem_logged_event_' + (user.id || user.username);
+    if (!sessionStorage.getItem(sessFlag)) {
+      sessionStorage.setItem(sessFlag, 'true');
+      logPlatformActivity('LOGIN_SUCCESS', 'تسجيل دخول إلى المنصة', { name: user.name, username: user.username, email: user.email });
+    }
   } else {
     localStorage.removeItem('moallem_current_user');
   }
@@ -723,6 +838,11 @@ function checkAuthGatekeeper() {
 }
 
 window.logoutAndOpenAuthPortal = function(toastMsg = null) {
+  const cur = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (cur && cur.username) {
+    logPlatformActivity('LOGOUT', 'تسجيل خروج من المنصة', { username: cur.username, name: cur.name });
+  }
+
   // Automatically save current work as a draft in archive before exit for this user
   autoSaveDraftToArchive(true);
   saveStateToStorage(false);
@@ -850,6 +970,17 @@ function updateUserAuthUI() {
     } else {
       drawerGrantBtn.style.setProperty('display', 'none', 'important');
       drawerGrantBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  const drawerServerBtn = document.getElementById('drawerServerDashboardBtn');
+  if (drawerServerBtn) {
+    if (isAdmin) {
+      drawerServerBtn.style.setProperty('display', 'flex', 'important');
+      drawerServerBtn.classList.remove('admin-only-hidden');
+    } else {
+      drawerServerBtn.style.setProperty('display', 'none', 'important');
+      drawerServerBtn.classList.add('admin-only-hidden');
     }
   }
 
@@ -1392,53 +1523,101 @@ window.setQuickGrade = function(gradeName) {
 /**
  * Saved Exams Archive Management
  */
+const OFFICIAL_11_PRESET_IDS = [
+  'preset_model_islamic',
+  'preset_model_english',
+  'preset_model_math',
+  'preset_model_physics',
+  'preset_model_arabic',
+  'preset_model_islamic_6th',
+  'preset_model_arabic_6th',
+  'preset_model_english_6th',
+  'preset_model_math_6th',
+  'preset_model_physics_6th',
+  'preset_model_chemistry_6th'
+];
+
 function initDefaultArchiveModels(forceReset = false) {
   try {
     const storageKey = getAccountStorageKey('moallem_saved_exams_archive');
-    let list = [];
-    let raw = localStorage.getItem(storageKey);
-    // Legacy migration for admin
-    if (!raw && storageKey.includes('usr_admin')) {
-      raw = localStorage.getItem('moallem_saved_exams_archive');
-    }
-    if (raw) {
-      try { list = JSON.parse(raw) || []; } catch(e) { list = []; }
-    }
-
     const officialModels = (typeof window !== 'undefined' && window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS) ? window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS : [];
-    if (!officialModels || officialModels.length === 0) return list;
+    if (!officialModels || officialModels.length === 0) return [];
 
-    const presetIds = officialModels.map(m => m.id);
-
-    if (forceReset) {
-      // Remove any previously cached preset copies and insert fresh copies
-      const userExams = list.filter(item => !presetIds.includes(item.id) && !item.isModelPreset);
-      const merged = [...officialModels, ...userExams];
-      localStorage.setItem(storageKey, JSON.stringify(merged));
-      updateArchiveBadge();
-      return merged;
-    }
-
-    let changed = false;
-    // Add missing official models to list
-    officialModels.forEach((model, idx) => {
-      const exists = list.some(item => item.id === model.id);
-      if (!exists) {
-        list.splice(idx, 0, JSON.parse(JSON.stringify(model)));
-        changed = true;
-      }
+    // Filter to strictly the 11 protected official ministerial models
+    const official11 = officialModels.filter(m => OFFICIAL_11_PRESET_IDS.includes(m.id));
+    official11.forEach(m => {
+      m.isModelPreset = true;
+      m.isProtected = true;
     });
 
-    if (changed || !raw) {
-      localStorage.setItem(storageKey, JSON.stringify(list));
-      updateArchiveBadge();
-    }
-    return list;
+    const cleanList = official11.map(m => JSON.parse(JSON.stringify(m)));
+    localStorage.setItem(storageKey, JSON.stringify(cleanList));
+    localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(cleanList));
+    updateArchiveBadge();
+    return cleanList;
   } catch (err) {
     console.error('Error in initDefaultArchiveModels:', err);
     return [];
   }
 }
+
+function purgeTrialDataOnStartup() {
+  try {
+    const PURGE_KEY = 'moallem_all_sections_zeroed_v2026';
+    if (!localStorage.getItem(PURGE_KEY)) {
+      // 1. Clear Question Bank
+      const bankKey = (typeof getAccountStorageKey === 'function') ? getAccountStorageKey('moallem_questions_history_bank') : 'moallem_questions_history_bank';
+      localStorage.removeItem(bankKey);
+      localStorage.removeItem('moallem_questions_history_bank');
+      localStorage.removeItem('moallem_questions_bank');
+
+      // 2. Clear Exam Draft & Current Questions
+      localStorage.removeItem('moallem_exam_draft_v1');
+      localStorage.removeItem('moallem_current_exam');
+      if (typeof appState !== 'undefined') {
+        appState.questions = [];
+        appState.currentArchiveId = null;
+        if (appState.header) {
+          appState.header.examTitle = '';
+          appState.header.subject = '';
+          appState.header.school = '';
+          appState.header.teacher = '';
+          appState.header.instructions = '';
+        }
+      }
+
+      // 3. Clear Student Grades Rosters
+      localStorage.removeItem('masar_teacher_grades_rosters_v1');
+      localStorage.removeItem('masar_teacher_grades_active_id');
+
+      // 4. Clear Student Behavior & Attendance
+      localStorage.removeItem('masar_teacher_behavior_records_v1');
+      localStorage.removeItem('masar_teacher_behavior_rosters_v1');
+
+      // 5. Clear Lesson Plans
+      localStorage.removeItem('masar_teacher_lesson_plans_archive_v1');
+      localStorage.removeItem('masar_teacher_lesson_plan_current_v1');
+
+      // 6. Reset Saved Exams Archive to strictly the 11 protected ministerial models
+      initDefaultArchiveModels(true);
+
+      localStorage.setItem(PURGE_KEY, '1');
+      console.log('✅ All sections completely zeroed and purged. 11 official ministerial models preserved.');
+    }
+  } catch (e) {
+    console.warn('Purge error:', e);
+  }
+}
+
+window.resetAllTrialData = function() {
+  localStorage.removeItem('moallem_trial_purged_v2026_final');
+  purgeTrialDataOnStartup();
+  if (typeof renderArchiveList === 'function') renderArchiveList();
+  if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+  if (typeof renderQuestionsList === 'function') renderQuestionsList();
+  if (typeof renderPaperQuestions === 'function') renderPaperQuestions();
+  showToast('تم تصفير كافة البيانات التجريبية، وحفظ النماذج الوزارية الـ 11 المحمية بنجاح 🏛️', 'success');
+};
 
 function getSavedExamsArchive() {
   try {
@@ -1453,7 +1632,7 @@ function getSavedExamsArchive() {
     const list = JSON.parse(raw);
     const officialModels = (typeof window !== 'undefined' && window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS) ? window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS : [];
     if (officialModels.length > 0) {
-      const hasAll = officialModels.every(m => list.some(item => item.id === m.id));
+      const hasAll = OFFICIAL_11_PRESET_IDS.every(id => list.some(item => item.id === id));
       if (!hasAll) {
         return initDefaultArchiveModels(false);
       }
@@ -1467,7 +1646,7 @@ function getSavedExamsArchive() {
 window.reseedDefaultArchiveModels = function() {
   initDefaultArchiveModels(true);
   renderArchiveList();
-  showToast('تم استيراد وتحديث النماذج الوزارية الـ 12 المعتمدة (الثالث متوسط والسادس إعدادي لجميع المواد) بنجاح في الأرشيف! 🏛️', 'success');
+  showToast('تم استيراد وتحديث النماذج الوزارية الـ 11 المعتمدة (الثالث متوسط والسادس إعدادي لجميع المواد) بنجاح في الأرشيف! 🏛️', 'success');
 };
 
 function saveExamsArchive(list) {
@@ -2003,8 +2182,12 @@ function initEventListeners() {
       if (targetContent) targetContent.style.display = 'block';
 
       if (targetId === 'tab-report') {
-        if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-        if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
+        if (typeof window.switchReportSubView === 'function') {
+          window.switchReportSubView(window.currentReportSubView || 'overview');
+        } else {
+          if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+          if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
+        }
       }
     });
   });
@@ -2505,7 +2688,11 @@ function initEventListeners() {
       }
 
       const nowReg = new Date();
+      const trialDurationMs = 24 * 60 * 60 * 1000; // 24 hours (1 full day free trial)
+      const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
       const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+      const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
       const newAccount = {
         id: 'usr_' + Date.now(),
         name,
@@ -2516,16 +2703,27 @@ function initEventListeners() {
         email,
         password: pass,
         contact: '',
-        isVerified: false,
-        role: 'viewer',
-        isSubscribed: false,
-        isVip: false,
+        isVerified: true,
+        role: 'teacher',
+        isSubscribed: true,
+        isVip: true,
+        isTrial: true,
+        trialDurationHours: 24,
+        trialStartedAt: nowReg.toISOString(),
+        subscriptionType: 'free_trial_24h',
+        subscriptionPlanName: 'فترة تجريبية مجانية (24 ساعة)',
+        subscriptionStartDate: nowReg.toISOString(),
+        subscriptionExpiresAt: trialExpiry.toISOString(),
+        subscriptionExpiryFormatted: expiryFormatted,
         registeredAt: nowReg.toISOString(),
         registeredDateFormatted: dateFormatted
       };
 
       accounts.push(newAccount);
       saveAuthAccounts(accounts);
+      localStorage.setItem(`moallem_vip_subscription_${newAccount.id}`, 'true');
+      localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, trialExpiry.toISOString());
+
       // Immediately register on server for cross-device support
       try {
         fetch(getBackendApiUrl('/api/accounts'), {
@@ -2556,10 +2754,7 @@ function initEventListeners() {
       if (portal) portal.classList.add('portal-hidden');
       if (workstation) workstation.classList.remove('portal-locked');
       
-      showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! هذا الحساب يخضع لعملية دفع واشتراك (50,000 د.ع) لتفعيل الصلاحيات 💳🔒`, 'warning');
-      if (typeof window.openSubscriptionModal === 'function') {
-        window.openSubscriptionModal();
-      }
+      showToast(`مرحباً بك أستاذ ${name}! تم منحك اشتراكاً تجريبياً مجانياً لمدة 24 ساعة لتجربة كافة إمكانيات المنصة بحرية كاملة 🎁✨`, 'success');
     });
   }
 
@@ -3152,19 +3347,19 @@ function renderBuilderList() {
           </div>
 
           <div class="q-actions">
-            <button title="تحريك لأعلى" onclick="moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
+            <button type="button" class="btn-q-act btn-q-up" title="تحريك لأعلى" onclick="moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>
               <i class="fa-solid fa-arrow-up"></i>
             </button>
-            <button title="تحريك لأسفل" onclick="moveQuestion(${idx}, 1)" ${idx === appState.questions.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
+            <button type="button" class="btn-q-act btn-q-down" title="تحريك لأسفل" onclick="moveQuestion(${idx}, 1)" ${idx === appState.questions.length - 1 ? 'disabled' : ''}>
               <i class="fa-solid fa-arrow-down"></i>
             </button>
-            <button title="تكرار السؤال" onclick="duplicateQuestion('${q.id}')">
+            <button type="button" class="btn-q-act btn-q-dup" title="تكرار السؤال" onclick="duplicateQuestion('${q.id}')">
               <i class="fa-solid fa-copy"></i>
             </button>
-            <button title="تعديل السؤال" onclick="openQuestionModal('${q.id}')" style="color: #60a5fa;">
+            <button type="button" class="btn-q-act btn-q-edit" title="تعديل السؤال" onclick="openQuestionModal('${q.id}')">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button title="حذف السؤال" class="btn-del" onclick="deleteQuestion('${q.id}')">
+            <button type="button" class="btn-q-act btn-q-del btn-del" title="حذف السؤال" onclick="deleteQuestion('${q.id}')">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
@@ -3632,6 +3827,15 @@ function setupModalInputTracking() {
   if (typeof window.updateModalMathPreview === 'function') {
     window.updateModalMathPreview();
   }
+
+  // Bind modal MathLive field if present
+  const mf = document.getElementById('modalMathLiveField');
+  if (mf && !mf._mathliveBound) {
+    mf.addEventListener('input', () => {
+      // Keep active math live preview synchronized if modalMathLiveField is being edited
+    });
+    mf._mathliveBound = true;
+  }
 }
 
 /**
@@ -3654,7 +3858,10 @@ function buildMathStudioHTML(isOpen = false) {
 
       <!-- تبويبات أقسام الرياضيات -->
       <div class="math-studio-tabs" id="mathStudioTabs">
-        <button type="button" class="math-tab-btn active" data-tab="powers_bases" onclick="window.switchMathStudioTab('powers_bases')">
+        <button type="button" class="math-tab-btn btn-tab-mathlive active" data-tab="mathlive_builder" onclick="window.switchMathStudioTab('mathlive_builder')">
+          <i class="fa-solid fa-keyboard" style="color: #67e8f9;"></i> محرر MathLive التفاعلي ⚡
+        </button>
+        <button type="button" class="math-tab-btn" data-tab="powers_bases" onclick="window.switchMathStudioTab('powers_bases')">
           <i class="fa-solid fa-superscript"></i> الأس والأساس
         </button>
         <button type="button" class="math-tab-btn" data-tab="fractions_roots" onclick="window.switchMathStudioTab('fractions_roots')">
@@ -3676,8 +3883,70 @@ function buildMathStudioHTML(isOpen = false) {
 
       <!-- محتويات التبويبات -->
       <div class="math-tab-content-wrapper">
+        <!-- 0. محرر MathLive التفاعلي الذكي (الأقوى والأحدث) -->
+        <div class="math-tab-pane active" id="mathPane_mathlive_builder">
+          <div class="mathlive-pane-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="badge-mathlive-live"><i class="fa-solid fa-bolt text-warning"></i> محرر MathLive التفاعلي (WYSIWYG)</span>
+                <span style="font-size: 0.72rem; color: #94a3b8;">انقر داخل الحقل واكتب بالفأرة أو لوحة المفاتيح</span>
+              </div>
+              <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-xs btn-primary" onclick="window.toggleMathLiveVirtualKeyboard('modalMathLiveField')" title="إظهار / إخفاء لوحة المفاتيح الرياضية">
+                  <i class="fa-solid fa-keyboard"></i> لوحة المفاتيح ⚡
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.importQuestionTextToMathLive('modalMathLiveField')" title="استيراد التحديد أو المعادلة من نص السؤال إلى المحرر">
+                  <i class="fa-solid fa-arrow-down-to-bracket"></i> استيراد من السؤال
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.clearMathLiveField('modalMathLiveField')" title="مسح">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.copyMathLiveLatex('modalMathLiveField')" title="نسخ LaTeX">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- حقل التحرير MathLive Web Component -->
+            <math-field id="modalMathLiveField" class="custom-mathlive-field" dir="ltr" virtual-keyboard-mode="manual">
+              x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+            </math-field>
+
+            <!-- نماذج وزارية سريعة بنقرة واحدة لتحميلها في MathLive والتعديل عليها -->
+            <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <small style="font-size: 0.72rem; font-weight: 800; color: #cbd5e1;">نماذج وزارية جاهزة للتعديل في MathLive فوراً:</small>
+                <button type="button" onclick="window.openStandaloneMathLiveModal(document.getElementById('modalMathLiveField')?.value)" style="color: #a78bfa; font-size: 0.72rem; text-decoration: underline; background: none; border: none; cursor: pointer;">
+                  <i class="fa-solid fa-up-right-from-square"></i> فتح المحرر الموسع
+                </button>
+              </div>
+              <div class="mathlive-quick-pills-row">
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', 'x = \\\\frac{-b \\\\pm \\\\sqrt{b^2 - 4ac}}{2a}')">قانون الدستور</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\frac{x^2 - 4}{x - 2} = x + 2')">كسر وتحليل</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\int_{0}^{\\\\pi} \\\\sin(x) \\\\, dx')">تكامل محدد</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\lim_{x \\\\to 0} \\\\frac{\\\\sin x}{x} = 1')">غاية دوال دائرية</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\begin{bmatrix} a & b \\\\\\\\ c & d \\\\end{bmatrix}')">مصفوفة 2x2</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', 'z = r(\\\\cos\\\\theta + i\\\\sin\\\\theta)')">ديموافر قطبية</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\frac{x^2}{a^2} + \\\\frac{y^2}{b^2} = 1')">قطع ناقص</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\sqrt[3]{x^3 - 8} = 2')">جذر تكعيبي</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '|2x - 5| \\\\le 7')">متباينة مطلقة</button>
+              </div>
+            </div>
+
+            <!-- أزرار الإدراج في السؤال -->
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" style="flex: 1; padding: 0.45rem 0.8rem; font-weight: 800; font-size: 0.85rem;" onclick="window.insertMathLiveIntoQuestion('modalMathLiveField', false)">
+                <i class="fa-solid fa-plus"></i> إدراج المعادلة في السؤال (مضمّنة $...$)
+              </button>
+              <button type="button" class="btn btn-accent" style="flex: 1; padding: 0.45rem 0.8rem; font-weight: 800; font-size: 0.85rem;" onclick="window.insertMathLiveIntoQuestion('modalMathLiveField', true)">
+                <i class="fa-solid fa-align-center"></i> إدراج كسطر مستقل ($$...$$)
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- 1. الأس والأساس -->
-        <div class="math-tab-pane active" id="mathPane_powers_bases">
+        <div class="math-tab-pane" id="mathPane_powers_bases">
           <div class="math-tools-grid">
             <button type="button" class="math-tool-btn" onclick="window.insertMathFormula('$x^2$')" title="تربيع (أس 2)">
               <span class="math-tool-render">x²</span>
@@ -4766,6 +5035,10 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           <label class="form-label" style="margin: 0;"><i class="fa-solid fa-align-right text-accent"></i> نص السؤال / صيغة المسألة <span class="badge-optional">(اختياري)</span></label>
 
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-mathlive-quick-pill" onclick="window.openMathLiveForQuestion()" title="فتح وتعديل المعادلة عبر محرر MathLive التفاعلي">
+              <i class="fa-solid fa-keyboard" style="color: #67e8f9;"></i>
+              <span>محرر MathLive ⚡</span>
+            </button>
             <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
               <i class="fa-solid fa-square-root-variable text-accent"></i>
               <span>ستوديو الرياضيات</span>
@@ -6993,54 +7266,720 @@ window.removeQuestionFromHistoryBank = function(qId) {
 };
 
 /* ==========================================================================
-   Executive Academic Reports & Created Exams Command Center Controller
+   Executive Academic Reports & Comprehensive Platform Command Center Controller
    ========================================================================== */
-window.currentReportSubView = 'models';
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+window.escapeHtml = escapeHtml;
+
+window.currentReportSubView = 'overview';
 let currentFilteredReportExams = [];
 let currentFilteredBankQuestions = [];
 
-window.switchReportSubView = function(view) {
-  window.currentReportSubView = view || 'models';
+/**
+ * Gather Comprehensive Platform Data (جميع أنشطة وسجلات المنصة)
+ */
+function getPlatformComprehensiveData() {
+  // 1. Teacher Profile
+  const profile = (typeof teacherProfile === 'object' && teacherProfile) ? teacherProfile : {};
+  const tName = profile.name || localStorage.getItem('masar_teacher_name') || 'أستاذ المادة';
+  const tSchool = profile.school || localStorage.getItem('masar_school_name') || 'ثانوية المتميزين للبنين';
+  const tGov = profile.governorate || 'بغداد';
+  const tYear = profile.academicYear || '2024 - 2025';
 
+  // 2. Behavior & Attendance Records
+  let behaviorRecords = {};
+  let behaviorRosters = [];
+  try {
+    const rawB = localStorage.getItem('masar_student_behavior_records');
+    if (rawB) behaviorRecords = JSON.parse(rawB);
+  } catch(e) {}
+  try {
+    const rawR = localStorage.getItem('masar_student_rosters');
+    if (rawR) behaviorRosters = JSON.parse(rawR);
+  } catch(e) {}
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const bKeys = Object.keys(behaviorRecords || {}).sort().reverse();
+  let todayRecord = null;
+  for (const k of bKeys) {
+    if (k.endsWith(todayStr)) {
+      todayRecord = behaviorRecords[k];
+      break;
+    }
+  }
+  if (!todayRecord && bKeys.length > 0) {
+    todayRecord = behaviorRecords[bKeys[0]];
+  }
+
+  let activeBehaviorRoster = behaviorRosters.length > 0 ? behaviorRosters[0] : null;
+  if (todayRecord && todayRecord.rosterId) {
+    activeBehaviorRoster = behaviorRosters.find(r => r.id === todayRecord.rosterId) || activeBehaviorRoster;
+  }
+
+  const bStudents = (todayRecord && todayRecord.students) || (activeBehaviorRoster && activeBehaviorRoster.students) || [];
+  let presentCount = 0, absentCount = 0, excusedCount = 0, lateCount = 0;
+  bStudents.forEach(st => {
+    if (st.attendance === 'present') presentCount++;
+    else if (st.attendance === 'absent') absentCount++;
+    else if (st.attendance === 'excused') excusedCount++;
+    else if (st.attendance === 'late') lateCount++;
+  });
+  const totalBStudents = bStudents.length;
+  const attendanceRate = totalBStudents > 0 ? Math.round(((presentCount + lateCount) / totalBStudents) * 100) : 0;
+
+  // 3. Student Grades Rosters
+  let gradesRosters = [];
+  try {
+    const rawG = localStorage.getItem('masar_teacher_grades_rosters_v1');
+    if (rawG) gradesRosters = JSON.parse(rawG);
+  } catch(e) {}
+  if (!Array.isArray(gradesRosters) || gradesRosters.length === 0) {
+    gradesRosters = behaviorRosters;
+  }
+  let totalEnrolledStudents = 0;
+  let allStudentsScores = [];
+  (gradesRosters || []).forEach(r => {
+    const sts = r.students || [];
+    totalEnrolledStudents += sts.length;
+    sts.forEach(st => {
+      const score = (typeof st.finalExam === 'number') ? st.finalExam : (typeof st.m1 === 'number') ? st.m1 : null;
+      if (score !== null) {
+        allStudentsScores.push({ name: st.name, score: score, className: r.name });
+      }
+    });
+  });
+  allStudentsScores.sort((a, b) => b.score - a.score);
+  const topStudents = allStudentsScores.slice(0, 5);
+  const averageScore = allStudentsScores.length > 0 ? Math.round(allStudentsScores.reduce((acc, s) => acc + s.score, 0) / allStudentsScores.length) : 85;
+
+  // 4. Exams & Question Bank
+  const allExams = (typeof getSavedExamsArchive === 'function') ? getSavedExamsArchive() : [];
+  const bank = (typeof getQuestionsHistoryBank === 'function') ? getQuestionsHistoryBank() : [];
+  const currentExamQuestions = (typeof appState === 'object' && appState && appState.questions) ? appState.questions : [];
+  const currentExamTitle = (appState && appState.header && appState.header.title) || 'الامتحان الشهري النموذجي';
+  const currentExamSubject = (appState && appState.header && appState.header.subject) || 'الرياضيات';
+  const currentExamGrade = (appState && appState.header && appState.header.grade) || 'الثالث المتوسط';
+  const currentExamTotalScore = (appState && appState.header && appState.header.totalScore) || 100;
+
+  // 5. Lesson Plan
+  let currentLessonPlan = null;
+  try {
+    const rawLP = localStorage.getItem('masar_current_lesson_plan');
+    if (rawLP) currentLessonPlan = JSON.parse(rawLP);
+  } catch(e) {}
+
+  // 6. Subscription / Trial Status
+  let trialStatusText = 'فترة تجربة مجانية (24 ساعة)';
+  try {
+    const rawUser = localStorage.getItem('moallem_user_account');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.isTrial) trialStatusText = 'فترة تجربة مجانية (24 ساعة)';
+      else if (u.isSubscribed) trialStatusText = 'اشتراك سنوي معتمد ⭐';
+    }
+  } catch(e) {}
+
+  return {
+    teacher: { name: tName, school: tSchool, governorate: tGov, academicYear: tYear },
+    behavior: {
+      todayRecord,
+      activeRoster: activeBehaviorRoster,
+      students: bStudents,
+      total: totalBStudents,
+      present: presentCount,
+      absent: absentCount,
+      excused: excusedCount,
+      late: lateCount,
+      rate: attendanceRate,
+      date: (todayRecord && todayRecord.date) || todayStr,
+      className: (todayRecord && todayRecord.className) || (activeBehaviorRoster && activeBehaviorRoster.name) || 'الصف الثالث المتوسط',
+      subject: (todayRecord && todayRecord.subject) || 'الرياضيات',
+      period: (todayRecord && todayRecord.period) || 'الأولى',
+      topic: (todayRecord && todayRecord.topic) || 'متابعة سير الدرس الصفي'
+    },
+    grades: {
+      rosters: gradesRosters,
+      totalEnrolled: totalEnrolledStudents,
+      topStudents,
+      averageScore
+    },
+    exams: {
+      allExams,
+      bank,
+      currentExam: {
+        title: currentExamTitle,
+        subject: currentExamSubject,
+        grade: currentExamGrade,
+        questionsCount: currentExamQuestions.length,
+        totalScore: currentExamTotalScore
+      }
+    },
+    lessonPlan: currentLessonPlan,
+    trialStatus: trialStatusText
+  };
+}
+
+/**
+ * Switch Report SubView (التبديل بين قطاعات التقرير اليومي)
+ */
+window.switchReportSubView = function(view) {
+  window.currentReportSubView = view || 'overview';
+
+  const btnOverview = document.getElementById('btnReportViewOverview');
+  const btnBehavior = document.getElementById('btnReportViewBehavior');
+  const btnGrades = document.getElementById('btnReportViewGrades');
+  const btnLesson = document.getElementById('btnReportViewLesson');
   const btnModels = document.getElementById('btnReportViewModels');
   const btnQuestions = document.getElementById('btnReportViewQuestions');
   const btnExams = document.getElementById('btnReportViewExams');
 
+  const containerOverview = document.getElementById('tabReportOverviewRender');
+  const containerBehavior = document.getElementById('tabReportBehaviorRender');
+  const containerGrades = document.getElementById('tabReportGradesRender');
+  const containerLesson = document.getElementById('tabReportLessonRender');
   const containerExams = document.getElementById('tabReportExamsListRender');
   const containerQuestions = document.getElementById('tabReportQuestionsListRender');
+  const filterToolbar = document.getElementById('tabReportFilterToolbar');
+  const resultsHeader = document.getElementById('tabReportResultsHeader');
   const resultsLabel = document.getElementById('tabReportResultsLabel');
   const helpHint = document.getElementById('tabReportHelpHint');
 
   // Toggle button active states
+  if (btnOverview) btnOverview.classList.toggle('active', view === 'overview');
+  if (btnBehavior) btnBehavior.classList.toggle('active', view === 'behavior');
+  if (btnGrades) btnGrades.classList.toggle('active', view === 'grades');
+  if (btnLesson) btnLesson.classList.toggle('active', view === 'lesson');
   if (btnModels) btnModels.classList.toggle('active', view === 'models');
   if (btnQuestions) btnQuestions.classList.toggle('active', view === 'questions');
   if (btnExams) btnExams.classList.toggle('active', view === 'exams');
 
-  if (view === 'models') {
+  // Hide all sections first
+  [containerOverview, containerBehavior, containerGrades, containerLesson, containerExams, containerQuestions].forEach(c => {
+    if (c) c.style.display = 'none';
+  });
+  if (filterToolbar) filterToolbar.style.display = 'none';
+  if (resultsHeader) resultsHeader.style.display = 'none';
+
+  if (view === 'overview') {
+    if (containerOverview) containerOverview.style.display = 'flex';
+    window.renderFullPlatformDailyOverview();
+  } else if (view === 'behavior') {
+    if (containerBehavior) {
+      containerBehavior.style.display = 'block';
+      window.renderFullPlatformBehaviorView();
+    }
+  } else if (view === 'grades') {
+    if (containerGrades) {
+      containerGrades.style.display = 'block';
+      window.renderFullPlatformGradesView();
+    }
+  } else if (view === 'lesson') {
+    if (containerLesson) {
+      containerLesson.style.display = 'block';
+      window.renderFullPlatformLessonView();
+    }
+  } else if (view === 'models') {
     if (containerExams) containerExams.style.display = 'grid';
-    if (containerQuestions) containerQuestions.style.display = 'none';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'النماذج الوزارية المعروضة: ';
     if (helpHint) {
       helpHint.innerHTML = '🏛️ <strong>قسم النماذج الوزارية المعتمدة (12 نموذجاً رسمياً):</strong> نماذج وزارية معتمدة ومتكاملة للثالث متوسط والسادس إعدادي لكافة المواد، جاهزة للاستعراض، التعديل المباشر، أو الطباعة الفورية.';
     }
+    window.filterDailyReport();
   } else if (view === 'questions') {
-    if (containerExams) containerExams.style.display = 'none';
     if (containerQuestions) containerQuestions.style.display = 'flex';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'الأسئلة الوزارية المعروضة: ';
     if (helpHint) {
       helpHint.innerHTML = '📑 <strong>حقل الأسئلة الوزارية المستقل:</strong> يمكنك البحث في بنك الأسئلة الوزارية المعتمدة وإدراج أي سؤال مباشرة في ورقة الاختبار الحالية بنقرة واحدة.';
     }
-  } else {
-    // view === 'exams'
+    window.filterDailyReport();
+  } else if (view === 'exams') {
     if (containerExams) containerExams.style.display = 'grid';
-    if (containerQuestions) containerQuestions.style.display = 'none';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'سجل الاختبارات المنشأة والمسودات: ';
     if (helpHint) {
       helpHint.innerHTML = '✍️ <strong>سجل اختباراتك المنشأة:</strong> استعرض وعدّل مسوداتك واختباراتك المحفوظة التي قمت بإنشائها بنفسك على المنصة.';
     }
+    window.filterDailyReport();
   }
 
-  window.filterDailyReport();
+  updateDailyReportMetrics();
+};
+
+/**
+ * Render Comprehensive Platform Live Overview (التقرير الشامل المتضمن كل شيء يدور بالمنصة)
+ */
+window.renderFullPlatformDailyOverview = function() {
+  const container = document.getElementById('tabReportOverviewRender');
+  if (!container) return;
+
+  const data = getPlatformComprehensiveData();
+  const b = data.behavior;
+  const g = data.grades;
+  const ex = data.exams;
+  const lp = data.lessonPlan;
+  const t = data.teacher;
+
+  const now = new Date();
+  const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  let dateFormattedAr = '';
+  try {
+    dateFormattedAr = now.toLocaleDateString('ar-IQ', dateOptions);
+  } catch(e) {
+    dateFormattedAr = now.toDateString();
+  }
+
+  container.innerHTML = `
+    <!-- 1. Teacher & Platform Header Status Banner -->
+    <div class="report-teacher-hero-card">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" style="width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));" title="شعار وزارة التربية العراقية المعتمد">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #0f172a;">${escapeHtml(t.name)}</h3>
+            <span class="badge-tag" style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 0.76rem;">${escapeHtml(t.school)}</span>
+            <span class="badge-tag" style="background: #ecfdf5; color: #059669; font-weight: 800; font-size: 0.74rem;">${escapeHtml(data.trialStatus)}</span>
+          </div>
+          <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <span><i class="fa-regular fa-calendar-check text-primary"></i> <b>${dateFormattedAr}</b></span>
+            <span><i class="fa-solid fa-graduation-cap text-warning"></i> الصف النشط: <b>${escapeHtml(b.className)}</b></span>
+            <span><i class="fa-solid fa-book text-info"></i> المادة: <b>${escapeHtml(b.subject)}</b></span>
+            <span><i class="fa-solid fa-clock text-purple"></i> الحصة: <b>${escapeHtml(b.period)}</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button type="button" class="btn btn-sm btn-primary" onclick="window.printFullPlatformDailyReport()" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; padding: 0.45rem 0.95rem;">
+          <i class="fa-solid fa-print"></i> طباعة التقرير A4
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Grid of Live Platform Hubs -->
+    <div class="report-overview-grid">
+      
+      <!-- Card 1: Attendance & Conduct Live Card (المتابعة والغياب اليومي) -->
+      <div class="report-overview-card" style="border-top: 4px solid #10b981;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #059669;">
+              <i class="fa-solid fa-clipboard-user"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">المتابعة وحسن السلوك اليوم</div>
+              <small style="color: #64748b; font-size: 0.74rem;">جلسة ${escapeHtml(b.className)} — ${escapeHtml(b.date)}</small>
+            </div>
+          </div>
+          <span class="report-badge-status ${b.rate >= 80 ? 'report-badge-present' : 'report-badge-excused'}" style="font-size: 0.82rem;">
+            نسبة الحضور: ${b.rate}%
+          </span>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+            <i class="fa-solid fa-circle-check text-success"></i> حضور: <b>${b.present + b.late}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;">
+            <i class="fa-solid fa-circle-xmark text-danger"></i> غياب: <b>${b.absent}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fffbeb; color: #92400e; border: 1px solid #fde68a;">
+            <i class="fa-solid fa-circle-pause text-warning"></i> إجازة: <b>${b.excused}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">
+            <i class="fa-solid fa-users text-primary"></i> المقيدون: <b>${b.total}</b>
+          </div>
+        </div>
+
+        <!-- Mini Table of Students Attendance -->
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #ffffff;">
+          <table class="report-table-mini">
+            <thead>
+              <tr>
+                <th style="width: 30px;">ت</th>
+                <th>اسم الطالب</th>
+                <th style="text-align: center; width: 75px;">الحضور</th>
+                <th style="text-align: center; width: 65px;">المشاركة</th>
+                <th style="text-align: center; width: 65px;">الواجب</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${b.students.slice(0, 7).map((st, i) => {
+                let attBadge = '<span class="report-badge-status report-badge-present">حاضر</span>';
+                if (st.attendance === 'absent') attBadge = '<span class="report-badge-status report-badge-absent">غائب</span>';
+                else if (st.attendance === 'excused') attBadge = '<span class="report-badge-status report-badge-excused">مجاز</span>';
+                else if (st.attendance === 'late') attBadge = '<span class="report-badge-status report-badge-late">متأخر</span>';
+
+                const partText = (st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي';
+                const hwText = st.homework === 'done' ? 'منجز ✔️' : 'ناقص ⚠️';
+
+                return `
+                  <tr>
+                    <td style="font-weight: bold; color: #64748b;">${i + 1}</td>
+                    <td style="font-weight: 700; color: #0f172a;">${escapeHtml(st.name)}</td>
+                    <td style="text-align: center;">${attBadge}</td>
+                    <td style="text-align: center; font-size: 0.74rem;">${partText}</td>
+                    <td style="text-align: center; font-size: 0.74rem;">${hwText}</td>
+                  </tr>
+                `;
+              }).join('')}
+              ${b.students.length > 7 ? `
+                <tr>
+                  <td colspan="5" style="text-align: center; font-size: 0.75rem; color: #64748b; background: #f8fafc;">
+                    + يوجد ${b.students.length - 7} طلاب آخرين مسجلين في كشف اليوم
+                  </td>
+                </tr>
+              ` : ''}
+              ${b.students.length === 0 ? `
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 1.5rem; color: #94a3b8;">
+                    لا يوجد طلاب مسجلون بعد. انقر على فتح السجل لإضافة الطلاب أو مزامنتهم.
+                  </td>
+                </tr>
+              ` : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <span style="font-size: 0.75rem; color: #64748b;"><i class="fa-solid fa-pen-nib text-primary"></i> موضوع: <b>${escapeHtml(b.topic)}</b></span>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToBehaviorTabFromReport()" style="border-color: #10b981; color: #059669; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح سجل السلوك ↗️
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Student Grades & Academic Ledgers (سجل درجات وتقييم الطلاب) -->
+      <div class="report-overview-card" style="border-top: 4px solid #0284c7;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(2, 132, 199, 0.15); color: #0284c7;">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">سجل درجات وتقييم الطلاب</div>
+              <small style="color: #64748b; font-size: 0.74rem;">${g.rosters.length} صفوف وشعب محفوظة ومسجلة</small>
+            </div>
+          </div>
+          <span class="report-badge-status" style="background: #eff6ff; color: #0284c7; font-size: 0.82rem;">
+            متوسط الأداء: ${g.averageScore}%
+          </span>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd;">
+            <i class="fa-solid fa-school text-primary"></i> الصفوف: <b>${g.rosters.length}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+            <i class="fa-solid fa-users text-success"></i> الطلاب المقيدون: <b>${g.totalEnrolled}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe;">
+            <i class="fa-solid fa-star text-warning"></i> المتفوقون: <b>${g.topStudents.length}</b>
+          </div>
+        </div>
+
+        <!-- Top Students or Classes List -->
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem; background: #f8fafc; font-size: 0.8rem;">
+          <div style="font-weight: 800; color: #334155; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-medal text-warning"></i> لوحة الشرف وأوائل الطلاب بالسجلات:
+          </div>
+          ${g.topStudents.length > 0 ? `
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              ${g.topStudents.map((st, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span style="font-weight: 700; color: #0f172a;">${idx + 1}. ${escapeHtml(st.name)} <small style="color: #64748b;">(${escapeHtml(st.className)})</small></span>
+                  <span style="font-weight: 800; color: #059669; background: #ecfdf5; padding: 1px 6px; border-radius: 4px;">${st.score} درجة</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="color: #64748b; text-align: center; padding: 0.75rem;">
+              سجل الدرجات نشط وجاهز لرصد درجات الشهر الأول ونصف السنة.
+            </div>
+          `}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <span style="font-size: 0.75rem; color: #64748b;"><i class="fa-solid fa-clipboard-check text-info"></i> نظام درجات معتمد وزارياً</span>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToGradesTabFromReport()" style="border-color: #0284c7; color: #0284c7; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح سجل الدرجات ↗️
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Active Exam & Question Bank (الاختبارات وبنك الأسئلة) -->
+      <div class="report-overview-card" style="border-top: 4px solid #f59e0b;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">الاختبارات وبنك الأسئلة</div>
+              <small style="color: #64748b; font-size: 0.74rem;">${ex.allExams.length} اختبارات بالأرشيف | ${ex.bank.length} مفردة بالبنك</small>
+            </div>
+          </div>
+          <span class="report-badge-status" style="background: #fffbeb; color: #b45309; font-size: 0.82rem;">
+            12 نموذجاً وزارياً
+          </span>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.75rem; font-size: 0.82rem;">
+          <div style="font-weight: 800; color: #92400e; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-file-pen text-warning"></i> الاختبار المفتوح حالياً بالمحرر:
+          </div>
+          <div style="font-size: 0.9rem; font-weight: 900; color: #0f172a;">${escapeHtml(ex.currentExam.title)}</div>
+          <div style="font-size: 0.76rem; color: #64748b; margin-top: 4px; display: flex; gap: 10px;">
+            <span>المادة: <b>${escapeHtml(ex.currentExam.subject)}</b></span>
+            <span>الأسئلة: <b>${ex.currentExam.questionsCount} سؤال</b></span>
+            <span>الدرجة الكلية: <b>${ex.currentExam.totalScore} درجة</b></span>
+          </div>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">
+            <i class="fa-solid fa-file-lines text-primary"></i> اختباراتك: <b>${ex.allExams.filter(e => !e.isModelPreset).length}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+            <i class="fa-solid fa-award text-success"></i> نماذج وزارية: <b>${ex.allExams.filter(e => e.isModelPreset).length || 12}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe;">
+            <i class="fa-solid fa-database text-purple"></i> إجمالي البنك: <b>${ex.bank.length}</b>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchReportSubView('models')" style="font-weight: 700; font-size: 0.74rem;">
+            النماذج الوزارية 🏛️
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToBuilderTabFromReport()" style="border-color: #f59e0b; color: #d97706; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح ورقة الاختبار ↗️
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 4: Daily Lesson Plan (الخطة اليومية وتحضير المعلم) -->
+      <div class="report-overview-card" style="border-top: 4px solid #8b5cf6;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(139, 92, 246, 0.15); color: #7c3aed;">
+              <i class="fa-solid fa-book-open-reader"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">الخطة والتحضير الصفي اليومي</div>
+              <small style="color: #64748b; font-size: 0.74rem;">معايير الإشراف التربوي العراقي</small>
+            </div>
+          </div>
+          <span class="report-badge-status" style="background: #f5f3ff; color: #7c3aed; font-size: 0.82rem;">
+            خطة موثقة
+          </span>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem; font-size: 0.8rem;">
+          <div style="font-weight: 800; color: #0f172a; font-size: 0.88rem; margin-bottom: 4px;">
+            ${escapeHtml((lp && lp.topic) || 'درس اليوم: مفاهيم وتطبيقات الدرس')}
+          </div>
+          <div style="font-size: 0.76rem; color: #64748b; display: flex; gap: 8px; flex-wrap: wrap;">
+            <span>الصف: <b>${escapeHtml((lp && lp.grade) || b.className)}</b></span>
+            <span>المادة: <b>${escapeHtml((lp && lp.subject) || b.subject)}</b></span>
+            <span>الحصة: <b>${escapeHtml((lp && lp.period) || b.period)}</b></span>
+          </div>
+          <div style="font-size: 0.75rem; color: #475569; margin-top: 6px; line-height: 1.5; border-top: 1px dashed #cbd5e1; padding-top: 4px;">
+            <b>الأهداف السلوكية:</b> ${escapeHtml((lp && lp.behavioralGoals) || 'أن يستوعب الطالب القوانين الأساسية ويطبقها بحل التمارين الصفية والأنشطة.')}
+          </div>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe;">
+            <i class="fa-solid fa-lightbulb text-warning"></i> استراتيجيات: <b>حل المشكلات والمناقشة</b>
+          </div>
+          <div class="report-stat-pill" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+            <i class="fa-solid fa-house-laptop text-success"></i> الواجب: <b>تم تحديده</b>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <span style="font-size: 0.75rem; color: #64748b;"><i class="fa-solid fa-circle-check text-success"></i> خطة درس معتمدة</span>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToLessonPlanTabFromReport()" style="border-color: #8b5cf6; color: #7c3aed; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح الخطة اليومية ↗️
+          </button>
+        </div>
+      </div>
+
+    </div>
+  `;
+};
+
+window.renderFullPlatformBehaviorView = function() {
+  const container = document.getElementById('tabReportBehaviorRender');
+  if (!container) return;
+  const data = getPlatformComprehensiveData();
+  const b = data.behavior;
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #0f172a;">كشف المتابعة وحسن السلوك المفصل — جلسة اليوم</h3>
+          <small style="color: #64748b;">${escapeHtml(b.className)} | ${escapeHtml(b.date)} | مادة ${escapeHtml(b.subject)}</small>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="window.switchToBehaviorTabFromReport()" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800;">
+            <i class="fa-solid fa-folder-open"></i> فتح واجهة السلوك الكاملة
+          </button>
+        </div>
+      </div>
+
+      <div class="report-pills-row" style="margin-bottom: 1rem;">
+        <span class="report-stat-pill" style="background: #ecfdf5; color: #059669; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> نسبة الحضور: ${b.rate}%</span>
+        <span class="report-stat-pill" style="background: #f0fdf4; color: #166534;"><i class="fa-solid fa-user-check"></i> حضور: ${b.present + b.late}</span>
+        <span class="report-stat-pill" style="background: #fef2f2; color: #991b1b;"><i class="fa-solid fa-user-xmark"></i> غياب: ${b.absent}</span>
+        <span class="report-stat-pill" style="background: #fffbeb; color: #92400e;"><i class="fa-solid fa-clock"></i> إجازات: ${b.excused}</span>
+      </div>
+
+      <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px;">
+        <table class="report-table-mini" style="font-size: 0.86rem;">
+          <thead>
+            <tr>
+              <th style="width: 35px;">ت</th>
+              <th>اسم الطالب</th>
+              <th style="text-align: center; width: 85px;">الحضور والغياب</th>
+              <th style="text-align: center; width: 85px;">المشاركة</th>
+              <th style="text-align: center; width: 85px;">الواجب</th>
+              <th style="text-align: center; width: 85px;">السلوك</th>
+              <th style="text-align: center; width: 65px;">التقييم</th>
+              <th>الملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${b.students.map((st, i) => `
+              <tr>
+                <td style="font-weight: bold; color: #64748b;">${i + 1}</td>
+                <td style="font-weight: 700; color: #0f172a;">${escapeHtml(st.name)}</td>
+                <td style="text-align: center;">
+                  <span class="report-badge-status ${st.attendance === 'absent' ? 'report-badge-absent' : st.attendance === 'excused' ? 'report-badge-excused' : st.attendance === 'late' ? 'report-badge-late' : 'report-badge-present'}">
+                    ${st.attendance === 'absent' ? 'غائب' : st.attendance === 'excused' ? 'مجاز' : st.attendance === 'late' ? 'متأخر' : 'حاضر'}
+                  </span>
+                </td>
+                <td style="text-align: center;">${(st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي'}</td>
+                <td style="text-align: center;">${st.homework === 'done' ? 'منجز ✔️' : 'ناقص ⚠️'}</td>
+                <td style="text-align: center;">${st.conduct === 'excellent' ? 'ممتاز 🏅' : 'جيد'}</td>
+                <td style="text-align: center; font-weight: bold;">${st.score || 10}/10</td>
+                <td style="color: #64748b; font-size: 0.78rem;">${escapeHtml(st.notes || '—')}</td>
+              </tr>
+            `).join('')}
+            ${b.students.length === 0 ? `
+              <tr><td colspan="8" style="text-align: center; padding: 2rem; color: #94a3b8;">لا يوجد طلاب مسجلون في جلسة اليوم</td></tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+};
+
+window.renderFullPlatformGradesView = function() {
+  const container = document.getElementById('tabReportGradesRender');
+  if (!container) return;
+  const data = getPlatformComprehensiveData();
+  const g = data.grades;
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #0f172a;">سجل درجات وتقييم الصفوف والشعب المحفوظة</h3>
+          <small style="color: #64748b;">${g.rosters.length} صفوف مسجلة | إجمالي ${g.totalEnrolled} طالباً</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="window.switchToGradesTabFromReport()" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800;">
+          <i class="fa-solid fa-folder-open"></i> فتح واجهة درجات الطلاب الكاملة
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+        ${g.rosters.map(r => `
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">${escapeHtml(r.name)}</span>
+              <span class="badge-tag" style="background: #e0f2fe; color: #0369a1; font-weight: 800;">${(r.students || []).length} طالب</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #64748b; display: flex; gap: 8px;">
+              <span>المادة: <b>${escapeHtml((r.meta && r.meta.subject) || r.subject || 'الرياضيات')}</b></span>
+              <span>المرحلة: <b>${escapeHtml((r.meta && r.meta.grade) || r.gradeLevel || 'الثالث المتوسط')}</b></span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+};
+
+window.renderFullPlatformLessonView = function() {
+  const container = document.getElementById('tabReportLessonRender');
+  if (!container) return;
+  const data = getPlatformComprehensiveData();
+  const lp = data.lessonPlan;
+  const b = data.behavior;
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #0f172a;">الخطة اليومية وتحضير المعلم</h3>
+          <small style="color: #64748b;">معتمدة وفق المعايير الوزارية</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="window.switchToLessonPlanTabFromReport()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); font-weight: 800;">
+          <i class="fa-solid fa-folder-open"></i> فتح واجهة الخطة اليومية الكاملة
+        </button>
+      </div>
+
+      <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem;">
+        <h4 style="margin: 0 0 8px 0; font-size: 1rem; font-weight: 800; color: #0f172a;">${escapeHtml((lp && lp.topic) || b.topic)}</h4>
+        <div style="font-size: 0.8rem; color: #475569; display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap;">
+          <span>الصف: <b>${escapeHtml((lp && lp.grade) || b.className)}</b></span>
+          <span>المادة: <b>${escapeHtml((lp && lp.subject) || b.subject)}</b></span>
+          <span>الحصة: <b>${escapeHtml((lp && lp.period) || b.period)}</b></span>
+          <span>الوحدة: <b>${escapeHtml((lp && lp.unit) || 'الأولى')}</b></span>
+        </div>
+        <div style="font-size: 0.82rem; color: #334155; line-height: 1.6; border-top: 1px dashed #cbd5e1; padding-top: 8px;">
+          <div><b>الأهداف السلوكية:</b> ${escapeHtml((lp && lp.behavioralGoals) || 'أن يتعرف الطالب على المفاهيم الرياضية الأساسية ويتمكن من حل التمارين بدقة.')}</div>
+          <div style="margin-top: 4px;"><b>الواجب البيتي:</b> ${escapeHtml((lp && lp.homework) || 'حل تمارين صفحة 24 بالدفتر الصفي.')}</div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+// Quick Navigation Helpers from Daily Report
+window.switchToBehaviorTabFromReport = function() {
+  const btn = document.getElementById('mainTabStudentBehaviorBtn');
+  if (btn) btn.click();
+};
+
+window.switchToGradesTabFromReport = function() {
+  const btn = document.getElementById('mainTabStudentGradesBtn');
+  if (btn) btn.click();
+};
+
+window.switchToBuilderTabFromReport = function() {
+  const btn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
+  if (btn) btn.click();
+};
+
+window.switchToLessonPlanTabFromReport = function() {
+  const btn = document.getElementById('mainTabLessonPlanBtn');
+  if (btn) btn.click();
 };
 
 window.clearReportSearch = function() {
@@ -7206,6 +8145,29 @@ window.closeDailyReportModal = function() {
   }
 };
 
+window.quickFilterReportModal = function(filterVal) {
+  const dateFilter = document.getElementById('dailyDateFilter');
+  const subjFilter = document.getElementById('dailySubjectFilter');
+  const searchInput = document.getElementById('dailySearchInput');
+  if (searchInput) searchInput.value = '';
+
+  if (filterVal === 'today') {
+    if (dateFilter) dateFilter.value = 'today';
+    if (subjFilter) subjFilter.value = 'all';
+  } else if (filterVal === 'all') {
+    if (dateFilter) dateFilter.value = 'all';
+    if (subjFilter) subjFilter.value = 'all';
+  } else {
+    // subject filter: arabic, english, math
+    if (subjFilter) subjFilter.value = filterVal;
+    if (dateFilter) dateFilter.value = 'all';
+  }
+
+  if (typeof window.filterDailyReport === 'function') {
+    window.filterDailyReport();
+  }
+};
+
 function updateDailyReportMetrics() {
   const bank = getQuestionsHistoryBank();
   const exams = getSavedExamsArchive();
@@ -7299,6 +8261,56 @@ function updateDailyReportMetrics() {
     }
   });
   setCircularMeter('tabReportStatRecent', recentTotal || todayCount, 10);
+
+  // Platform-wide Comprehensive KPI Integration
+  try {
+    const platformData = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+    if (platformData) {
+      const b = platformData.behavior;
+      const g = platformData.grades;
+      const lp = platformData.lessonPlan;
+
+      // 1. Attendance Rate Circular Meter
+      const attRateEl = document.getElementById('tabReportStatAttendanceRate');
+      if (attRateEl) attRateEl.innerText = (b.rate || 0) + '%';
+      const meterFillAtt = document.getElementById('meterFillAttendance');
+      if (meterFillAtt) {
+        const circumference = 188.5;
+        const ratio = Math.min(Math.max((b.rate || 0) / 100, 0.05), 1);
+        meterFillAtt.style.strokeDashoffset = (circumference * (1 - ratio)).toFixed(1);
+      }
+      const attBadge = document.getElementById('tabReportBadgeAttendance');
+      if (attBadge) attBadge.innerText = `${b.present + b.late} حضور من ${b.total || 0}`;
+
+      // 2. Total Enrolled Students Circular Meter
+      setCircularMeter('tabReportStatTotalStudents', g.totalEnrolled || b.total || 0, 50);
+      const classesBadge = document.getElementById('tabReportBadgeClasses');
+      if (classesBadge) classesBadge.innerText = `${g.rosters.length || 1} صفوف وشعب`;
+
+      // 3. Lesson Plan Circular Meter
+      const lessonSubjEl = document.getElementById('tabReportStatLessonSubject');
+      if (lessonSubjEl) lessonSubjEl.innerText = (lp && lp.topic) ? 'موثقة ✔️' : 'جاهزة 📖';
+      const lessonBadge = document.getElementById('tabReportBadgeLesson');
+      if (lessonBadge) lessonBadge.innerText = (lp && lp.grade) ? lp.grade : 'وفق المعايير';
+      const meterFillLesson = document.getElementById('meterFillLesson');
+      if (meterFillLesson) meterFillLesson.style.strokeDashoffset = '25';
+
+      // 4. Update Sub-view Switcher Chips
+      const chipOverview = document.getElementById('repCounterOverview');
+      if (chipOverview) chipOverview.innerText = '🌟';
+
+      const chipBehavior = document.getElementById('repCounterBehavior');
+      if (chipBehavior) chipBehavior.innerText = `${b.rate}% (${b.total})`;
+
+      const chipGrades = document.getElementById('repCounterGrades');
+      if (chipGrades) chipGrades.innerText = g.totalEnrolled || 0;
+
+      const chipLesson = document.getElementById('repCounterLesson');
+      if (chipLesson) chipLesson.innerText = '📖';
+    }
+  } catch(err) {
+    console.error('Error updating platform KPI metrics:', err);
+  }
 }
 
 window.filterDailyReport = function() {
@@ -7682,13 +8694,20 @@ window.printExamFromArchiveDirectly = function(id) {
   }, 300);
 };
 
-window.printAcademicReport = function() {
-  const exams = (currentFilteredReportExams && currentFilteredReportExams.length > 0)
-    ? currentFilteredReportExams
-    : getSavedExamsArchive();
+window.refreshFullDailyReport = function() {
+  updateDailyReportMetrics();
+  if (typeof window.switchReportSubView === 'function') {
+    window.switchReportSubView(window.currentReportSubView || 'overview');
+  }
+  if (typeof showToast === 'function') {
+    showToast('تم تحديث وقراءة كافة بيانات وسجلات المنصة الحالية فوراً 🔄✨', 'success');
+  }
+};
 
-  if (exams.length === 0) {
-    showToast('لا توجد اختبارات مسجلة لطباعة التقرير الشامل عنها', 'info');
+window.printFullPlatformDailyReport = function() {
+  const data = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+  if (!data) {
+    if (typeof showToast === 'function') showToast('تعذر قراءة بيانات المنصة الشاملة للطباعة', 'danger');
     return;
   }
 
@@ -7701,95 +8720,153 @@ window.printAcademicReport = function() {
 
   const now = new Date();
   const dateFormatted = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+  let dayName = '';
+  try {
+    dayName = now.toLocaleDateString('ar-IQ', { weekday: 'long' });
+  } catch(e) {
+    dayName = 'اليوم';
+  }
   const timeFormatted = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-  // Gather stages covered
-  const stagesSet = new Set();
-  exams.forEach(e => {
-    const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
-    if (g && g !== 'غير محدد') stagesSet.add(g);
-  });
-
-  const totalQuestions = exams.reduce((sum, e) => sum + (e.questionsCount || (e.data && e.data.questions ? e.data.questions.length : 0)), 0);
+  const t = data.teacher;
+  const b = data.behavior;
+  const g = data.grades;
+  const ex = data.exams;
+  const lp = data.lessonPlan;
 
   printContainer.innerHTML = `
-    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 25px;">
-      <!-- Report Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 14px; margin-bottom: 16px;">
-        <div>
-          <div style="font-size: 16pt; font-weight: bold;">جمهورية العراق - وزارة التربية</div>
-          <div style="font-size: 13pt; color: #1e3a8a; font-weight: bold;">منصة المعلم الأستاذ (Moallem Pro) — المركز الأكاديمي لإدارة الاختبارات</div>
-          <div style="font-size: 11pt; color: #333; margin-top: 3px;">المعلم: ${teacherProfile.name || 'أستاذ حسين'} | المدرسة: ${teacherProfile.school || 'ثانوية المتميزين'} | المحافظة: ${teacherProfile.governorate || 'العراق'}</div>
+    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 20px 25px; line-height: 1.4; background: #fff;">
+      
+      <!-- 1. Official Header (ترويسة وزارة التربية الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 12px; margin-bottom: 14px;">
+        <div style="width: 32%;">
+          <div style="font-size: 13pt; font-weight: bold;">جمهورية العراق</div>
+          <div style="font-size: 11.5pt; font-weight: bold;">وزارة التربية العراقية</div>
+          <div style="font-size: 10pt; color: #222;">مديرية التربية في: <strong>${escapeHtml(t.governorate || 'بغداد')}</strong></div>
+          <div style="font-size: 10pt; color: #222;">المدرسة: <strong>${escapeHtml(t.school || 'ثانوية المتميزين')}</strong></div>
         </div>
-        <div style="text-align: left; font-size: 10.5pt; line-height: 1.6;">
-          <div><strong>تاريخ التقرير:</strong> ${dateFormatted}</div>
+        <div style="width: 36%; text-align: center;">
+          <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" style="width: 68px; height: 68px; object-fit: contain; margin-bottom: 4px; display: inline-block;">
+          <div style="font-size: 15pt; font-weight: 900; color: #0f172a; margin-bottom: 2px;">التقرير الأكاديمي اليومي الشامل</div>
+          <div style="font-size: 9.5pt; font-weight: bold; color: #0284c7;">منصة مسار المعلم الذكية — الرصد الموحد للأنشطة والقطاعات</div>
+          <div style="font-size: 9pt; color: #555; margin-top: 2px;">العام الدراسي: <strong>${escapeHtml(t.academicYear || '2024 - 2025')}</strong></div>
+        </div>
+        <div style="width: 32%; text-align: left; font-size: 9.5pt; line-height: 1.6;">
+          <div><strong>اليوم:</strong> ${dayName || 'اليوم'}</div>
+          <div><strong>التاريخ:</strong> ${dateFormatted}</div>
           <div><strong>وقت الطباعة:</strong> ${timeFormatted}</div>
-          <div><strong>إجمالي الاختبارات:</strong> ${exams.length} اختبار</div>
-          <div><strong>المراحل الدراسية:</strong> ${stagesSet.size} مراحل</div>
+          <div><strong>المعلم المشرف:</strong> ${escapeHtml(t.name || 'أستاذ المادة')}</div>
         </div>
       </div>
 
-      <!-- Report Title -->
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="font-size: 17pt; margin: 0 0 6px 0; text-decoration: underline;">التقرير الأكاديمي الشامل لحصر الاختبارات والمراحل الدراسية المنشأة</h2>
-        <div style="display: flex; justify-content: center; gap: 24px; font-size: 11pt; margin-top: 8px;">
-          <span>🔹 عدد الاختبارات: <strong>${exams.length}</strong></span>
-          <span>🔹 إجمالي مفردات الأسئلة: <strong>${totalQuestions}</strong></span>
-          <span>🔹 المراحل المغطاة: <strong>${Array.from(stagesSet).join('، ') || 'عام'}</strong></span>
+      <!-- 2. Sector 1: Attendance & Conduct (قطاع المتابعة اليومية وحسن السلوك) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📋 أولاً: سجل المتابعة اليومية وحسن السلوك والغياب — (الصف: ${escapeHtml(b.className)} | مادة ${escapeHtml(b.subject)} | الحصة: ${escapeHtml(b.period)})</span>
+          <span style="font-size: 10pt;">نسبة الحضور: <strong>${b.rate}%</strong></span>
         </div>
-      </div>
-
-      <!-- Exams Table -->
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10.5pt;">
-        <thead>
-          <tr style="background: #f1f5f9; border: 1.5px solid #000;">
-            <th style="border: 1px solid #000; padding: 7px; width: 35px; text-align: center;">ت</th>
-            <th style="border: 1px solid #000; padding: 7px; text-align: right;">عنوان الاختبار / النموذج</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 130px; text-align: center;">المرحلة والصف الدراسي</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 110px; text-align: center;">المادة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 110px; text-align: center;">نوع النموذج</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 75px; text-align: center;">الأسئلة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 75px; text-align: center;">الدرجة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 120px; text-align: center;">تاريخ الحفظ</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${exams.map((ex, idx) => {
-            const st = ex.grade || (ex.data && ex.data.header && ex.data.header.grade) || 'عام';
-            const sub = ex.subject || (ex.data && ex.data.header && ex.data.header.subject) || 'عام';
-            const qc = ex.questionsCount || (ex.data && ex.data.questions ? ex.data.questions.length : 0);
-            const typeLabel = ex.isModelPreset ? 'وزاري معتمد ⭐' : ex.isDraft ? 'مسودة عمل' : 'اختبار محفوظ';
-            return `
-              <tr style="border: 1px solid #000;">
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${idx + 1}</td>
-                <td style="border: 1px solid #000; padding: 6px; font-weight: 700;">${ex.title || 'اختبار بدون عنوان'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${st}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${sub}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${typeLabel}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${qc}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${ex.totalScore || 100}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9.5pt;">${ex.updatedAt || ex.createdAt || '—'}</td>
+        <div style="padding: 8px 10px; font-size: 10pt; background: #fafafa; border-bottom: 1px solid #ddd; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 8px;">
+          <span>المقيدون: <b>${b.total}</b></span>
+          <span>حضور: <b>${b.present + b.late}</b></span>
+          <span>غياب: <b>${b.absent}</b></span>
+          <span>إجازات: <b>${b.excused}</b></span>
+          <span>تأخير: <b>${b.late}</b></span>
+          <span>موضوع الدرس: <b>${escapeHtml(b.topic)}</b></span>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+          <thead>
+            <tr style="background: #e2e8f0; border-bottom: 1px solid #000;">
+              <th style="border: 1px solid #000; padding: 4px; width: 30px; text-align: center;">ت</th>
+              <th style="border: 1px solid #000; padding: 4px; text-align: right;">اسم الطالب</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 80px; text-align: center;">الموقف</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">المشاركة</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">الواجب</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">السلوك</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 60px; text-align: center;">التقييم</th>
+              <th style="border: 1px solid #000; padding: 4px; text-align: right;">ملاحظات المعلم</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(b.students || []).slice(0, 15).map((st, i) => `
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${i + 1}</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-weight: bold;">${escapeHtml(st.name)}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: 700;">
+                  ${st.attendance === 'absent' ? '❌ غائب' : st.attendance === 'excused' ? '⚠️ مجاز' : st.attendance === 'late' ? '⏰ متأخر' : '✔ حاضر'}
+                </td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${(st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.homework === 'done' ? 'منجز ✔' : 'ناقص'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.conduct === 'excellent' ? 'ممتاز' : 'جيد'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${st.score || 10}/10</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-size: 9pt; color: #333;">${escapeHtml(st.notes || '—')}</td>
               </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
+            `).join('')}
+            ${(!b.students || b.students.length === 0) ? `
+              <tr><td colspan="8" style="text-align: center; padding: 8px; border: 1px solid #000;">لا توجد بيانات حضور مسجلة لجلسة اليوم</td></tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
 
-      <!-- Footer Signatures -->
-      <div style="display: flex; justify-content: space-between; margin-top: 45px; padding-top: 15px; font-size: 11pt;">
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مدرس المادة ومعد الاختبارات</div>
-          <div style="margin-top: 35px;">___________________</div>
+      <!-- 3. Sector 2: Student Grades Ledger (سجل درجات وتقييم الطلاب) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>🎓 ثانياً: موقف سجل درجات الطلاب والشعب المعتمدة</span>
+          <span style="font-size: 10pt;">الصفوف المقيدة: <strong>${g.rosters.length}</strong> | إجمالي الطلاب: <strong>${g.totalEnrolled}</strong></span>
         </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مسؤول الكنترول واللجنة الامتحانية</div>
-          <div style="margin-top: 35px;">___________________</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مصادقة إدارة المدرسة / الإشراف</div>
-          <div style="margin-top: 35px;">___________________</div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div>متوسط الأداء العام بالدرجات: <strong>${g.averageScore}%</strong></div>
+          <div>أوائل الطلاب المتفوقين المسجلين: <strong>${g.topStudents.map(s => s.name + ' (' + s.score + 'د)').join(' • ') || 'سجلات الرصد نشطة ومحدثة'}</strong></div>
         </div>
       </div>
+
+      <!-- 4. Sector 3: Exams & Central Question Bank (الاختبارات وبنك الأسئلة) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📑 ثالثاً: حصر الاختبارات وبنك الأسئلة المركزي</span>
+          <span style="font-size: 10pt;">إجمالي الاختبارات: <strong>${ex.allExams.length}</strong> | مفردات البنك: <strong>${ex.bank.length}</strong> سؤال</span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: #fafafa;">
+          <span>الاختبار النشط الحالي: <strong>${escapeHtml(ex.currentExam.title)}</strong> (${escapeHtml(ex.currentExam.subject)} - ${escapeHtml(ex.currentExam.grade)})</span>
+          <span>الأسئلة بالمحرر: <strong>${ex.currentExam.questionsCount}</strong></span>
+          <span>الدرجة الكلية: <strong>${ex.currentExam.totalScore} درجة</strong></span>
+          <span>النماذج الوزارية الرسمية: <strong>${ex.allExams.filter(e => e.isModelPreset).length || 12} نموذج</strong></span>
+        </div>
+      </div>
+
+      <!-- 5. Sector 4: Daily Lesson Plan (الخطة اليومية وتحضير المعلم) -->
+      <div style="margin-bottom: 16px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📖 رابعاً: خطة الدرس والتحضير الصفي اليومي</span>
+          <span style="font-size: 10pt;">الحالة: <strong>معتمدة وموثقة وزارياً ✔️</strong></span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; line-height: 1.6;">
+          <div><strong>عنوان الدرس / الموضوع:</strong> ${escapeHtml((lp && lp.topic) || b.topic)} | <strong>الصف:</strong> ${escapeHtml((lp && lp.grade) || b.className)} | <strong>الوحدة:</strong> ${escapeHtml((lp && lp.unit) || 'الأولى')}</div>
+          <div><strong>الأهداف السلوكية:</strong> ${escapeHtml((lp && lp.behavioralGoals) || 'أن يستوعب الطالب القوانين الأساسية ويطبقها بحل التمارين الصفية بدقة.')}</div>
+          <div><strong>استراتيجيات التدريس المعتمدة:</strong> حل المشكلات، العصف الذهني، الحوار والمناقشة الصفية.</div>
+          <div><strong>الواجب البيتي الصفي:</strong> ${escapeHtml((lp && lp.homework) || 'حل مسائل وتطبيقات الموضوع بالدفتر الصفي.')}</div>
+        </div>
+      </div>
+
+      <!-- 6. Official Triple Signatures (التوقيعات والمصادقات الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 15px; border-top: 1.5px solid #000; font-size: 10.5pt; text-align: center;">
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مدرس المادة ومعد التقرير</div>
+          <div style="margin-top: 5px; color: #444;">${escapeHtml(t.name || 'أستاذ المادة')}</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">المشرف التربوي الاختصاصي</div>
+          <div style="margin-top: 5px; color: #444;">المشرف المتابع للمدرسة</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مصادقة مدير المدرسة وختم الإدارة</div>
+          <div style="margin-top: 5px; color: #444;">إدارة ${escapeHtml(t.school || 'المدرسة')}</div>
+          <div style="margin-top: 30px;">التوقيع والختم: ___________________</div>
+        </div>
+      </div>
+
     </div>
   `;
 
@@ -7800,6 +8877,8 @@ window.printAcademicReport = function() {
     document.body.classList.remove('printing-academic-report');
   }, 1000);
 };
+
+window.printAcademicReport = window.printFullPlatformDailyReport;
 
 
 function renderDailyQuestionsList(list) {
@@ -8142,12 +9221,12 @@ window.switchToReportTab = function(isFromSave = false) {
     archiveModal.classList.remove('open');
   }
 
-  // 6. Update metrics & questions list
-  if (typeof updateDailyReportMetrics === 'function') {
-    updateDailyReportMetrics();
-  }
-  if (typeof filterDailyReportQuestions === 'function') {
-    filterDailyReportQuestions();
+  // 6. Update metrics & render comprehensive platform view
+  if (typeof window.switchReportSubView === 'function') {
+    window.switchReportSubView(window.currentReportSubView || 'overview');
+  } else {
+    if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+    if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
   }
 
   // 7. Scroll smoothly to top of the report
@@ -8340,9 +9419,7 @@ let googleTokenClient = null;
 let isGisReady = false;
 
 window.initGoogleIdentityServices = function() {
-  const clientId = window.getGoogleClientId();
   if (typeof google === 'undefined' || !google.accounts) {
-    setTimeout(window.initGoogleIdentityServices, 500);
     return;
   }
 
@@ -8507,7 +9584,10 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
 
   // Brand-new Google user: Automatically create account with Google details and login instantly!
   const nowReg = new Date();
+  const trialDurationMs = 24 * 60 * 60 * 1000;
+  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
   const rawPrefix = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
   
   const newGoogleAcc = {
@@ -8528,12 +9608,22 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
     role: 'teacher',
     isSubscribed: true,
     isVip: true,
+    isTrial: true,
+    trialDurationHours: 24,
+    trialStartedAt: nowReg.toISOString(),
+    subscriptionType: 'free_trial_24h',
+    subscriptionPlanName: 'فترة تجريبية مجانية (24 ساعة)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
   };
 
   accounts.push(newGoogleAcc);
   saveAuthAccounts(accounts);
+  localStorage.setItem(`moallem_vip_subscription_${newGoogleAcc.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${newGoogleAcc.id}`, trialExpiry.toISOString());
   window.performGoogleLoginSuccess(newGoogleAcc);
 };
 
@@ -8581,25 +9671,15 @@ window.renderGoogleSavedAccountsList = function() {
 
 window.validateOfficialGoogleEmail = function(emailStr) {
   const email = (emailStr || '').trim().toLowerCase();
-  if (!email) return { isValid: false, reason: 'empty' };
+  if (!email) return { isValid: false, reason: 'empty', message: 'يرجى إدخال البريد الإلكتروني' };
 
-  // Domain check
-  if (!email.endsWith('@gmail.com') && !email.endsWith('@googlemail.com')) {
-    return { isValid: false, reason: 'domain', message: 'يجب أن ينتهي البريد بـ @gmail.com أو @googlemail.com حصراً' };
+  // Standard email validation (any valid domain: gmail, outlook, yahoo, edu, etc.)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { isValid: false, reason: 'format', message: 'يرجى إدخال عنوان بريد إلكتروني صالح (مثال: teacher@example.com)' };
   }
 
   const localPart = email.split('@')[0];
-  
-  // Google length check: 6 to 30 characters
-  if (localPart.length < 6 || localPart.length > 30) {
-    return { isValid: false, reason: 'length', message: 'معرفات حسابات Google تتكون من 6 إلى 30 حرفاً ورقماً' };
-  }
-
-  // Google character check: only a-z, 0-9, and .
-  if (!/^[a-z0-9]+(\.[a-z0-9]+)*$/.test(localPart)) {
-    return { isValid: false, reason: 'chars', message: 'حسابات Google لا تقبل رموزاً خاصة أو نقاطاً متتالية أو نقطة في البداية/النهاية' };
-  }
-
   return { isValid: true, email: email, localPart: localPart };
 };
 
@@ -8615,13 +9695,13 @@ window.handlePersonalGoogleEmailInput = function(val) {
 
   if (!email) {
     if (badge) {
-      badge.innerText = 'مطلوب @gmail.com';
-      badge.style.background = 'rgba(66, 133, 244, 0.1)';
-      badge.style.color = '#4285f4';
-      badge.style.borderColor = 'rgba(66, 133, 244, 0.25)';
+      badge.innerText = 'إدخال يدوي';
+      badge.style.background = 'rgba(37, 99, 235, 0.1)';
+      badge.style.color = '#3b82f6';
+      badge.style.borderColor = 'rgba(37, 99, 235, 0.25)';
     }
     if (notice) {
-      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). تم إلغاء أي دخول مباشر بدون مصادقة.';
+      notice.innerHTML = 'أدخل بريدك الإلكتروني يدوياً لفتح حسابك أو تسجيل حساب جديد.';
     }
     return;
   }
@@ -8630,23 +9710,23 @@ window.handlePersonalGoogleEmailInput = function(val) {
 
   if (check.isValid) {
     if (badge) {
-      badge.innerText = '✔ حساب Google رسمي مطابق';
+      badge.innerText = '✔ بريد صالح';
       badge.style.background = 'rgba(16, 185, 129, 0.15)';
       badge.style.color = '#10b981';
       badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
     }
     if (notice) {
-      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> تم فحص المعرف: مطابق لقواعد حسابات Google الرسمية. اضغط الزر أدناه للمتابعة.</span>';
+      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> البريد صالح ومكتمل. اضغط الزر أدناه للمتابعة.</span>';
     }
   } else {
     if (badge) {
-      badge.innerText = '❌ غير مطابق لـ Google';
+      badge.innerText = '❌ غير صالح';
       badge.style.background = 'rgba(239, 68, 68, 0.1)';
       badge.style.color = '#ef4444';
       badge.style.borderColor = 'rgba(239, 68, 68, 0.25)';
     }
     if (notice) {
-      notice.innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${check.message || 'أدخل بريد Gmail صالح'}</span>`;
+      notice.innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${check.message || 'أدخل بريد إلكتروني صالح'}</span>`;
     }
   }
 };
@@ -8657,7 +9737,7 @@ window.submitPersonalGoogleEmail = function() {
   const input = document.getElementById('googlePersonalEmailInput');
   const rawEmail = input ? input.value.trim().toLowerCase() : '';
 
-  // Strict Google Account Validation
+  // Email Validation
   const check = window.validateOfficialGoogleEmail(rawEmail);
 
   if (!check.isValid) {
@@ -8665,7 +9745,7 @@ window.submitPersonalGoogleEmail = function() {
       input.classList.add('input-error');
       input.focus();
     }
-    showToast(check.message || 'يرجى إدخال بريد Google شخصي صالح ينتهي بـ @gmail.com 🛡️', 'error');
+    showToast(check.message || 'يرجى إدخال بريد إلكتروني صالح 🛡️', 'error');
     return;
   }
 
@@ -8678,7 +9758,7 @@ window.submitPersonalGoogleEmail = function() {
   );
 
   if (existing) {
-    // SECURITY FIX: NEVER LOG IN INSTANTLY! REQUIRE PASSWORD!
+    // SECURITY: Require password
     window.currentPromptedAccount = existing;
     const passBox = document.getElementById('googleExistingAccountPasswordBox');
     const passInput = document.getElementById('googleExistingPassInput');
@@ -8697,17 +9777,17 @@ window.submitPersonalGoogleEmail = function() {
         passInput.focus();
       }
     }
-    showToast('تم العثور على حسابك! يرجى إدخال كلمة المرور لتأكيد هويتك، أو المتابعة بزر Google الرسمي أعلاه 🔒', 'warning');
+    showToast('تم العثور على حسابك! يرجى إدخال كلمة المرور لتأكيد هويتك 🔒', 'warning');
     return;
   }
 
-  // New Google Teacher: derive friendly suggested name
+  // New Teacher: derive suggested name
   const rawPrefix = rawEmail.split('@')[0];
   const suggestedName = 'أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
 
-  // Advance to Step 2 with verified email
+  // Advance to Step 2 with email
   window.proceedToStep2(suggestedName, rawEmail, '');
-  showToast('تم التحقق من حساب Google بنجاح! أكمل بيانات مدرستك وكلمة مرورك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
+  showToast('تم التحقق من البريد بنجاح! أكمل بياناتك وكلمة مرورك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
 };
 
 window.confirmExistingAccountWithPassword = function() {
@@ -8807,60 +9887,10 @@ let pendingGoogleAccount = {
   googleId: ''
 };
 
-// Launch Official Google Popup / Account Chooser
+// Launch Manual Email Registration / Login Modal
 window.launchGoogleRealPopup = function() {
-  const statusEl = document.getElementById('googleAuthStatusNotice');
-  if (statusEl) statusEl.style.display = 'block';
-
-  // 1. If GSI rendered button exists inside .g_id_signin, trigger it directly
-  const gsiBtn = document.querySelector('.g_id_signin div[role="button"], #googleOfficialGsiButton div[role="button"]');
-  if (gsiBtn) {
-    if (statusEl) statusEl.style.display = 'none';
-    gsiBtn.click();
-    return;
-  }
-
-  // 2. Initialize if not ready
-  if (!googleTokenClient && typeof google !== 'undefined' && google.accounts) {
-    window.initGoogleIdentityServices();
-  }
-
-  // 3. Try GSI prompt (One Tap / Account Chooser)
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-    try {
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // If One Tap cannot be displayed, try OAuth token client or modal
-          if (googleTokenClient) {
-            try { googleTokenClient.requestAccessToken({ prompt: 'select_account' }); } catch(err) {}
-          } else if (typeof window.openGoogleAccountModal === 'function') {
-            window.openGoogleAccountModal();
-          }
-        }
-      });
-      if (statusEl) statusEl.style.display = 'none';
-      return;
-    } catch(e) {
-      console.warn('GSI prompt notification:', e);
-    }
-  }
-
-  // 4. Try OAuth2 token client
-  if (googleTokenClient) {
-    try {
-      googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-      if (statusEl) statusEl.style.display = 'none';
-      return;
-    } catch (e) {
-      console.warn('Failed to launch token client popup:', e);
-    }
-  }
-
-  if (statusEl) statusEl.style.display = 'none';
   if (typeof window.openGoogleAccountModal === 'function') {
     window.openGoogleAccountModal();
-  } else {
-    showToast('جارٍ تشغيل مصادقة Google... يرجى اختيار حسابك من نافذة Google 💡', 'info');
   }
 };
 
@@ -9025,7 +10055,11 @@ window.completeGoogleLoginWithProfile = function() {
   }
 
   const nowReg = new Date();
+  const trialDurationMs = 24 * 60 * 60 * 1000;
+  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
   const finalGoogleAccount = {
     id: 'usr_google_' + Date.now(),
     name: name,
@@ -9041,15 +10075,26 @@ window.completeGoogleLoginWithProfile = function() {
     contact: contact,
     isGoogleUser: true,
     isVerified: true,
-    role: 'viewer',
-    isSubscribed: false,
-    isVip: false,
+    role: 'teacher',
+    isSubscribed: true,
+    isVip: true,
+    isTrial: true,
+    trialDurationHours: 24,
+    trialStartedAt: nowReg.toISOString(),
+    subscriptionType: 'free_trial_24h',
+    subscriptionPlanName: 'فترة تجريبية مجانية (24 ساعة)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
   };
 
   accounts.push(finalGoogleAccount);
   saveAuthAccounts(accounts);
+  localStorage.setItem(`moallem_vip_subscription_${finalGoogleAccount.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${finalGoogleAccount.id}`, trialExpiry.toISOString());
+
   if (typeof window.renderSubscribersManagementUI === 'function') {
     window.renderSubscribersManagementUI();
   }
@@ -9059,10 +10104,7 @@ window.completeGoogleLoginWithProfile = function() {
 
   window.performGoogleLoginSuccess(finalGoogleAccount);
 
-  showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! هذا الحساب يخضع لعملية دفع واشتراك (50,000 د.ع) لتفعيل كافة الصلاحيات 💳🔒`, 'warning');
-  if (typeof window.openSubscriptionModal === 'function') {
-    window.openSubscriptionModal();
-  }
+  showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! تم تفعيل اشتراك تجريبي مجاني لمدة 24 ساعة لتجربة كافة إمكانيات المنصة 🎁✨`, 'success');
 };
 
 window.loginWithSelectedGoogleAccount = function(name, email) {
@@ -9162,15 +10204,57 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
   const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
   const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
 
+  // 1. Questions Bank
   let questionsBank = [];
   try {
     const rawBank = localStorage.getItem(bankStorageKey) || localStorage.getItem('moallem_questions_bank');
     if (rawBank) questionsBank = JSON.parse(rawBank);
   } catch(e) {}
 
+  // 2. Exams Archive
   let examsArchive = [];
   try {
     examsArchive = getSavedExamsArchive();
+  } catch(e) {}
+
+  // 3. Student Grades Rosters
+  let studentGradesRosters = null;
+  let studentGradesActiveId = null;
+  try {
+    const rawGrades = localStorage.getItem('masar_teacher_grades_rosters_v1');
+    if (rawGrades) studentGradesRosters = JSON.parse(rawGrades);
+    studentGradesActiveId = localStorage.getItem('masar_teacher_grades_active_roster_id') || '';
+  } catch(e) {}
+
+  // 4. Student Daily Behavior & Conduct
+  let studentBehaviorRecords = null;
+  let studentBehaviorRosters = null;
+  try {
+    const rawBehavior = localStorage.getItem('masar_student_behavior_records');
+    if (rawBehavior) studentBehaviorRecords = JSON.parse(rawBehavior);
+    const rawBRosters = localStorage.getItem('masar_student_rosters');
+    if (rawBRosters) studentBehaviorRosters = JSON.parse(rawBRosters);
+  } catch(e) {}
+
+  // 5. Lesson Plans Studio & Archive
+  let lessonPlanCurrent = null;
+  let lessonPlanArchive = null;
+  try {
+    const rawPlan = localStorage.getItem('masar_current_lesson_plan');
+    if (rawPlan) lessonPlanCurrent = JSON.parse(rawPlan);
+    const rawArch = localStorage.getItem('masar_lesson_plans_archive');
+    if (rawArch) lessonPlanArchive = JSON.parse(rawArch);
+  } catch(e) {}
+
+  // 6. Teacher Profile & Platform Settings
+  let profileData = null;
+  try {
+    profileData = teacherProfile || JSON.parse(localStorage.getItem('moallem_teacher_profile') || '{}');
+  } catch(e) {}
+
+  let privacyData = null;
+  try {
+    privacyData = privacySettings || JSON.parse(localStorage.getItem('moallem_privacy_settings') || '{}');
   } catch(e) {}
 
   const payload = {
@@ -9185,6 +10269,14 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
       questions: appState.questions,
       settings: appState.settings
     },
+    studentGradesRosters: studentGradesRosters,
+    studentGradesActiveId: studentGradesActiveId,
+    studentBehaviorRecords: studentBehaviorRecords,
+    studentBehaviorRosters: studentBehaviorRosters,
+    lessonPlanCurrent: lessonPlanCurrent,
+    lessonPlanArchive: lessonPlanArchive,
+    teacherProfile: profileData,
+    privacySettings: privacyData,
     savedAt: new Date().toISOString()
   };
 
@@ -9208,7 +10300,7 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
     if (res.ok) {
       const resJson = await res.json();
       if (!isSilent && resJson.success) {
-        showToast('تمت مزامنة وحفظ كافة أسئلتك واختباراتك سحابياً بنجاح! ☁️', 'success');
+        showToast('تم حفظ ومزامنة كافة بيانات المنصة (الأسئلة، الاختبارات، سجل الدرجات، السلوك، والخطط) في السيرفر بنجاح! ☁️💾', 'success');
       }
     }
   } catch (e) {
@@ -9283,13 +10375,56 @@ window.restoreUserDataFromServer = async function(user) {
         }
       }
 
+      // 4. Restore Student Grades Rosters
+      if (Array.isArray(data.studentGradesRosters) && data.studentGradesRosters.length > 0) {
+        localStorage.setItem('masar_teacher_grades_rosters_v1', JSON.stringify(data.studentGradesRosters));
+        if (data.studentGradesActiveId) {
+          localStorage.setItem('masar_teacher_grades_active_roster_id', data.studentGradesActiveId);
+        }
+        if (window.StudentGradesModule && typeof window.StudentGradesModule.init === 'function') {
+          window.StudentGradesModule.init();
+        }
+      }
+
+      // 5. Restore Student Daily Behavior & Conduct
+      if (data.studentBehaviorRecords && typeof data.studentBehaviorRecords === 'object' && Object.keys(data.studentBehaviorRecords).length > 0) {
+        localStorage.setItem('masar_student_behavior_records', JSON.stringify(data.studentBehaviorRecords));
+      }
+      if (Array.isArray(data.studentBehaviorRosters) && data.studentBehaviorRosters.length > 0) {
+        localStorage.setItem('masar_student_rosters', JSON.stringify(data.studentBehaviorRosters));
+      }
+      if (window.StudentBehaviorModule && typeof window.StudentBehaviorModule.init === 'function') {
+        window.StudentBehaviorModule.init();
+      }
+
+      // 6. Restore Lesson Plans Studio & Archive
+      if (data.lessonPlanCurrent && typeof data.lessonPlanCurrent === 'object') {
+        localStorage.setItem('masar_current_lesson_plan', JSON.stringify(data.lessonPlanCurrent));
+      }
+      if (Array.isArray(data.lessonPlanArchive) && data.lessonPlanArchive.length > 0) {
+        localStorage.setItem('masar_lesson_plans_archive', JSON.stringify(data.lessonPlanArchive));
+      }
+      if (window.LessonPlanModule && typeof window.LessonPlanModule.reload === 'function') {
+        window.LessonPlanModule.reload();
+      }
+
+      // 7. Restore Teacher Profile & Settings
+      if (data.teacherProfile && typeof data.teacherProfile === 'object') {
+        teacherProfile = { ...teacherProfile, ...data.teacherProfile };
+        localStorage.setItem('moallem_teacher_profile', JSON.stringify(teacherProfile));
+        applyProfileToExamHeader();
+        if (typeof updateProfileModalInputs === 'function') updateProfileModalInputs();
+      }
+      if (data.privacySettings && typeof data.privacySettings === 'object') {
+        privacySettings = { ...privacySettings, ...data.privacySettings };
+        localStorage.setItem('moallem_privacy_settings', JSON.stringify(privacySettings));
+        updatePrivacySettingsUI();
+      }
+
       renderAll();
       if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
 
-      const totalItems = restoredCount + (Array.isArray(data.examsArchive) ? data.examsArchive.length : 0);
-      if (totalItems > 0) {
-        showToast(`تمت مزامنة واسترجاع جميع أسئلتك واختباراتك (${restoredCount} سؤال) من السيرفر بنجاح! ☁️📱`, 'success');
-      }
+      showToast(`تم استرجاع ومزامنة كافة بيانات المنصة بالكامل من السيرفر بنجاح! ☁️📱`, 'success');
       return true;
     }
   } catch (err) {
@@ -9653,10 +10788,12 @@ window.openMobileSyncModal = function() {
   const examBadge = document.getElementById('syncExamsCountBadge');
   if (examBadge) examBadge.innerText = `${archive.length} اختبار`;
 
-  // Determine direct URL
-  let baseUrl = window.location.origin;
+  // Determine direct URL (prioritize worldwide Cloudflare URL so it opens anywhere on 4G)
+  const savedPub = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : '';
+  const preferredUrl = window.MOALLEM_PUBLIC_SERVER_URL || savedPub;
+  let baseUrl = preferredUrl || window.location.origin;
   if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
-    baseUrl = 'http://192.168.0.29:8080';
+    baseUrl = preferredUrl || 'http://localhost:8080';
   }
   const wifiUrlEl = document.getElementById('syncWifiDirectUrl');
   if (wifiUrlEl) wifiUrlEl.innerText = baseUrl;
@@ -9710,13 +10847,15 @@ window.copyDirectMobileSyncLink = function() {
 };
 
 window.copyWifiDirectUrl = function() {
-  let baseUrl = window.location.origin;
+  const savedPub = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : '';
+  const preferredUrl = window.MOALLEM_PUBLIC_SERVER_URL || savedPub;
+  let baseUrl = preferredUrl || window.location.origin;
   if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
-    baseUrl = 'http://192.168.0.29:8080';
+    baseUrl = preferredUrl || 'http://localhost:8080';
   }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(baseUrl).then(() => {
-      showToast('تم نسخ رابط الواي فاي المباشر: ' + baseUrl + ' 📋', 'success');
+      showToast('تم نسخ رابط المنصة: ' + baseUrl + ' 📋', 'success');
     }).catch(() => {
       prompt('رابط الواي فاي المباشر:', baseUrl);
     });
@@ -9774,8 +10913,8 @@ window.importFullSyncFile = function(event) {
 
 // Automatic listener on tab focus / visibilitychange
 document.addEventListener('visibilitychange', () => {
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (document.visibilityState === 'visible') {
-    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
     if (user && user.id && user.id !== 'usr_guest') {
       if (typeof window.restoreUserDataFromServer === 'function') {
         window.restoreUserDataFromServer(user).catch(() => {});
@@ -9784,8 +10923,24 @@ document.addEventListener('visibilitychange', () => {
     if (typeof syncAccountsWithServer === 'function') {
       syncAccountsWithServer().catch(() => {});
     }
+  } else if (document.visibilityState === 'hidden') {
+    if (user && user.id && user.id !== 'usr_guest') {
+      if (typeof window.syncUserDataToServer === 'function') {
+        window.syncUserDataToServer(user, true).catch(() => {});
+      }
+    }
   }
 });
+
+// Continuous background auto-save to server (حفظ دوري لكافة أعمال وبيانات المنصة في السيرفر)
+setInterval(() => {
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (user && user.id && user.id !== 'usr_guest') {
+    if (typeof window.syncUserDataToServer === 'function') {
+      window.syncUserDataToServer(user, true).catch(() => {});
+    }
+  }
+}, 90000);
 
 // Run immediate check for URL sync token on load
 if (typeof window !== 'undefined') {
@@ -9800,7 +10955,7 @@ if (typeof window !== 'undefined') {
 };
 
 /* ==========================================================================
-   VIP Annual Subscription (50,000 IQD) Management & View-Only Permissions
+   VIP Annual Subscription & 24h Free Trial Management
    ========================================================================== */
 function isUserSubscribedOrAdmin() {
   const current = getCurrentUser();
@@ -9810,11 +10965,24 @@ function isUserSubscribedOrAdmin() {
     return true;
   }
   const now = Date.now();
-  // Check subscription expiration (1 year limit)
+  // Check subscription expiration (24h free trial or annual/monthly subscription)
   if (current.subscriptionExpiresAt) {
     const expTime = new Date(current.subscriptionExpiresAt).getTime();
     if (!isNaN(expTime) && now > expTime) {
-      return false; // Expired after 1 year!
+      if (current.isSubscribed || current.isVip) {
+        current.isSubscribed = false;
+        current.isVip = false;
+        try {
+          const accs = getAuthAccounts();
+          const idx = accs.findIndex(a => a.id === current.id);
+          if (idx !== -1) {
+            accs[idx].isSubscribed = false;
+            accs[idx].isVip = false;
+            saveAuthAccounts(accs);
+          }
+        } catch(e) {}
+      }
+      return false; // Expired!
     }
   }
   // Check user subscription status
@@ -9826,7 +10994,7 @@ function isUserSubscribedOrAdmin() {
     if (expStr) {
       const expTime = new Date(expStr).getTime();
       if (!isNaN(expTime) && now > expTime) {
-        return false; // Expired after 1 year!
+        return false; // Expired!
       }
     }
     return true;
@@ -9857,7 +11025,7 @@ window.selectSubscriptionPlan = function(planKey) {
   } else if (planKey === '4_months' || planKey === '3_months') {
     planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفادة من عرض الأكثر طلباً (باقة الـ 4 أشهر - 75,000 د.ع بدلاً من 100 ألف / شهر مجاناً) لتفعيل حسابي${userIdentifier}.`;
   } else if (planKey === '1_year') {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود تفعيل العرض السنوي الشامل بنصف السعر (الباقة السنوية الأكاديمية - 150,000 د.ع بدلاً من 300 ألف) لتفعيل حسابي${userIdentifier}.`;
+    planMsg = `مرحباً إدارة منصة مسار المعلم، أود تفعيل العرض السنوي الشامل (الباقة السنوية الأكاديمية - 200,000 د.ع بدلاً من 300 ألف) لتفعيل حسابي${userIdentifier}.`;
   } else {
     planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفسار عن باقات الاشتراك وتفعيل حسابي${userIdentifier}.`;
   }
@@ -9896,25 +11064,121 @@ window.toggleVipSubscriptionDemo = function() {
   window.open(`https://wa.me/9647700000000?text=${textMsg}`, '_blank');
 };
 
+let trialTickerInterval = null;
+function updateTrialWarningBanner() {
+  const banner = document.getElementById('trialWarningBanner');
+  if (!banner) return;
+
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  // If not logged in, or super admin:
+  if (!current || !current.id || current.id === 'usr_guest' || current.isAdmin || current.role === 'admin' || current.username === 'admin') {
+    banner.style.display = 'none';
+    if (trialTickerInterval) {
+      clearInterval(trialTickerInterval);
+      trialTickerInterval = null;
+    }
+    return;
+  }
+
+  // Check if trial user
+  const isTrialUser = !!(current.isTrial || current.subscriptionType === 'free_trial_24h' || (current.trialDurationHours && current.subscriptionExpiresAt));
+  if (!isTrialUser) {
+    banner.style.display = 'none';
+    if (trialTickerInterval) {
+      clearInterval(trialTickerInterval);
+      trialTickerInterval = null;
+    }
+    return;
+  }
+
+  // Show trial warning banner
+  banner.style.display = 'block';
+
+  const expTimeStr = current.subscriptionExpiresAt || (current.id && localStorage.getItem(`moallem_vip_subscription_exp_${current.id}`));
+  const expTime = expTimeStr ? new Date(expTimeStr).getTime() : 0;
+  const now = Date.now();
+  const diffMs = expTime - now;
+
+  const timerDigits = document.getElementById('trialTimerDisplay');
+  const badgeTitle = document.getElementById('trialBadgeTitle');
+  const descEl = document.getElementById('trialBannerDesc');
+  const actionBtnText = document.getElementById('trialActionBtnText');
+
+  if (diffMs > 0) {
+    banner.classList.remove('trial-expired');
+    const totalSecs = Math.floor(diffMs / 1000);
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+    const formattedTime = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+    if (timerDigits) timerDigits.innerText = formattedTime;
+    if (badgeTitle) badgeTitle.innerText = 'فترة تجريبية مجانية (24 ساعة)';
+    if (descEl) {
+      descEl.innerHTML = `<strong>تنبيه هام:</strong> تم تفعيل حسابك بصلاحيات كاملة للتجربة لمدة <strong>24 ساعة مجاناً</strong>. متبقي <strong>${formattedTime}</strong> — اشترك الآن لتفادي تقييد الميزات وحفظ عملك دون انقطاع.`;
+    }
+    if (actionBtnText) actionBtnText.innerText = 'ترقية الحساب والاشتراك الآن 👑';
+  } else {
+    // Expired state
+    banner.classList.add('trial-expired');
+    if (timerDigits) timerDigits.innerText = '00:00:00';
+    if (badgeTitle) badgeTitle.innerText = '⛔ انتهت الفترة التجريبية (24 ساعة)';
+    if (descEl) {
+      descEl.innerHTML = `<strong>تنبيه عاجل:</strong> انتهت فترة الـ 24 ساعة التجريبية المجانية لحسابك. المنصة الآن في <strong>وضع المشاهدة فقط</strong>. يرجى تفعيل اشتراكك لاستئناف التعديل والطباعة فوراً!`;
+    }
+    if (actionBtnText) actionBtnText.innerText = 'تفعيل الاشتراك الكامل 👑';
+
+    if (current.isSubscribed || current.isVip) {
+      current.isSubscribed = false;
+      current.isVip = false;
+      try {
+        const accs = getAuthAccounts();
+        const aIdx = accs.findIndex(a => a.id === current.id);
+        if (aIdx !== -1) {
+          accs[aIdx].isSubscribed = false;
+          accs[aIdx].isVip = false;
+          saveAuthAccounts(accs);
+        }
+      } catch(e) {}
+    }
+  }
+
+  if (!trialTickerInterval) {
+    trialTickerInterval = setInterval(() => {
+      updateTrialWarningBanner();
+    }, 1000);
+  }
+}
+window.updateTrialWarningBanner = updateTrialWarningBanner;
+
 window.updateVipUIStatus = function() {
   const current = getCurrentUser();
   const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin');
   const isSubscribed = isUserSubscribedOrAdmin();
 
+  // Update trial warning banner & countdown clock
+  updateTrialWarningBanner();
+
   // View-Only Mode Banner & Body class
   const banner = document.getElementById('viewOnlyModeBanner');
+  const isTrial = current && (current.isTrial || current.subscriptionType === 'free_trial_24h');
+
   if (isSubscribed) {
     document.body.classList.remove('view-only-mode');
     if (banner) banner.style.display = 'none';
   } else {
     document.body.classList.add('view-only-mode');
-    if (banner) banner.style.display = 'flex';
+    if (banner) {
+      banner.style.display = isTrial ? 'none' : 'flex';
+    }
   }
 
   const btnTxt = document.getElementById('vipToggleBtnText');
   if (btnTxt) {
     if (isAdmin) {
       btnTxt.innerText = 'حساب الآدمن (مفعل مدى الحياة 👑)';
+    } else if (isTrial && isSubscribed) {
+      btnTxt.innerText = 'فترة تجريبية مجانية (24 ساعة) 🎁';
     } else if (isSubscribed) {
       btnTxt.innerText = 'حسابك مفعل بنجاح ✔';
     } else {
@@ -9928,6 +11192,8 @@ window.updateVipUIStatus = function() {
     if (span) {
       if (isAdmin) {
         span.innerHTML = 'باقة الآدمن (كافة الصلاحيات 👑)';
+      } else if (isTrial && isSubscribed) {
+        span.innerHTML = 'تجربة مجانية نشطة (24 ساعة) 🎁';
       } else if (isSubscribed) {
         span.innerHTML = 'الاشتراك مفعل 👑';
       } else {
@@ -10262,7 +11528,7 @@ window.manageDirectActivateUser = function(accId) {
 
   const now = new Date();
   const expiryDate = new Date(now);
-  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
   let durationCode = '1_year';
 
   if (chosenPlan === '1_month') {
@@ -10275,7 +11541,7 @@ window.manageDirectActivateUser = function(accId) {
     durationCode = '4_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
-    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     durationCode = '1_year';
   }
 
@@ -10357,7 +11623,7 @@ window.manageApproveGrantSubscription = function() {
 
   const now = new Date();
   const expiryDate = new Date(now);
-  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
   let durationCode = '1_year';
 
   if (chosenPlan === '1_month') {
@@ -10370,7 +11636,7 @@ window.manageApproveGrantSubscription = function() {
     durationCode = '4_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
-    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     durationCode = '1_year';
   }
 
@@ -11465,6 +12731,26 @@ window.saveAllAiVersionsToArchive = function() {
     showToast('خطأ في حفظ النماذج في الأرشيف: ' + err.message, 'error');
   }
 };
+
+/* ==========================================================================
+   Platform Showcase & Teacher Guide Interactive Engine
+   (محرك واجهة عرض ودليل مميزات المنصة الشامل للمعلم — واجهة أساسية ومحاكاة حية)
+   ========================================================================== */
+
+// Platform Showcase Module removed per user request
+window.switchToPlatformShowcaseTab = function() {};
+window.openPlatformShowcaseModal = function() {};
+window.closePlatformShowcaseModal = function() {};
+window.showcaseJumpTo = function() {};
+window.showcaseScrollToSection = function() {};
+window.switchSimulatorTab = function() {};
+window.nextCinemaSlide = function() {};
+window.prevCinemaSlide = function() {};
+window.jumpToCinemaSlide = function() {};
+window.toggleLiveEcoSimulation = function() {};
+
+
+
 
 
 

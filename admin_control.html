@@ -560,6 +560,41 @@
   <!-- Main Container -->
   <main class="dashboard-container">
 
+    <!-- Global Worldwide Tunnel Access Banner -->
+    <section class="global-tunnel-card" id="globalTunnelSection" style="margin-bottom: 24px;">
+      <div style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(16, 185, 129, 0.18)); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 16px; padding: 20px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.35);">
+        <div style="display: flex; align-items: center; gap: 16px; max-width: 650px;">
+          <div style="width: 52px; height: 52px; border-radius: 14px; background: linear-gradient(135deg, #0284c7, #2563eb); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #fff; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4); flex-shrink: 0;">
+            <i class="fa-solid fa-earth-americas"></i>
+          </div>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0;">رابط المنصة العالمي (Cloudflare Global Tunnel)</h2>
+              <span id="tunnelStatusBadge" class="server-badge" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;">
+                <span class="pulse-dot" style="background-color: #fbbf24; box-shadow: 0 0 10px #fbbf24;"></span>
+                جاري الاتصال بالنفق...
+              </span>
+            </div>
+            <p style="font-size: 0.85rem; color: #cbd5e1; margin: 0; line-height: 1.5;">
+              يعمل من أي موبايل أو لابتوب بالعالم، على شبكات الهاتف 4G وراوترات أخرى. وترتفع كافة البيانات تلقائياً وفوراً لقاعدة البيانات المركزية هنا!
+            </p>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1; justify-content: flex-end; min-width: 300px;">
+          <input type="text" id="globalTunnelInput" readonly value="جاري استخراج الرابط العالمي..." style="flex: 1; min-width: 260px; max-width: 440px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 10px; padding: 10px 14px; color: #38bdf8; font-family: monospace; font-size: 0.92rem; font-weight: 700; outline: none; text-align: left; direction: ltr;">
+          <button class="btn btn-primary" onclick="copyGlobalTunnelUrl()" id="btnCopyGlobalUrl">
+            <i class="fa-solid fa-copy"></i>
+            نسخ الرابط
+          </button>
+          <a id="btnOpenGlobalUrl" href="#" target="_blank" class="btn btn-outline" style="pointer-events: none; opacity: 0.5;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            فتح
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- Metrics Row -->
     <section class="metrics-grid">
       <!-- Total Accounts -->
@@ -739,6 +774,10 @@
           <div style="background: rgba(15, 23, 42, 0.7); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
             <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 4px;">نظام التشغيل ومعدل التوفر</div>
             <div style="font-weight: 800; font-size: 1.1rem; color: #34d399;">24/7 Watchdog Bot Active</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 4px;">الربط السحابي العالمي (Cloudflare Tunnel)</div>
+            <div style="font-weight: 800; font-size: 0.95rem; color: #38bdf8; word-break: break-all;" id="sys-tunnel-display">جاري التحقق...</div>
           </div>
         </div>
 
@@ -1123,10 +1162,67 @@
       });
     }
 
+    // Fetch Worldwide Public URL
+    async function fetchPublicUrl() {
+      try {
+        const res = await fetch('/api/public_url', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          const input = document.getElementById('globalTunnelInput');
+          const badge = document.getElementById('tunnelStatusBadge');
+          const openBtn = document.getElementById('btnOpenGlobalUrl');
+          const sysDisplay = document.getElementById('sys-tunnel-display');
+
+          if (data.public_url) {
+            input.value = data.public_url;
+            badge.innerHTML = `<span class="pulse-dot"></span> متصل عالمياً (Online 4G/Anywhere)`;
+            badge.style.background = 'rgba(16, 185, 129, 0.15)';
+            badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+            badge.style.color = '#34d399';
+            openBtn.href = data.public_url;
+            openBtn.style.pointerEvents = 'auto';
+            openBtn.style.opacity = '1';
+            if (sysDisplay) {
+              sysDisplay.innerHTML = `<a href="${data.public_url}" target="_blank" style="color:#38bdf8; text-decoration: underline;">${data.public_url}</a>`;
+            }
+          } else {
+            input.value = 'جاري التوليد والربط العالمي عبر Cloudflare...';
+            if (sysDisplay) {
+              sysDisplay.textContent = 'جاري الاتصال بالنفق العالمي...';
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch public url:', err);
+      }
+    }
+
+    function copyGlobalTunnelUrl() {
+      const input = document.getElementById('globalTunnelInput');
+      if (!input || !input.value || input.value.startsWith('جاري')) {
+        alert('الرابط قيد التجهيز والربط الآن، يرجى الانتظار بضع ثوانٍ...');
+        return;
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          const btn = document.getElementById('btnCopyGlobalUrl');
+          const oldHtml = btn.innerHTML;
+          btn.innerHTML = `<i class="fa-solid fa-check"></i> تم النسخ!`;
+          setTimeout(() => { btn.innerHTML = oldHtml; }, 2500);
+        }).catch(() => {
+          prompt('انسخ الرابط العالمي:', input.value);
+        });
+      } else {
+        prompt('انسخ الرابط العالمي:', input.value);
+      }
+    }
+
     // Auto-refresh stats every 8 seconds
     window.addEventListener('DOMContentLoaded', () => {
       fetchLiveStats();
+      fetchPublicUrl();
       setInterval(fetchLiveStats, 8000);
+      setInterval(fetchPublicUrl, 6000);
     });
   </script>
 </body>

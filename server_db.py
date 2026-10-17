@@ -354,14 +354,21 @@ def get_activities(limit=150, user_id=None, action_type=None):
         return logs
 
 def save_cloud_sync_data(payload):
-    """حفظ المزامنة السحابية للمستخدم (أسئلة + اختبارات + إعدادات) في قاعدة البيانات والملفات"""
+    """حفظ المزامنة السحابية للمستخدم (أسئلة + اختبارات + درجات + سلوك + خطط دراسية + إعدادات) في قاعدة البيانات والملفات"""
     email = (payload.get('email') or '').strip().lower()
     user_id = (payload.get('userId') or '').strip().lower()
     username = (payload.get('username') or '').strip().lower()
     primary_key = email or user_id or username or 'default'
 
-    questions_count = len(payload.get('questionsBank', []))
-    exams_count = len(payload.get('examsArchive', []))
+    questions_count = len(payload.get('questionsBank', []) or [])
+    exams_count = len(payload.get('examsArchive', []) or [])
+    grades_rosters = payload.get('studentGradesRosters', []) or []
+    grades_count = len(grades_rosters) if isinstance(grades_rosters, list) else 0
+    plans_archive = payload.get('lessonPlanArchive', []) or []
+    plans_count = len(plans_archive) if isinstance(plans_archive, list) else 0
+    behavior_records = payload.get('studentBehaviorRecords', {}) or {}
+    behavior_count = len(behavior_records) if isinstance(behavior_records, dict) else 0
+
     updated_at = datetime.now().isoformat()
     payload['server_saved_at'] = updated_at
 
@@ -399,21 +406,32 @@ def save_cloud_sync_data(payload):
     except Exception as e:
         logging.error(f"خطأ حفظ ملف النسخ الاحتياطي السحابي: {e}")
 
-    # تسجيل الحدث
+    # تسجيل الحدث الشامل
+    summary_parts = []
+    if questions_count: summary_parts.append(f"{questions_count} سؤال")
+    if exams_count: summary_parts.append(f"{exams_count} اختبار")
+    if grades_count: summary_parts.append(f"{grades_count} سجل درجات")
+    if plans_count: summary_parts.append(f"{plans_count} خطة درس")
+    if behavior_count: summary_parts.append(f"{behavior_count} جلسة متابعة سلوك")
+    if not summary_parts: summary_parts.append("إعدادات المنصة")
+
     log_activity(
         user_id or primary_key, 
         username or email or 'مستخدم', 
-        'مزامنة سحابية وحفظ بيانات', 
-        f"تم حفظ {questions_count} سؤال و {exams_count} اختبار في السيرفر", 
+        'مزامنة سحابية وحفظ بيانات المنصة كاملة', 
+        f"تم حفظ ومزامنة المنصة بالكامل: {', '.join(summary_parts)} في السيرفر", 
         action_type='CLOUD_SYNC',
-        user_name=payload.get('name', '')
+        user_name=payload.get('teacherName') or payload.get('name', '')
     )
 
     return {
         'success': True,
         'timestamp': updated_at,
         'questions_count': questions_count,
-        'exams_count': exams_count
+        'exams_count': exams_count,
+        'grades_count': grades_count,
+        'plans_count': plans_count,
+        'behavior_count': behavior_count
     }
 
 def get_cloud_sync_data(keys):
