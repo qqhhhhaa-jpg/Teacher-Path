@@ -7584,7 +7584,7 @@ function renderPaperQuestions() {
 
   if (appState.questions.length === 0) {
     paperDoc.innerHTML = `
-      <article class="exam-paper exam-paper-page" id="examPaperPage_1" data-page="1">
+      <article class="exam-paper exam-paper-page" id="examPaperPage_1" data-page="1" data-pdf-page>
         <div class="paper-watermark" id="paperWatermarkEl" style="display: none;"></div>
         <div class="paper-content" id="paperContentWrapper">
           ${getPaperHeaderHTML()}
@@ -7643,7 +7643,7 @@ function renderPaperQuestions() {
     }).join('');
 
     docHTML += `
-      <article class="exam-paper exam-paper-page" id="examPaperPage_${pageNum}" data-page="${pageNum}">
+      <article class="exam-paper exam-paper-page" id="examPaperPage_${pageNum}" data-page="${pageNum}" data-pdf-page>
         <div class="paper-watermark ${!isFirstPage ? 'paper-watermark-clone' : ''}" id="${isFirstPage ? 'paperWatermarkEl' : `paperWatermarkEl_p${pageNum}`}" style="display: none;"></div>
         
         <div class="paper-content" id="${isFirstPage ? 'paperContentWrapper' : `paperContentWrapper_p${pageNum}`}">
