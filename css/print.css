@@ -25,6 +25,7 @@
     max-height: none !important;
     overflow: visible !important;
     position: static !important;
+    zoom: 1 !important;
   }
 
   /* Completely hide all UI controls, builders, toolbars, mobile tabs, modals, and portals */

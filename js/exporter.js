@@ -555,6 +555,46 @@ const ExamExporter = {
     document.body.appendChild(a);
     a.click();
     a.remove();
+  },
+
+  /**
+   * Direct PDF download without opening print interface or switching tabs
+   */
+  exportPDF: async function(options) {
+    options = options || {};
+    const state = this.getState();
+    const isLtr = (state && state.settings && state.settings.direction === 'ltr');
+    const rawTitle = (state && state.header && state.header.examTitle) || 'امتحان_مسار_المعلم';
+    const safeTitle = rawTitle.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'امتحان_مسار_المعلم';
+    const filename = options.filename || options.path || `${safeTitle}.pdf`;
+
+    const paper = document.getElementById('examPaperDoc');
+    if (!paper) {
+      throw new Error('لم يتم العثور على ورقة الامتحان للتصدير.');
+    }
+
+    this.ensurePreviewVisible();
+    if (typeof window.renderPaperQuestions === 'function') window.renderPaperQuestions();
+    if (typeof window.applyPaperSettings === 'function') window.applyPaperSettings();
+
+    if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
+      return await window.MasarPDF.exportExam(options);
+    }
+
+    if (typeof window.exportToPDF === 'function') {
+      return await window.exportToPDF(paper, {
+        filename: filename,
+        format: options.format || 'a4',
+        orientation: options.orientation || 'portrait',
+        margin: options.margin || 8,
+        scale: options.scale || 2
+      });
+    } else {
+      if (typeof showToast === 'function') {
+        showToast('تعذر العثور على محرك تصدير الـ PDF في الصفحة.', 'error');
+      }
+      throw new Error('محرك تصدير PDF غير متاح.');
+    }
   }
 };
 

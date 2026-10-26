@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="h_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="h_board" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="h_gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <filter id="h_shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#f59e0b" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <rect x="15" y="15" width="130" height="130" rx="36" fill="url(#h_bg)"/>
+  <!-- Clipboard Board -->
+  <g filter="url(#h_shadow)">
+    <rect x="36" y="34" width="76" height="96" rx="14" fill="#ffffff" stroke="#fcd34d" stroke-width="2"/>
+    <!-- Top Clip -->
+    <rect x="54" y="26" width="40" height="16" rx="6" fill="url(#h_board)"/>
+    <circle cx="74" cy="34" r="3.5" fill="#ffffff"/>
+    <!-- Official Heading Ribbon -->
+    <rect x="46" y="52" width="56" height="12" rx="4" fill="url(#h_gold)"/>
+    <circle cx="74" cy="58" r="3" fill="#ffffff"/>
+    <!-- Rows with icons -->
+    <rect x="48" y="74" width="36" height="5" rx="2.5" fill="#cbd5e1"/>
+    <circle cx="94" cy="76" r="4" fill="#10b981"/>
+    <rect x="48" y="88" width="44" height="5" rx="2.5" fill="#cbd5e1"/>
+    <circle cx="94" cy="90" r="4" fill="#3b82f6"/>
+    <rect x="48" y="102" width="38" height="5" rx="2.5" fill="#cbd5e1"/>
+    <circle cx="94" cy="104" r="4" fill="#f59e0b"/>
+  </g>
+  <!-- Seal Stamp Badge -->
+  <g transform="translate(100, 95)" filter="url(#h_shadow)">
+    <circle cx="16" cy="16" r="18" fill="url(#h_gold)"/>
+    <circle cx="16" cy="16" r="14" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="3,2"/>
+    <path d="M16 8 L18.5 13 L24 13.8 L20 17.7 L21 23 L16 20.4 L11 23 L12 17.7 L8 13.8 L13.5 13 Z" fill="#ffffff"/>
+  </g>
+</svg>

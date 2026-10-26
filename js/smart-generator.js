@@ -1682,94 +1682,10 @@ const PRESET_EXAMS = {
   }
 };
 
-/**
- * Smart Question Generator from Teacher Input (AI Simulator)
- */
-function generateQuestionsFromText(inputText, questionTypes = ['mcq', 'true_false', 'fill_blanks', 'essay']) {
-  if (!inputText || inputText.trim().length < 20) {
-    throw new Error('يرجى إدخال نص كافٍ (فقرة أو ملخص الدرس) لتحليله واستخراج الأسئلة.');
-  }
-
-  const sentences = inputText
-    .split(/[.\n!؟]/)
-    .map(s => s.trim())
-    .filter(s => s.length > 15);
-
-  if (sentences.length === 0) {
-    throw new Error('النص قصير جداً، يرجى كتابة جمل كاملة ومعلومات مفيدة.');
-  }
-
-  const generatedList = [];
-
-  sentences.forEach((sentence, idx) => {
-    const words = sentence.split(/\s+/).filter(w => w.length > 2);
-    if (words.length < 4) return;
-
-    const chosenType = questionTypes[idx % questionTypes.length];
-
-    if (chosenType === 'mcq') {
-      const keyword = words[Math.floor(words.length / 2)];
-      const questionText = sentence.replace(keyword, '................');
-      generatedList.push({
-        id: generateId(),
-        type: 'mcq',
-        text: `اختر التكملة الصحيحة: «${questionText}»`,
-        options: [
-          { id: 'o1', text: keyword, isCorrect: true },
-          { id: 'o2', text: words[0] || 'عنصر بديل', isCorrect: false },
-          { id: 'o3', text: 'لا شيء مما سبق', isCorrect: false },
-          { id: 'o4', text: 'جميع ما سبق', isCorrect: false }
-        ],
-        explanation: `الإجابة مستخلصة من النص: ${sentence}`,
-        score: 2,
-        difficulty: 'متوسط',
-        bloom: 'فهم'
-      });
-    } else if (chosenType === 'true_false') {
-      const isTruth = (idx % 2 === 0);
-      generatedList.push({
-        id: generateId(),
-        type: 'true_false',
-        text: sentence,
-        isTrue: isTruth,
-        correction: isTruth ? '' : 'العبارة بحاجة إلى تدقيق وفقاً لسياق الدرس.',
-        score: 2,
-        difficulty: 'سهل',
-        bloom: 'تذكر'
-      });
-    } else if (chosenType === 'fill_blanks') {
-      const keyIndex = Math.min(words.length - 2, 2);
-      const targetWord = words[keyIndex];
-      const blanked = sentence.replace(targetWord, `[${targetWord}]`);
-      generatedList.push({
-        id: generateId(),
-        type: 'fill_blanks',
-        text: blanked,
-        answers: [targetWord],
-        score: 2,
-        difficulty: 'متوسط',
-        bloom: 'تذكر'
-      });
-    } else if (chosenType === 'essay') {
-      generatedList.push({
-        id: generateId(),
-        type: 'essay',
-        text: `اشرح باختصار الفكرة الواردة في العبارة التالية: «${sentence}»؟`,
-        modelAnswer: sentence,
-        linesCount: 3,
-        score: 4,
-        difficulty: 'متوسط',
-        bloom: 'تحليل'
-      });
-    }
-  });
-
-  return generatedList;
+function generateQuestionsFromText() {
+  return [];
 }
 
-/**
- * Calculates Bloom Taxonomy distribution
- */
 function analyzeBloomDistribution(questions) {
   const stats = {
     'تذكر': 0,

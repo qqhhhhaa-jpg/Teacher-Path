@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Moallem Pro - 24/7 Server Watchdog Bot
-بوت حارس ومراقب السيرفر الذكي - يعمل على مدار 24 ساعة بدون توقف
-- تشغيل سيرفر محلي متقدم متعدد المهام (Multi-threaded) على المنفذ 8080
-- إعادة تشغيل ذاتية فورية عند حدوث أي انقطاع أو انهيار (Self-Healing)
-- إمكانية الفتح من أجهزة الهاتف والتابلت عبر شبكة الواي فاي المنزلية
-- سجل عمليات وحالة تشغيل لحظي (server_bot.log)
+Moallem Pro - 24/7 Server Watchdog & Central Data Engine
+سيرفر وبوت حارس منصة مسار المعلم الذكية 4.0 - يعمل 24 ساعة لحفظ البيانات بالكامل:
+- إدارة وحفظ الحسابات وأسماء المستخدمين وكلمات المرور
+- تتبع وتسجيل كل ما يدور بالمنصة كاملاً في قاعدة بيانات مركزية SQLite + JSON
+- مزامنة بنك الأسئلة والأرشيف السحابي
+- حارس الجلسات الحية ومنع تعدد الأجهزة
+- لوحة تحكم ورادار مباشر للأنشطة /dashboard
 """
 
 import sys
@@ -17,6 +18,12 @@ import logging
 from datetime import datetime
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from socketserver import ThreadingMixIn
+import json
+import re
+import subprocess
+import threading
+import atexit
+from urllib.parse import urlparse, parse_qs
 
 # Fix Windows console UTF-8 encoding safely
 if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
@@ -36,7 +43,7 @@ HOST = '0.0.0.0' # Allows local network access (PC, Mobile, Tablet)
 WORKSPACE_DIR = os.path.dirname(os.path.abspath(__file__))
 START_TIME = time.time()
 
-# Setup logging to both console and file
+# Setup logging
 LOG_FILE = os.path.join(WORKSPACE_DIR, 'server_bot.log')
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +54,13 @@ logging.basicConfig(
         logging.StreamHandler(sys.stdout)
     ]
 )
+
+# Import Central SQLite Database Engine
+try:
+    import server_db
+except Exception as e:
+    logging.error(f"تحذير: تعذر استيراد محرك القاعدة server_db: {e}")
+    server_db = None
 
 def get_local_ip():
     """Detect local Wi-Fi / LAN IP for phone & tablet connection"""
@@ -59,67 +73,120 @@ def get_local_ip():
     except Exception:
         return '127.0.0.1'
 
+# ===============================================================================
+# Cloudflare Global Tunnel Manager (Worldwide Access from 4G / Any Network)
+# ===============================================================================
+PUBLIC_TUNNEL_URL = None
+tunnel_process = None
+tunnel_status = "initializing"
+
+def start_cloudflare_tunnel(port):
+    """
+    Launches Cloudflare Tunnel to provide world-wide HTTPS access
+    Works from 4G mobile data, different Wi-Fi networks, and anywhere worldwide
+    without requiring router port forwarding or static IP.
+    """
+    global PUBLIC_TUNNEL_URL, tunnel_process, tunnel_status
+
+    cf_path = os.path.join(WORKSPACE_DIR, 'tools', 'cloudflared.exe')
+    if not os.path.exists(cf_path):
+        logging.info("أداة Cloudflare Tunnel غير موجودة في مجلد tools، يعمل السيرفر بنمط الشبكة المحلية فقط.")
+        tunnel_status = "not_found"
+        return
+
+    tunnel_status = "connecting"
+    logging.info("جاري إطلاق نفق Cloudflare العالمي لتشغيل المنصة عبر مختلف الشبكات وبيانات 4G...")
+
+    cmd = [
+        cf_path,
+        'tunnel',
+        '--url', f'http://127.0.0.1:{port}',
+        '--no-autoupdate'
+    ]
+
+    try:
+        creation_flags = 0x08000000 if os.name == 'nt' else 0 # CREATE_NO_WINDOW
+        tunnel_process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            creationflags=creation_flags
+        )
+
+        url_found = False
+        for line in iter(tunnel_process.stdout.readline, ''):
+            if not line:
+                break
+            match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
+            if match and not url_found:
+                PUBLIC_TUNNEL_URL = match.group(0)
+                tunnel_status = "online"
+                url_found = True
+
+                tunnel_banner = f"""
+===============================================================================
+  🌐 تم تفعيل الرابط العالمي بنجاح (Cloudflare Tunnel - متاح من أي مكان بالعالم):
+  * رابط المنصة العالمي:   {PUBLIC_TUNNEL_URL}
+  * لوحة تحكم السيرفر:     {PUBLIC_TUNNEL_URL}/dashboard
+  * الاتصال متاح من:       بيانات الهاتف 4G، راوترات أخرى، وأي مكان بالعالم!
+===============================================================================
+"""
+                try:
+                    print(tunnel_banner)
+                except Exception:
+                    pass
+                logging.info(f"🌐 [الربط العالمي] الرابط العام الفعال: {PUBLIC_TUNNEL_URL}")
+
+                try:
+                    pub_txt = os.path.join(WORKSPACE_DIR, 'رابط_المنصة_العالمي.txt')
+                    with open(pub_txt, 'w', encoding='utf-8') as f:
+                        f.write("🌐 رابط منصة مسار المعلم الذكية العالمي (Cloudflare Tunnel)\n")
+                        f.write("===========================================================\n\n")
+                        f.write(f"الرابط المباشر للمنصة:\n{PUBLIC_TUNNEL_URL}\n\n")
+                        f.write(f"لوحة تحكم السيرفر المركزية:\n{PUBLIC_TUNNEL_URL}/dashboard\n\n")
+                        f.write("-----------------------------------------------------------\n")
+                        f.write("💡 مميزات هذا الرابط:\n")
+                        f.write("1. يفتح على أي موبايل أو تابلت أو لابتوب من أي مكان بالعالم.\n")
+                        f.write("2. يعمل على شبكات الهاتف 4G (زين، آسيا سيل، كورك) دون الحاجة لنفس الراوتر.\n")
+                        f.write("3. أي تعديل أو خطة أو حساب أو اختبار يتم حفظه فوراً في قاعدة البيانات المركزية.\n")
+                        f.write(f"\nتاريخ التحديث: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}\n")
+
+                    data_dir = os.path.join(WORKSPACE_DIR, 'data')
+                    os.makedirs(data_dir, exist_ok=True)
+                    with open(os.path.join(data_dir, 'public_server_url.txt'), 'w', encoding='utf-8') as f:
+                        f.write(PUBLIC_TUNNEL_URL)
+                except Exception as e:
+                    logging.warning(f"تعذر كتابة ملف الرابط العالمي: {e}")
+
+        tunnel_process.wait()
+    except Exception as e:
+        tunnel_status = "error"
+        logging.warning(f"ملاحظة في نفق Cloudflare: {e}")
+
+def stop_cloudflare_tunnel():
+    global tunnel_process
+    if tunnel_process and tunnel_process.poll() is None:
+        try:
+            tunnel_process.terminate()
+            tunnel_process.wait(timeout=2)
+        except Exception:
+            try:
+                tunnel_process.kill()
+            except Exception:
+                pass
+        tunnel_process = None
+
+atexit.register(stop_cloudflare_tunnel)
+
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Multi-threaded server to handle simultaneous connections without blocking"""
     daemon_threads = True
     allow_reuse_address = True
 
-import json
-import re
-from urllib.parse import urlparse, parse_qs
-
-ACCOUNTS_FILE = os.path.join(WORKSPACE_DIR, 'data', 'accounts.json')
-DEFAULT_ADMIN_ACCOUNT = {
-    'id': 'usr_admin',
-    'name': 'الأستاذ حسين علي (المدير العام)',
-    'username': 'admin',
-    'email': 'admin@moallem.iq',
-    'password': 'qq7878aassdd',
-    'role': 'admin',
-    'isAdmin': True,
-    'isVip': True,
-    'isVerified': True,
-    'governorate': 'العراق - الإدارة العامة',
-    'school': 'إدارة منصة مُعَلِّم بـرو',
-    'subject': 'الإشراف العام والتطوير',
-    'rights': 'إعداد وتنظيم الأستاذ حسين علي - الإدارة العامة لمنصة مُعَلِّم برو',
-    'contact': '07700000000',
-    'createdAt': '2026-01-01T00:00:00.000Z'
-}
-
-def load_server_accounts():
-    data_dir = os.path.join(WORKSPACE_DIR, 'data')
-    os.makedirs(data_dir, exist_ok=True)
-    accounts = []
-    if os.path.exists(ACCOUNTS_FILE):
-        try:
-            with open(ACCOUNTS_FILE, 'r', encoding='utf-8') as f:
-                accounts = json.load(f)
-        except Exception:
-            accounts = []
-    if not isinstance(accounts, list):
-        accounts = []
-    
-    admin_idx = -1
-    for i, a in enumerate(accounts):
-        if a.get('id') == 'usr_admin' or a.get('username') == 'admin':
-            admin_idx = i
-            break
-            
-    if admin_idx == -1:
-        accounts.insert(0, dict(DEFAULT_ADMIN_ACCOUNT))
-    else:
-        accounts[admin_idx] = { **DEFAULT_ADMIN_ACCOUNT, **accounts[admin_idx], 'password': 'qq7878aassdd' }
-    return accounts
-
-def save_server_accounts(accounts):
-    data_dir = os.path.join(WORKSPACE_DIR, 'data')
-    os.makedirs(data_dir, exist_ok=True)
-    with open(ACCOUNTS_FILE, 'w', encoding='utf-8') as f:
-        json.dump(accounts, f, ensure_ascii=False, indent=2)
-
 class RobustRequestHandler(SimpleHTTPRequestHandler):
-    """Enhanced HTTP Handler with UTF-8 support, health-check, accounts DB, and cloud-sync API"""
+    """Enhanced HTTP Handler with SQLite telemetry, UTF-8 support, and real-time APIs"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=WORKSPACE_DIR, **kwargs)
@@ -128,257 +195,292 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Cache-Control')
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         super().end_headers()
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.end_headers()
 
+    def send_json_response(self, data, status=200):
+        self.send_response(status)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.end_headers()
+        res_str = json.dumps(data, ensure_ascii=False)
+        self.wfile.write(res_str.encode('utf-8'))
+
     def do_GET(self):
         clean_path = self.path.split('?')[0].rstrip('/')
+        client_ip = self.client_address[0] if hasattr(self, 'client_address') else ''
 
-        # Health-check endpoint for bots and keep-alive monitors
+        # 1. Dashboard UI Route
+        if clean_path in ('/dashboard', '/admin', '/control', '/server-control'):
+            dash_path = os.path.join(WORKSPACE_DIR, 'admin_control.html')
+            if os.path.exists(dash_path):
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.end_headers()
+                with open(dash_path, 'rb') as f:
+                    self.wfile.write(f.read())
+                return
+
+        # 2. Health-check endpoint
         if clean_path in ('/health', '/ping', '/bot-status'):
             uptime_seconds = int(time.time() - START_TIME)
             hours, remainder = divmod(uptime_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             uptime_str = f"{hours}h {minutes}m {seconds}s"
             
-            response = (
-                f'{{"status":"online","bot":"active","port":{PORT},'
-                f'"uptime":"{uptime_str}","uptime_seconds":{uptime_seconds},'
-                f'"timestamp":"{datetime.now().isoformat()}"}}\n'
-            )
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(response.encode('utf-8'))
+            self.send_json_response({
+                "status": "online",
+                "bot": "active_24_7",
+                "port": PORT,
+                "uptime": uptime_str,
+                "uptime_seconds": uptime_seconds,
+                "timestamp": datetime.now().isoformat()
+            })
             return
 
-        # Accounts GET endpoint: /api/accounts
+        # 2.5 Public Tunnel URL endpoint: /api/public_url
+        if clean_path == '/api/public_url':
+            local_ip = get_local_ip()
+            self.send_json_response({
+                "success": True,
+                "public_url": PUBLIC_TUNNEL_URL,
+                "tunnel_status": tunnel_status,
+                "local_ip": local_ip,
+                "local_url": f"http://{local_ip}:{PORT}",
+                "port": PORT,
+                "is_global": bool(PUBLIC_TUNNEL_URL)
+            })
+            return
+
+        # 3. Platform Statistics: /api/stats
+        if clean_path == '/api/stats':
+            if server_db:
+                stats = server_db.get_platform_statistics()
+            else:
+                stats = {"status": "ok", "error": "db_not_loaded"}
+            self.send_json_response(stats)
+            return
+
+        # 4. Accounts GET endpoint: /api/accounts
         if clean_path == '/api/accounts':
-            accounts = load_server_accounts()
-            res = json.dumps({"success": True, "accounts": accounts}, ensure_ascii=False)
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+            if server_db:
+                accounts = server_db.get_all_accounts()
+            else:
+                accounts = []
+            self.send_json_response({"success": True, "accounts": accounts})
             return
 
-        # Cloud Sync GET endpoint: /api/cloud_sync?email=...&userId=...
+        # 5. Activity Stream GET endpoint: /api/activity
+        if clean_path == '/api/activity':
+            query = parse_qs(urlparse(self.path).query)
+            limit = int(query.get('limit', [150])[0])
+            user_id = query.get('user_id', [''])[0].strip() or None
+            action_type = query.get('action_type', [''])[0].strip() or None
+
+            activities = server_db.get_activities(limit=limit, user_id=user_id, action_type=action_type) if server_db else []
+            self.send_json_response({"success": True, "activities": activities})
+            return
+
+        # 6. Cloud Sync GET endpoint: /api/cloud_sync
         if clean_path == '/api/cloud_sync':
             query = parse_qs(urlparse(self.path).query)
             email = query.get('email', [''])[0].strip().lower()
             user_id = query.get('userId', [''])[0].strip().lower()
             username = query.get('username', [''])[0].strip().lower()
 
-            clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) if email else ''
-            clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) if user_id else ''
-            clean_u = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', username) if username else ''
-
-            data_dir = os.path.join(WORKSPACE_DIR, 'data')
-            candidate_files = []
-            if clean_email: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_email}.json'))
-            if clean_uid: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_uid}.json'))
-            if clean_u: candidate_files.append(os.path.join(data_dir, f'cloud_sync_{clean_u}.json'))
-
-            saved_data = None
-            for fp in candidate_files:
-                if os.path.exists(fp):
-                    try:
-                        with open(fp, 'r', encoding='utf-8') as f:
-                            saved_data = json.load(f)
-                            if saved_data:
-                                break
-                    except Exception:
-                        pass
+            candidate_keys = [email, user_id, username]
+            saved_data = server_db.get_cloud_sync_data(candidate_keys) if server_db else None
 
             if saved_data:
-                res = json.dumps({"success": True, "exists": True, "data": saved_data}, ensure_ascii=False)
+                self.send_json_response({"success": True, "exists": True, "data": saved_data})
             else:
-                res = json.dumps({"success": True, "exists": False, "data": None}, ensure_ascii=False)
-
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+                self.send_json_response({"success": True, "exists": False, "data": None})
             return
 
-        # Active Session Check GET endpoint: /api/active_session?userId=...
+        # 7. Active Session Check: /api/active_session
         if clean_path == '/api/active_session':
             query = parse_qs(urlparse(self.path).query)
             user_id = query.get('userId', [''])[0].strip().lower()
-            clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) or 'default'
-            data_dir = os.path.join(WORKSPACE_DIR, 'data')
-            session_file = os.path.join(data_dir, f'session_{clean_uid}.json')
-            if os.path.exists(session_file):
-                try:
-                    with open(session_file, 'r', encoding='utf-8') as f:
-                        session_data = json.load(f)
-                    res = json.dumps({"success": True, "active": True, "session": session_data}, ensure_ascii=False)
-                except Exception as e:
-                    res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
-            else:
-                res = json.dumps({"success": True, "active": False, "session": None}, ensure_ascii=False)
+            session_data = server_db.get_active_session(user_id) if (server_db and user_id) else None
 
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+            if session_data:
+                self.send_json_response({"success": True, "active": True, "session": session_data})
+            else:
+                self.send_json_response({"success": True, "active": False, "session": None})
             return
+
+        # 8. Full Database Backup Export: /api/backup
+        if clean_path == '/api/backup':
+            if server_db:
+                backup = server_db.export_full_backup_data()
+                filename = f"moallem_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json; charset=utf-8')
+                self.send_header('Content-Disposition', f'attachment; filename="{filename}"')
+                self.end_headers()
+                self.wfile.write(json.dumps(backup, ensure_ascii=False, indent=2).encode('utf-8'))
+                return
+            else:
+                self.send_json_response({"error": "database_unavailable"}, status=500)
+                return
 
         return super().do_GET()
 
     def do_POST(self):
         clean_path = self.path.split('?')[0].rstrip('/')
+        client_ip = self.client_address[0] if hasattr(self, 'client_address') else ''
 
-        # Accounts POST endpoint: /api/accounts
+        # Read JSON Body
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(length).decode('utf-8') if length > 0 else '{}'
+            payload = json.loads(body) if body else {}
+        except Exception as e:
+            self.send_json_response({"success": False, "error": f"Invalid JSON: {e}"}, status=400)
+            return
+
+        # 1. Accounts POST endpoint: /api/accounts
         if clean_path == '/api/accounts':
             try:
-                length = int(self.headers.get('Content-Length', 0))
-                body = self.rfile.read(length).decode('utf-8')
-                payload = json.loads(body) if body else {}
-                accounts = load_server_accounts()
-
                 if 'account' in payload and isinstance(payload['account'], dict):
-                    acc = payload['account']
-                    aid = acc.get('id')
-                    aemail = (acc.get('email') or '').lower().strip()
-                    auser = (acc.get('username') or '').lower().strip()
-
-                    found_idx = -1
-                    for i, existing in enumerate(accounts):
-                        if aid and existing.get('id') == aid:
-                            found_idx = i
-                            break
-                        if aemail and (existing.get('email') or '').lower().strip() == aemail:
-                            found_idx = i
-                            break
-                        if auser and (existing.get('username') or '').lower().strip() == auser:
-                            found_idx = i
-                            break
-
-                    if found_idx >= 0:
-                        accounts[found_idx] = { **accounts[found_idx], **acc }
-                    else:
-                        accounts.append(acc)
-
+                    server_db.upsert_account(payload['account'])
+                    server_db.log_activity(
+                        payload['account'].get('id', ''),
+                        payload['account'].get('username', ''),
+                        'تحديث أو إضافة حساب',
+                        f"تم حفظ بيانات الحساب {payload['account'].get('username')}",
+                        action_type='ACCOUNT_SAVE',
+                        ip_address=client_ip
+                    )
                 elif 'accounts' in payload and isinstance(payload['accounts'], list):
-                    acc_map = {}
-                    for a in accounts:
-                        k = a.get('id') or (a.get('email') or a.get('username') or '')
-                        if k:
-                            acc_map[k] = a
-                    for acc in payload['accounts']:
-                        k = acc.get('id') or (acc.get('email') or acc.get('username') or '')
-                        if k:
-                            if k in acc_map:
-                                acc_map[k] = { **acc_map[k], **acc }
-                            else:
-                                acc_map[k] = acc
-                    accounts = list(acc_map.values())
-
-                save_server_accounts(accounts)
-                res = json.dumps({
+                    for a in payload['accounts']:
+                        server_db.upsert_account(a, sync_json=False)
+                    server_db.sync_accounts_to_json()
+                
+                accounts = server_db.get_all_accounts()
+                self.send_json_response({
                     "success": True, 
-                    "message": "تم حفظ وتحديث الحسابات على السيرفر بنجاح", 
+                    "message": "تم حفظ وتحديث الحسابات في قاعدة بيانات السيرفر بنجاح", 
                     "accounts_count": len(accounts)
-                }, ensure_ascii=False)
-                self.send_response(200)
+                })
             except Exception as e:
-                res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
-                self.send_response(500)
-
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+                self.send_json_response({"success": False, "error": str(e)}, status=500)
             return
 
-        # Cloud Sync POST endpoint: /api/cloud_sync
+        # 2. Authentication Login: /api/auth/login
+        if clean_path == '/api/auth/login':
+            identifier = (payload.get('identifier') or payload.get('username') or payload.get('email') or '').strip().lower()
+            password = payload.get('password') or ''
+            device_info = payload.get('deviceInfo') or ''
+
+            accounts = server_db.get_all_accounts()
+            matched = None
+            for acc in accounts:
+                aid = (acc.get('id') or '').lower()
+                auser = (acc.get('username') or '').lower()
+                aemail = (acc.get('email') or '').lower()
+                if identifier in (aid, auser, aemail):
+                    matched = acc
+                    break
+
+            if matched and (str(matched.get('password')) == str(password)):
+                # Login Success!
+                matched['lastLoginAt'] = datetime.now().isoformat()
+                matched['deviceInfo'] = device_info
+                server_db.upsert_account(matched)
+                server_db.log_activity(
+                    matched.get('id'),
+                    matched.get('username'),
+                    'تسجيل دخول ناجح',
+                    f"تم تسجيل الدخول بنجاح عبر {device_info or 'المتصفح'}",
+                    action_type='LOGIN_SUCCESS',
+                    ip_address=client_ip,
+                    device_info=device_info,
+                    user_name=matched.get('name', '')
+                )
+                self.send_json_response({"success": True, "account": matched})
+            else:
+                server_db.log_activity(
+                    'guest',
+                    identifier,
+                    'محاولة دخول فاشلة',
+                    f"محاولة فاشلة لتسجيل الدخول باستخدام المعرف: {identifier}",
+                    action_type='LOGIN_FAILED',
+                    ip_address=client_ip,
+                    device_info=device_info
+                )
+                self.send_json_response({"success": False, "message": "بيانات الدخول غير صحيحة"}, status=401)
+            return
+
+        # 3. Telemetry Event Logger: /api/activity
+        if clean_path == '/api/activity':
+            user_id = payload.get('userId') or payload.get('user_id') or 'guest'
+            username = payload.get('username') or 'زائر'
+            user_name = payload.get('userName') or payload.get('name') or ''
+            action_type = payload.get('actionType') or payload.get('action_type') or 'GENERAL'
+            action_title = payload.get('actionTitle') or payload.get('action_title') or action_type
+            details = payload.get('details') or ''
+            device_info = payload.get('deviceInfo') or ''
+
+            logged = server_db.log_activity(
+                user_id=user_id,
+                username=username,
+                action_title=action_title,
+                details=details,
+                action_type=action_type,
+                ip_address=client_ip,
+                device_info=device_info,
+                user_name=user_name
+            ) if server_db else False
+
+            self.send_json_response({"success": logged})
+            return
+
+        # 4. Cloud Sync POST endpoint: /api/cloud_sync
         if clean_path == '/api/cloud_sync':
             try:
-                length = int(self.headers.get('Content-Length', 0))
-                body = self.rfile.read(length).decode('utf-8')
-                payload = json.loads(body)
-                email = payload.get('email', '').strip().lower()
-                user_id = payload.get('userId', '').strip().lower()
-                clean_email = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', email) if email else ''
-                clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) if user_id else ''
-                primary_key = clean_email or clean_uid or 'default'
-
-                data_dir = os.path.join(WORKSPACE_DIR, 'data')
-                os.makedirs(data_dir, exist_ok=True)
-                file_path = os.path.join(data_dir, f'cloud_sync_{primary_key}.json')
-                
-                payload['server_saved_at'] = datetime.now().isoformat()
-                with open(file_path, 'w', encoding='utf-8') as f:
-                    json.dump(payload, f, ensure_ascii=False, indent=2)
-                
-                # Also save under userId if distinct so phone can find by userId
-                if clean_uid and clean_uid != primary_key:
-                    second_path = os.path.join(data_dir, f'cloud_sync_{clean_uid}.json')
-                    with open(second_path, 'w', encoding='utf-8') as f:
-                        json.dump(payload, f, ensure_ascii=False, indent=2)
-
-                res = json.dumps({
-                    "success": True, 
-                    "message": "تمت المزامنة والحفظ السحابي بنجاح", 
-                    "timestamp": payload['server_saved_at'],
-                    "questions_count": len(payload.get('questionsBank', [])),
-                    "exams_count": len(payload.get('examsArchive', []))
-                }, ensure_ascii=False)
-                self.send_response(200)
+                res = server_db.save_cloud_sync_data(payload) if server_db else {"success": False}
+                self.send_json_response(res)
             except Exception as e:
-                res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
-                self.send_response(500)
-
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+                self.send_json_response({"success": False, "error": str(e)}, status=500)
             return
 
-        # Active Session Registration POST endpoint: /api/active_session
+        # 5. Active Session Registration: /api/active_session
         if clean_path == '/api/active_session':
             try:
-                length = int(self.headers.get('Content-Length', 0))
-                body = self.rfile.read(length).decode('utf-8')
-                payload = json.loads(body)
-                user_id = payload.get('userId', '').strip().lower()
-                clean_uid = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', user_id) or 'default'
-                data_dir = os.path.join(WORKSPACE_DIR, 'data')
-                os.makedirs(data_dir, exist_ok=True)
-                session_file = os.path.join(data_dir, f'session_{clean_uid}.json')
-                
-                payload['registered_at'] = datetime.now().isoformat()
-                with open(session_file, 'w', encoding='utf-8') as f:
-                    json.dump(payload, f, ensure_ascii=False, indent=2)
-
-                res = json.dumps({"success": True, "message": "Session registered successfully"}, ensure_ascii=False)
-                self.send_response(200)
+                if server_db:
+                    server_db.save_active_session(payload, ip_address=client_ip)
+                self.send_json_response({"success": True, "message": "تم تسجيل الجلسة النشطة"})
             except Exception as e:
-                res = json.dumps({"success": False, "error": str(e)}, ensure_ascii=False)
-                self.send_response(500)
-
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(res.encode('utf-8'))
+                self.send_json_response({"success": False, "error": str(e)}, status=500)
             return
 
         self.send_response(404)
         self.end_headers()
 
-    def end_headers(self):
-        # Add CORS, no-cache headers, and UTF-8 encoding headers
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-        self.send_header('Pragma', 'no-cache')
-        self.send_header('Expires', '0')
-        super().end_headers()
+    def do_DELETE(self):
+        clean_path = self.path.split('?')[0].rstrip('/')
+        if clean_path == '/api/accounts':
+            query = parse_qs(urlparse(self.path).query)
+            aid = query.get('id', [''])[0].strip()
+            if not aid:
+                self.send_json_response({"success": False, "message": "Missing account id"}, status=400)
+                return
+            
+            ok, msg = server_db.delete_account(aid) if server_db else (False, "DB offline")
+            self.send_json_response({"success": ok, "message": msg}, status=200 if ok else 400)
+            return
+        
+        self.send_response(404)
+        self.end_headers()
 
     def log_message(self, format, *args):
-        # Only log non-200 or important requests to keep log file clean
+        # Filter noisy access logs, keep errors and major calls
         try:
             status_code = str(args[1]) if len(args) > 1 else ''
             if status_code.startswith(('4', '5')):
@@ -387,18 +489,22 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             pass
 
 def print_banner(local_ip):
+    pub_info = f"  * رابط الإنترنت العالمي (4G / أي مكان): {PUBLIC_TUNNEL_URL}" if PUBLIC_TUNNEL_URL else "  * رابط الإنترنت العالمي (4G): جاري التوليد والربط عبر Cloudflare..."
     banner = f"""
 ===============================================================================
-    [BOT] بوت حارس ومراقب السيرفر - منصة معلم برو (Moallem Pro 24/7 Bot)
+    [BOT] سيرفر منصة مسار المعلم الذكية 4.0 - قاعدة البيانات والمراقبة المركزية
 ===============================================================================
-  * حالة البوت: نشط ويعمل على مدار 24 ساعة متواصلة [ONLINE]
+  * حالة السيرفر: نشط وقاعدة البيانات المركزية متصلة [ONLINE 24/7]
   * رابط المنصة على جهازك:   http://localhost:{PORT}
-  * رابط الفتح من الهاتف:    http://{local_ip}:{PORT}
-  * فحص صحة البوت (Health): http://localhost:{PORT}/health
+  * لوحة تحكم السيرفر الحية: http://localhost:{PORT}/dashboard
+  * رابط الفتح عبر نفس الراوتر (Wi-Fi): http://{local_ip}:{PORT}
+{pub_info}
+  * فحص صحة السيرفر (Health): http://localhost:{PORT}/health
   * ملف السجل الحي (Logs):   {LOG_FILE}
 ===============================================================================
+  * الوصول من خارج الشبكة: مدعوم تلقائياً عبر النفق العالمي دون الحاجة لفتح منافذ الراوتر.
   * الحماية الذكية: السيرفر محمي ضد الإغلاق، وسيُعاد تشغيله تلقائياً عند أي طارئ.
-  * لإيقاف البوت: اضغط Ctrl + C أو شغل ملف ايقاف_السيرفر.bat
+  * لإيقاف السيرفر: اضغط Ctrl + C أو شغل ملف ايقاف_السيرفر.bat
 ===============================================================================
 """
     try:
@@ -409,7 +515,11 @@ def print_banner(local_ip):
 def run_server():
     local_ip = get_local_ip()
     print_banner(local_ip)
-    logging.info(f"تم تشغيل بوت حراسة السيرفر على المنفذ {PORT} (العمل 24 ساعة)")
+    logging.info(f"تم إطلاق محرك قاعدة البيانات وسيرفر المراقبة على المنفذ {PORT}")
+
+    # Launch Cloudflare Global Tunnel in background thread
+    tunnel_thread = threading.Thread(target=start_cloudflare_tunnel, args=(PORT,), daemon=True)
+    tunnel_thread.start()
 
     restart_count = 0
     while True:
@@ -418,8 +528,9 @@ def run_server():
             logging.info(f"السيرفر يستقبل الاتصالات الآن بنجاح على http://localhost:{PORT}")
             server.serve_forever()
         except KeyboardInterrupt:
-            logging.info("تم إيقاف البوت بواسطة المستخدم (Ctrl+C).")
+            logging.info("تم إيقاف السيرفر بواسطة المستخدم (Ctrl+C).")
             print("\nتم إيقاف السيرفر بنجاح.")
+            stop_cloudflare_tunnel()
             break
         except OSError as e:
             if "address already in use" in str(e).lower() or getattr(e, 'winerror', 0) == 10048:

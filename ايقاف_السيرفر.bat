@@ -14,6 +14,9 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":8080" ^| findstr "LISTENING
     taskkill /F /PID %%a > nul 2>&1
 )
 
+:: إنهاء عملية نفق Cloudflare إن وجدت
+taskkill /F /IM cloudflared.exe > nul 2>&1
+
 echo.
 echo ✅ تم إيقاف السيرفر وبوت الحراسة بنجاح!
 echo اضغط أي زر للإغلاق...

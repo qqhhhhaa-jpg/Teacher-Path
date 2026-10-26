@@ -1,3 +1,247 @@
+
+/* ==========================================================================
+   Teacher's Path - Multi-App Navigation & Workstation Controller
+   إدارة التنقل الذكي بين تطبيقات المنصة الـ 7 والتحكم بظهور زر المعاينة
+   ========================================================================== */
+
+window.EXAM_BUILDER_TABS = ['tab-questions', 'tab-header', 'tab-settings'];
+
+window.updatePreviewVisibilityForTab = function(tabId) {
+  const isExamTab = window.EXAM_BUILDER_TABS.includes(tabId);
+  const prevBtn = document.getElementById('togglePreviewBtn');
+  const printBtn = document.getElementById('printExamBtn');
+  const mainCont = document.querySelector('.main-container');
+
+  if (prevBtn) {
+    if (isExamTab) {
+      prevBtn.style.removeProperty('display');
+    } else {
+      prevBtn.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  if (printBtn) {
+    if (isExamTab) {
+      printBtn.style.removeProperty('display');
+    } else {
+      printBtn.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  // Mobile Workstation Tabs & Floating Switcher
+  const mobileTabs = document.getElementById('mobileViewTabs');
+  const floatBtn = document.getElementById('mobileFloatPreviewBtn');
+  const floatCta = document.querySelector('.mobile-floating-preview-cta');
+
+  if (mobileTabs) {
+    if (isExamTab) {
+      mobileTabs.style.removeProperty('display');
+    } else {
+      mobileTabs.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  if (floatBtn) {
+    if (isExamTab) {
+      floatBtn.style.removeProperty('display');
+    } else {
+      floatBtn.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  if (floatCta) {
+    if (isExamTab) {
+      floatCta.style.removeProperty('display');
+    } else {
+      floatCta.style.setProperty('display', 'none', 'important');
+    }
+  }
+
+  if (mainCont) {
+    if (isExamTab) {
+      mainCont.classList.remove('wide-mode');
+      const isVisible = (typeof appState !== 'undefined' && appState.settings && appState.settings.previewVisible !== false);
+      mainCont.classList.toggle('preview-hidden', !isVisible);
+    } else {
+      mainCont.classList.add('wide-mode');
+      mainCont.classList.add('preview-hidden');
+      if (typeof window.setMobileWorkstationMode === 'function') {
+        window.setMobileWorkstationMode('builder');
+      } else {
+        mainCont.setAttribute('data-mobile-mode', 'builder');
+      }
+    }
+  }
+};
+
+window.isUserOnStarterPlan = function(user) {
+  const current = user || (typeof getCurrentUser === 'function' ? getCurrentUser() : null);
+  if (!current) return false;
+
+  // Super Admin is never restricted
+  if (current.isAdmin || current.role === 'admin' || current.username === 'admin') {
+    return false;
+  }
+
+  // Active trial users (during the 2-day trial) have full trial access to all sections
+  const isTrial = !!(current.isTrial || current.subscriptionType === 'free_trial_48h' || current.subscriptionType === 'free_trial_24h' || (current.trialDurationHours && current.subscriptionExpiresAt && !current.subscriptionDuration));
+  if (isTrial) {
+    return false;
+  }
+
+  // Check higher plans (Plan 2: 6 months / Plan 3: 1 year VIP) - they are NOT starter plan
+  const dur = String(current.subscriptionDuration || current.subscriptionType || '').toLowerCase();
+  const planName = String(current.subscriptionPlanName || '').toLowerCase();
+
+  if (dur === '6_months' || dur === '4_months' || dur === '3_months' || dur === '1_year' || dur === 'annual' || dur === 'yearly') {
+    return false;
+  }
+  if (planName.includes('6 أشهر') || planName.includes('ستة') || planName.includes('نصف سنة') || planName.includes('سنوي') || planName.includes('سنة') || planName.includes('vip') || planName.includes('الأكاديمية')) {
+    return false;
+  }
+
+  // Check Plan 1 (Starter / Monthly / باقة شهر واحد - 25 ألف)
+  if (dur === '1_month' || dur === '1month' || dur === 'monthly' || dur === 'month') {
+    return true;
+  }
+  if (planName.includes('شهر واحد') || planName.includes('الشهرية') || planName.includes('1_month') || planName.includes('25 ألف') || planName.includes('25,000')) {
+    return true;
+  }
+
+  if (current.id) {
+    const localCode = localStorage.getItem(`moallem_user_plan_code_${current.id}`);
+    if (localCode === '1_month') return true;
+    if (localCode === '6_months' || localCode === '1_year') return false;
+  }
+
+  return false;
+};
+
+window.checkSectionPlanAccess = function(targetId) {
+  if (!targetId) return true;
+
+  // Basic allowed sections for Starter Plan:
+  // - tab-apps (الرئيسية)
+  // - tab-questions (إنشاء وبناء الأسئلة)
+  // - tab-header (ترويسة وبيانات الامتحان)
+  // - tab-settings (تنسيقات الورقة واللغة والطباعة)
+  const basicAllowedTabs = ['tab-apps', 'tab-questions', 'tab-header', 'tab-settings'];
+  if (basicAllowedTabs.includes(targetId)) {
+    return true;
+  }
+
+  // Check if user is on Plan 1 (باقة شهر واحد)
+  if (typeof window.isUserOnStarterPlan === 'function' && window.isUserOnStarterPlan()) {
+    const sectionNames = {
+      'tab-student-grades': 'سجل ورصد درجات الطلاب والتحليلات',
+      'tab-student-behavior': 'المتابعة اليومية وحسن السلوك التراكمي',
+      'tab-report': 'المركز الأكاديمي وبنك الأسئلة وإحصائيات بلوم',
+      'tab-certificates': 'استوديو إصدار شهادات التقدير والتفوق للطلبة',
+      'tab-schedule': 'استوديو تصميم جدول الحصص والدروس الأسبوعي (A3 عريض)',
+      'tab-seating': 'استوديو خريطة الجلوس وتوزيع القاعات الامتحانية (A4 عمودي)',
+      'tab-exam-cards': 'استوديو البطاقة الامتحانية الرسمية وباجات الطلاب (A4)'
+    };
+
+    const sectionTitle = sectionNames[targetId] || 'هذا القسم المتقدم';
+
+    if (typeof showToast === 'function') {
+      showToast(`⭐ ميزة متقدمة: قسم [${sectionTitle}] متاح حصرياً في باقة الـ 6 أشهر والباقة السنوية الأكاديمية! 👑`, 'warning');
+    }
+
+    setTimeout(() => {
+      if (typeof window.openSubscriptionModal === 'function') {
+        window.openSubscriptionModal();
+      }
+    }, 350);
+
+    return false;
+  }
+
+  return true;
+};
+
+window.switchToTab = function(targetId) {
+  if (!targetId) return;
+
+  // Programmatic access gatekeeper for Plan 1 (Starter Plan)
+  if (typeof window.checkSectionPlanAccess === 'function' && !window.checkSectionPlanAccess(targetId)) {
+    return;
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === targetId);
+  });
+
+  document.querySelectorAll('.tab-content').forEach(c => {
+    c.style.display = (c.id === targetId) ? 'block' : 'none';
+  });
+
+  window.updatePreviewVisibilityForTab(targetId);
+
+  if (targetId === 'tab-apps') {
+    if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
+    if (typeof window.initAppCards3DTilt === 'function') window.initAppCards3DTilt();
+  }
+
+  if (targetId === 'tab-report') {
+    if (typeof window.switchReportSubView === 'function') {
+      window.switchReportSubView(window.currentReportSubView || 'overview');
+    } else {
+      if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+      if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
+    }
+  } else if (targetId === 'tab-student-grades' && typeof window.renderStudentGradesTable === 'function') {
+    window.renderStudentGradesTable();
+  } else if (targetId === 'tab-student-behavior' && typeof window.renderStudentBehaviorTable === 'function') {
+    window.renderStudentBehaviorTable();
+  } else if (targetId === 'tab-certificates' && typeof window.renderCertificatesStudio === 'function') {
+    window.renderCertificatesStudio();
+  } else if (targetId === 'tab-schedule' && typeof window.renderScheduleStudio === 'function') {
+    window.renderScheduleStudio();
+  } else if (targetId === 'tab-seating' && typeof window.renderSeatingStudio === 'function') {
+    window.renderSeatingStudio();
+  } else if (targetId === 'tab-exam-cards' && typeof window.renderExamCardsStudio === 'function') {
+    window.renderExamCardsStudio();
+  }
+
+  const scrollPane = document.querySelector('.builder-body-scrollable');
+  if (scrollPane) scrollPane.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.updateAppsHubStats = function() {
+  const elExams = document.getElementById('appsStatExams');
+  const elStudents = document.getElementById('appsStatStudents');
+  const elQuestions = document.getElementById('appsStatQuestions');
+  const elSubjects = document.getElementById('appsStatSubjects');
+
+  if (elExams && typeof getExamsArchive === 'function') {
+    const archive = getExamsArchive() || [];
+    elExams.textContent = archive.length || 0;
+  }
+
+  if (elQuestions && typeof appState !== 'undefined' && appState.questions) {
+    elQuestions.textContent = appState.questions.length || 0;
+  }
+
+  if (elStudents) {
+    let studentCount = 28;
+    try {
+      const savedClass = localStorage.getItem('sg_active_class_data_v1');
+      if (savedClass) {
+        const parsed = JSON.parse(savedClass);
+        if (parsed && Array.isArray(parsed.students)) {
+          studentCount = parsed.students.length;
+        }
+      }
+    } catch(e) {}
+    elStudents.textContent = studentCount;
+  }
+
+  if (elSubjects) {
+    elSubjects.textContent = '12';
+  }
+};
+
 /**
  * app.js
  * Main Application Controller for Moallem Pro Exam Studio
@@ -62,11 +306,15 @@ let teacherProfile = {
 
 // DOM Ready initialization
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof purgeTrialDataOnStartup === 'function') purgeTrialDataOnStartup();
   loadTeacherProfile();
   loadSavedState();
   initTheme();
   initAccentColor();
   initPreviewVisibility();
+  if (typeof window.updatePreviewVisibilityForTab === 'function') {
+    window.updatePreviewVisibilityForTab('tab-apps');
+  }
   initEventListeners();
   initSideQTypeBarMovable();
   initSubjectMode();
@@ -78,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
   checkAuthGatekeeper();
   checkDraftRestore();
   initSingleDeviceWatchdog();
+  checkMandatoryTeacherProfileOnStartup();
 
   // Background sync accounts from server (for cross-device synchronization)
   if (typeof syncAccountsWithServer === 'function') {
@@ -110,11 +359,16 @@ function toggleTheme() {
   updateThemeIcon(newTheme);
   showToast(`تم التبديل إلى الوضع ${newTheme === 'dark' ? 'الداكن' : 'الفاتح (الأبيض النقي)'}`, 'info');
 }
+window.toggleTheme = toggleTheme;
 
 function updateThemeIcon(theme) {
   const icon = document.getElementById('themeIcon');
   if (icon) {
     icon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+  }
+  const topbarIcon = document.getElementById('topbarThemeIcon');
+  if (topbarIcon) {
+    topbarIcon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
   }
   const label = document.getElementById('themeToggleLabel');
   if (label) {
@@ -305,10 +559,26 @@ function getAccountStorageKey(baseKey) {
 }
 window.getAccountStorageKey = getAccountStorageKey;
 
+// Global Master Cloud Server URL for worldwide multi-device sync
+window.MOALLEM_DEFAULT_SERVER_URL = window.MOALLEM_DEFAULT_SERVER_URL || '';
+
 function getBackendApiUrl(endpoint) {
   const custom = localStorage.getItem('moallem_custom_backend_url');
   if (custom && custom.trim()) {
     const base = custom.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  if (window.MOALLEM_DEFAULT_SERVER_URL && window.MOALLEM_DEFAULT_SERVER_URL.trim()) {
+    const base = window.MOALLEM_DEFAULT_SERVER_URL.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  if (window.MOALLEM_PUBLIC_SERVER_URL && window.MOALLEM_PUBLIC_SERVER_URL.trim()) {
+    const base = window.MOALLEM_PUBLIC_SERVER_URL.trim().replace(/\/+$/, '');
+    return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  }
+  const savedPublicUrl = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : null;
+  if (savedPublicUrl && savedPublicUrl.trim()) {
+    const base = savedPublicUrl.trim().replace(/\/+$/, '');
     return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   }
   if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') {
@@ -318,27 +588,101 @@ function getBackendApiUrl(endpoint) {
 }
 window.getBackendApiUrl = getBackendApiUrl;
 
+// Auto-detect Worldwide Cloudflare Tunnel URL from Server
+(async function initServerTunnelDetection() {
+  try {
+    const candidateUrls = ['/api/public_url', 'http://localhost:8080/api/public_url'];
+    for (const u of candidateUrls) {
+      try {
+        const res = await fetch(u, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.public_url) {
+            window.MOALLEM_PUBLIC_SERVER_URL = data.public_url;
+            try {
+              localStorage.setItem('moallem_public_server_url', data.public_url);
+            } catch (_) {}
+            break;
+          }
+        }
+      } catch (_) {}
+    }
+  } catch (_) {}
+})();
+
 function getAuthAccounts() {
   try {
     const raw = localStorage.getItem('moallem_auth_accounts');
     let accounts = raw ? JSON.parse(raw) : [];
     // Remove old demo/guest default account if present
     accounts = accounts.filter(a => a.id !== 'usr_hussein');
-    // Ensure SUPER_ADMIN_ACCOUNT is always registered and up to date with new password
+    // Ensure SUPER_ADMIN_ACCOUNT is always registered and up to date with new password,
+    // while preserving any custom profile updates made by the teacher (name, school, etc.)
     const adminIdx = accounts.findIndex(a => a.id === 'usr_admin' || a.username === 'admin');
     if (adminIdx === -1) {
       accounts.unshift({ ...SUPER_ADMIN_ACCOUNT });
     } else {
       accounts[adminIdx] = { 
-        ...accounts[adminIdx], 
         ...SUPER_ADMIN_ACCOUNT, 
-        password: 'qq7878aassdd' 
+        ...accounts[adminIdx], 
+        id: 'usr_admin',
+        username: 'admin',
+        isAdmin: true,
+        role: 'admin',
+        password: accounts[adminIdx].password || 'qq7878aassdd' 
       };
     }
+
+    // Ensure test1 (regular user, non-admin) is registered and up to date
+    const testUserObj = {
+      id: 'usr_test1',
+      name: 'الأستاذ (test1)',
+      username: 'test1',
+      email: 'test1@moallem.iq',
+      password: 'test2025',
+      role: 'teacher',
+      isAdmin: false,
+      isVip: false,
+      isVerified: true,
+      isSubscribed: false,
+      governorate: 'العراق',
+      school: 'مدرسة مسار المعلم',
+      subject: 'عام',
+      createdAt: '2026-10-17T00:00:00.000Z'
+    };
+    const testIdx = accounts.findIndex(a => a.id === 'usr_test1' || a.username === 'test1');
+    if (testIdx === -1) {
+      accounts.push(testUserObj);
+    } else {
+      accounts[testIdx] = {
+        ...testUserObj,
+        ...accounts[testIdx],
+        username: 'test1',
+        password: 'test2025',
+        isAdmin: false,
+        role: accounts[testIdx].role === 'admin' ? 'teacher' : (accounts[testIdx].role || 'teacher')
+      };
+    }
+
     localStorage.setItem('moallem_auth_accounts', JSON.stringify(accounts));
     return accounts;
   } catch (e) {
-    return [{ ...SUPER_ADMIN_ACCOUNT }];
+    return [{ ...SUPER_ADMIN_ACCOUNT }, {
+      id: 'usr_test1',
+      name: 'الأستاذ (test1)',
+      username: 'test1',
+      email: 'test1@moallem.iq',
+      password: 'test2025',
+      role: 'teacher',
+      isAdmin: false,
+      isVip: false,
+      isVerified: true,
+      isSubscribed: false,
+      governorate: 'العراق',
+      school: 'مدرسة مسار المعلم',
+      subject: 'عام',
+      createdAt: '2026-10-17T00:00:00.000Z'
+    }];
   }
 }
 
@@ -374,12 +718,27 @@ async function syncAccountsWithServer() {
           }
         });
 
-        // 3. Merge server accounts (server takes precedence for subscriptions/roles)
+        // 3. Merge server accounts (server takes precedence for subscriptions/roles, but preserve local profile edits)
         data.accounts.forEach(acc => {
           const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
           if (k) {
             const existing = mergedMap.get(k) || {};
-            mergedMap.set(k, { ...existing, ...acc });
+            const merged = { ...acc, ...existing };
+            // Enforce server authoritative subscription/role privileges
+            if (acc.isSubscribed !== undefined) merged.isSubscribed = acc.isSubscribed;
+            if (acc.isVip !== undefined) merged.isVip = acc.isVip;
+            if (acc.isAdmin !== undefined) merged.isAdmin = acc.isAdmin;
+            if (acc.role) merged.role = acc.role;
+            if (acc.subscriptionExpire) merged.subscriptionExpire = acc.subscriptionExpire;
+
+            // Preserve local teacher profile customizations if user edited them
+            if (existing.name && existing.name.trim()) merged.name = existing.name;
+            if (existing.school && existing.school.trim()) merged.school = existing.school;
+            if (existing.governorate && existing.governorate.trim()) merged.governorate = existing.governorate;
+            if (existing.subject && existing.subject.trim()) merged.subject = existing.subject;
+            if (existing.contact && existing.contact.trim()) merged.contact = existing.contact;
+
+            mergedMap.set(k, merged);
           }
         });
 
@@ -423,6 +782,30 @@ function saveAuthAccounts(accounts) {
     }).catch(() => {});
   } catch (err) {}
 }
+
+/* ==========================================================================
+   Platform Telemetry & Activity Engine (محرك تسجيل وتتبع كل حركة على السيرفر)
+   ========================================================================== */
+function logPlatformActivity(actionType, actionTitle, details = '') {
+  try {
+    const user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+    const payload = {
+      userId: user.id || 'guest',
+      username: user.username || user.email || 'زائر',
+      userName: user.name || '',
+      actionType: actionType || 'GENERAL',
+      actionTitle: actionTitle || actionType,
+      details: typeof details === 'object' ? JSON.stringify(details) : String(details || ''),
+      deviceInfo: typeof detectCurrentDeviceName === 'function' ? detectCurrentDeviceName() : ''
+    };
+    fetch(getBackendApiUrl('/api/activity'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  } catch (e) {}
+}
+window.logPlatformActivity = logPlatformActivity;
 
 /* ==========================================================================
    Single Active Device Concurrency Guard (حارس الجلسة الفردية ومنع تعدد الأجهزة)
@@ -693,6 +1076,14 @@ function setCurrentUser(user) {
   if (user) {
     localStorage.setItem('moallem_current_user', JSON.stringify(user));
     teacherProfile = { ...user };
+    const sessFlag = 'moallem_logged_event_' + (user.id || user.username);
+    if (!sessionStorage.getItem(sessFlag)) {
+      sessionStorage.setItem(sessFlag, 'true');
+      logPlatformActivity('LOGIN_SUCCESS', 'تسجيل دخول إلى المنصة', { name: user.name, username: user.username, email: user.email });
+      if (typeof window.recordSessionLog === 'function') {
+        window.recordSessionLog('دخول', { user: user });
+      }
+    }
   } else {
     localStorage.removeItem('moallem_current_user');
   }
@@ -722,7 +1113,155 @@ function checkAuthGatekeeper() {
   updatePrivacySettingsUI();
 }
 
+/* ==========================================================================
+   Account Session Logging & Direct Logout System (سجل وأنشطة تسجيل الدخول والخروج المستقلة لكل حساب)
+   ========================================================================== */
+window.recordSessionLog = function(type, details = {}) {
+  try {
+    const user = details.user || (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+    const userId = String(user.id || user.username || user.email || 'guest').toLowerCase().trim();
+    const storageKey = `moallem_auth_sessions_log_${userId}`;
+    
+    let logs = [];
+    try {
+      const logStr = localStorage.getItem(storageKey);
+      if (logStr) logs = JSON.parse(logStr);
+    } catch (_) { logs = []; }
+    if (!Array.isArray(logs)) logs = [];
+    
+    const now = new Date();
+    const timeStr = now.toLocaleDateString('ar-IQ', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    
+    const deviceName = (typeof detectCurrentDeviceName === 'function') 
+      ? detectCurrentDeviceName() 
+      : (window.innerWidth <= 768 ? 'هاتف محمول 📱' : 'حاسبة / لابتوب 💻');
+
+    const entry = {
+      type: type, // 'دخول' أو 'خروج'
+      timestamp: timeStr,
+      device: deviceName,
+      userId: userId,
+      user: user.name || user.username || 'المعلم'
+    };
+    
+    logs.unshift(entry);
+    if (logs.length > 20) logs = logs.slice(0, 20);
+    localStorage.setItem(storageKey, JSON.stringify(logs));
+
+    // Update the account's independent online/offline status in moallem_auth_accounts
+    try {
+      const accountsRaw = localStorage.getItem('moallem_auth_accounts');
+      if (accountsRaw) {
+        let accounts = JSON.parse(accountsRaw);
+        if (Array.isArray(accounts)) {
+          const accIdx = accounts.findIndex(a => 
+            String(a.id || a.username || a.email).toLowerCase() === userId ||
+            (user.id && a.id === user.id) ||
+            (user.username && a.username === user.username) ||
+            (user.email && a.email === user.email)
+          );
+          if (accIdx !== -1) {
+            accounts[accIdx].isOnline = (type === 'دخول');
+            accounts[accIdx].lastActivityTime = timeStr;
+            accounts[accIdx].lastActivityType = type;
+            accounts[accIdx].lastDevice = deviceName;
+            if (type === 'دخول') accounts[accIdx].lastLogin = timeStr;
+            if (type === 'خروج') accounts[accIdx].lastLogout = timeStr;
+            localStorage.setItem('moallem_auth_accounts', JSON.stringify(accounts));
+          }
+        }
+      }
+    } catch (_) {}
+
+  } catch (e) {
+    console.warn('recordSessionLog error:', e);
+  }
+};
+
+window.renderSessionsLog = function() {
+  const container = document.getElementById('profileSessionsLogList');
+  if (!container) return;
+
+  const cur = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const userId = cur ? String(cur.id || cur.username || cur.email || 'guest').toLowerCase().trim() : 'guest';
+  const storageKey = `moallem_auth_sessions_log_${userId}`;
+
+  let logs = [];
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (raw) logs = JSON.parse(raw);
+  } catch (e) {
+    logs = [];
+  }
+
+  if (!Array.isArray(logs) || logs.length === 0) {
+    const dev = (typeof detectCurrentDeviceName === 'function') ? detectCurrentDeviceName() : 'هذا الجهاز';
+    const now = new Date().toLocaleDateString('ar-IQ', {
+      year: 'numeric', month: 'short', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+    logs = [
+      {
+        type: 'دخول',
+        timestamp: `${now} (نشط الآن 🟢)`,
+        device: dev,
+        userId: userId,
+        user: cur ? (cur.name || cur.username) : 'المعلم'
+      }
+    ];
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(logs));
+    } catch(e) {}
+  }
+
+  container.innerHTML = logs.map(item => {
+    const isLogin = item.type === 'دخول';
+    const iconClass = isLogin ? 'fa-arrow-right-to-bracket' : 'fa-arrow-right-from-bracket';
+    const bgBadge = isLogin ? 'rgba(16, 185, 129, 0.12)' : 'rgba(239, 68, 68, 0.12)';
+    const colorBadge = isLogin ? '#10b981' : '#ef4444';
+    const titleText = isLogin ? 'تسجيل دخول ناجح' : 'تسجيل خروج من الحساب';
+
+    return `
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 10px; background: rgba(0,0,0,0.02); border: 1px solid var(--border-color); border-radius: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="width: 26px; height: 26px; border-radius: 6px; background: ${bgBadge}; color: ${colorBadge}; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0;">
+            <i class="fa-solid ${iconClass}"></i>
+          </span>
+          <div>
+            <strong style="color: var(--text-main); font-size: 0.8rem; display: block;">${titleText}</strong>
+            <small style="color: var(--text-muted); font-size: 0.72rem;">${item.device || 'جهاز غير محدد'}</small>
+          </div>
+        </div>
+        <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 700; white-space: nowrap; direction: ltr;">
+          ${item.timestamp}
+        </span>
+      </div>
+    `;
+  }).join('');
+};
+
+window.confirmLogout = function() {
+  const confirmed = confirm('هل أنت متأكد من رغبتك في تسجيل الخروج من الحساب وقفل المنصة؟\nسيتم حفظ كافة البيانات والمسودات بأمان لحماية خصوصيتك.');
+  if (confirmed) {
+    if (typeof window.closeSideDrawer === 'function') window.closeSideDrawer();
+    const pModal = document.getElementById('profileModal');
+    if (pModal) pModal.classList.remove('open');
+    window.logoutAndOpenAuthPortal('تم تسجيل الخروج وقفل الحساب بنجاح 🔒');
+  }
+};
+
 window.logoutAndOpenAuthPortal = function(toastMsg = null) {
+  const cur = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (cur && cur.username) {
+    logPlatformActivity('LOGOUT', 'تسجيل خروج من المنصة', { username: cur.username, name: cur.name });
+  }
+  if (typeof window.recordSessionLog === 'function') {
+    window.recordSessionLog('خروج', { user: cur });
+  }
+
   // Automatically save current work as a draft in archive before exit for this user
   autoSaveDraftToArchive(true);
   saveStateToStorage(false);
@@ -733,8 +1272,23 @@ window.logoutAndOpenAuthPortal = function(toastMsg = null) {
 
   // Clear workspace so next login doesn't see previous user's exams
   loadDefaultPreset();
+  if (typeof appState !== 'undefined') {
+    appState.questions = [];
+    appState.currentArchiveId = null;
+  }
   syncHeaderInputs();
   renderAll();
+
+  // Reset student grades & behavior in memory for next user
+  if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+    window.reloadStudentGradesForCurrentUser(true);
+  }
+  if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+    window.reloadStudentBehaviorForCurrentUser(true);
+  }
+  updateArchiveBadge();
+  if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+  if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
 
   const portal = document.getElementById('fullscreenAuthPortal');
   const workstation = document.getElementById('appWorkstation');
@@ -779,9 +1333,37 @@ window.filterPortalFeaturesShowcase = function(category, btn) {
   });
 };
 
+function syncProfileModalInputs(user) {
+  if (!user) user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
+  const pName = document.getElementById('profName');
+  const pGov = document.getElementById('profGov');
+  const pSchool = document.getElementById('profSchool');
+  const pSub = document.getElementById('profSubject');
+  const pContact = document.getElementById('profContact');
+  const pRights = document.getElementById('profRights');
+
+  if (pName) pName.value = user.name || '';
+  if (pGov) pGov.value = user.governorate || '';
+  if (pSchool) pSchool.value = user.school || '';
+  if (pSub) pSub.value = user.subject || '';
+  if (pContact) pContact.value = user.contact || user.phone || user.email || '';
+  if (pRights) pRights.value = user.rights || (user.name ? `إعداد وتنظيم ${user.name} - جميع الحقوق محفوظة` : '');
+}
+window.syncProfileModalInputs = syncProfileModalInputs;
+
 function loadTeacherProfile() {
-  const current = getCurrentUser();
-  if (current) {
+  const current = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  if (current && current.id) {
+    try {
+      const savedUserProf = localStorage.getItem(`moallem_teacher_profile_${current.id}`);
+      if (savedUserProf) {
+        const parsed = JSON.parse(savedUserProf);
+        Object.assign(current, parsed);
+        localStorage.setItem('moallem_current_user', JSON.stringify(current));
+      }
+    } catch (_) {}
+    teacherProfile = { ...current };
+  } else if (current) {
     teacherProfile = { ...current };
   } else {
     teacherProfile = {
@@ -789,9 +1371,11 @@ function loadTeacherProfile() {
       governorate: '',
       school: '',
       subject: '',
-      contact: ''
+      contact: '',
+      rights: ''
     };
   }
+  syncProfileModalInputs(teacherProfile);
   updateUserAuthUI();
 }
 
@@ -804,17 +1388,38 @@ function updateUserAuthUI() {
   const navSchool = document.getElementById('navTeacherSchool');
   const navAvatar = document.getElementById('navAvatarInitials');
   const dropName = document.getElementById('dropdownTeacherName');
+  const heroNameEl = document.getElementById('heroBannerTeacherName');
+  
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin' || current.id === 'usr_admin');
+  const isSubscribed = loggedIn && current && (current.isSubscribed || current.isVip || isAdmin || (current.id && localStorage.getItem(`moallem_vip_subscription_${current.id}`) === 'true'));
+
+  const displayName = (current && (current.name || current.username)) || 'أستاذ المادة';
+  const roleText = isAdmin ? 'المدير العام للمنصة 👑' : (isSubscribed ? 'مشترك معتمد PRO 💎' : 'مدرس معتمد • مسار المعلم');
+  const shortRoleText = isAdmin ? 'المدير العام 👑' : (isSubscribed ? 'مشترك PRO 💎' : 'مدرس معتمد');
+
+  // Topbar user badge (أقصى اليسار)
+  const topbarName = document.getElementById('topbarTeacherName') || document.querySelector('.topbar-user-name');
+  if (topbarName) topbarName.textContent = displayName;
+  const topbarRole = document.getElementById('topbarTeacherRole') || document.querySelector('.topbar-user-role');
+  if (topbarRole) topbarRole.textContent = shortRoleText;
+
+  // Drawer teacher card
+  const drawerName = document.getElementById('drawerTeacherName');
+  if (drawerName) drawerName.textContent = displayName;
+  const drawerRole = document.getElementById('drawerTeacherRole');
+  if (drawerRole) drawerRole.textContent = roleText;
+
+  if (heroNameEl) {
+    heroNameEl.textContent = displayName;
+  }
   const dropEmail = document.getElementById('dropdownTeacherEmail');
   const googleStatusBtn = document.getElementById('navGoogleSyncStatusBtn');
   const drawerGoogleBtn = document.getElementById('drawerGoogleSyncBtn');
   const drawerPermissionsBtn = document.getElementById('drawerAdminPermissionsBtn');
-  const drawerGrantBtn = document.getElementById('drawerAdminGrantVipBtn');
-  const drawerSubCountBadge = document.getElementById('drawerSubscribersCountBadge');
+  const drawerSubscribersBtn = document.getElementById('drawerAdminSubscribersBtn') || document.getElementById('drawerAdminGrantVipBtn');
+  const drawerSubCountBadge = document.getElementById('drawerActiveSubsBadge') || document.getElementById('drawerSubscribersCountBadge');
 
-  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
-  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
-
-  // Both Manage Permissions and Manage Subscriptions buttons are strictly for ADMIN ONLY
   if (drawerPermissionsBtn) {
     if (isAdmin) {
       drawerPermissionsBtn.style.setProperty('display', 'flex', 'important');
@@ -825,10 +1430,11 @@ function updateUserAuthUI() {
     }
   }
 
-  if (drawerGrantBtn) {
+  // Drawer Subscribers Management Button (Admin Only 👑)
+  if (drawerSubscribersBtn) {
     if (isAdmin) {
-      drawerGrantBtn.style.setProperty('display', 'flex', 'important');
-      drawerGrantBtn.classList.remove('admin-only-hidden');
+      drawerSubscribersBtn.style.setProperty('display', 'flex', 'important');
+      drawerSubscribersBtn.classList.remove('admin-only-hidden');
       
       // Calculate active non-admin subscribers count (with 1-year expiration check)
       const allAccounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
@@ -847,9 +1453,70 @@ function updateUserAuthUI() {
       if (drawerSubCountBadge) {
         drawerSubCountBadge.innerText = `${activeSubsCount} مشترك 👑`;
       }
+
+      // Topbar Subscribers Counter Badge
+      const topbarSubsBadge = document.getElementById('topbarActiveSubsBadge');
+      if (topbarSubsBadge) {
+        topbarSubsBadge.innerText = activeSubsCount;
+      }
     } else {
-      drawerGrantBtn.style.setProperty('display', 'none', 'important');
-      drawerGrantBtn.classList.add('admin-only-hidden');
+      drawerSubscribersBtn.style.setProperty('display', 'none', 'important');
+      drawerSubscribersBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  // Drawer Pricing & Discounts Button (Admin Only 👑)
+  const drawerPricingBtn = document.getElementById('drawerAdminPricingBtn');
+  if (drawerPricingBtn) {
+    if (isAdmin) {
+      drawerPricingBtn.style.setProperty('display', 'flex', 'important');
+      drawerPricingBtn.classList.remove('admin-only-hidden');
+    } else {
+      drawerPricingBtn.style.setProperty('display', 'none', 'important');
+      drawerPricingBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  // Topbar Admin Subscribers Button (Strictly for ADMIN ONLY 👑)
+  const topbarSubBtn = document.getElementById('topbarAdminSubscribersBtn');
+  if (topbarSubBtn) {
+    if (isAdmin) {
+      topbarSubBtn.style.setProperty('display', 'inline-flex', 'important');
+      topbarSubBtn.classList.remove('admin-only-hidden');
+    } else {
+      topbarSubBtn.style.setProperty('display', 'none', 'important');
+      topbarSubBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  // Topbar Admin Server Status & Gateway Diagnostics Button (Strictly for ADMIN ONLY ⚡)
+  const topbarSrvBtn = document.getElementById('topbarServerStatusBtn');
+  if (topbarSrvBtn) {
+    if (isAdmin) {
+      topbarSrvBtn.style.setProperty('display', 'inline-flex', 'important');
+      topbarSrvBtn.classList.remove('admin-only-hidden');
+      if (typeof window.checkServerStatusLive === 'function') {
+        // Trigger a silent check if not already checked recently
+        if (!window._serverCheckedRecently) {
+          window._serverCheckedRecently = true;
+          window.checkServerStatusLive(false);
+        }
+      }
+    } else {
+      topbarSrvBtn.style.setProperty('display', 'none', 'important');
+      topbarSrvBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  // Drawer Server Status Button (Strictly for ADMIN ONLY ⚡)
+  const drawerServerBtn = document.getElementById('drawerServerStatusBtn') || document.getElementById('drawerServerDashboardBtn');
+  if (drawerServerBtn) {
+    if (isAdmin) {
+      drawerServerBtn.style.setProperty('display', 'flex', 'important');
+      drawerServerBtn.classList.remove('admin-only-hidden');
+    } else {
+      drawerServerBtn.style.setProperty('display', 'none', 'important');
+      drawerServerBtn.classList.add('admin-only-hidden');
     }
   }
 
@@ -864,7 +1531,7 @@ function updateUserAuthUI() {
     }
 
     if (navName) {
-      navName.innerText = isAdmin ? 'الأستاذ حسين (المدير العام)' : (current.name || 'أستاذ المادة');
+      navName.innerText = displayName;
     }
     
     const isGoogleLinked = current.isGoogleUser || (current.email && current.email.includes('@gmail.com'));
@@ -920,20 +1587,11 @@ function updateUserAuthUI() {
         navAvatar.style.background = 'linear-gradient(135deg, #2563eb, #38bdf8)';
       }
     }
-    if (dropName) dropName.innerText = current.name;
-    if (dropEmail) dropEmail.innerText = current.email || (current.subject + ' - ' + current.governorate);
+    if (dropName) dropName.innerText = displayName;
+    if (dropEmail) dropEmail.innerText = current.email || (current.subject ? `${current.subject} - ${current.governorate || ''}` : '');
 
-    // Sync modal fields
-    const pName = document.getElementById('profName');
-    const pGov = document.getElementById('profGov');
-    const pSchool = document.getElementById('profSchool');
-    const pSub = document.getElementById('profSubject');
-    const pContact = document.getElementById('profContact');
-    if (pName) pName.value = current.name || '';
-    if (pGov) pGov.value = current.governorate || '';
-    if (pSchool) pSchool.value = current.school || '';
-    if (pSub) pSub.value = current.subject || '';
-    if (pContact) pContact.value = current.contact || (current.email || '');
+    // Sync modal fields to current user data
+    syncProfileModalInputs(current);
   } else {
     if (pillBtn) {
       pillBtn.style.display = 'none';
@@ -944,6 +1602,10 @@ function updateUserAuthUI() {
       openAuthBtn.classList.remove('auth-hidden');
     }
     if (googleStatusBtn) googleStatusBtn.style.display = 'none';
+  }
+
+  if (typeof window.syncSideDrawerItems === 'function') {
+    window.syncSideDrawerItems();
   }
 }
 
@@ -956,16 +1618,81 @@ window.togglePasswordVisibility = function(inputId, btn) {
   if (icon) icon.className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
 };
 
-function saveTeacherProfile() {
+window.validateTeacherProfileFields = function(showVisualFeedback = false) {
+  const pName = document.getElementById('profName');
+  const pGov = document.getElementById('profGov');
+  const pSchool = document.getElementById('profSchool');
+  const pSub = document.getElementById('profSubject');
+  const pContact = document.getElementById('profContact');
+  const pRights = document.getElementById('profRights');
+
+  const fields = [
+    { el: pName, label: 'الاسم الكامل للأستاذ / المعلم' },
+    { el: pGov, label: 'المحافظة / الإدارة التعليمية' },
+    { el: pSchool, label: 'المدرسة أو الكلية' },
+    { el: pSub, label: 'المادة الدراسية التخصصية' },
+    { el: pContact, label: 'رقم الهاتف أو وسيلة التواصل' },
+    { el: pRights, label: 'حقوق الطبع والترويسة المخصصة' }
+  ];
+
+  let missing = [];
+  fields.forEach(f => {
+    if (!f.el || !f.el.value.trim()) {
+      missing.push(f);
+      if (showVisualFeedback && f.el) {
+        f.el.style.borderColor = '#ef4444';
+        f.el.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)';
+      }
+    } else if (f.el) {
+      f.el.style.borderColor = '';
+      f.el.style.boxShadow = '';
+    }
+  });
+
+  return { isValid: missing.length === 0, missingFields: missing };
+};
+
+function saveTeacherProfile(isClosingOrManual = false, explicitData = null) {
   const current = getCurrentUser() || {};
-  const profNameEl = document.getElementById('profName');
-  if (profNameEl && profNameEl.value) {
-    current.name = profNameEl.value.trim() || current.name || 'أستاذ المادة';
-    current.governorate = document.getElementById('profGov') ? document.getElementById('profGov').value.trim() : current.governorate;
-    current.school = document.getElementById('profSchool') ? document.getElementById('profSchool').value.trim() : current.school;
-    current.subject = document.getElementById('profSubject') ? document.getElementById('profSubject').value.trim() : current.subject;
-    current.contact = document.getElementById('profContact') ? document.getElementById('profContact').value.trim() : current.contact;
+  if (!current.id && !current.username) return;
+
+  if (explicitData && typeof explicitData === 'object') {
+    Object.assign(current, explicitData);
+  } else {
+    const profNameEl = document.getElementById('profName');
+    const profGovEl = document.getElementById('profGov');
+    const profSchoolEl = document.getElementById('profSchool');
+    const profSubjectEl = document.getElementById('profSubject');
+    const profContactEl = document.getElementById('profContact');
+    const profRightsEl = document.getElementById('profRights');
+
+    if (profNameEl && profNameEl.value.trim()) current.name = profNameEl.value.trim();
+    if (profGovEl && profGovEl.value.trim()) current.governorate = profGovEl.value.trim();
+    if (profSchoolEl && profSchoolEl.value.trim()) current.school = profSchoolEl.value.trim();
+    if (profSubjectEl && profSubjectEl.value.trim()) current.subject = profSubjectEl.value.trim();
+    if (profContactEl && profContactEl.value.trim()) current.contact = profContactEl.value.trim();
+    if (profRightsEl && profRightsEl.value.trim()) current.rights = profRightsEl.value.trim();
   }
+  current.updatedAt = new Date().toISOString();
+
+  // If super admin, keep in-memory SUPER_ADMIN_ACCOUNT synchronized as well
+  if (current.id === 'usr_admin' || current.username === 'admin') {
+    if (current.name) SUPER_ADMIN_ACCOUNT.name = current.name;
+    if (current.governorate) SUPER_ADMIN_ACCOUNT.governorate = current.governorate;
+    if (current.school) SUPER_ADMIN_ACCOUNT.school = current.school;
+    if (current.subject) SUPER_ADMIN_ACCOUNT.subject = current.subject;
+    if (current.contact) SUPER_ADMIN_ACCOUNT.contact = current.contact;
+    if (current.rights) SUPER_ADMIN_ACCOUNT.rights = current.rights;
+  }
+
+  // Update global teacherProfile and persist to storage
+  teacherProfile = { ...teacherProfile, ...current };
+  try {
+    localStorage.setItem('moallem_teacher_profile', JSON.stringify(teacherProfile));
+    if (current.id) {
+      localStorage.setItem(`moallem_teacher_profile_${current.id}`, JSON.stringify(teacherProfile));
+    }
+  } catch (_) {}
 
   // Update in accounts
   const accounts = getAuthAccounts();
@@ -980,12 +1707,65 @@ function saveTeacherProfile() {
   }
 
   setCurrentUser(current);
+  syncProfileModalInputs(current);
+  
+  // Sync topbar teacher name & drawer
+  const displayName = current.name || current.username || 'أستاذ المادة';
+  const topbarNameEl = document.getElementById('topbarTeacherName') || document.querySelector('.topbar-user-name');
+  if (topbarNameEl) {
+    topbarNameEl.textContent = displayName;
+  }
+  const drawerNameEl = document.getElementById('drawerTeacherName');
+  if (drawerNameEl) {
+    drawerNameEl.textContent = displayName;
+  }
+  const heroNameEl = document.getElementById('heroBannerTeacherName');
+  if (heroNameEl) {
+    heroNameEl.textContent = displayName;
+  }
+
+  // Auto apply to exam header silently
+  applyProfileToExamHeader(true);
+
+  // Sync to server cloud sync so server also has updated teacherProfile & teacherName
+  if (typeof window.saveUserDataToServer === 'function' && current && current.id && current.id !== 'usr_guest') {
+    window.saveUserDataToServer(true);
+  }
+
+  // Auto-save visual indicator
+  const indicator = document.getElementById('profileAutoSaveIndicator');
+  if (indicator) {
+    indicator.style.display = 'inline-flex';
+    clearTimeout(window._profileAutoSaveTimer);
+    window._profileAutoSaveTimer = setTimeout(() => {
+      indicator.style.display = 'none';
+    }, 2500);
+  }
+  
+  if (isClosingOrManual) {
+    showToast('تم حفظ وتحديث بيانات المدرس الأساسية بنجاح! 💾✨', 'success');
+  }
+}
+window.saveTeacherProfile = saveTeacherProfile;
+
+window.validateAndCloseProfileModal = function() {
+  const check = window.validateTeacherProfileFields(true);
+  if (!check.isValid) {
+    const firstMissing = check.missingFields[0];
+    if (typeof showToast === 'function') {
+      showToast(`⚠️ حقل أساسي إجباري مطلوب: (${firstMissing.label})`, 'error');
+    }
+    if (firstMissing.el) firstMissing.el.focus();
+    return false;
+  }
+
+  saveTeacherProfile(true);
   const pModal = document.getElementById('profileModal');
   if (pModal) pModal.classList.remove('open');
-  showToast('تم حفظ وتحديث بيانات حساب المعلم بنجاح!', 'success');
-}
+  return true;
+};
 
-function applyProfileToExamHeader() {
+function applyProfileToExamHeader(isSilent = false) {
   const current = getCurrentUser();
   if (!current) return;
 
@@ -1019,7 +1799,9 @@ function applyProfileToExamHeader() {
   }
   saveStateToStorage();
   renderPaperHeader();
-  showToast('تمت تعبئة ترويسة وحقوق الاختبار ببيانات المعلم تلقائياً!', 'success');
+  if (!isSilent) {
+    showToast('تمت تعبئة ترويسة وحقوق الاختبار ببيانات المعلم تلقائياً!', 'success');
+  }
 }
 
 /**
@@ -1392,53 +2174,101 @@ window.setQuickGrade = function(gradeName) {
 /**
  * Saved Exams Archive Management
  */
+const OFFICIAL_11_PRESET_IDS = [
+  'preset_model_islamic',
+  'preset_model_english',
+  'preset_model_math',
+  'preset_model_physics',
+  'preset_model_arabic',
+  'preset_model_islamic_6th',
+  'preset_model_arabic_6th',
+  'preset_model_english_6th',
+  'preset_model_math_6th',
+  'preset_model_physics_6th',
+  'preset_model_chemistry_6th'
+];
+
 function initDefaultArchiveModels(forceReset = false) {
   try {
     const storageKey = getAccountStorageKey('moallem_saved_exams_archive');
-    let list = [];
-    let raw = localStorage.getItem(storageKey);
-    // Legacy migration for admin
-    if (!raw && storageKey.includes('usr_admin')) {
-      raw = localStorage.getItem('moallem_saved_exams_archive');
-    }
-    if (raw) {
-      try { list = JSON.parse(raw) || []; } catch(e) { list = []; }
-    }
-
     const officialModels = (typeof window !== 'undefined' && window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS) ? window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS : [];
-    if (!officialModels || officialModels.length === 0) return list;
+    if (!officialModels || officialModels.length === 0) return [];
 
-    const presetIds = officialModels.map(m => m.id);
-
-    if (forceReset) {
-      // Remove any previously cached preset copies and insert fresh copies
-      const userExams = list.filter(item => !presetIds.includes(item.id) && !item.isModelPreset);
-      const merged = [...officialModels, ...userExams];
-      localStorage.setItem(storageKey, JSON.stringify(merged));
-      updateArchiveBadge();
-      return merged;
-    }
-
-    let changed = false;
-    // Add missing official models to list
-    officialModels.forEach((model, idx) => {
-      const exists = list.some(item => item.id === model.id);
-      if (!exists) {
-        list.splice(idx, 0, JSON.parse(JSON.stringify(model)));
-        changed = true;
-      }
+    // Filter to strictly the 11 protected official ministerial models
+    const official11 = officialModels.filter(m => OFFICIAL_11_PRESET_IDS.includes(m.id));
+    official11.forEach(m => {
+      m.isModelPreset = true;
+      m.isProtected = true;
     });
 
-    if (changed || !raw) {
-      localStorage.setItem(storageKey, JSON.stringify(list));
-      updateArchiveBadge();
-    }
-    return list;
+    const cleanList = official11.map(m => JSON.parse(JSON.stringify(m)));
+    localStorage.setItem(storageKey, JSON.stringify(cleanList));
+    localStorage.setItem('moallem_saved_exams_archive', JSON.stringify(cleanList));
+    updateArchiveBadge();
+    return cleanList;
   } catch (err) {
     console.error('Error in initDefaultArchiveModels:', err);
     return [];
   }
 }
+
+function purgeTrialDataOnStartup() {
+  try {
+    const PURGE_KEY = 'moallem_all_sections_zeroed_v2026';
+    if (!localStorage.getItem(PURGE_KEY)) {
+      // 1. Clear Question Bank
+      const bankKey = (typeof getAccountStorageKey === 'function') ? getAccountStorageKey('moallem_questions_history_bank') : 'moallem_questions_history_bank';
+      localStorage.removeItem(bankKey);
+      localStorage.removeItem('moallem_questions_history_bank');
+      localStorage.removeItem('moallem_questions_bank');
+
+      // 2. Clear Exam Draft & Current Questions
+      localStorage.removeItem('moallem_exam_draft_v1');
+      localStorage.removeItem('moallem_current_exam');
+      if (typeof appState !== 'undefined') {
+        appState.questions = [];
+        appState.currentArchiveId = null;
+        if (appState.header) {
+          appState.header.examTitle = '';
+          appState.header.subject = '';
+          appState.header.school = '';
+          appState.header.teacher = '';
+          appState.header.instructions = '';
+        }
+      }
+
+      // 3. Clear Student Grades Rosters
+      localStorage.removeItem('masar_teacher_grades_rosters_v1');
+      localStorage.removeItem('masar_teacher_grades_active_id');
+
+      // 4. Clear Student Behavior & Attendance
+      localStorage.removeItem('masar_teacher_behavior_records_v1');
+      localStorage.removeItem('masar_teacher_behavior_rosters_v1');
+
+      // 5. Clear Lesson Plans
+      localStorage.removeItem('masar_teacher_lesson_plans_archive_v1');
+      localStorage.removeItem('masar_teacher_lesson_plan_current_v1');
+
+      // 6. Reset Saved Exams Archive to strictly the 11 protected ministerial models
+      initDefaultArchiveModels(true);
+
+      localStorage.setItem(PURGE_KEY, '1');
+      console.log('✅ All sections completely zeroed and purged. 11 official ministerial models preserved.');
+    }
+  } catch (e) {
+    console.warn('Purge error:', e);
+  }
+}
+
+window.resetAllTrialData = function() {
+  localStorage.removeItem('moallem_trial_purged_v2026_final');
+  purgeTrialDataOnStartup();
+  if (typeof renderArchiveList === 'function') renderArchiveList();
+  if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+  if (typeof renderQuestionsList === 'function') renderQuestionsList();
+  if (typeof renderPaperQuestions === 'function') renderPaperQuestions();
+  showToast('تم تصفير كافة البيانات التجريبية، وحفظ النماذج الوزارية الـ 11 المحمية بنجاح 🏛️', 'success');
+};
 
 function getSavedExamsArchive() {
   try {
@@ -1453,7 +2283,7 @@ function getSavedExamsArchive() {
     const list = JSON.parse(raw);
     const officialModels = (typeof window !== 'undefined' && window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS) ? window.OFFICIAL_MINISTERIAL_ARCHIVE_MODELS : [];
     if (officialModels.length > 0) {
-      const hasAll = officialModels.every(m => list.some(item => item.id === m.id));
+      const hasAll = OFFICIAL_11_PRESET_IDS.every(id => list.some(item => item.id === id));
       if (!hasAll) {
         return initDefaultArchiveModels(false);
       }
@@ -1467,7 +2297,7 @@ function getSavedExamsArchive() {
 window.reseedDefaultArchiveModels = function() {
   initDefaultArchiveModels(true);
   renderArchiveList();
-  showToast('تم استيراد وتحديث النماذج الوزارية الـ 12 المعتمدة (الثالث متوسط والسادس إعدادي لجميع المواد) بنجاح في الأرشيف! 🏛️', 'success');
+  showToast('تم استيراد وتحديث النماذج الوزارية الـ 11 المعتمدة (الثالث متوسط والسادس إعدادي لجميع المواد) بنجاح في الأرشيف! 🏛️', 'success');
 };
 
 function saveExamsArchive(list) {
@@ -1871,94 +2701,207 @@ window.deleteExamFromArchive = function(id) {
 };
 
 /**
- * Right Slide-Out Sidebar Drawer Controller (شريط جانبي يظهر ويختفي من جهة اليمين)
+ * Right Slide-Out Sidebar Drawer Controller
+ * (شريط جانبي عائم فخم لا يؤثر على مساحة أو تخطيط الموقع إطلاقاً)
  */
+let _lastDrawerToggleTime = 0;
+
 window.openSideDrawer = function() {
   const drawer = document.getElementById('sideDrawer');
   const backdrop = document.getElementById('drawerBackdrop');
   if (drawer) {
-    drawer.classList.remove('mini-mode');
-    drawer.classList.add('open', 'expanded');
-    localStorage.setItem('moallem_drawer_minidock', 'false');
+    drawer.classList.add('open');
   }
-  if (backdrop && window.innerWidth <= 768) {
+  if (backdrop) {
     backdrop.classList.add('open');
   }
-  const icon = document.getElementById('drawerCollapseIcon');
-  if (icon) icon.className = 'fa-solid fa-angles-right';
-  const btn = document.getElementById('toggleSideDrawerCollapseBtn');
-  if (btn) btn.title = 'تصغير إلى شريط الأيقونات فقط';
+  try {
+    if (typeof window.syncSideDrawerItems === 'function') {
+      window.syncSideDrawerItems();
+    }
+  } catch(err) {
+    console.warn('Error in syncSideDrawerItems:', err);
+  }
 };
 
 window.closeSideDrawer = function() {
   const drawer = document.getElementById('sideDrawer');
   const backdrop = document.getElementById('drawerBackdrop');
   if (drawer) {
-    drawer.classList.add('mini-mode');
-    drawer.classList.remove('expanded');
-    if (window.innerWidth <= 768) {
-      drawer.classList.remove('open');
-    } else {
-      drawer.classList.add('open'); // Always visible as icon dock on desktop
-    }
-    localStorage.setItem('moallem_drawer_minidock', 'true');
+    drawer.classList.remove('open', 'expanded', 'mini-mode');
   }
-  if (backdrop) backdrop.classList.remove('open');
-  const icon = document.getElementById('drawerCollapseIcon');
-  if (icon) icon.className = 'fa-solid fa-angles-left';
-  const btn = document.getElementById('toggleSideDrawerCollapseBtn');
-  if (btn) btn.title = 'توسيع شريط الأدوات وعرض النصوص كاملة';
+  if (backdrop) {
+    backdrop.classList.remove('open');
+  }
 };
 
-window.startNewExamFromDrawer = function() {
-  window.closeSideDrawer();
-  if (appState.questions && appState.questions.length > 0) {
-    if (!confirm('هل ترغب ببدء إنشاء اختبار جديد وتفريغ الورقة الحالية؟ (سيتم حفظ عملك السابق كمسودة بالأرشيف تلقائياً)')) {
-      return;
-    }
-    autoSaveDraftToArchive(true);
+window.toggleSideDrawer = function(e) {
+  if (e && typeof e.stopPropagation === 'function') {
+    e.stopPropagation();
   }
-  appState.questions = [];
-  appState.currentArchiveId = null;
-  appState.header.examTitle = '';
-  appState.header.instructions = '';
-  syncHeaderInputs();
-  saveStateToStorage();
-  renderAll();
-
-  // Switch to questions tab
-  const tabQuestions = document.querySelector('.tab-btn[data-tab="tab-questions"]');
-  if (tabQuestions) tabQuestions.click();
-
-  // Smooth scroll to side question types bar
-  const qBar = document.querySelector('.side-qtype-bar') || document.querySelector('.questions-workspace-layout');
-  if (qBar) {
-    qBar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const now = Date.now();
+  if (now - _lastDrawerToggleTime < 280) {
+    return; // Prevent duplicate rapid toggle
   }
+  _lastDrawerToggleTime = now;
 
-  showToast('تم فتح ورقة اختبار جديدة وتفريغ الحقول! اختر نوع السؤال للبدء فوراً ✨', 'success');
-};
-
-window.toggleSideDrawer = function() {
   const drawer = document.getElementById('sideDrawer');
   if (!drawer) return;
-  const isExpanded = drawer.classList.contains('expanded') || (!drawer.classList.contains('mini-mode') && drawer.classList.contains('open'));
-  if (isExpanded) {
+  if (drawer.classList.contains('open')) {
     window.closeSideDrawer();
   } else {
     window.openSideDrawer();
   }
 };
 
+window.syncSideDrawerItems = function() {
+  const current = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || (appState && appState.currentAccount) || {};
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  const isSubscribed = (current.isSubscribed || current.isVip || isAdmin || (current.id && localStorage.getItem(`moallem_vip_subscription_${current.id}`) === 'true'));
+
+  // Sync Teacher Name & Role
+  const displayName = (current && (current.name || current.username)) || (appState && appState.teacherProfile && appState.teacherProfile.name) || 'أستاذ المادة';
+  const nameEl = document.getElementById('drawerTeacherName');
+  const roleEl = document.getElementById('drawerTeacherRole');
+  if (nameEl) {
+    nameEl.innerText = displayName;
+  }
+  if (roleEl) {
+    roleEl.innerText = isAdmin ? 'المدير العام للمنصة 👑' : (isSubscribed ? 'مشترك معتمد PRO 💎' : 'مدرس معتمد • مسار المعلم');
+  }
+
+  // Also sync topbar badge
+  const topbarNameEl = document.getElementById('topbarTeacherName') || document.querySelector('.topbar-user-name');
+  if (topbarNameEl) {
+    topbarNameEl.innerText = displayName;
+  }
+  const topbarRoleEl = document.getElementById('topbarTeacherRole') || document.querySelector('.topbar-user-role');
+  if (topbarRoleEl) {
+    topbarRoleEl.innerText = isAdmin ? 'المدير العام 👑' : (isSubscribed ? 'مشترك PRO 💎' : 'مدرس معتمد');
+  }
+
+  // 1. إعدادات الحساب (Always accessible)
+  const accBtn = document.getElementById('drawerAccountSettingsBtn');
+  if (accBtn) {
+    accBtn.style.display = 'flex';
+  }
+
+  // 2. إدارة المشتركين (Admin Only)
+  const subBtn = document.getElementById('drawerAdminSubscribersBtn');
+  const subCountBadge = document.getElementById('drawerActiveSubsBadge');
+  if (subBtn) {
+    if (isAdmin) {
+      subBtn.style.setProperty('display', 'flex', 'important');
+      subBtn.classList.remove('admin-only-hidden');
+    } else {
+      subBtn.style.setProperty('display', 'none', 'important');
+      subBtn.classList.add('admin-only-hidden');
+    }
+  }
+  if (subCountBadge && isAdmin) {
+    const allAccounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+    const activeSubsCount = allAccounts.filter(acc => {
+      if (acc.isAdmin || acc.role === 'admin' || acc.username === 'admin') return false;
+      return acc.isSubscribed || acc.isVip || (acc.id && localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
+    }).length;
+    subCountBadge.innerText = activeSubsCount;
+  }
+
+  // 3. إدارة السيرفر والكيت وي (Admin Only ⚡)
+  const srvBtn = document.getElementById('drawerServerStatusBtn');
+  const srvPill = document.getElementById('drawerServerStatusPill');
+  const gwHint = document.getElementById('drawerGatewayTypeHint');
+  if (srvBtn) {
+    if (isAdmin) {
+      srvBtn.style.setProperty('display', 'flex', 'important');
+      srvBtn.classList.remove('admin-only-hidden');
+    } else {
+      srvBtn.style.setProperty('display', 'none', 'important');
+      srvBtn.classList.add('admin-only-hidden');
+    }
+  }
+  if (window.MOALLEM_PUBLIC_SERVER_URL) {
+    if (srvPill) srvPill.innerText = 'سحابي 🟢';
+    if (gwHint) gwHint.innerText = window.MOALLEM_PUBLIC_SERVER_URL.includes('trycloudflare') ? 'بوابة Cloudflare Argo Tunnel' : 'بوابة سحابية نشطة';
+  } else {
+    if (srvPill) srvPill.innerText = 'محلي 🟡';
+    if (gwHint) gwHint.innerText = 'بوابة: Localhost / Port 5000';
+  }
+
+  // 4. خطة الاشتراك والباقات (Always accessible)
+  const plansBtn = document.getElementById('drawerSubscriptionPlansBtn');
+  if (plansBtn) {
+    plansBtn.style.display = 'flex';
+  }
+
+  // 5. إدارة وضبط أسعار الباقات والخصومات (Admin Only)
+  const adminPricingBtn = document.getElementById('drawerAdminPricingBtn');
+  if (adminPricingBtn) {
+    if (isAdmin) {
+      adminPricingBtn.style.setProperty('display', 'flex', 'important');
+      adminPricingBtn.classList.remove('admin-only-hidden');
+    } else {
+      adminPricingBtn.style.setProperty('display', 'none', 'important');
+      adminPricingBtn.classList.add('admin-only-hidden');
+    }
+  }
+
+  // Synchronize Topbar Admin Buttons (Strictly for ADMIN ONLY 👑⚡)
+  const topbarSubBtn = document.getElementById('topbarAdminSubscribersBtn');
+  if (topbarSubBtn) {
+    if (isAdmin) {
+      topbarSubBtn.style.setProperty('display', 'inline-flex', 'important');
+      topbarSubBtn.classList.remove('admin-only-hidden');
+    } else {
+      topbarSubBtn.style.setProperty('display', 'none', 'important');
+      topbarSubBtn.classList.add('admin-only-hidden');
+    }
+  }
+  const topbarSrvBtn = document.getElementById('topbarServerStatusBtn');
+  if (topbarSrvBtn) {
+    if (isAdmin) {
+      topbarSrvBtn.style.setProperty('display', 'inline-flex', 'important');
+      topbarSrvBtn.classList.remove('admin-only-hidden');
+    } else {
+      topbarSrvBtn.style.setProperty('display', 'none', 'important');
+      topbarSrvBtn.classList.add('admin-only-hidden');
+    }
+  }
+};
+
+window.initAppCards3DTilt = function() {
+  const cards = document.querySelectorAll('.app-hub-card');
+  cards.forEach(card => {
+    if (card._has3dTilt) return;
+    card._has3dTilt = true;
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
+      
+      card.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-10px) scale(1.025)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+};
+
 /**
  * Attaches Event Listeners
  */
 function initEventListeners() {
-  // Side Drawer Toggle & Close (من جهة اليمين)
-  const toggleDrawerBtn = document.getElementById('toggleSideDrawerBtn');
+  // Side Drawer Close & Keyboard
   const closeDrawerBtn = document.getElementById('closeSideDrawerBtn');
   const drawerBackdrop = document.getElementById('drawerBackdrop');
-  if (toggleDrawerBtn) toggleDrawerBtn.addEventListener('click', window.toggleSideDrawer);
   if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', window.closeSideDrawer);
   if (drawerBackdrop) drawerBackdrop.addEventListener('click', window.closeSideDrawer);
 
@@ -1991,23 +2934,127 @@ function initEventListeners() {
   const togglePrevBtn = document.getElementById('togglePreviewBtn');
   if (togglePrevBtn) togglePrevBtn.addEventListener('click', window.togglePreviewPane);
 
-  // Tabs Switching
+  // Tabs Switching via Centralized Controller
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-
-      btn.classList.add('active');
       const targetId = btn.getAttribute('data-tab');
-      const targetContent = document.getElementById(targetId);
-      if (targetContent) targetContent.style.display = 'block';
-
-      if (targetId === 'tab-report') {
-        if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-        if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
-      }
+      window.switchToTab(targetId);
     });
   });
+
+  // Initial Sync for Active Tab & Preview Button Visibility
+  const activeTabBtn = document.querySelector('.tab-btn.active');
+  const initialTabId = activeTabBtn ? activeTabBtn.getAttribute('data-tab') : 'tab-apps';
+  window.updatePreviewVisibilityForTab(initialTabId);
+  window.updateAppsHubStats();
+
+  if (typeof openQuestionModal === 'function') {
+    window.openQuestionModal = openQuestionModal;
+  }
+
+  // Custom Question Type Dropdown Handlers
+  let _lastQDropdownToggleTime = 0;
+  window.toggleQTypeDropdown = function(e) {
+    if (e) {
+      if (typeof e.stopPropagation === 'function') e.stopPropagation();
+      if (typeof e.preventDefault === 'function') e.preventDefault();
+    }
+    const now = Date.now();
+    if (now - _lastQDropdownToggleTime < 180) {
+      return;
+    }
+    _lastQDropdownToggleTime = now;
+
+    const dropdown = document.getElementById('qbuilderCustomDropdown');
+    const menu = document.getElementById('qbuilderDropdownMenu');
+    const trigger = document.getElementById('qbuilderDropdownTrigger');
+    const chevron = document.getElementById('qbuilderTriggerChevron');
+    if (!dropdown || !menu) return;
+
+    const isOpen = dropdown.classList.contains('open') || menu.style.display === 'block';
+    if (isOpen) {
+      window.closeQTypeDropdown();
+    } else {
+      dropdown.classList.add('open');
+      menu.style.display = 'block';
+      menu.style.opacity = '1';
+      menu.style.visibility = 'visible';
+      menu.style.pointerEvents = 'auto';
+      menu.style.transform = 'translateY(0) scale(1)';
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+      if (chevron) chevron.style.transform = 'rotate(180deg)';
+    }
+  };
+
+  window.closeQTypeDropdown = function() {
+    const dropdown = document.getElementById('qbuilderCustomDropdown');
+    const menu = document.getElementById('qbuilderDropdownMenu');
+    const trigger = document.getElementById('qbuilderDropdownTrigger');
+    const chevron = document.getElementById('qbuilderTriggerChevron');
+    if (dropdown) dropdown.classList.remove('open');
+    if (menu) {
+      menu.style.display = 'none';
+      menu.style.opacity = '0';
+      menu.style.visibility = 'hidden';
+      menu.style.pointerEvents = 'none';
+      menu.style.transform = 'translateY(-8px) scale(0.98)';
+    }
+    if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    if (chevron) chevron.style.transform = 'rotate(0deg)';
+  };
+
+  window.selectAndOpenQuestionType = function(type, label) {
+    window.closeQTypeDropdown();
+    
+    // Update selected label
+    const selectedNameEl = document.getElementById('qbuilderSelectedTypeName');
+    if (selectedNameEl && label) {
+      selectedNameEl.innerText = label;
+    }
+    const legacySelect = document.getElementById('qbuilderTypeSelect');
+    if (legacySelect && type) {
+      legacySelect.value = type;
+    }
+
+    if (!type) return;
+    if (type === 'mathlive') {
+      if (typeof window.openStandaloneMathLiveModal === 'function') {
+        window.openStandaloneMathLiveModal();
+      } else if (typeof openStandaloneMathLiveModal === 'function') {
+        openStandaloneMathLiveModal();
+      }
+    } else {
+      if (typeof window.openQuestionModal === 'function') {
+        window.openQuestionModal(null, type);
+      } else if (typeof openQuestionModal === 'function') {
+        openQuestionModal(null, type);
+      }
+    }
+  };
+
+  // Close dropdown on outside click or Escape
+  document.addEventListener('click', (e) => {
+    const dropdown = document.getElementById('qbuilderCustomDropdown');
+    if (dropdown && dropdown.classList.contains('open') && !dropdown.contains(e.target)) {
+      window.closeQTypeDropdown();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      window.closeQTypeDropdown();
+    }
+  });
+
+  window.handleQTypeSelectChange = function(type) {
+    window.selectAndOpenQuestionType(type);
+  };
+
+  window.addQuestionFromCurrentSelect = function() {
+    const legacySelect = document.getElementById('qbuilderTypeSelect');
+    const type = legacySelect ? legacySelect.value : 'mcq';
+    window.selectAndOpenQuestionType(type);
+  };
 
   // Adding Question Buttons
   document.querySelectorAll('[data-add-type]').forEach(btn => {
@@ -2210,6 +3257,423 @@ function initEventListeners() {
     }
   };
 
+  window.executeExamPaperPdf = async function(options) {
+    if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
+      return await window.MasarPDF.exportExam(options);
+    }
+
+    // Locate the configuration for the PDF export in app.js
+    const exportOptions = Object.assign({
+      timeout: 60000, // Increase timeout to 60 seconds (or relevant setting for your library)
+      html2canvas: {
+        useCORS: true,
+        logging: false,
+        scale: 2 // Reducing scale can also prevent timeouts by lowering memory usage
+      }
+    }, options || {});
+    options = exportOptions;
+
+    // If the error persists, wrap the execution in a check that ensures images are loaded
+    try {
+      await Promise.all(Array.from(document.images).map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => { img.onload = img.onerror = resolve; });
+      }));
+    } catch (imgLoadErr) {
+      console.warn('Image preloading warning:', imgLoadErr);
+    }
+
+    if (typeof isUserSubscribedOrAdmin === 'function' && !isUserSubscribedOrAdmin()) {
+      if (typeof requireSubscription === 'function') {
+        requireSubscription('تصدير ورقة الاختبار بصيغة PDF');
+      }
+      return;
+    }
+
+    const questionsCount = (window.appState && Array.isArray(window.appState.questions)) ? window.appState.questions.length : 0;
+    if (questionsCount === 0) {
+      if (typeof showToast === 'function') {
+        showToast('ورقة الاختبار فارغة! يرجى إضافة بعض الأسئلة أولاً قبل حفظ وتنزيل الـ PDF 📄', 'warning');
+      }
+      return;
+    }
+
+    // 1. Ensure student paper mode is active and elements are rendered
+    const prevMode = window.appState?.viewMode || 'student';
+    if (window.appState) window.appState.viewMode = 'student';
+
+    try {
+      if (typeof window.renderPaperHeader === 'function') window.renderPaperHeader();
+      if (typeof window.renderPaperQuestions === 'function') window.renderPaperQuestions();
+      if (typeof window.applyPaperSettings === 'function') window.applyPaperSettings();
+    } catch (e) {
+      console.warn('Paper render prep:', e);
+    }
+
+    const rawTitle = (window.appState?.header?.examTitle || 'امتحان_مسار_المعلم');
+    const safeTitle = rawTitle.replace(/[/\\?%*:|"<>]/g, '_').trim() || 'امتحان_مسار_المعلم';
+    const filename = (options && options.path) ? options.path : `${safeTitle}.pdf`;
+
+    // 2. Retrieve paper HTML
+    let paperHTML = '';
+    if (window.ExamExporter && typeof window.ExamExporter.generatePaperCopyHTML === 'function') {
+      paperHTML = window.ExamExporter.generatePaperCopyHTML('student');
+    } else {
+      const sourceDoc = document.getElementById('examPaperDoc');
+      paperHTML = sourceDoc ? sourceDoc.innerHTML : '';
+    }
+
+    if (!paperHTML || paperHTML.trim().length === 0) {
+      if (typeof showToast === 'function') showToast('لا توجد بيانات أو أسئلة في ورقة الامتحان لتصديرها', 'warning');
+      return;
+    }
+
+    // 3. Create non-blocking animated loading overlay with safety dismiss
+    const overlay = document.createElement('div');
+    overlay.id = 'directPdfExportOverlay';
+    overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999999; background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; font-family: "Cairo", sans-serif;';
+    overlay.innerHTML = `
+      <div style="position: relative; text-align: center; background: rgba(30, 41, 59, 0.96); padding: 2.2rem 2.8rem; border-radius: 20px; border: 1.5px solid rgba(255,255,255,0.18); box-shadow: 0 25px 60px rgba(0,0,0,0.65); max-width: 440px; width: 90%;">
+        <button type="button" onclick="document.getElementById('directPdfExportOverlay')?.remove()" style="position: absolute; top: 12px; left: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;" title="إلغاء">✕</button>
+        <div style="font-size: 2.8rem; color: #38bdf8; margin-bottom: 0.9rem;">
+          <i class="fa-solid fa-circle-notch fa-spin"></i>
+        </div>
+        <h3 style="margin: 0; font-size: 1.3rem; font-weight: 800; color: #ffffff;">جاري تصدير وتنزيل ملف PDF... 📄</h3>
+        <p style="margin: 0.5rem 0 0; color: #94a3b8; font-size: 0.85rem;">يتم إنشاء صفحات الامتحان وتنزيل الملف لجهازك مباشرة</p>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const safetyTimer = setTimeout(() => {
+      const ov = document.getElementById('directPdfExportOverlay');
+      if (ov) ov.remove();
+    }, 60000);
+
+    const isLtr = (window.appState?.settings?.direction === 'ltr');
+
+    // 4. Primary direct html2pdf execution
+    let exportSucceeded = false;
+    let frame = null;
+
+    const element = document.getElementById('exam-paper-container') || document.getElementById('exam-paper') || document.getElementById('examPaperDoc');
+    if (element && typeof window.html2pdf !== 'undefined') {
+      try {
+        if (window.ExamExporter && typeof window.ExamExporter.ensurePreviewVisible === 'function') {
+          window.ExamExporter.ensurePreviewVisible();
+        }
+
+        const opt = {
+          margin:       1,
+          filename:     filename || 'exam-paper.pdf',
+          image:        { type: 'jpeg', quality: 0.98 },
+          timeout:      options.timeout || 60000,
+          html2canvas:  { 
+            useCORS: true, 
+            logging: false,
+            scale: 2 // Reducing scale can also prevent timeouts by lowering memory usage
+          },
+          jsPDF:        { unit: 'in', format: 'letter', orientation: (window.appState?.settings?.orientation || 'portrait') }
+        };
+
+        const exportPromise = window.html2pdf().set(opt).from(element).save();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Export timeout')), options.timeout || 60000));
+        await Promise.race([exportPromise, timeoutPromise]);
+
+        exportSucceeded = true;
+        if (typeof showToast === 'function') {
+          showToast(`تم تنزيل ملف «${filename || 'exam-paper.pdf'}» بنجاح! 📥📄`, 'success');
+        }
+      } catch (err) {
+        console.warn('Fast HTML2PDF attempt:', err);
+      }
+    }
+
+    if (!exportSucceeded && typeof window.exportToPDF === 'function') {
+      const sourceDoc = document.getElementById('examPaperDoc') || element;
+      if (sourceDoc) {
+        try {
+          if (window.ExamExporter && typeof window.ExamExporter.ensurePreviewVisible === 'function') {
+            window.ExamExporter.ensurePreviewVisible();
+          }
+          const res = await window.exportToPDF(sourceDoc, {
+            filename: filename,
+            format: 'a4',
+            orientation: (window.appState?.settings?.orientation || 'portrait'),
+            margin: 8,
+            scale: 2,
+            useCORS: true,
+            allowTaint: false
+          });
+          exportSucceeded = true;
+          if (typeof showToast === 'function') {
+            showToast(`تم تنزيل ملف «${filename}» بنجاح! 📥📄 (عدد الصفحات: ${res.pages})`, 'success');
+          }
+        } catch (err) {
+          console.warn('exportToPDF direct execution error:', err);
+        }
+      }
+    }
+
+    // Direct html2canvas + jsPDF engine (Add useCORS: true and allowTaint: false)
+    if (!exportSucceeded) {
+      try {
+        const sourceDoc = document.getElementById('examPaperDoc');
+        const html2canvasFn = window.html2canvas || (window.html2pdf && window.html2pdf.html2canvas);
+        const JsPdfClass = window.jsPDF || (window.jspdf && window.jspdf.jsPDF) || (window.html2pdf && window.html2pdf.jsPDF);
+
+        if (sourceDoc && html2canvasFn && JsPdfClass) {
+          if (window.ExamExporter && typeof window.ExamExporter.ensurePreviewVisible === 'function') {
+            window.ExamExporter.ensurePreviewVisible();
+          }
+
+          // Direct html2canvas call with useCORS: true and allowTaint: false to respect CORS
+          const canvas = await html2canvasFn(sourceDoc, {
+            useCORS: true,
+            allowTaint: false, // Ensure this is false to respect CORS
+            scale: 2,
+            backgroundColor: '#ffffff',
+            logging: false,
+            onclone: (clonedDoc) => {
+              clonedDoc.querySelectorAll('img').forEach(img => {
+                try { img.crossOrigin = 'anonymous'; } catch(e){}
+              });
+              clonedDoc.querySelectorAll('.no-print, [data-pdf-hide], .paper-pages-ctrl, .btn-paper-break-ctrl, .paper-q-font-tools').forEach(el => {
+                el.style.setProperty('display', 'none', 'important');
+              });
+            }
+          });
+
+          const imgData = canvas.toDataURL('image/png');
+          const orientation = (window.appState?.settings?.orientation || 'portrait');
+          const pdf = new JsPdfClass({
+            orientation: orientation,
+            unit: 'mm',
+            format: 'a4',
+            compress: true
+          });
+
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const margin = 6;
+          const contentWidth = pageWidth - (margin * 2);
+          const contentHeight = pageHeight - (margin * 2);
+
+          const pixelsPerMM = canvas.width / contentWidth;
+          const pageHeightPixels = Math.floor(contentHeight * pixelsPerMM);
+
+          if (canvas.height <= pageHeightPixels * 1.05) {
+            const imgRatio = canvas.height / canvas.width;
+            pdf.addImage(imgData, 'PNG', margin, margin, contentWidth, contentWidth * imgRatio, undefined, 'FAST');
+          } else {
+            let offsetY = 0;
+            let pageNum = 0;
+            while (offsetY < canvas.height) {
+              const sliceH = Math.min(pageHeightPixels, canvas.height - offsetY);
+              const pCanvas = document.createElement('canvas');
+              pCanvas.width = canvas.width;
+              pCanvas.height = sliceH;
+              const ctx = pCanvas.getContext('2d');
+              ctx.fillStyle = '#ffffff';
+              ctx.fillRect(0, 0, pCanvas.width, pCanvas.height);
+              ctx.drawImage(canvas, 0, offsetY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+              const sliceData = pCanvas.toDataURL('image/png');
+              if (pageNum > 0) {
+                pdf.addPage('a4', orientation);
+              }
+              const sliceH_mm = sliceH / pixelsPerMM;
+              pdf.addImage(sliceData, 'PNG', margin, margin, contentWidth, sliceH_mm, undefined, 'FAST');
+              offsetY += sliceH;
+              pageNum++;
+            }
+          }
+
+          pdf.save(filename);
+          exportSucceeded = true;
+          if (typeof showToast === 'function') {
+            showToast(`تم تنزيل ملف «${filename}» بنجاح! 📥📄`, 'success');
+          }
+        }
+      } catch (directErr) {
+        console.warn('Direct html2canvas / jsPDF fallback attempt error:', directErr);
+      }
+    }
+
+    // Secondary fallback via html2pdf iframe with CORS
+    if (!exportSucceeded && typeof html2pdf !== 'undefined') {
+      try {
+        frame = document.createElement('iframe');
+        frame.id = 'directPdfExportFrame';
+        frame.style.cssText = 'position: fixed; left: 0; top: 0; width: 794px; height: 1120px; z-index: 99990; background: #ffffff; opacity: 1; pointer-events: none; border: none;';
+        document.body.appendChild(frame);
+
+        const fDoc = frame.contentWindow.document;
+        fDoc.open();
+        fDoc.write(`
+          <!DOCTYPE html>
+          <html dir="${isLtr ? 'ltr' : 'rtl'}" lang="${isLtr ? 'en' : 'ar'}">
+          <head>
+            <meta charset="utf-8">
+            <style>
+              *, *::before, *::after {
+                box-sizing: border-box !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
+              html, body {
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #111827 !important;
+                font-family: 'Cairo', sans-serif !important;
+                width: 794px !important;
+              }
+              .exam-paper {
+                width: 794px !important;
+                min-height: 1120px !important;
+                margin: 0 !important;
+                padding: 8mm 12mm !important;
+                background: #ffffff !important;
+                color: #111827 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                box-sizing: border-box !important;
+              }
+              .header-grid {
+                display: grid !important;
+                grid-template-columns: 1fr auto 1fr !important;
+                align-items: center !important;
+                border: 1.5px solid #111827 !important;
+                padding: 10px 14px !important;
+                border-radius: 6px !important;
+                margin-bottom: 12px !important;
+              }
+              .header-meta-col { font-size: 0.85rem !important; line-height: 1.6 !important; }
+              .header-center-col { text-align: center !important; }
+              .school-seal { height: 60px !important; object-fit: contain !important; display: block !important; margin: 0 auto 4px auto !important; }
+              .exam-title-badge { font-weight: 800 !important; font-size: 1.05rem !important; text-align: center !important; }
+              .exam-subtitle { font-size: 0.8rem !important; text-align: center !important; color: #374151 !important; }
+              .paper-question {
+                margin-top: 14px !important;
+                border-bottom: 1px dashed #d1d5db !important;
+                padding-bottom: 12px !important;
+                page-break-inside: avoid !important;
+              }
+              .paper-q-header { display: flex !important; justify-content: space-between !important; font-weight: 700 !important; margin-bottom: 6px !important; }
+              .paper-mcq-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; margin-top: 6px !important; }
+              .paper-mcq-opt { display: flex !important; align-items: center !important; gap: 6px !important; font-size: 0.88rem !important; }
+              .paper-opt-letter { display: inline-flex !important; width: 22px !important; height: 22px !important; border-radius: 50% !important; border: 1px solid #111827 !important; align-items: center !important; justify-content: center !important; font-size: 0.8rem !important; }
+              .paper-footer { margin-top: auto !important; border-top: 1.5px solid #111827 !important; padding-top: 6px !important; font-size: 0.8rem !important; display: flex !important; justify-content: space-between !important; }
+              .no-print, .paper-page-separator, .paper-pages-ctrl, .btn-paper-break-ctrl, .paper-q-font-tools { display: none !important; }
+            </style>
+          </head>
+          <body>
+            <div class="exam-paper-container" dir="${isLtr ? 'ltr' : 'rtl'}">
+              ${paperHTML}
+            </div>
+          </body>
+          </html>
+        `);
+        fDoc.close();
+
+        await new Promise(r => setTimeout(r, 200));
+
+        const opt = {
+          margin: 0,
+          filename: filename,
+          image: { type: 'jpeg', quality: 0.96 },
+          html2canvas: {
+            scale: 1.5,
+            useCORS: true,
+            allowTaint: false,
+            logging: false,
+            backgroundColor: '#ffffff'
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+          },
+          pagebreak: { mode: ['css', 'legacy'] }
+        };
+
+        const exportPromise = window.html2pdf().set(opt).from(fDoc.body).save();
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Export timeout')), options.timeout || 60000));
+        await Promise.race([exportPromise, timeoutPromise]);
+
+        exportSucceeded = true;
+        if (typeof showToast === 'function') {
+          showToast(`تم تنزيل ملف «${filename}» بنجاح! 📥📄`, 'success');
+        }
+      } catch (err) {
+        console.warn('Fast HTML2PDF attempt:', err);
+      } finally {
+        if (frame && frame.parentNode) frame.remove();
+      }
+    }
+
+    // 5. If export failed, notify user cleanly without opening print interface or blank pages
+    if (!exportSucceeded) {
+      if (typeof showToast === 'function') {
+        showToast('تعذر إنشاء ملف الـ PDF. يرجى التأكد من إضافة أسئلة للامتحان والمحاولة مرة أخرى ⚠️', 'error', 4500);
+      }
+    }
+
+    clearTimeout(safetyTimer);
+    if (overlay && overlay.parentNode) overlay.remove();
+
+    // Restore mode
+    if (prevMode === 'answer_key' && window.appState) {
+      window.appState.viewMode = 'answer_key';
+      if (typeof window.renderPaperQuestions === 'function') window.renderPaperQuestions();
+    }
+  };
+
+  window.exportCurrentExamToPdf = async function(options) {
+    if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
+      return await window.MasarPDF.exportExam(options);
+    }
+
+    // Locate the configuration for the PDF export in app.js
+    const exportOptions = Object.assign({
+      timeout: 60000, // Increase timeout to 60 seconds (default is often 5-10s)
+      html2canvas: {
+        useCORS: true,
+        logging: false,
+        scale: 2 // Reducing scale can also prevent timeouts by lowering memory usage
+      }
+    }, options || {});
+
+    // If the error persists, wrap the execution in a check that ensures images are loaded
+    return await Promise.all(Array.from(document.images).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => { img.onload = img.onerror = resolve; });
+    })).then(() => {
+      return window.executeExamPaperPdf(exportOptions);
+    });
+  };
+
+  // Standalone html2pdf exporter helper
+  window.exportExamWithHtml2Pdf = async function(customOpt) {
+    const element = document.getElementById('exam-paper-container') || document.getElementById('exam-paper') || document.getElementById('examPaperDoc');
+    const opt = Object.assign({
+      margin:       1,
+      filename:     'exam-paper.pdf',
+      image:        { type: 'jpeg', quality: 0.98 },
+      timeout:      60000,
+      html2canvas:  { 
+        useCORS: true, // This allows the canvas to load cross-origin images
+        logging: false,
+        scale: 2
+      },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    }, customOpt || {});
+
+    // New usage:
+    return html2pdf().set(opt).from(element).save();
+  };
+
   const printExamBtn = document.getElementById('printExamBtn');
   if (printExamBtn) {
     printExamBtn.addEventListener('click', (e) => {
@@ -2247,36 +3711,56 @@ function initEventListeners() {
     }
   });
 
-  document.getElementById('generateModelBBtn').addEventListener('click', () => {
-    if (appState.questions.length < 2) {
-      showToast('أضف سؤالين على الأقل لتوليد نموذج بديل', 'error');
-      return;
-    }
-    const shuffled = ExamExporter.createModelVariation(appState.questions);
-    appState.questions = shuffled;
-    appState.header.examTitle = appState.header.examTitle.replace(' - نموذج (ب)', '') + ' - نموذج (ب)';
-    saveStateToStorage();
-    renderAll();
-    showToast('تم خلط الأسئلة والخيارات وتوليد نموذج (ب) بنجاح!', 'success');
-  });
+  const generateModelBBtn = document.getElementById('generateModelBBtn');
+  if (generateModelBBtn) {
+    generateModelBBtn.addEventListener('click', () => {
+      if (appState.questions.length < 2) {
+        showToast('أضف سؤالين على الأقل لإنشاء نموذج بديل', 'error');
+        return;
+      }
+      const shuffled = ExamExporter.createModelVariation(appState.questions);
+      appState.questions = shuffled;
+      appState.header.examTitle = appState.header.examTitle.replace(' - نموذج (ب)', '') + ' - نموذج (ب)';
+      saveStateToStorage();
+      renderAll();
+      showToast('تم خلط الأسئلة والخيارات وإنشاء نموذج (ب) بنجاح!', 'success');
+    });
+  }
 
   // Archive & Save Buttons
-  document.getElementById('saveExamToArchiveBtn').addEventListener('click', () => {
-    saveCurrentExamToArchive(false);
-  });
+  const saveExamToArchiveBtn = document.getElementById('saveExamToArchiveBtn');
+  if (saveExamToArchiveBtn) {
+    saveExamToArchiveBtn.addEventListener('click', () => {
+      saveCurrentExamToArchive(false);
+    });
+  }
 
-  document.getElementById('openArchiveBtn').addEventListener('click', openArchiveModal);
-  document.getElementById('closeArchiveModalBtn').addEventListener('click', () => {
-    document.getElementById('archiveModal').classList.remove('open');
-  });
-  document.getElementById('closeArchiveModalFooterBtn').addEventListener('click', () => {
-    document.getElementById('archiveModal').classList.remove('open');
-  });
+  const openArchiveBtn = document.getElementById('openArchiveBtn');
+  if (openArchiveBtn) {
+    openArchiveBtn.addEventListener('click', openArchiveModal);
+  }
+  const closeArchiveModalBtn = document.getElementById('closeArchiveModalBtn');
+  if (closeArchiveModalBtn) {
+    closeArchiveModalBtn.addEventListener('click', () => {
+      const modal = document.getElementById('archiveModal');
+      if (modal) modal.classList.remove('open');
+    });
+  }
+  const closeArchiveModalFooterBtn = document.getElementById('closeArchiveModalFooterBtn');
+  if (closeArchiveModalFooterBtn) {
+    closeArchiveModalFooterBtn.addEventListener('click', () => {
+      const modal = document.getElementById('archiveModal');
+      if (modal) modal.classList.remove('open');
+    });
+  }
 
-  document.getElementById('saveCurrentAsNewBtn').addEventListener('click', () => {
-    saveCurrentExamToArchive(true);
-    renderArchiveList();
-  });
+  const saveCurrentAsNewBtn = document.getElementById('saveCurrentAsNewBtn');
+  if (saveCurrentAsNewBtn) {
+    saveCurrentAsNewBtn.addEventListener('click', () => {
+      saveCurrentExamToArchive(true);
+      renderArchiveList();
+    });
+  }
 
   const archiveSearch = document.getElementById('archiveSearchInput');
   if (archiveSearch) {
@@ -2429,7 +3913,17 @@ function initEventListeners() {
         updatePrivacySettingsUI();
         updateArchiveBadge();
         renderAll();
+
+        // Reload user's isolated student grades & behavior!
+        if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+          window.reloadStudentGradesForCurrentUser();
+        }
+        if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+          window.reloadStudentBehaviorForCurrentUser();
+        }
+
         if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+        if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
         if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
 
         // Restore cloud questions & exams across devices from server backend!
@@ -2481,6 +3975,43 @@ function initEventListeners() {
     });
   }
 
+  window.quickDemoLoginHelper = function() {
+    const emailInput = document.getElementById('loginEmail');
+    const passInput = document.getElementById('loginPassword');
+    const loginForm = document.getElementById('loginForm');
+    if (emailInput && passInput && loginForm) {
+      emailInput.value = 'test1';
+      passInput.value = 'test2025';
+      if (typeof showToast === 'function') {
+        showToast('جارٍ تسجيل الدخول التلقائي بحساب المعلم التجريبي ⚡...', 'success');
+      }
+      setTimeout(() => {
+        loginForm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }, 250);
+    }
+  };
+
+  window.showForgotPassHint = function() {
+    if (typeof Swal !== 'undefined') {
+      Swal.fire({
+        icon: 'info',
+        title: 'استعادة وتفعيل الحساب 🔑',
+        html: `
+          <div style="text-align: right; line-height: 1.8; font-size: 0.92rem;">
+            <p>أستاذنا العزيز، لاسترجاع بيانات حسابك أو كلمة المرور:</p>
+            <ul style="padding-right: 1.2rem; margin: 0.8rem 0;">
+              <li>تواصل مباشرة مع إدارة الدعم الفني المعتمدة للمنصة لتزويدك ببياناتك فوراً.</li>
+            </ul>
+          </div>
+        `,
+        confirmButtonText: 'حسناً، فهمت',
+        confirmButtonColor: '#2563eb'
+      });
+    } else if (typeof showToast === 'function') {
+      showToast('لإعادة تعيين كلمة المرور يرجى التواصل مع الدعم الفني أو استخدام الدخول التجريبي 🔑', 'info');
+    }
+  };
+
   // Register Form Submission
   if (formRegister) {
     formRegister.addEventListener('submit', (e) => {
@@ -2505,7 +4036,11 @@ function initEventListeners() {
       }
 
       const nowReg = new Date();
+      const trialDurationMs = 2 * 24 * 60 * 60 * 1000; // 48 hours (2 full days free trial)
+      const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
       const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+      const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
       const newAccount = {
         id: 'usr_' + Date.now(),
         name,
@@ -2516,16 +4051,27 @@ function initEventListeners() {
         email,
         password: pass,
         contact: '',
-        isVerified: false,
-        role: 'viewer',
-        isSubscribed: false,
-        isVip: false,
+        isVerified: true,
+        role: 'teacher',
+        isSubscribed: true,
+        isVip: true,
+        isTrial: true,
+        trialDurationHours: 48,
+        trialStartedAt: nowReg.toISOString(),
+        subscriptionType: 'free_trial_48h',
+        subscriptionPlanName: 'فترة تجريبية مجانية (يومان / 48 ساعة)',
+        subscriptionStartDate: nowReg.toISOString(),
+        subscriptionExpiresAt: trialExpiry.toISOString(),
+        subscriptionExpiryFormatted: expiryFormatted,
         registeredAt: nowReg.toISOString(),
         registeredDateFormatted: dateFormatted
       };
 
       accounts.push(newAccount);
       saveAuthAccounts(accounts);
+      localStorage.setItem(`moallem_vip_subscription_${newAccount.id}`, 'true');
+      localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, trialExpiry.toISOString());
+
       // Immediately register on server for cross-device support
       try {
         fetch(getBackendApiUrl('/api/accounts'), {
@@ -2543,23 +4089,52 @@ function initEventListeners() {
       localStorage.setItem('moallem_logged_in', 'true');
       sessionStorage.setItem('moallem_session_active', 'true');
 
-      if (typeof window.syncUserDataToServer === 'function') {
-        window.syncUserDataToServer(newAccount, true);
+      // 1. Reset working exam workspace completely clean for this new user
+      loadDefaultPreset();
+      if (typeof appState !== 'undefined') {
+        appState.questions = [];
+        appState.currentArchiveId = null;
+        if (appState.header) {
+          appState.header.teacher = name;
+          appState.header.subject = subject || '';
+          appState.header.school = school || '';
+          appState.header.ministry = gov ? `وزارة التربية - المديرية العامة لتربية ${gov}` : '';
+        }
       }
+      syncHeaderInputs();
+      saveStateToStorage(false);
+
+      // 2. Initialize fresh, completely isolated student grades for this new user (force empty)
+      if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+        window.reloadStudentGradesForCurrentUser(true);
+      }
+
+      // 3. Initialize fresh, completely isolated student behavior for this new user (force empty)
+      if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+        window.reloadStudentBehaviorForCurrentUser(true);
+      }
+
+      // 4. Update UI and stats
       applyProfileToExamHeader();
       updatePrivacySettingsUI();
       updateUserAuthUI();
+      updateArchiveBadge();
+      renderAll();
+      if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+      if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
       if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+
+      // 5. Sync the new user's clean data to server
+      if (typeof window.syncUserDataToServer === 'function') {
+        window.syncUserDataToServer(newAccount, true);
+      }
       
       const portal = document.getElementById('fullscreenAuthPortal');
       const workstation = document.getElementById('appWorkstation');
       if (portal) portal.classList.add('portal-hidden');
       if (workstation) workstation.classList.remove('portal-locked');
       
-      showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! هذا الحساب يخضع لعملية دفع واشتراك (50,000 د.ع) لتفعيل الصلاحيات 💳🔒`, 'warning');
-      if (typeof window.openSubscriptionModal === 'function') {
-        window.openSubscriptionModal();
-      }
+      showToast(`مرحباً بك أستاذ ${name}! تم منحك اشتراكاً تجريبياً مجانياً لمدة 24 ساعة لتجربة كافة إمكانيات المنصة بحرية كاملة 🎁✨`, 'success');
     });
   }
 
@@ -2610,11 +4185,40 @@ function initEventListeners() {
   }
 
   // Profile Edit Modal
-  document.getElementById('closeProfileModalBtn').addEventListener('click', () => {
-    document.getElementById('profileModal').classList.remove('open');
+  const closeProfBtn = document.getElementById('closeProfileModalBtn');
+  if (closeProfBtn) {
+    closeProfBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.validateAndCloseProfileModal();
+    });
+  }
+  const saveProfBtn = document.getElementById('saveProfileBtn');
+  if (saveProfBtn) saveProfBtn.addEventListener('click', () => window.validateAndCloseProfileModal());
+  const applyProfBtn = document.getElementById('applyProfileToHeaderBtn');
+  if (applyProfBtn) applyProfBtn.addEventListener('click', () => applyProfileToExamHeader(false));
+
+  // Live Auto-Save and Error clearing on input
+  ['profName', 'profGov', 'profSchool', 'profSubject', 'profContact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', () => {
+        if (el.value.trim()) {
+          el.style.borderColor = '';
+          el.style.boxShadow = '';
+        }
+        const check = window.validateTeacherProfileFields(false);
+        if (check.isValid) {
+          saveTeacherProfile(false);
+        }
+      });
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          window.validateAndCloseProfileModal();
+        }
+      });
+    }
   });
-  document.getElementById('saveProfileBtn').addEventListener('click', saveTeacherProfile);
-  document.getElementById('applyProfileToHeaderBtn').addEventListener('click', applyProfileToExamHeader);
 
   // Iraqi Style Quick Action (if present)
   const applyIraqBtn = document.getElementById('applyIraqStyleBtn');
@@ -2685,38 +4289,12 @@ function initEventListeners() {
   }
 
   // Modal Cancel & Close
-  document.getElementById('closeModalBtn').addEventListener('click', closeQuestionModal);
-  document.getElementById('cancelModalBtn').addEventListener('click', closeQuestionModal);
-  document.getElementById('saveQuestionModalBtn').addEventListener('click', saveQuestionFromModal);
-
-  // AI Generator Button (Safely guarded)
-  const runAiBtn = document.getElementById('runAiGeneratorBtn');
-  if (runAiBtn) {
-    runAiBtn.addEventListener('click', () => {
-      const text = document.getElementById('aiInputText')?.value || '';
-      const types = [];
-      if (document.getElementById('aiGenMCQ')?.checked) types.push('mcq');
-      if (document.getElementById('aiGenTF')?.checked) types.push('true_false');
-      if (document.getElementById('aiGenFill')?.checked) types.push('fill_blanks');
-      if (document.getElementById('aiGenEssay')?.checked) types.push('essay');
-
-      if (types.length === 0) {
-        showToast('يرجى تحديد نوع واحد على الأقل من الأسئلة', 'error');
-        return;
-      }
-
-      try {
-        const newQuestions = generateQuestionsFromText(text, types);
-        appState.questions.push(...newQuestions);
-        saveStateToStorage();
-        renderAll();
-        showToast(`تم استخراج وتوليد ${newQuestions.length} أسئلة بنجاح!`, 'success');
-        document.querySelector('[data-tab="tab-questions"]')?.click();
-      } catch (err) {
-        showToast(err.message, 'error');
-      }
-    });
-  }
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  if (closeModalBtn) closeModalBtn.addEventListener('click', closeQuestionModal);
+  const cancelModalBtn = document.getElementById('cancelModalBtn');
+  if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeQuestionModal);
+  const saveQuestionModalBtn = document.getElementById('saveQuestionModalBtn');
+  if (saveQuestionModalBtn) saveQuestionModalBtn.addEventListener('click', saveQuestionFromModal);
 
   // Emergency Auto-Save on Exit, Window Close, Page Hide, or Visibility Change
   window.addEventListener('beforeunload', () => {
@@ -2892,7 +4470,8 @@ window.loadPresetExam = function(presetKey) {
   syncHeaderInputs();
   saveStateToStorage();
   renderAll();
-  document.getElementById('presetsModal').classList.remove('open');
+  const presetsModalEl = document.getElementById('presetsModal');
+  if (presetsModalEl) presetsModalEl.classList.remove('open');
   showToast(`تم تحميل نموذج ${preset.name} بنجاح!`, 'success');
 };
 
@@ -3152,19 +4731,19 @@ function renderBuilderList() {
           </div>
 
           <div class="q-actions">
-            <button title="تحريك لأعلى" onclick="moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''}>
+            <button type="button" class="btn-q-act btn-q-up" title="تحريك لأعلى" onclick="moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>
               <i class="fa-solid fa-arrow-up"></i>
             </button>
-            <button title="تحريك لأسفل" onclick="moveQuestion(${idx}, 1)" ${idx === appState.questions.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>
+            <button type="button" class="btn-q-act btn-q-down" title="تحريك لأسفل" onclick="moveQuestion(${idx}, 1)" ${idx === appState.questions.length - 1 ? 'disabled' : ''}>
               <i class="fa-solid fa-arrow-down"></i>
             </button>
-            <button title="تكرار السؤال" onclick="duplicateQuestion('${q.id}')">
+            <button type="button" class="btn-q-act btn-q-dup" title="تكرار السؤال" onclick="duplicateQuestion('${q.id}')">
               <i class="fa-solid fa-copy"></i>
             </button>
-            <button title="تعديل السؤال" onclick="openQuestionModal('${q.id}')" style="color: #60a5fa;">
+            <button type="button" class="btn-q-act btn-q-edit" title="تعديل السؤال" onclick="openQuestionModal('${q.id}')">
               <i class="fa-solid fa-pen"></i>
             </button>
-            <button title="حذف السؤال" class="btn-del" onclick="deleteQuestion('${q.id}')">
+            <button type="button" class="btn-q-act btn-q-del btn-del" title="حذف السؤال" onclick="deleteQuestion('${q.id}')">
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
@@ -3632,6 +5211,15 @@ function setupModalInputTracking() {
   if (typeof window.updateModalMathPreview === 'function') {
     window.updateModalMathPreview();
   }
+
+  // Bind modal MathLive field if present
+  const mf = document.getElementById('modalMathLiveField');
+  if (mf && !mf._mathliveBound) {
+    mf.addEventListener('input', () => {
+      // Keep active math live preview synchronized if modalMathLiveField is being edited
+    });
+    mf._mathliveBound = true;
+  }
 }
 
 /**
@@ -3654,7 +5242,10 @@ function buildMathStudioHTML(isOpen = false) {
 
       <!-- تبويبات أقسام الرياضيات -->
       <div class="math-studio-tabs" id="mathStudioTabs">
-        <button type="button" class="math-tab-btn active" data-tab="powers_bases" onclick="window.switchMathStudioTab('powers_bases')">
+        <button type="button" class="math-tab-btn btn-tab-mathlive active" data-tab="mathlive_builder" onclick="window.switchMathStudioTab('mathlive_builder')">
+          <i class="fa-solid fa-keyboard" style="color: #67e8f9;"></i> محرر MathLive التفاعلي ⚡
+        </button>
+        <button type="button" class="math-tab-btn" data-tab="powers_bases" onclick="window.switchMathStudioTab('powers_bases')">
           <i class="fa-solid fa-superscript"></i> الأس والأساس
         </button>
         <button type="button" class="math-tab-btn" data-tab="fractions_roots" onclick="window.switchMathStudioTab('fractions_roots')">
@@ -3676,8 +5267,70 @@ function buildMathStudioHTML(isOpen = false) {
 
       <!-- محتويات التبويبات -->
       <div class="math-tab-content-wrapper">
+        <!-- 0. محرر MathLive التفاعلي الذكي (الأقوى والأحدث) -->
+        <div class="math-tab-pane active" id="mathPane_mathlive_builder">
+          <div class="mathlive-pane-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="badge-mathlive-live"><i class="fa-solid fa-bolt text-warning"></i> محرر MathLive التفاعلي (WYSIWYG)</span>
+                <span style="font-size: 0.72rem; color: #94a3b8;">انقر داخل الحقل واكتب بالفأرة أو لوحة المفاتيح</span>
+              </div>
+              <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+                <button type="button" class="btn btn-xs btn-primary" onclick="window.toggleMathLiveVirtualKeyboard('modalMathLiveField')" title="إظهار / إخفاء لوحة المفاتيح الرياضية">
+                  <i class="fa-solid fa-keyboard"></i> لوحة المفاتيح ⚡
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.importQuestionTextToMathLive('modalMathLiveField')" title="استيراد التحديد أو المعادلة من نص السؤال إلى المحرر">
+                  <i class="fa-solid fa-arrow-down-to-bracket"></i> استيراد من السؤال
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.clearMathLiveField('modalMathLiveField')" title="مسح">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+                <button type="button" class="btn btn-xs btn-outline" onclick="window.copyMathLiveLatex('modalMathLiveField')" title="نسخ LaTeX">
+                  <i class="fa-solid fa-copy"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- حقل التحرير MathLive Web Component -->
+            <math-field id="modalMathLiveField" class="custom-mathlive-field" dir="ltr" virtual-keyboard-mode="manual">
+              x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}
+            </math-field>
+
+            <!-- نماذج وزارية سريعة بنقرة واحدة لتحميلها في MathLive والتعديل عليها -->
+            <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                <small style="font-size: 0.72rem; font-weight: 800; color: #cbd5e1;">نماذج وزارية جاهزة للتعديل في MathLive فوراً:</small>
+                <button type="button" onclick="window.openStandaloneMathLiveModal(document.getElementById('modalMathLiveField')?.value)" style="color: #a78bfa; font-size: 0.72rem; text-decoration: underline; background: none; border: none; cursor: pointer;">
+                  <i class="fa-solid fa-up-right-from-square"></i> فتح المحرر الموسع
+                </button>
+              </div>
+              <div class="mathlive-quick-pills-row">
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', 'x = \\\\frac{-b \\\\pm \\\\sqrt{b^2 - 4ac}}{2a}')">قانون الدستور</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\frac{x^2 - 4}{x - 2} = x + 2')">كسر وتحليل</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\int_{0}^{\\\\pi} \\\\sin(x) \\\\, dx')">تكامل محدد</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\lim_{x \\\\to 0} \\\\frac{\\\\sin x}{x} = 1')">غاية دوال دائرية</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\begin{bmatrix} a & b \\\\\\\\ c & d \\\\end{bmatrix}')">مصفوفة 2x2</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', 'z = r(\\\\cos\\\\theta + i\\\\sin\\\\theta)')">ديموافر قطبية</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\frac{x^2}{a^2} + \\\\frac{y^2}{b^2} = 1')">قطع ناقص</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '\\\\sqrt[3]{x^3 - 8} = 2')">جذر تكعيبي</button>
+                <button type="button" class="btn-math-preset-pill" onclick="window.setMathLivePreset('modalMathLiveField', '|2x - 5| \\\\le 7')">متباينة مطلقة</button>
+              </div>
+            </div>
+
+            <!-- أزرار الإدراج في السؤال -->
+            <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" style="flex: 1; padding: 0.45rem 0.8rem; font-weight: 800; font-size: 0.85rem;" onclick="window.insertMathLiveIntoQuestion('modalMathLiveField', false)">
+                <i class="fa-solid fa-plus"></i> إدراج المعادلة في السؤال (مضمّنة $...$)
+              </button>
+              <button type="button" class="btn btn-accent" style="flex: 1; padding: 0.45rem 0.8rem; font-weight: 800; font-size: 0.85rem;" onclick="window.insertMathLiveIntoQuestion('modalMathLiveField', true)">
+                <i class="fa-solid fa-align-center"></i> إدراج كسطر مستقل ($$...$$)
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- 1. الأس والأساس -->
-        <div class="math-tab-pane active" id="mathPane_powers_bases">
+        <div class="math-tab-pane" id="mathPane_powers_bases">
           <div class="math-tools-grid">
             <button type="button" class="math-tool-btn" onclick="window.insertMathFormula('$x^2$')" title="تربيع (أس 2)">
               <span class="math-tool-render">x²</span>
@@ -4766,6 +6419,10 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           <label class="form-label" style="margin: 0;"><i class="fa-solid fa-align-right text-accent"></i> نص السؤال / صيغة المسألة <span class="badge-optional">(اختياري)</span></label>
 
           <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+            <button type="button" class="btn-mathlive-quick-pill" onclick="window.openMathLiveForQuestion()" title="فتح وتعديل المعادلة عبر محرر MathLive التفاعلي">
+              <i class="fa-solid fa-keyboard" style="color: #67e8f9;"></i>
+              <span>محرر MathLive ⚡</span>
+            </button>
             <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
               <i class="fa-solid fa-square-root-variable text-accent"></i>
               <span>ستوديو الرياضيات</span>
@@ -5188,9 +6845,11 @@ window.quickEditQuestionLabel = function(qId) {
 };
 
 function closeQuestionModal() {
-  document.getElementById('questionModal').classList.remove('open');
+  const modal = document.getElementById('questionModal');
+  if (modal) modal.classList.remove('open');
   appState.editingQuestionId = null;
 }
+window.closeQuestionModal = closeQuestionModal;
 
 function saveQuestionFromModal() {
   const qId = document.getElementById('modalQId').value;
@@ -5326,6 +6985,7 @@ function saveQuestionFromModal() {
   renderAll();
   showToast(isNew ? 'تمت إضافة السؤال بنجاح' : 'تم تحديث السؤال بنجاح', 'success');
 }
+window.saveQuestionFromModal = saveQuestionFromModal;
 
 /**
  * Renders Official Exam Paper Header on live A4 preview
@@ -6582,13 +8242,36 @@ function showToast(message, type = 'info') {
 function initSideQTypeBarMovable() {
   const bar = document.getElementById('sideQTypeBar');
   const scrollContainer = document.querySelector('.builder-body-scrollable');
+  const scrollTopBtn = document.getElementById('scrollQuestionsTopBtn');
+  const scrollBottomBtn = document.getElementById('scrollQuestionsBottomBtn');
+
+  // Page Fast Scroll Up (صعود لأعلى قائمة الأسئلة)
+  if (scrollTopBtn) {
+    scrollTopBtn.onclick = () => {
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+  }
+
+  // Page Fast Scroll Down (نزول لأسفل قائمة الأسئلة)
+  if (scrollBottomBtn) {
+    scrollBottomBtn.onclick = () => {
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
+    };
+  }
+
   if (!bar) return;
 
   const header = document.getElementById('sideQTypeHeader');
   const nudgeUpBtn = document.getElementById('sideQTypeNudgeUp');
   const nudgeDownBtn = document.getElementById('sideQTypeNudgeDown');
-  const scrollTopBtn = document.getElementById('scrollQuestionsTopBtn');
-  const scrollBottomBtn = document.getElementById('scrollQuestionsBottomBtn');
 
   // Load saved top offset or default (12px)
   let currentTop = parseInt(localStorage.getItem('side_qtype_bar_top') || '12', 10);
@@ -6847,6 +8530,26 @@ function setSubjectMode(mode, userInitiated = false) {
       }
     });
   }
+  const qSelect = document.getElementById('qbuilderTypeSelect');
+  if (qSelect && preset && preset.btnLabels) {
+    Array.from(qSelect.options).forEach(opt => {
+      const qType = opt.value;
+      if (qType && preset.btnLabels[qType]) {
+        opt.text = preset.btnLabels[qType];
+      }
+    });
+  }
+
+  // Update rich custom dropdown items
+  if (preset && preset.btnLabels) {
+    document.querySelectorAll('.qtype-menu-item[data-qtype]').forEach(item => {
+      const qType = item.getAttribute('data-qtype');
+      if (qType && preset.btnLabels[qType]) {
+        const strong = item.querySelector('.qitem-text strong');
+        if (strong) strong.innerText = preset.btnLabels[qType];
+      }
+    });
+  }
 
   // Direction and auto-sync on user switch
   if (userInitiated) {
@@ -6993,54 +8696,731 @@ window.removeQuestionFromHistoryBank = function(qId) {
 };
 
 /* ==========================================================================
-   Executive Academic Reports & Created Exams Command Center Controller
+   Executive Academic Reports & Comprehensive Platform Command Center Controller
    ========================================================================== */
-window.currentReportSubView = 'models';
+function escapeHtml(str) {
+  return String(str == null ? '' : str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+window.escapeHtml = escapeHtml;
+
+window.currentReportSubView = 'overview';
 let currentFilteredReportExams = [];
 let currentFilteredBankQuestions = [];
 
-window.switchReportSubView = function(view) {
-  window.currentReportSubView = view || 'models';
+/**
+ * Gather Comprehensive Platform Data (جميع أنشطة وسجلات المنصة)
+ */
+function getPlatformComprehensiveData() {
+  // 1. Teacher Profile
+  const profile = (typeof teacherProfile === 'object' && teacherProfile) ? teacherProfile : {};
+  const tName = profile.name || localStorage.getItem('masar_teacher_name') || 'أستاذ المادة';
+  const tSchool = profile.school || localStorage.getItem('masar_school_name') || 'ثانوية المتميزين للبنين';
+  const tGov = profile.governorate || 'بغداد';
+  const tYear = profile.academicYear || '2024 - 2025';
 
+  // 2. Behavior & Attendance Records (Isolated per teacher)
+  let behaviorRecords = {};
+  let behaviorRosters = [];
+  const curUser = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+  const isAdmin = !!(curUser && (curUser.isAdmin || curUser.role === 'admin' || (curUser.id && String(curUser.id).includes('admin'))));
+
+  const behKey = (typeof getAccountStorageKey === 'function') ? getAccountStorageKey('masar_student_behavior_records') : 'masar_student_behavior_records';
+  const rostKey = (typeof getAccountStorageKey === 'function') ? getAccountStorageKey('masar_student_rosters') : 'masar_student_rosters';
+
+  try {
+    let rawB = localStorage.getItem(behKey);
+    if (!rawB && isAdmin) rawB = localStorage.getItem('masar_student_behavior_records');
+    if (rawB) behaviorRecords = JSON.parse(rawB);
+  } catch(e) {}
+  try {
+    let rawR = localStorage.getItem(rostKey);
+    if (!rawR && isAdmin) rawR = localStorage.getItem('masar_student_rosters');
+    if (rawR) behaviorRosters = JSON.parse(rawR);
+  } catch(e) {}
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const bKeys = Object.keys(behaviorRecords || {}).sort().reverse();
+  let todayRecord = null;
+  for (const k of bKeys) {
+    if (k.endsWith(todayStr)) {
+      todayRecord = behaviorRecords[k];
+      break;
+    }
+  }
+  if (!todayRecord && bKeys.length > 0) {
+    todayRecord = behaviorRecords[bKeys[0]];
+  }
+
+  let activeBehaviorRoster = behaviorRosters.length > 0 ? behaviorRosters[0] : null;
+  if (todayRecord && todayRecord.rosterId) {
+    activeBehaviorRoster = behaviorRosters.find(r => r.id === todayRecord.rosterId) || activeBehaviorRoster;
+  }
+
+  const bStudents = (todayRecord && todayRecord.students) || (activeBehaviorRoster && activeBehaviorRoster.students) || [];
+  let presentCount = 0, absentCount = 0, excusedCount = 0, lateCount = 0;
+  bStudents.forEach(st => {
+    if (st.attendance === 'present') presentCount++;
+    else if (st.attendance === 'absent') absentCount++;
+    else if (st.attendance === 'excused') excusedCount++;
+    else if (st.attendance === 'late') lateCount++;
+  });
+  const totalBStudents = bStudents.length;
+  const attendanceRate = totalBStudents > 0 ? Math.round(((presentCount + lateCount) / totalBStudents) * 100) : 0;
+
+  // 3. Student Grades Rosters (Isolated per teacher)
+  let gradesRosters = [];
+  const gradesKey = (typeof getAccountStorageKey === 'function') ? getAccountStorageKey('masar_teacher_grades_rosters_v1') : 'masar_teacher_grades_rosters_v1';
+  try {
+    let rawG = localStorage.getItem(gradesKey);
+    if (!rawG && isAdmin) rawG = localStorage.getItem('masar_teacher_grades_rosters_v1');
+    if (rawG) gradesRosters = JSON.parse(rawG);
+  } catch(e) {}
+  if (!Array.isArray(gradesRosters) || gradesRosters.length === 0) {
+    gradesRosters = behaviorRosters;
+  }
+  let totalEnrolledStudents = 0;
+  let allStudentsScores = [];
+  (gradesRosters || []).forEach(r => {
+    const sts = r.students || [];
+    totalEnrolledStudents += sts.length;
+    sts.forEach(st => {
+      const score = (typeof st.finalExam === 'number') ? st.finalExam : (typeof st.m1 === 'number') ? st.m1 : null;
+      if (score !== null) {
+        allStudentsScores.push({ name: st.name, score: score, className: r.name });
+      }
+    });
+  });
+  allStudentsScores.sort((a, b) => b.score - a.score);
+  const topStudents = allStudentsScores.slice(0, 5);
+  const averageScore = allStudentsScores.length > 0 ? Math.round(allStudentsScores.reduce((acc, s) => acc + s.score, 0) / allStudentsScores.length) : 85;
+
+  // 4. Exams & Question Bank
+  const allExams = (typeof getSavedExamsArchive === 'function') ? getSavedExamsArchive() : [];
+  const bank = (typeof getQuestionsHistoryBank === 'function') ? getQuestionsHistoryBank() : [];
+  const currentExamQuestions = (typeof appState === 'object' && appState && appState.questions) ? appState.questions : [];
+  const currentExamTitle = (appState && appState.header && appState.header.title) || 'الامتحان الشهري النموذجي';
+  const currentExamSubject = (appState && appState.header && appState.header.subject) || 'الرياضيات';
+  const currentExamGrade = (appState && appState.header && appState.header.grade) || 'الثالث المتوسط';
+  const currentExamTotalScore = (appState && appState.header && appState.header.totalScore) || 100;
+
+  // 5. Subscription / Trial Status
+  let trialStatusText = 'فترة تجربة مجانية (24 ساعة)';
+  try {
+    const rawUser = localStorage.getItem('moallem_user_account');
+    if (rawUser) {
+      const u = JSON.parse(rawUser);
+      if (u.isTrial) trialStatusText = 'فترة تجربة مجانية (يومان / 48 ساعة)';
+      else if (u.isSubscribed) trialStatusText = 'اشتراك سنوي معتمد ⭐';
+    }
+  } catch(e) {}
+
+  return {
+    teacher: { name: tName, school: tSchool, governorate: tGov, academicYear: tYear },
+    behavior: {
+      todayRecord,
+      activeRoster: activeBehaviorRoster,
+      students: bStudents,
+      total: totalBStudents,
+      present: presentCount,
+      absent: absentCount,
+      excused: excusedCount,
+      late: lateCount,
+      rate: attendanceRate,
+      date: (todayRecord && todayRecord.date) || todayStr,
+      className: (todayRecord && todayRecord.className) || (activeBehaviorRoster && activeBehaviorRoster.name) || 'الصف الثالث المتوسط',
+      subject: (todayRecord && todayRecord.subject) || 'الرياضيات',
+      period: (todayRecord && todayRecord.period) || 'الأولى',
+      topic: (todayRecord && todayRecord.topic) || 'متابعة سير الدرس الصفي'
+    },
+    grades: {
+      rosters: gradesRosters,
+      totalEnrolled: totalEnrolledStudents,
+      topStudents,
+      averageScore
+    },
+    exams: {
+      allExams,
+      bank,
+      currentExam: {
+        title: currentExamTitle,
+        subject: currentExamSubject,
+        grade: currentExamGrade,
+        questionsCount: currentExamQuestions.length,
+        totalScore: currentExamTotalScore
+      }
+    },
+    trialStatus: trialStatusText
+  };
+}
+
+/**
+ * Switch Report SubView (التبديل بين قطاعات التقرير اليومي)
+ */
+window.switchReportSubView = function(view) {
+  window.currentReportSubView = view || 'overview';
+
+  const btnOverview = document.getElementById('btnReportViewOverview');
+  const btnBehavior = document.getElementById('btnReportViewBehavior');
+  const btnGrades = document.getElementById('btnReportViewGrades');
   const btnModels = document.getElementById('btnReportViewModels');
   const btnQuestions = document.getElementById('btnReportViewQuestions');
   const btnExams = document.getElementById('btnReportViewExams');
+  const btnPdfDoc = document.getElementById('btnReportViewPdfDoc');
 
+  const containerOverview = document.getElementById('tabReportOverviewRender');
+  const containerBehavior = document.getElementById('tabReportBehaviorRender');
+  const containerGrades = document.getElementById('tabReportGradesRender');
   const containerExams = document.getElementById('tabReportExamsListRender');
   const containerQuestions = document.getElementById('tabReportQuestionsListRender');
+  const containerPdfDoc = document.getElementById('tabReportPdfDocRender');
+  const filterToolbar = document.getElementById('tabReportFilterToolbar');
+  const resultsHeader = document.getElementById('tabReportResultsHeader');
   const resultsLabel = document.getElementById('tabReportResultsLabel');
   const helpHint = document.getElementById('tabReportHelpHint');
 
   // Toggle button active states
+  if (btnOverview) btnOverview.classList.toggle('active', view === 'overview');
+  if (btnBehavior) btnBehavior.classList.toggle('active', view === 'behavior');
+  if (btnGrades) btnGrades.classList.toggle('active', view === 'grades');
   if (btnModels) btnModels.classList.toggle('active', view === 'models');
   if (btnQuestions) btnQuestions.classList.toggle('active', view === 'questions');
   if (btnExams) btnExams.classList.toggle('active', view === 'exams');
+  if (btnPdfDoc) btnPdfDoc.classList.toggle('active', view === 'pdfDoc');
 
-  if (view === 'models') {
+  // Hide all sections first
+  [containerOverview, containerBehavior, containerGrades, containerExams, containerQuestions, containerPdfDoc].forEach(c => {
+    if (c) c.style.display = 'none';
+  });
+  if (filterToolbar) filterToolbar.style.display = 'none';
+  if (resultsHeader) resultsHeader.style.display = 'none';
+
+  if (view === 'overview') {
+    if (containerOverview) containerOverview.style.display = 'flex';
+    window.renderFullPlatformDailyOverview();
+  } else if (view === 'behavior') {
+    if (containerBehavior) {
+      containerBehavior.style.display = 'block';
+      window.renderFullPlatformBehaviorView();
+    }
+  } else if (view === 'grades') {
+    if (containerGrades) {
+      containerGrades.style.display = 'block';
+      window.renderFullPlatformGradesView();
+    }
+  } else if (view === 'models') {
     if (containerExams) containerExams.style.display = 'grid';
-    if (containerQuestions) containerQuestions.style.display = 'none';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'النماذج الوزارية المعروضة: ';
     if (helpHint) {
       helpHint.innerHTML = '🏛️ <strong>قسم النماذج الوزارية المعتمدة (12 نموذجاً رسمياً):</strong> نماذج وزارية معتمدة ومتكاملة للثالث متوسط والسادس إعدادي لكافة المواد، جاهزة للاستعراض، التعديل المباشر، أو الطباعة الفورية.';
     }
+    window.filterDailyReport();
   } else if (view === 'questions') {
-    if (containerExams) containerExams.style.display = 'none';
     if (containerQuestions) containerQuestions.style.display = 'flex';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'الأسئلة الوزارية المعروضة: ';
     if (helpHint) {
       helpHint.innerHTML = '📑 <strong>حقل الأسئلة الوزارية المستقل:</strong> يمكنك البحث في بنك الأسئلة الوزارية المعتمدة وإدراج أي سؤال مباشرة في ورقة الاختبار الحالية بنقرة واحدة.';
     }
-  } else {
-    // view === 'exams'
+    window.filterDailyReport();
+  } else if (view === 'exams') {
     if (containerExams) containerExams.style.display = 'grid';
-    if (containerQuestions) containerQuestions.style.display = 'none';
+    if (filterToolbar) filterToolbar.style.display = 'block';
+    if (resultsHeader) resultsHeader.style.display = 'flex';
     if (resultsLabel) resultsLabel.innerText = 'سجل الاختبارات المنشأة والمسودات: ';
     if (helpHint) {
       helpHint.innerHTML = '✍️ <strong>سجل اختباراتك المنشأة:</strong> استعرض وعدّل مسوداتك واختباراتك المحفوظة التي قمت بإنشائها بنفسك على المنصة.';
     }
+    window.filterDailyReport();
+  } else if (view === 'pdfDoc') {
+    if (containerPdfDoc) {
+      containerPdfDoc.style.display = 'block';
+      try {
+        const d = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+        if (d) {
+          const stEl = document.getElementById('pdfReportStudentsVal');
+          const exEl = document.getElementById('pdfReportExamsVal');
+          if (stEl && d.grades && d.grades.totalStudents) stEl.textContent = d.grades.totalStudents;
+          if (exEl && d.exams && d.exams.totalExams) exEl.textContent = d.exams.totalExams;
+        }
+      } catch(e) {}
+    }
   }
 
-  window.filterDailyReport();
+  updateDailyReportMetrics();
+};
+
+/**
+ * Render Comprehensive Platform Live Overview (التقرير الشامل المتضمن كل شيء يدور بالمنصة)
+ */
+window.renderFullPlatformDailyOverview = function() {
+  const container = document.getElementById('tabReportOverviewRender');
+  if (!container) return;
+
+  const data = getPlatformComprehensiveData();
+  const b = data.behavior;
+  const g = data.grades;
+  const ex = data.exams;
+  const t = data.teacher;
+
+  const now = new Date();
+  const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  let dateFormattedAr = '';
+  try {
+    dateFormattedAr = now.toLocaleDateString('ar-IQ', dateOptions);
+  } catch(e) {
+    dateFormattedAr = now.toDateString();
+  }
+
+  container.innerHTML = `
+    <!-- 1. Teacher & Platform Header Status Banner -->
+    <div class="report-teacher-hero-card">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" style="width: 54px; height: 54px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));" title="شعار وزارة التربية العراقية المعتمد">
+        <div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 900; color: #0f172a;">${escapeHtml(t.name)}</h3>
+            <span class="badge-tag" style="background: #e0f2fe; color: #0369a1; font-weight: 800; font-size: 0.76rem;">${escapeHtml(t.school)}</span>
+            <span class="badge-tag" style="background: #ecfdf5; color: #059669; font-weight: 800; font-size: 0.74rem;">${escapeHtml(data.trialStatus)}</span>
+          </div>
+          <div style="font-size: 0.82rem; color: #64748b; margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <span><i class="fa-regular fa-calendar-check text-primary"></i> <b>${dateFormattedAr}</b></span>
+            <span><i class="fa-solid fa-graduation-cap text-warning"></i> الصف النشط: <b>${escapeHtml(b.className)}</b></span>
+            <span><i class="fa-solid fa-book text-info"></i> المادة: <b>${escapeHtml(b.subject)}</b></span>
+            <span><i class="fa-solid fa-clock text-purple"></i> الحصة: <b>${escapeHtml(b.period)}</b></span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button type="button" class="btn btn-sm btn-danger" onclick="window.exportFullPlatformDailyReportPdf()" style="background: linear-gradient(135deg, #e11d48, #be123c); font-weight: 800; padding: 0.45rem 0.95rem; border: none; box-shadow: 0 4px 12px rgba(225,29,72,0.25);">
+          <i class="fa-solid fa-file-pdf"></i> تنزيل تقرير PDF 📄
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="window.printFullPlatformDailyReport()" style="font-weight: 700; padding: 0.45rem 0.95rem;">
+          <i class="fa-solid fa-print"></i> طباعة A4
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. Grid of Live Platform Hubs -->
+    <div class="report-overview-grid">
+      
+      <!-- Card 1: Attendance & Conduct Live Card (المتابعة والغياب اليومي) -->
+      <div class="report-overview-card" style="border-top: 4px solid #10b981;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(16, 185, 129, 0.15); color: #059669;">
+              <i class="fa-solid fa-clipboard-user"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">المتابعة وحسن السلوك اليوم</div>
+              <small style="color: #64748b; font-size: 0.74rem;">جلسة ${escapeHtml(b.className)} — ${escapeHtml(b.date)}</small>
+            </div>
+          </div>
+          <span class="report-badge-status ${b.rate >= 80 ? 'report-badge-present' : 'report-badge-excused'}" style="font-size: 0.82rem;">
+            نسبة الحضور: ${b.rate}%
+          </span>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+            <i class="fa-solid fa-circle-check text-success"></i> حضور: <b>${b.present + b.late}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;">
+            <i class="fa-solid fa-circle-xmark text-danger"></i> غياب: <b>${b.absent}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fffbeb; color: #92400e; border: 1px solid #fde68a;">
+            <i class="fa-solid fa-circle-pause text-warning"></i> إجازة: <b>${b.excused}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">
+            <i class="fa-solid fa-users text-primary"></i> المقيدون: <b>${b.total}</b>
+          </div>
+        </div>
+
+        <!-- Mini Table of Students Attendance -->
+        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 10px; background: #ffffff;">
+          <table class="report-table-mini">
+            <thead>
+              <tr>
+                <th style="width: 30px;">ت</th>
+                <th>اسم الطالب</th>
+                <th style="text-align: center; width: 75px;">الحضور</th>
+                <th style="text-align: center; width: 65px;">المشاركة</th>
+                <th style="text-align: center; width: 65px;">الواجب</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${b.students.slice(0, 7).map((st, i) => {
+                let attBadge = '<span class="report-badge-status report-badge-present">حاضر</span>';
+                if (st.attendance === 'absent') attBadge = '<span class="report-badge-status report-badge-absent">غائب</span>';
+                else if (st.attendance === 'excused') attBadge = '<span class="report-badge-status report-badge-excused">مجاز</span>';
+                else if (st.attendance === 'late') attBadge = '<span class="report-badge-status report-badge-late">متأخر</span>';
+
+                const partText = (st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي';
+                const hwText = st.homework === 'done' ? 'منجز ✔️' : 'ناقص ⚠️';
+
+                return `
+                  <tr>
+                    <td style="font-weight: bold; color: #64748b;">${i + 1}</td>
+                    <td style="font-weight: 700; color: #0f172a;">${escapeHtml(st.name)}</td>
+                    <td style="text-align: center;">${attBadge}</td>
+                    <td style="text-align: center; font-size: 0.74rem;">${partText}</td>
+                    <td style="text-align: center; font-size: 0.74rem;">${hwText}</td>
+                  </tr>
+                `;
+              }).join('')}
+              ${b.students.length > 7 ? `
+                <tr>
+                  <td colspan="5" style="text-align: center; font-size: 0.75rem; color: #64748b; background: #f8fafc;">
+                    + يوجد ${b.students.length - 7} طلاب آخرين مسجلين في كشف اليوم
+                  </td>
+                </tr>
+              ` : ''}
+              ${b.students.length === 0 ? `
+                <tr>
+                  <td colspan="5" style="text-align: center; padding: 1.5rem; color: #94a3b8;">
+                    لا يوجد طلاب مسجلون بعد. انقر على فتح السجل لإضافة الطلاب أو مزامنتهم.
+                  </td>
+                </tr>
+              ` : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <span style="font-size: 0.75rem; color: #64748b;"><i class="fa-solid fa-pen-nib text-primary"></i> موضوع: <b>${escapeHtml(b.topic)}</b></span>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToBehaviorTabFromReport()" style="border-color: #10b981; color: #059669; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح سجل السلوك ↗️
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Student Grades & Academic Ledgers (سجل درجات وتقييم الطلاب) -->
+      <div class="report-overview-card" style="border-top: 4px solid #0284c7;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(2, 132, 199, 0.15); color: #0284c7;">
+              <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">سجل درجات وتقييم الطلاب</div>
+              <small style="color: #64748b; font-size: 0.74rem;">${g.rosters.length} صفوف وشعب محفوظة ومسجلة</small>
+            </div>
+          </div>
+          <span class="report-badge-status" style="background: #eff6ff; color: #0284c7; font-size: 0.82rem;">
+            متوسط الأداء: ${g.averageScore}%
+          </span>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #f0f9ff; color: #0369a1; border: 1px solid #bae6fd;">
+            <i class="fa-solid fa-school text-primary"></i> الصفوف: <b>${g.rosters.length}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+            <i class="fa-solid fa-users text-success"></i> الطلاب المقيدون: <b>${g.totalEnrolled}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe;">
+            <i class="fa-solid fa-star text-warning"></i> المتفوقون: <b>${g.topStudents.length}</b>
+          </div>
+        </div>
+
+        <!-- Top Students or Classes List -->
+        <div style="border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem; background: #f8fafc; font-size: 0.8rem;">
+          <div style="font-weight: 800; color: #334155; margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-medal text-warning"></i> لوحة الشرف وأوائل الطلاب بالسجلات:
+          </div>
+          ${g.topStudents.length > 0 ? `
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              ${g.topStudents.map((st, idx) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #ffffff; padding: 4px 8px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span style="font-weight: 700; color: #0f172a;">${idx + 1}. ${escapeHtml(st.name)} <small style="color: #64748b;">(${escapeHtml(st.className)})</small></span>
+                  <span style="font-weight: 800; color: #059669; background: #ecfdf5; padding: 1px 6px; border-radius: 4px;">${st.score} درجة</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div style="color: #64748b; text-align: center; padding: 0.75rem;">
+              سجل الدرجات نشط وجاهز لرصد درجات الشهر الأول ونصف السنة.
+            </div>
+          `}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <span style="font-size: 0.75rem; color: #64748b;"><i class="fa-solid fa-clipboard-check text-info"></i> نظام درجات معتمد وزارياً</span>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToGradesTabFromReport()" style="border-color: #0284c7; color: #0284c7; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح سجل الدرجات ↗️
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Active Exam & Question Bank (الاختبارات وبنك الأسئلة) -->
+      <div class="report-overview-card" style="border-top: 4px solid #f59e0b;">
+        <div class="report-card-top">
+          <div class="report-card-title-group">
+            <div class="report-card-icon" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">
+              <i class="fa-solid fa-file-signature"></i>
+            </div>
+            <div>
+              <div style="font-weight: 900; font-size: 0.98rem; color: #0f172a;">الاختبارات وبنك الأسئلة</div>
+              <small style="color: #64748b; font-size: 0.74rem;">${ex.allExams.length} اختبارات بالأرشيف | ${ex.bank.length} مفردة بالبنك</small>
+            </div>
+          </div>
+          <span class="report-badge-status" style="background: #fffbeb; color: #b45309; font-size: 0.82rem;">
+            12 نموذجاً وزارياً
+          </span>
+        </div>
+
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 0.75rem; font-size: 0.82rem;">
+          <div style="font-weight: 800; color: #92400e; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <i class="fa-solid fa-file-pen text-warning"></i> الاختبار المفتوح حالياً بالمحرر:
+          </div>
+          <div style="font-size: 0.9rem; font-weight: 900; color: #0f172a;">${escapeHtml(ex.currentExam.title)}</div>
+          <div style="font-size: 0.76rem; color: #64748b; margin-top: 4px; display: flex; gap: 10px;">
+            <span>المادة: <b>${escapeHtml(ex.currentExam.subject)}</b></span>
+            <span>الأسئلة: <b>${ex.currentExam.questionsCount} سؤال</b></span>
+            <span>الدرجة الكلية: <b>${ex.currentExam.totalScore} درجة</b></span>
+          </div>
+        </div>
+
+        <div class="report-pills-row">
+          <div class="report-stat-pill" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe;">
+            <i class="fa-solid fa-file-lines text-primary"></i> اختباراتك: <b>${ex.allExams.filter(e => !e.isModelPreset).length}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;">
+            <i class="fa-solid fa-award text-success"></i> نماذج وزارية: <b>${ex.allExams.filter(e => e.isModelPreset).length || 12}</b>
+          </div>
+          <div class="report-stat-pill" style="background: #fdf4ff; color: #86198f; border: 1px solid #f5d0fe;">
+            <i class="fa-solid fa-database text-purple"></i> إجمالي البنك: <b>${ex.bank.length}</b>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 6px;">
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchReportSubView('models')" style="font-weight: 700; font-size: 0.74rem;">
+            النماذج الوزارية 🏛️
+          </button>
+          <button type="button" class="btn btn-sm btn-outline" onclick="window.switchToBuilderTabFromReport()" style="border-color: #f59e0b; color: #d97706; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+            فتح ورقة الاختبار ↗️
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 3. Bottom Intelligence Row: Cognitive Bloom Levels & Live Operations Timeline -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.15rem; margin-top: 1rem;">
+      
+      <!-- Bloom's Taxonomy Cognitive Distribution -->
+      <div class="bloom-analytics-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.65rem;">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 0.95rem; font-weight: 900; color: #0f172a;">
+            <i class="fa-solid fa-brain" style="color: #7c3aed;"></i>
+            <span>توزيع مستويات بلوم المعرفية لأسئلة اليوم</span>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #7c3aed; background: rgba(124, 58, 237, 0.1); padding: 3px 8px; border-radius: 6px;">مقياس وزاري معتمد</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 0.25rem;">
+          <div class="bloom-bar-row">
+            <div class="bloom-bar-meta">
+              <span>1. التذكر واسترجاع الحقائق</span>
+              <span>25% (مستوى أساسي)</span>
+            </div>
+            <div class="bloom-progress-track">
+              <div class="bloom-progress-fill" style="width: 25%; background: linear-gradient(90deg, #38bdf8, #0284c7);"></div>
+            </div>
+          </div>
+
+          <div class="bloom-bar-row">
+            <div class="bloom-bar-meta">
+              <span>2. الفهم والاستيعاب والشرح</span>
+              <span>35% (مستوى متوسط)</span>
+            </div>
+            <div class="bloom-progress-track">
+              <div class="bloom-progress-fill" style="width: 35%; background: linear-gradient(90deg, #10b981, #059669);"></div>
+            </div>
+          </div>
+
+          <div class="bloom-bar-row">
+            <div class="bloom-bar-meta">
+              <span>3. التطبيق العملي وحل المسائل</span>
+              <span>20% (مهارة تطبيقية)</span>
+            </div>
+            <div class="bloom-progress-track">
+              <div class="bloom-progress-fill" style="width: 20%; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+            </div>
+          </div>
+
+          <div class="bloom-bar-row">
+            <div class="bloom-bar-meta">
+              <span>4. التحليل والاستنتاج والمقارنة</span>
+              <span>12% (تفكير عليا)</span>
+            </div>
+            <div class="bloom-progress-track">
+              <div class="bloom-progress-fill" style="width: 12%; background: linear-gradient(90deg, #8b5cf6, #7c3aed);"></div>
+            </div>
+          </div>
+
+          <div class="bloom-bar-row">
+            <div class="bloom-bar-meta">
+              <span>5. التقويم وإبداء الرأي والابتكار</span>
+              <span>8% (قدرات متقدمة)</span>
+            </div>
+            <div class="bloom-progress-track">
+              <div class="bloom-progress-fill" style="width: 8%; background: linear-gradient(90deg, #ec4899, #db2777);"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f5f9; padding-top: 8px; font-size: 0.74rem; color: #64748b;">
+          <span>مطابقة مواصفات الامتحانات العامة: <b>100%</b></span>
+          <span style="color: #059669; font-weight: 800;">متوازن وزارياً ✔️</span>
+        </div>
+      </div>
+
+      <!-- Live Operations & Activity Timeline -->
+      <div class="daily-activity-timeline-card">
+        <div class="timeline-title-row">
+          <div class="timeline-title">
+            <i class="fa-solid fa-clock-rotate-left" style="color: #0284c7;"></i>
+            <span>سجل العمليات والأنشطة اللحظية المنفذة اليوم</span>
+          </div>
+          <span style="font-size: 0.72rem; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 6px;">مباشر • اليوم</span>
+        </div>
+
+        <div class="timeline-list" id="platformDailyActivitiesTimeline">
+          <!-- Populated by window.renderPlatformDailyActivitiesTimeline() -->
+        </div>
+      </div>
+
+    </div>
+  `;
+};
+
+window.renderFullPlatformBehaviorView = function() {
+  const container = document.getElementById('tabReportBehaviorRender');
+  if (!container) return;
+  const data = getPlatformComprehensiveData();
+  const b = data.behavior;
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #0f172a;">كشف المتابعة وحسن السلوك المفصل — جلسة اليوم</h3>
+          <small style="color: #64748b;">${escapeHtml(b.className)} | ${escapeHtml(b.date)} | مادة ${escapeHtml(b.subject)}</small>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="btn btn-sm btn-primary" onclick="window.switchToBehaviorTabFromReport()" style="background: linear-gradient(135deg, #10b981, #059669); font-weight: 800;">
+            <i class="fa-solid fa-folder-open"></i> فتح واجهة السلوك الكاملة
+          </button>
+        </div>
+      </div>
+
+      <div class="report-pills-row" style="margin-bottom: 1rem;">
+        <span class="report-stat-pill" style="background: #ecfdf5; color: #059669; font-size: 0.85rem;"><i class="fa-solid fa-circle-check"></i> نسبة الحضور: ${b.rate}%</span>
+        <span class="report-stat-pill" style="background: #f0fdf4; color: #166534;"><i class="fa-solid fa-user-check"></i> حضور: ${b.present + b.late}</span>
+        <span class="report-stat-pill" style="background: #fef2f2; color: #991b1b;"><i class="fa-solid fa-user-xmark"></i> غياب: ${b.absent}</span>
+        <span class="report-stat-pill" style="background: #fffbeb; color: #92400e;"><i class="fa-solid fa-clock"></i> إجازات: ${b.excused}</span>
+      </div>
+
+      <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 10px;">
+        <table class="report-table-mini" style="font-size: 0.86rem;">
+          <thead>
+            <tr>
+              <th style="width: 35px;">ت</th>
+              <th>اسم الطالب</th>
+              <th style="text-align: center; width: 85px;">الحضور والغياب</th>
+              <th style="text-align: center; width: 85px;">المشاركة</th>
+              <th style="text-align: center; width: 85px;">الواجب</th>
+              <th style="text-align: center; width: 85px;">السلوك</th>
+              <th style="text-align: center; width: 65px;">التقييم</th>
+              <th>الملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${b.students.map((st, i) => `
+              <tr>
+                <td style="font-weight: bold; color: #64748b;">${i + 1}</td>
+                <td style="font-weight: 700; color: #0f172a;">${escapeHtml(st.name)}</td>
+                <td style="text-align: center;">
+                  <span class="report-badge-status ${st.attendance === 'absent' ? 'report-badge-absent' : st.attendance === 'excused' ? 'report-badge-excused' : st.attendance === 'late' ? 'report-badge-late' : 'report-badge-present'}">
+                    ${st.attendance === 'absent' ? 'غائب' : st.attendance === 'excused' ? 'مجاز' : st.attendance === 'late' ? 'متأخر' : 'حاضر'}
+                  </span>
+                </td>
+                <td style="text-align: center;">${(st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي'}</td>
+                <td style="text-align: center;">${st.homework === 'done' ? 'منجز ✔️' : 'ناقص ⚠️'}</td>
+                <td style="text-align: center;">${st.conduct === 'excellent' ? 'ممتاز 🏅' : 'جيد'}</td>
+                <td style="text-align: center; font-weight: bold;">${st.score || 10}/10</td>
+                <td style="color: #64748b; font-size: 0.78rem;">${escapeHtml(st.notes || '—')}</td>
+              </tr>
+            `).join('')}
+            ${b.students.length === 0 ? `
+              <tr><td colspan="8" style="text-align: center; padding: 2rem; color: #94a3b8;">لا يوجد طلاب مسجلون في جلسة اليوم</td></tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+};
+
+window.renderFullPlatformGradesView = function() {
+  const container = document.getElementById('tabReportGradesRender');
+  if (!container) return;
+  const data = getPlatformComprehensiveData();
+  const g = data.grades;
+
+  container.innerHTML = `
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 1.25rem; box-shadow: 0 4px 14px rgba(0,0,0,0.03);">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #f1f5f9; padding-bottom: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <h3 style="margin: 0; font-size: 1.05rem; font-weight: 900; color: #0f172a;">سجل درجات وتقييم الصفوف والشعب المحفوظة</h3>
+          <small style="color: #64748b;">${g.rosters.length} صفوف مسجلة | إجمالي ${g.totalEnrolled} طالباً</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" onclick="window.switchToGradesTabFromReport()" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800;">
+          <i class="fa-solid fa-folder-open"></i> فتح واجهة درجات الطلاب الكاملة
+        </button>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+        ${g.rosters.map(r => `
+          <div style="border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 1rem; background: #f8fafc;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-weight: 800; font-size: 0.95rem; color: #0f172a;">${escapeHtml(r.name)}</span>
+              <span class="badge-tag" style="background: #e0f2fe; color: #0369a1; font-weight: 800;">${(r.students || []).length} طالب</span>
+            </div>
+            <div style="font-size: 0.78rem; color: #64748b; display: flex; gap: 8px;">
+              <span>المادة: <b>${escapeHtml((r.meta && r.meta.subject) || r.subject || 'الرياضيات')}</b></span>
+              <span>المرحلة: <b>${escapeHtml((r.meta && r.meta.grade) || r.gradeLevel || 'الثالث المتوسط')}</b></span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+};
+
+// Quick Navigation Helpers from Daily Report
+window.switchToBehaviorTabFromReport = function() {
+  const btn = document.getElementById('mainTabStudentBehaviorBtn');
+  if (btn) btn.click();
+};
+
+window.switchToGradesTabFromReport = function() {
+  const btn = document.getElementById('mainTabStudentGradesBtn');
+  if (btn) btn.click();
+};
+
+window.switchToBuilderTabFromReport = function() {
+  const btn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
+  if (btn) btn.click();
 };
 
 window.clearReportSearch = function() {
@@ -7206,6 +9586,29 @@ window.closeDailyReportModal = function() {
   }
 };
 
+window.quickFilterReportModal = function(filterVal) {
+  const dateFilter = document.getElementById('dailyDateFilter');
+  const subjFilter = document.getElementById('dailySubjectFilter');
+  const searchInput = document.getElementById('dailySearchInput');
+  if (searchInput) searchInput.value = '';
+
+  if (filterVal === 'today') {
+    if (dateFilter) dateFilter.value = 'today';
+    if (subjFilter) subjFilter.value = 'all';
+  } else if (filterVal === 'all') {
+    if (dateFilter) dateFilter.value = 'all';
+    if (subjFilter) subjFilter.value = 'all';
+  } else {
+    // subject filter: arabic, english, math
+    if (subjFilter) subjFilter.value = filterVal;
+    if (dateFilter) dateFilter.value = 'all';
+  }
+
+  if (typeof window.filterDailyReport === 'function') {
+    window.filterDailyReport();
+  }
+};
+
 function updateDailyReportMetrics() {
   const bank = getQuestionsHistoryBank();
   const exams = getSavedExamsArchive();
@@ -7299,6 +9702,56 @@ function updateDailyReportMetrics() {
     }
   });
   setCircularMeter('tabReportStatRecent', recentTotal || todayCount, 10);
+
+  // Platform-wide Comprehensive KPI Integration
+  try {
+    const platformData = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+    if (platformData) {
+      const b = platformData.behavior;
+      const g = platformData.grades;
+      const lp = platformData.lessonPlan;
+
+      // 1. Attendance Rate Circular Meter
+      const attRateEl = document.getElementById('tabReportStatAttendanceRate');
+      if (attRateEl) attRateEl.innerText = (b.rate || 0) + '%';
+      const meterFillAtt = document.getElementById('meterFillAttendance');
+      if (meterFillAtt) {
+        const circumference = 188.5;
+        const ratio = Math.min(Math.max((b.rate || 0) / 100, 0.05), 1);
+        meterFillAtt.style.strokeDashoffset = (circumference * (1 - ratio)).toFixed(1);
+      }
+      const attBadge = document.getElementById('tabReportBadgeAttendance');
+      if (attBadge) attBadge.innerText = `${b.present + b.late} حضور من ${b.total || 0}`;
+
+      // 2. Total Enrolled Students Circular Meter
+      setCircularMeter('tabReportStatTotalStudents', g.totalEnrolled || b.total || 0, 50);
+      const classesBadge = document.getElementById('tabReportBadgeClasses');
+      if (classesBadge) classesBadge.innerText = `${g.rosters.length || 1} صفوف وشعب`;
+
+      // 3. Lesson Plan Circular Meter
+      const lessonSubjEl = document.getElementById('tabReportStatLessonSubject');
+      if (lessonSubjEl) lessonSubjEl.innerText = (lp && lp.topic) ? 'موثقة ✔️' : 'جاهزة 📖';
+      const lessonBadge = document.getElementById('tabReportBadgeLesson');
+      if (lessonBadge) lessonBadge.innerText = (lp && lp.grade) ? lp.grade : 'وفق المعايير';
+      const meterFillLesson = document.getElementById('meterFillLesson');
+      if (meterFillLesson) meterFillLesson.style.strokeDashoffset = '25';
+
+      // 4. Update Sub-view Switcher Chips
+      const chipOverview = document.getElementById('repCounterOverview');
+      if (chipOverview) chipOverview.innerText = '🌟';
+
+      const chipBehavior = document.getElementById('repCounterBehavior');
+      if (chipBehavior) chipBehavior.innerText = `${b.rate}% (${b.total})`;
+
+      const chipGrades = document.getElementById('repCounterGrades');
+      if (chipGrades) chipGrades.innerText = g.totalEnrolled || 0;
+
+      const chipLesson = document.getElementById('repCounterLesson');
+      if (chipLesson) chipLesson.innerText = '📖';
+    }
+  } catch(err) {
+    console.error('Error updating platform KPI metrics:', err);
+  }
 }
 
 window.filterDailyReport = function() {
@@ -7630,6 +10083,10 @@ window.renderReportExamsList = function(list) {
             <i class="fa-solid fa-print"></i>
             <span>طباعة</span>
           </button>
+          <button type="button" class="btn-rep-action btn-rep-pdf" onclick="window.exportExamFromArchiveToPdf('${exam.id}')" title="تنزيل الاختبار بصيغة PDF مباشرة للجهاز 📥" style="background: rgba(225, 29, 72, 0.1); color: #e11d48; border-color: rgba(225, 29, 72, 0.3);">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span>تنزيل PDF</span>
+          </button>
           <button type="button" class="btn-rep-action btn-rep-dup" onclick="window.duplicateExamInArchive('${exam.id}')" title="إنشاء نسخة مكررة من هذا الاختبار">
             <i class="fa-solid fa-copy"></i>
           </button>
@@ -7682,13 +10139,31 @@ window.printExamFromArchiveDirectly = function(id) {
   }, 300);
 };
 
-window.printAcademicReport = function() {
-  const exams = (currentFilteredReportExams && currentFilteredReportExams.length > 0)
-    ? currentFilteredReportExams
-    : getSavedExamsArchive();
+window.exportExamFromArchiveToPdf = async function(id) {
+  if (typeof loadExamFromArchive === 'function') {
+    loadExamFromArchive(id);
+  }
+  setTimeout(async () => {
+    if (typeof window.exportCurrentExamToPdf === 'function') {
+      await window.exportCurrentExamToPdf();
+    }
+  }, 350);
+};
 
-  if (exams.length === 0) {
-    showToast('لا توجد اختبارات مسجلة لطباعة التقرير الشامل عنها', 'info');
+window.refreshFullDailyReport = function() {
+  updateDailyReportMetrics();
+  if (typeof window.switchReportSubView === 'function') {
+    window.switchReportSubView(window.currentReportSubView || 'overview');
+  }
+  if (typeof showToast === 'function') {
+    showToast('تم تحديث وقراءة كافة بيانات وسجلات المنصة الحالية فوراً 🔄✨', 'success');
+  }
+};
+
+window.printFullPlatformDailyReport = function() {
+  const data = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+  if (!data) {
+    if (typeof showToast === 'function') showToast('تعذر قراءة بيانات المنصة الشاملة للطباعة', 'danger');
     return;
   }
 
@@ -7701,95 +10176,139 @@ window.printAcademicReport = function() {
 
   const now = new Date();
   const dateFormatted = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+  let dayName = '';
+  try {
+    dayName = now.toLocaleDateString('ar-IQ', { weekday: 'long' });
+  } catch(e) {
+    dayName = 'اليوم';
+  }
   const timeFormatted = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
 
-  // Gather stages covered
-  const stagesSet = new Set();
-  exams.forEach(e => {
-    const g = (e.grade || (e.data && e.data.header && e.data.header.grade) || '').trim();
-    if (g && g !== 'غير محدد') stagesSet.add(g);
-  });
-
-  const totalQuestions = exams.reduce((sum, e) => sum + (e.questionsCount || (e.data && e.data.questions ? e.data.questions.length : 0)), 0);
+  const t = data.teacher;
+  const b = data.behavior;
+  const g = data.grades;
+  const ex = data.exams;
 
   printContainer.innerHTML = `
-    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 25px;">
-      <!-- Report Header -->
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 14px; margin-bottom: 16px;">
-        <div>
-          <div style="font-size: 16pt; font-weight: bold;">جمهورية العراق - وزارة التربية</div>
-          <div style="font-size: 13pt; color: #1e3a8a; font-weight: bold;">منصة المعلم الأستاذ (Moallem Pro) — المركز الأكاديمي لإدارة الاختبارات</div>
-          <div style="font-size: 11pt; color: #333; margin-top: 3px;">المعلم: ${teacherProfile.name || 'أستاذ حسين'} | المدرسة: ${teacherProfile.school || 'ثانوية المتميزين'} | المحافظة: ${teacherProfile.governorate || 'العراق'}</div>
+    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 20px 25px; line-height: 1.4; background: #fff;">
+      
+      <!-- 1. Official Header (ترويسة وزارة التربية الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 12px; margin-bottom: 14px;">
+        <div style="width: 32%;">
+          <div style="font-size: 13pt; font-weight: bold;">جمهورية العراق</div>
+          <div style="font-size: 11.5pt; font-weight: bold;">وزارة التربية العراقية</div>
+          <div style="font-size: 10pt; color: #222;">مديرية التربية في: <strong>${escapeHtml(t.governorate || 'بغداد')}</strong></div>
+          <div style="font-size: 10pt; color: #222;">المدرسة: <strong>${escapeHtml(t.school || 'ثانوية المتميزين')}</strong></div>
         </div>
-        <div style="text-align: left; font-size: 10.5pt; line-height: 1.6;">
-          <div><strong>تاريخ التقرير:</strong> ${dateFormatted}</div>
+        <div style="width: 36%; text-align: center;">
+          <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" style="width: 68px; height: 68px; object-fit: contain; margin-bottom: 4px; display: inline-block;">
+          <div style="font-size: 15pt; font-weight: 900; color: #0f172a; margin-bottom: 2px;">التقرير الأكاديمي اليومي الشامل</div>
+          <div style="font-size: 9.5pt; font-weight: bold; color: #0284c7;">منصة مسار المعلم الذكية — الرصد الموحد للأنشطة والقطاعات</div>
+          <div style="font-size: 9pt; color: #555; margin-top: 2px;">العام الدراسي: <strong>${escapeHtml(t.academicYear || '2024 - 2025')}</strong></div>
+        </div>
+        <div style="width: 32%; text-align: left; font-size: 9.5pt; line-height: 1.6;">
+          <div><strong>اليوم:</strong> ${dayName || 'اليوم'}</div>
+          <div><strong>التاريخ:</strong> ${dateFormatted}</div>
           <div><strong>وقت الطباعة:</strong> ${timeFormatted}</div>
-          <div><strong>إجمالي الاختبارات:</strong> ${exams.length} اختبار</div>
-          <div><strong>المراحل الدراسية:</strong> ${stagesSet.size} مراحل</div>
+          <div><strong>المعلم المشرف:</strong> ${escapeHtml(t.name || 'أستاذ المادة')}</div>
         </div>
       </div>
 
-      <!-- Report Title -->
-      <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="font-size: 17pt; margin: 0 0 6px 0; text-decoration: underline;">التقرير الأكاديمي الشامل لحصر الاختبارات والمراحل الدراسية المنشأة</h2>
-        <div style="display: flex; justify-content: center; gap: 24px; font-size: 11pt; margin-top: 8px;">
-          <span>🔹 عدد الاختبارات: <strong>${exams.length}</strong></span>
-          <span>🔹 إجمالي مفردات الأسئلة: <strong>${totalQuestions}</strong></span>
-          <span>🔹 المراحل المغطاة: <strong>${Array.from(stagesSet).join('، ') || 'عام'}</strong></span>
+      <!-- 2. Sector 1: Attendance & Conduct (قطاع المتابعة اليومية وحسن السلوك) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📋 أولاً: سجل المتابعة اليومية وحسن السلوك والغياب — (الصف: ${escapeHtml(b.className)} | مادة ${escapeHtml(b.subject)} | الحصة: ${escapeHtml(b.period)})</span>
+          <span style="font-size: 10pt;">نسبة الحضور: <strong>${b.rate}%</strong></span>
         </div>
-      </div>
-
-      <!-- Exams Table -->
-      <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10.5pt;">
-        <thead>
-          <tr style="background: #f1f5f9; border: 1.5px solid #000;">
-            <th style="border: 1px solid #000; padding: 7px; width: 35px; text-align: center;">ت</th>
-            <th style="border: 1px solid #000; padding: 7px; text-align: right;">عنوان الاختبار / النموذج</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 130px; text-align: center;">المرحلة والصف الدراسي</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 110px; text-align: center;">المادة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 110px; text-align: center;">نوع النموذج</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 75px; text-align: center;">الأسئلة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 75px; text-align: center;">الدرجة</th>
-            <th style="border: 1px solid #000; padding: 7px; width: 120px; text-align: center;">تاريخ الحفظ</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${exams.map((ex, idx) => {
-            const st = ex.grade || (ex.data && ex.data.header && ex.data.header.grade) || 'عام';
-            const sub = ex.subject || (ex.data && ex.data.header && ex.data.header.subject) || 'عام';
-            const qc = ex.questionsCount || (ex.data && ex.data.questions ? ex.data.questions.length : 0);
-            const typeLabel = ex.isModelPreset ? 'وزاري معتمد ⭐' : ex.isDraft ? 'مسودة عمل' : 'اختبار محفوظ';
-            return `
-              <tr style="border: 1px solid #000;">
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${idx + 1}</td>
-                <td style="border: 1px solid #000; padding: 6px; font-weight: 700;">${ex.title || 'اختبار بدون عنوان'}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${st}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${sub}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${typeLabel}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${qc}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${ex.totalScore || 100}</td>
-                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-size: 9.5pt;">${ex.updatedAt || ex.createdAt || '—'}</td>
+        <div style="padding: 8px 10px; font-size: 10pt; background: #fafafa; border-bottom: 1px solid #ddd; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 8px;">
+          <span>المقيدون: <b>${b.total}</b></span>
+          <span>حضور: <b>${b.present + b.late}</b></span>
+          <span>غياب: <b>${b.absent}</b></span>
+          <span>إجازات: <b>${b.excused}</b></span>
+          <span>تأخير: <b>${b.late}</b></span>
+          <span>موضوع الدرس: <b>${escapeHtml(b.topic)}</b></span>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 9.5pt;">
+          <thead>
+            <tr style="background: #e2e8f0; border-bottom: 1px solid #000;">
+              <th style="border: 1px solid #000; padding: 4px; width: 30px; text-align: center;">ت</th>
+              <th style="border: 1px solid #000; padding: 4px; text-align: right;">اسم الطالب</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 80px; text-align: center;">الموقف</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">المشاركة</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">الواجب</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">السلوك</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 60px; text-align: center;">التقييم</th>
+              <th style="border: 1px solid #000; padding: 4px; text-align: right;">ملاحظات المعلم</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(b.students || []).slice(0, 15).map((st, i) => `
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${i + 1}</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-weight: bold;">${escapeHtml(st.name)}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: 700;">
+                  ${st.attendance === 'absent' ? '❌ غائب' : st.attendance === 'excused' ? '⚠️ مجاز' : st.attendance === 'late' ? '⏰ متأخر' : '✔ حاضر'}
+                </td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${(st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.homework === 'done' ? 'منجز ✔' : 'ناقص'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.conduct === 'excellent' ? 'ممتاز' : 'جيد'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${st.score || 10}/10</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-size: 9pt; color: #333;">${escapeHtml(st.notes || '—')}</td>
               </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
+            `).join('')}
+            ${(!b.students || b.students.length === 0) ? `
+              <tr><td colspan="8" style="text-align: center; padding: 8px; border: 1px solid #000;">لا توجد بيانات حضور مسجلة لجلسة اليوم</td></tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
 
-      <!-- Footer Signatures -->
-      <div style="display: flex; justify-content: space-between; margin-top: 45px; padding-top: 15px; font-size: 11pt;">
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مدرس المادة ومعد الاختبارات</div>
-          <div style="margin-top: 35px;">___________________</div>
+      <!-- 3. Sector 2: Student Grades Ledger (سجل درجات وتقييم الطلاب) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>🎓 ثانياً: موقف سجل درجات الطلاب والشعب المعتمدة</span>
+          <span style="font-size: 10pt;">الصفوف المقيدة: <strong>${g.rosters.length}</strong> | إجمالي الطلاب: <strong>${g.totalEnrolled}</strong></span>
         </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مسؤول الكنترول واللجنة الامتحانية</div>
-          <div style="margin-top: 35px;">___________________</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-weight: bold;">مصادقة إدارة المدرسة / الإشراف</div>
-          <div style="margin-top: 35px;">___________________</div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div>متوسط الأداء العام بالدرجات: <strong>${g.averageScore}%</strong></div>
+          <div>أوائل الطلاب المتفوقين المسجلين: <strong>${g.topStudents.map(s => s.name + ' (' + s.score + 'د)').join(' • ') || 'سجلات الرصد نشطة ومحدثة'}</strong></div>
         </div>
       </div>
+
+      <!-- 4. Sector 3: Exams & Central Question Bank (الاختبارات وبنك الأسئلة) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📑 ثالثاً: حصر الاختبارات وبنك الأسئلة المركزي</span>
+          <span style="font-size: 10pt;">إجمالي الاختبارات: <strong>${ex.allExams.length}</strong> | مفردات البنك: <strong>${ex.bank.length}</strong> سؤال</span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: #fafafa;">
+          <span>الاختبار النشط الحالي: <strong>${escapeHtml(ex.currentExam.title)}</strong> (${escapeHtml(ex.currentExam.subject)} - ${escapeHtml(ex.currentExam.grade)})</span>
+          <span>الأسئلة بالمحرر: <strong>${ex.currentExam.questionsCount}</strong></span>
+          <span>الدرجة الكلية: <strong>${ex.currentExam.totalScore} درجة</strong></span>
+          <span>النماذج الوزارية الرسمية: <strong>${ex.allExams.filter(e => e.isModelPreset).length || 12} نموذج</strong></span>
+        </div>
+      </div>
+
+
+      <!-- 6. Official Triple Signatures (التوقيعات والمصادقات الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 15px; border-top: 1.5px solid #000; font-size: 10.5pt; text-align: center;">
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مدرس المادة ومعد التقرير</div>
+          <div style="margin-top: 5px; color: #444;">${escapeHtml(t.name || 'أستاذ المادة')}</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">المشرف التربوي الاختصاصي</div>
+          <div style="margin-top: 5px; color: #444;">المشرف المتابع للمدرسة</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مصادقة مدير المدرسة وختم الإدارة</div>
+          <div style="margin-top: 5px; color: #444;">إدارة ${escapeHtml(t.school || 'المدرسة')}</div>
+          <div style="margin-top: 30px;">التوقيع والختم: ___________________</div>
+        </div>
+      </div>
+
     </div>
   `;
 
@@ -7800,6 +10319,186 @@ window.printAcademicReport = function() {
     document.body.classList.remove('printing-academic-report');
   }, 1000);
 };
+
+window.printAcademicReport = window.printFullPlatformDailyReport;
+
+window.exportFullPlatformDailyReportPdf = async function() {
+  const data = (typeof getPlatformComprehensiveData === 'function') ? getPlatformComprehensiveData() : null;
+  if (!data) {
+    if (typeof showToast === 'function') showToast('تعذر قراءة بيانات المنصة الشاملة لتصدير PDF', 'danger');
+    return;
+  }
+
+  let printContainer = document.getElementById('academicReportPrintContainer');
+  if (!printContainer) {
+    printContainer = document.createElement('div');
+    printContainer.id = 'academicReportPrintContainer';
+    document.body.appendChild(printContainer);
+  }
+
+  const now = new Date();
+  const dateFormatted = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+  let dayName = '';
+  try {
+    dayName = now.toLocaleDateString('ar-IQ', { weekday: 'long' });
+  } catch(e) {
+    dayName = 'اليوم';
+  }
+  const timeFormatted = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+  const t = data.teacher;
+  const b = data.behavior;
+  const g = data.grades;
+  const ex = data.exams;
+
+  printContainer.innerHTML = `
+    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 25px 30px; line-height: 1.4; background: #fff; width: 100%; box-sizing: border-box;">
+      
+      <!-- 1. Official Header (ترويسة وزارة التربية الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2.5px solid #000; padding-bottom: 12px; margin-bottom: 14px;">
+        <div style="width: 32%;">
+          <div style="font-size: 13pt; font-weight: bold;">جمهورية العراق</div>
+          <div style="font-size: 11.5pt; font-weight: bold;">وزارة التربية العراقية</div>
+          <div style="font-size: 10pt; color: #222;">مديرية التربية في: <strong>${escapeHtml(t.governorate || 'بغداد')}</strong></div>
+          <div style="font-size: 10pt; color: #222;">المدرسة: <strong>${escapeHtml(t.school || 'ثانوية المتميزين')}</strong></div>
+        </div>
+        <div style="width: 36%; text-align: center;">
+          <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية العراقية" style="width: 68px; height: 68px; object-fit: contain; margin-bottom: 4px; display: inline-block;">
+          <div style="font-size: 15pt; font-weight: 900; color: #0f172a; margin-bottom: 2px;">التقرير الأكاديمي اليومي الشامل</div>
+          <div style="font-size: 9.5pt; font-weight: bold; color: #0284c7;">منصة مسار المعلم الذكية — الرصد الموحد للأنشطة والقطاعات</div>
+          <div style="font-size: 9pt; color: #555; margin-top: 2px;">العام الدراسي: <strong>${escapeHtml(t.academicYear || '2024 - 2025')}</strong></div>
+        </div>
+        <div style="width: 32%; text-align: left; font-size: 9.5pt; line-height: 1.6;">
+          <div><strong>اليوم:</strong> ${dayName || 'اليوم'}</div>
+          <div><strong>التاريخ:</strong> ${dateFormatted}</div>
+          <div><strong>وقت الإصدار:</strong> ${timeFormatted}</div>
+          <div><strong>الأستاذ:</strong> ${escapeHtml(t.name || 'المعلم')}</div>
+        </div>
+      </div>
+
+      <!-- 2. Sector 1: Attendance & Conduct Summary (المتابعة والغياب اليومي) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📋 أولاً: سجل الحضور والمتابعة اليومية — ${escapeHtml(b.className)} (المادة: ${escapeHtml(b.subject)} - الحصة: ${escapeHtml(b.period)})</span>
+          <span style="font-size: 10pt;">نسبة الحضور: <strong>${b.stats.attendanceRate}%</strong></span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; background: #fafafa;">
+          <span>إجمالي الطلاب: <strong>${b.stats.total}</strong></span>
+          <span>الحاضرون: <strong style="color: green;">${b.stats.present}</strong></span>
+          <span>الغياب: <strong style="color: red;">${b.stats.absent}</strong></span>
+          <span>الإجازات: <strong style="color: orange;">${b.stats.excused}</strong></span>
+          <span>المتأخرون: <strong>${b.stats.late}</strong></span>
+        </div>
+        <table style="width: 100%; border-collapse: collapse; font-size: 9pt;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 1px solid #000;">
+              <th style="border: 1px solid #000; padding: 4px; width: 35px; text-align: center;">ت</th>
+              <th style="border: 1px solid #000; padding: 4px 6px; text-align: right;">اسم الطالب الثلاثي</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">الحضور</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">المشاركة</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">الواجب</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 75px; text-align: center;">السلوك</th>
+              <th style="border: 1px solid #000; padding: 4px; width: 65px; text-align: center;">التقييم</th>
+              <th style="border: 1px solid #000; padding: 4px; text-align: right;">ملاحظات المعلم</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(b.students || []).slice(0, 25).map((st, i) => `
+              <tr style="border-bottom: 1px solid #ccc;">
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${i + 1}</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-weight: bold;">${escapeHtml(st.name)}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: 700;">
+                  ${st.attendance === 'absent' ? '❌ غائب' : st.attendance === 'excused' ? '⚠️ مجاز' : st.attendance === 'late' ? '⏰ متأخر' : '✔ حاضر'}
+                </td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${(st.participation === 'excellent' || st.participation === 'active') ? 'نشط ⭐' : 'عادي'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.homework === 'done' ? 'منجز ✔' : 'ناقص'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center;">${st.conduct === 'excellent' ? 'ممتاز' : 'جيد'}</td>
+                <td style="border: 1px solid #000; padding: 3px; text-align: center; font-weight: bold;">${st.score || 10}/10</td>
+                <td style="border: 1px solid #000; padding: 3px 6px; font-size: 9pt; color: #333;">${escapeHtml(st.notes || '—')}</td>
+              </tr>
+            `).join('')}
+            ${(!b.students || b.students.length === 0) ? `
+              <tr><td colspan="8" style="text-align: center; padding: 8px; border: 1px solid #000;">لا توجد بيانات حضور مسجلة لجلسة اليوم</td></tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 3. Sector 2: Student Grades Ledger (سجل درجات وتقييم الطلاب) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>🎓 ثانياً: موقف سجل درجات الطلاب والشعب المعتمدة</span>
+          <span style="font-size: 10pt;">الصفوف المقيدة: <strong>${g.rosters.length}</strong> | إجمالي الطلاب: <strong>${g.totalEnrolled}</strong></span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+          <div>متوسط الأداء العام بالدرجات: <strong>${g.averageScore}%</strong></div>
+          <div>أوائل الطلاب المتفوقين المسجلين: <strong>${g.topStudents.map(s => s.name + ' (' + s.score + 'د)').join(' • ') || 'سجلات الرصد نشطة ومحدثة'}</strong></div>
+        </div>
+      </div>
+
+      <!-- 4. Sector 3: Exams & Central Question Bank (الاختبارات وبنك الأسئلة) -->
+      <div style="margin-bottom: 14px; border: 1.5px solid #000; border-radius: 6px; overflow: hidden;">
+        <div style="background: #f1f5f9; border-bottom: 1.5px solid #000; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 11pt;">
+          <span>📑 ثالثاً: حصر الاختبارات وبنك الأسئلة المركزي</span>
+          <span style="font-size: 10pt;">إجمالي الاختبارات: <strong>${ex.allExams.length}</strong> | مفردات البنك: <strong>${ex.bank.length}</strong> سؤال</span>
+        </div>
+        <div style="padding: 8px 10px; font-size: 9.5pt; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: #fafafa;">
+          <span>الاختبار النشط الحالي: <strong>${escapeHtml(ex.currentExam.title)}</strong> (${escapeHtml(ex.currentExam.subject)} - ${escapeHtml(ex.currentExam.grade)})</span>
+          <span>الأسئلة بالمحرر: <strong>${ex.currentExam.questionsCount}</strong></span>
+          <span>الدرجة الكلية: <strong>${ex.currentExam.totalScore} درجة</strong></span>
+          <span>النماذج الوزارية الرسمية: <strong>${ex.allExams.filter(e => e.isModelPreset).length || 12} نموذج</strong></span>
+        </div>
+      </div>
+
+      <!-- 5. Official Triple Signatures (التوقيعات والمصادقات الرسمية المعتمدة) -->
+      <div style="display: flex; justify-content: space-between; margin-top: 30px; padding-top: 15px; border-top: 1.5px solid #000; font-size: 10.5pt; text-align: center;">
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مدرس المادة ومعد التقرير</div>
+          <div style="margin-top: 5px; color: #444;">${escapeHtml(t.name || 'أستاذ المادة')}</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">المشرف التربوي الاختصاصي</div>
+          <div style="margin-top: 5px; color: #444;">المشرف المتابع للمدرسة</div>
+          <div style="margin-top: 30px;">التوقيع: ___________________</div>
+        </div>
+        <div style="width: 30%;">
+          <div style="font-weight: bold;">مصادقة مدير المدرسة وختم الإدارة</div>
+          <div style="margin-top: 5px; color: #444;">إدارة ${escapeHtml(t.school || 'المدرسة')}</div>
+          <div style="margin-top: 30px;">التوقيع والختم: ___________________</div>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  printContainer.style.display = 'block';
+  printContainer.style.position = 'relative';
+
+  const dateSlug = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const filename = `تقرير-المدرسة-اليومي-الشامل-${dateSlug}.pdf`;
+
+  try {
+    if (typeof window.exportToPDF === 'function') {
+      await window.exportToPDF(printContainer, {
+        filename: filename,
+        format: 'a4',
+        orientation: 'portrait',
+        margin: [10, 10, 10, 10],
+        scale: 2
+      });
+      if (typeof showToast === 'function') showToast('تم تنزيل التقرير الأكاديمي الشامل بصيغة PDF بنجاح ✅', 'success');
+    } else {
+      throw new Error('محرك تصدير PDF المباشر غير متوفر');
+    }
+  } catch (err) {
+    console.error('exportFullPlatformDailyReportPdf error:', err);
+    if (typeof showToast === 'function') showToast('حدث خطأ أثناء تنزيل تقرير PDF: ' + (err.message || 'خطأ غير متوقع'), 'danger');
+  } finally {
+    if (printContainer) printContainer.style.display = 'none';
+  }
+};
+
 
 
 function renderDailyQuestionsList(list) {
@@ -8046,6 +10745,141 @@ window.printDailyReport = function() {
   }, 1000);
 };
 
+window.exportDailyReportPdf = async function() {
+  const list = (currentFilteredBankQuestions && currentFilteredBankQuestions.length > 0)
+    ? currentFilteredBankQuestions
+    : getQuestionsHistoryBank();
+
+  if (list.length === 0) {
+    if (typeof showToast === 'function') showToast('لا توجد أسئلة مسجلة في التقرير لتصديرها بصيغة PDF', 'info');
+    return;
+  }
+
+  let printContainer = document.getElementById('dailyReportPrintContainer');
+  if (!printContainer) {
+    printContainer = document.createElement('div');
+    printContainer.id = 'dailyReportPrintContainer';
+    document.body.appendChild(printContainer);
+  }
+
+  const now = new Date();
+  const dateFormatted = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
+  const timeFormatted = now.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+
+  const arabicCount = list.filter(q => (!q.subject || q.subject === 'arabic')).length;
+  const englishCount = list.filter(q => q.subject === 'english').length;
+  const mathCount = list.filter(q => q.subject === 'math').length;
+
+  printContainer.innerHTML = `
+    <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 20px; background: #fff; width: 100%; box-sizing: border-box;">
+      <!-- Report Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px;">
+        <div>
+          <div style="font-size: 15pt; font-weight: bold;">جمهورية العراق - وزارة التربية</div>
+          <div style="font-size: 12pt; color: #333;">منصة المعلم الأستاذ (Moallem Pro) لإدارة الاختبارات</div>
+          <div style="font-size: 11pt; color: #555;">المعلم: ${teacherProfile.name || 'أستاذ حسين'} | المدرسة: ${teacherProfile.school || 'ثانوية المتميزين'}</div>
+        </div>
+        <div style="text-align: left; font-size: 10pt;">
+          <div><strong>تاريخ التقرير:</strong> ${dateFormatted}</div>
+          <div><strong>وقت الإصدار:</strong> ${timeFormatted}</div>
+          <div><strong>إجمالي الأسئلة:</strong> ${list.length} سؤال</div>
+        </div>
+      </div>
+
+      <!-- Report Title -->
+      <div style="text-align: center; margin-bottom: 18px;">
+        <h2 style="font-size: 16pt; margin: 0 0 6px 0; text-decoration: underline;">تقرير المتابعة اليومي وبنك الأسئلة المنشأة</h2>
+        <div style="display: flex; justify-content: center; gap: 20px; font-size: 11pt; margin-top: 8px;">
+          <span>🔹 أسئلة اللغة العربية: <strong>${arabicCount}</strong></span>
+          <span>🔹 أسئلة اللغة الإنكليزية: <strong>${englishCount}</strong></span>
+          <span>🔹 أسئلة الرياضيات: <strong>${mathCount}</strong></span>
+        </div>
+      </div>
+
+      <!-- Questions Table / List -->
+      <table style="width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10.5pt;">
+        <thead>
+          <tr style="background: #f1f5f9; border: 1.5px solid #000;">
+            <th style="border: 1px solid #000; padding: 6px; width: 40px; text-align: center;">ت</th>
+            <th style="border: 1px solid #000; padding: 6px; width: 85px; text-align: center;">المادة</th>
+            <th style="border: 1px solid #000; padding: 6px; width: 110px; text-align: center;">النوع</th>
+            <th style="border: 1px solid #000; padding: 6px; text-align: right;">صيغة السؤال وتفاصيله</th>
+            <th style="border: 1px solid #000; padding: 6px; width: 60px; text-align: center;">الدرجة</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map((q, i) => {
+            const qSub = q.subject || 'arabic';
+            const subLabel = qSub === 'english' ? 'English' : qSub === 'math' ? 'رياضيات' : 'عربي';
+            const typeDef = QUESTION_TYPES[q.type] || { name: 'سؤال' };
+            const isEn = (qSub === 'english');
+
+            let extra = '';
+            if (q.type === 'mcq' && q.options) {
+              extra = `<div style="font-size: 9.5pt; color: #333; margin-top: 4px;">الخيارات: ${q.options.map(o => (o.isCorrect ? ' [✔ ' : ' [') + o.text + ']').join(' ')}</div>`;
+            } else if (q.modelAnswer) {
+              extra = `<div style="font-size: 9.5pt; color: #222; margin-top: 4px;"><strong>الإجابة النموذجية:</strong> ${q.modelAnswer}</div>`;
+            }
+
+            return `
+              <tr style="border: 1px solid #000;">
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${i + 1}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${subLabel}</td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center;">${typeDef.name}</td>
+                <td style="border: 1px solid #000; padding: 6px; direction: ${isEn ? 'ltr' : 'rtl'}; text-align: ${isEn ? 'left' : 'right'};">
+                  ${q.title ? `<div style="font-weight: bold; margin-bottom: 2px;">${q.title}</div>` : ''}
+                  <div>${q.text || ''}</div>
+                  ${extra}
+                </td>
+                <td style="border: 1px solid #000; padding: 6px; text-align: center; font-weight: bold;">${q.score || 10}</td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+
+      <!-- Signatures Footer -->
+      <div style="margin-top: 40px; display: flex; justify-content: space-between; padding: 0 30px;">
+        <div style="text-align: center;">
+          <div style="font-weight: bold;">مدرس المادة ومعد الأسئلة</div>
+          <div style="margin-top: 35px;">___________________</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-weight: bold;">مصادقة إدارة المدرسة / الإشراف</div>
+          <div style="margin-top: 35px;">___________________</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  printContainer.style.display = 'block';
+  printContainer.style.position = 'relative';
+
+  const dateSlug = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const filename = `تقرير-بنك-الأسئلة-${dateSlug}.pdf`;
+
+  try {
+    if (typeof window.exportToPDF === 'function') {
+      await window.exportToPDF(printContainer, {
+        filename: filename,
+        format: 'a4',
+        orientation: 'portrait',
+        margin: [10, 10, 10, 10],
+        scale: 2
+      });
+      if (typeof showToast === 'function') showToast('تم تنزيل تقرير بنك الأسئلة بصيغة PDF بنجاح ✅', 'success');
+    } else {
+      throw new Error('محرك تصدير PDF المباشر غير متوفر');
+    }
+  } catch (err) {
+    console.error('exportDailyReportPdf error:', err);
+    if (typeof showToast === 'function') showToast('حدث خطأ أثناء تنزيل تقرير PDF: ' + (err.message || 'خطأ غير متوقع'), 'danger');
+  } finally {
+    if (printContainer) printContainer.style.display = 'none';
+  }
+};
+
+
 // Global exports for accessibility across application
 window.initSubjectMode = initSubjectMode;
 window.setSubjectMode = setSubjectMode;
@@ -8122,6 +10956,10 @@ window.switchToReportTab = function(isFromSave = false) {
     reportContent.classList.add('active');
   }
 
+  if (typeof window.updatePreviewVisibilityForTab === 'function') {
+    window.updatePreviewVisibilityForTab('tab-report');
+  }
+
   // 3. Switch mobile workstation to builder if on mobile
   if (typeof window.setMobileWorkstationMode === 'function') {
     window.setMobileWorkstationMode('builder');
@@ -8142,12 +10980,12 @@ window.switchToReportTab = function(isFromSave = false) {
     archiveModal.classList.remove('open');
   }
 
-  // 6. Update metrics & questions list
-  if (typeof updateDailyReportMetrics === 'function') {
-    updateDailyReportMetrics();
-  }
-  if (typeof filterDailyReportQuestions === 'function') {
-    filterDailyReportQuestions();
+  // 6. Update metrics & render comprehensive platform view
+  if (typeof window.switchReportSubView === 'function') {
+    window.switchReportSubView(window.currentReportSubView || 'overview');
+  } else {
+    if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+    if (typeof filterDailyReportQuestions === 'function') filterDailyReportQuestions();
   }
 
   // 7. Scroll smoothly to top of the report
@@ -8224,11 +11062,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (localStorage.getItem('moallem_side_qtype_collapsed') === 'true') {
     window.toggleSideQTypeCollapse(true);
   }
-  // Default to mini-dock icons bar on desktop unless explicitly expanded
-  if (localStorage.getItem('moallem_drawer_minidock') === 'false') {
-    window.openSideDrawer();
-  } else {
-    window.closeSideDrawer(); // Sets mini-mode & open on desktop!
+  // Keep sidebar drawer closed initially so it never affects the site layout
+  window.closeSideDrawer();
+  if (typeof window.initAppCards3DTilt === 'function') {
+    window.initAppCards3DTilt();
   }
 });
 
@@ -8340,9 +11177,7 @@ let googleTokenClient = null;
 let isGisReady = false;
 
 window.initGoogleIdentityServices = function() {
-  const clientId = window.getGoogleClientId();
   if (typeof google === 'undefined' || !google.accounts) {
-    setTimeout(window.initGoogleIdentityServices, 500);
     return;
   }
 
@@ -8507,7 +11342,10 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
 
   // Brand-new Google user: Automatically create account with Google details and login instantly!
   const nowReg = new Date();
+  const trialDurationMs = 2 * 24 * 60 * 60 * 1000; // 48 hours (2 full days free trial)
+  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
   const rawPrefix = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
   
   const newGoogleAcc = {
@@ -8528,12 +11366,22 @@ window.handleVerifiedGoogleAccount = function(googleProfile) {
     role: 'teacher',
     isSubscribed: true,
     isVip: true,
+    isTrial: true,
+    trialDurationHours: 48,
+    trialStartedAt: nowReg.toISOString(),
+    subscriptionType: 'free_trial_48h',
+    subscriptionPlanName: 'فترة تجريبية مجانية (يومان / 48 ساعة)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
   };
 
   accounts.push(newGoogleAcc);
   saveAuthAccounts(accounts);
+  localStorage.setItem(`moallem_vip_subscription_${newGoogleAcc.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${newGoogleAcc.id}`, trialExpiry.toISOString());
   window.performGoogleLoginSuccess(newGoogleAcc);
 };
 
@@ -8581,25 +11429,15 @@ window.renderGoogleSavedAccountsList = function() {
 
 window.validateOfficialGoogleEmail = function(emailStr) {
   const email = (emailStr || '').trim().toLowerCase();
-  if (!email) return { isValid: false, reason: 'empty' };
+  if (!email) return { isValid: false, reason: 'empty', message: 'يرجى إدخال البريد الإلكتروني' };
 
-  // Domain check
-  if (!email.endsWith('@gmail.com') && !email.endsWith('@googlemail.com')) {
-    return { isValid: false, reason: 'domain', message: 'يجب أن ينتهي البريد بـ @gmail.com أو @googlemail.com حصراً' };
+  // Standard email validation (any valid domain: gmail, outlook, yahoo, edu, etc.)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { isValid: false, reason: 'format', message: 'يرجى إدخال عنوان بريد إلكتروني صالح (مثال: teacher@example.com)' };
   }
 
   const localPart = email.split('@')[0];
-  
-  // Google length check: 6 to 30 characters
-  if (localPart.length < 6 || localPart.length > 30) {
-    return { isValid: false, reason: 'length', message: 'معرفات حسابات Google تتكون من 6 إلى 30 حرفاً ورقماً' };
-  }
-
-  // Google character check: only a-z, 0-9, and .
-  if (!/^[a-z0-9]+(\.[a-z0-9]+)*$/.test(localPart)) {
-    return { isValid: false, reason: 'chars', message: 'حسابات Google لا تقبل رموزاً خاصة أو نقاطاً متتالية أو نقطة في البداية/النهاية' };
-  }
-
   return { isValid: true, email: email, localPart: localPart };
 };
 
@@ -8615,13 +11453,13 @@ window.handlePersonalGoogleEmailInput = function(val) {
 
   if (!email) {
     if (badge) {
-      badge.innerText = 'مطلوب @gmail.com';
-      badge.style.background = 'rgba(66, 133, 244, 0.1)';
-      badge.style.color = '#4285f4';
-      badge.style.borderColor = 'rgba(66, 133, 244, 0.25)';
+      badge.innerText = 'إدخال يدوي';
+      badge.style.background = 'rgba(37, 99, 235, 0.1)';
+      badge.style.color = '#3b82f6';
+      badge.style.borderColor = 'rgba(37, 99, 235, 0.25)';
     }
     if (notice) {
-      notice.innerHTML = 'أدخل بريدك الشخصي الرسمي (يجب أن ينتهي بـ @gmail.com). تم إلغاء أي دخول مباشر بدون مصادقة.';
+      notice.innerHTML = 'أدخل بريدك الإلكتروني يدوياً لفتح حسابك أو تسجيل حساب جديد.';
     }
     return;
   }
@@ -8630,23 +11468,23 @@ window.handlePersonalGoogleEmailInput = function(val) {
 
   if (check.isValid) {
     if (badge) {
-      badge.innerText = '✔ حساب Google رسمي مطابق';
+      badge.innerText = '✔ بريد صالح';
       badge.style.background = 'rgba(16, 185, 129, 0.15)';
       badge.style.color = '#10b981';
       badge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
     }
     if (notice) {
-      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> تم فحص المعرف: مطابق لقواعد حسابات Google الرسمية. اضغط الزر أدناه للمتابعة.</span>';
+      notice.innerHTML = '<span style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-circle-check"></i> البريد صالح ومكتمل. اضغط الزر أدناه للمتابعة.</span>';
     }
   } else {
     if (badge) {
-      badge.innerText = '❌ غير مطابق لـ Google';
+      badge.innerText = '❌ غير صالح';
       badge.style.background = 'rgba(239, 68, 68, 0.1)';
       badge.style.color = '#ef4444';
       badge.style.borderColor = 'rgba(239, 68, 68, 0.25)';
     }
     if (notice) {
-      notice.innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${check.message || 'أدخل بريد Gmail صالح'}</span>`;
+      notice.innerHTML = `<span style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${check.message || 'أدخل بريد إلكتروني صالح'}</span>`;
     }
   }
 };
@@ -8657,7 +11495,7 @@ window.submitPersonalGoogleEmail = function() {
   const input = document.getElementById('googlePersonalEmailInput');
   const rawEmail = input ? input.value.trim().toLowerCase() : '';
 
-  // Strict Google Account Validation
+  // Email Validation
   const check = window.validateOfficialGoogleEmail(rawEmail);
 
   if (!check.isValid) {
@@ -8665,7 +11503,7 @@ window.submitPersonalGoogleEmail = function() {
       input.classList.add('input-error');
       input.focus();
     }
-    showToast(check.message || 'يرجى إدخال بريد Google شخصي صالح ينتهي بـ @gmail.com 🛡️', 'error');
+    showToast(check.message || 'يرجى إدخال بريد إلكتروني صالح 🛡️', 'error');
     return;
   }
 
@@ -8678,7 +11516,7 @@ window.submitPersonalGoogleEmail = function() {
   );
 
   if (existing) {
-    // SECURITY FIX: NEVER LOG IN INSTANTLY! REQUIRE PASSWORD!
+    // SECURITY: Require password
     window.currentPromptedAccount = existing;
     const passBox = document.getElementById('googleExistingAccountPasswordBox');
     const passInput = document.getElementById('googleExistingPassInput');
@@ -8697,17 +11535,17 @@ window.submitPersonalGoogleEmail = function() {
         passInput.focus();
       }
     }
-    showToast('تم العثور على حسابك! يرجى إدخال كلمة المرور لتأكيد هويتك، أو المتابعة بزر Google الرسمي أعلاه 🔒', 'warning');
+    showToast('تم العثور على حسابك! يرجى إدخال كلمة المرور لتأكيد هويتك 🔒', 'warning');
     return;
   }
 
-  // New Google Teacher: derive friendly suggested name
+  // New Teacher: derive suggested name
   const rawPrefix = rawEmail.split('@')[0];
   const suggestedName = 'أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
 
-  // Advance to Step 2 with verified email
+  // Advance to Step 2 with email
   window.proceedToStep2(suggestedName, rawEmail, '');
-  showToast('تم التحقق من حساب Google بنجاح! أكمل بيانات مدرستك وكلمة مرورك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
+  showToast('تم التحقق من البريد بنجاح! أكمل بياناتك وكلمة مرورك لتثبيت حسابك وتأمين خصوصيتك 🔒', 'info');
 };
 
 window.confirmExistingAccountWithPassword = function() {
@@ -8807,60 +11645,10 @@ let pendingGoogleAccount = {
   googleId: ''
 };
 
-// Launch Official Google Popup / Account Chooser
+// Launch Manual Email Registration / Login Modal
 window.launchGoogleRealPopup = function() {
-  const statusEl = document.getElementById('googleAuthStatusNotice');
-  if (statusEl) statusEl.style.display = 'block';
-
-  // 1. If GSI rendered button exists inside .g_id_signin, trigger it directly
-  const gsiBtn = document.querySelector('.g_id_signin div[role="button"], #googleOfficialGsiButton div[role="button"]');
-  if (gsiBtn) {
-    if (statusEl) statusEl.style.display = 'none';
-    gsiBtn.click();
-    return;
-  }
-
-  // 2. Initialize if not ready
-  if (!googleTokenClient && typeof google !== 'undefined' && google.accounts) {
-    window.initGoogleIdentityServices();
-  }
-
-  // 3. Try GSI prompt (One Tap / Account Chooser)
-  if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-    try {
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // If One Tap cannot be displayed, try OAuth token client or modal
-          if (googleTokenClient) {
-            try { googleTokenClient.requestAccessToken({ prompt: 'select_account' }); } catch(err) {}
-          } else if (typeof window.openGoogleAccountModal === 'function') {
-            window.openGoogleAccountModal();
-          }
-        }
-      });
-      if (statusEl) statusEl.style.display = 'none';
-      return;
-    } catch(e) {
-      console.warn('GSI prompt notification:', e);
-    }
-  }
-
-  // 4. Try OAuth2 token client
-  if (googleTokenClient) {
-    try {
-      googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-      if (statusEl) statusEl.style.display = 'none';
-      return;
-    } catch (e) {
-      console.warn('Failed to launch token client popup:', e);
-    }
-  }
-
-  if (statusEl) statusEl.style.display = 'none';
   if (typeof window.openGoogleAccountModal === 'function') {
     window.openGoogleAccountModal();
-  } else {
-    showToast('جارٍ تشغيل مصادقة Google... يرجى اختيار حسابك من نافذة Google 💡', 'info');
   }
 };
 
@@ -8985,30 +11773,66 @@ window.completeGoogleLoginWithProfile = function() {
   const name = (nameInput && nameInput.value.trim()) || '';
   const username = (userInput && userInput.value.trim()) || '';
   const password = (passInput && passInput.value) || '';
-  const subject = (subInput && subInput.value.trim()) || 'عام';
+  const subject = (subInput && subInput.value.trim()) || '';
   const school = (schoolInput && schoolInput.value.trim()) || '';
   const governorate = (govInput && govInput.value.trim()) || '';
-  const rights = (rightsInput && rightsInput.value.trim()) || (name ? `إعداد وتنظيم ${name} - جميع الحقوق محفوظة` : '');
+  const rights = (rightsInput && rightsInput.value.trim()) || '';
   const contact = (contactInput && contactInput.value.trim()) || '';
 
+  // Clear previous error styles
+  [nameInput, userInput, passInput, subInput, schoolInput, govInput, rightsInput, contactInput].forEach(el => {
+    if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
+  });
+
+  // Strict Validation: Every field in Step 2 is mandatory!
   if (!name) {
-    showToast('يرجى كتابة الاسم الثلاثي أو اللقب أولاً!', 'warning');
-    if (nameInput) nameInput.focus();
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة الاسم الكامل للأستاذ / المعلم!', 'warning');
+    if (nameInput) { nameInput.focus(); nameInput.style.borderColor = '#ef4444'; nameInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
     return;
   }
   if (!username) {
-    showToast('يرجى كتابة اسم المستخدم (اليوزر) للدخول السريع!', 'warning');
-    if (userInput) userInput.focus();
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة اسم المستخدم (اليوزر) للدخول السريع!', 'warning');
+    if (userInput) { userInput.focus(); userInput.style.borderColor = '#ef4444'; userInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
     return;
   }
   if (username.toLowerCase() === 'admin' || username.toLowerCase() === 'usr_admin') {
     showToast('عذراً، اسم المستخدم (admin) محجوز للإدارة فقط ولا يمكن استخدامه!', 'danger');
-    if (userInput) userInput.focus();
+    if (userInput) { userInput.focus(); userInput.style.borderColor = '#ef4444'; }
     return;
   }
   if (!password) {
-    showToast('يرجى تعيين كلمة مرور لحسابك!', 'warning');
-    if (passInput) passInput.focus();
+    showToast('⚠️ حقل إجباري مطلوب: يرجى تعيين كلمة مرور (الباسورد) لحسابك!', 'warning');
+    if (passInput) { passInput.focus(); passInput.style.borderColor = '#ef4444'; passInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
+    return;
+  }
+  if (password.length < 4) {
+    showToast('⚠️ كلمة المرور يجب أن لا تقل عن 4 رموز!', 'warning');
+    if (passInput) { passInput.focus(); passInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!subject) {
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة المادة الدراسية التخصصية!', 'warning');
+    if (subInput) { subInput.focus(); subInput.style.borderColor = '#ef4444'; subInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
+    return;
+  }
+  if (!school) {
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة اسم المدرسة أو المعهد!', 'warning');
+    if (schoolInput) { schoolInput.focus(); schoolInput.style.borderColor = '#ef4444'; schoolInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
+    return;
+  }
+  if (!governorate) {
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة المحافظة أو المديرية التعليمية!', 'warning');
+    if (govInput) { govInput.focus(); govInput.style.borderColor = '#ef4444'; govInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
+    return;
+  }
+  if (!rights) {
+    showToast('⚠️ حقل إجباري مطلوب: يرجى ملء حقوق الطبع والترويسة المخصصة لك!', 'warning');
+    if (rightsInput) { rightsInput.focus(); rightsInput.style.borderColor = '#ef4444'; rightsInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
+    return;
+  }
+  if (!contact) {
+    showToast('⚠️ حقل إجباري مطلوب: يرجى كتابة رقم الهاتف أو وسيلة التواصل!', 'warning');
+    if (contactInput) { contactInput.focus(); contactInput.style.borderColor = '#ef4444'; contactInput.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'; }
     return;
   }
 
@@ -9025,7 +11849,11 @@ window.completeGoogleLoginWithProfile = function() {
   }
 
   const nowReg = new Date();
+  const trialDurationMs = 2 * 24 * 60 * 60 * 1000; // 48 hours (2 full days free trial)
+  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth()+1).padStart(2,'0')}-${String(nowReg.getDate()).padStart(2,'0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
   const finalGoogleAccount = {
     id: 'usr_google_' + Date.now(),
     name: name,
@@ -9041,28 +11869,42 @@ window.completeGoogleLoginWithProfile = function() {
     contact: contact,
     isGoogleUser: true,
     isVerified: true,
-    role: 'viewer',
-    isSubscribed: false,
-    isVip: false,
+    role: 'teacher',
+    isSubscribed: true,
+    isVip: true,
+    isTrial: true,
+    trialDurationHours: 48,
+    trialStartedAt: nowReg.toISOString(),
+    subscriptionType: 'free_trial_48h',
+    subscriptionPlanName: 'فترة تجريبية مجانية (يومان / 48 ساعة)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
   };
 
   accounts.push(finalGoogleAccount);
   saveAuthAccounts(accounts);
+  localStorage.setItem(`moallem_vip_subscription_${finalGoogleAccount.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${finalGoogleAccount.id}`, trialExpiry.toISOString());
+
+  // Save isolated profile for this account immediately
+  try {
+    localStorage.setItem(`moallem_teacher_profile_${finalGoogleAccount.id}`, JSON.stringify(finalGoogleAccount));
+  } catch (_) {}
+
   if (typeof window.renderSubscribersManagementUI === 'function') {
     window.renderSubscribersManagementUI();
   }
 
-  // Update teacherProfile state
-  teacherProfile = { ...teacherProfile, ...finalGoogleAccount };
+  // Update teacherProfile state and sync modal inputs
+  teacherProfile = { ...finalGoogleAccount };
+  syncProfileModalInputs(finalGoogleAccount);
 
   window.performGoogleLoginSuccess(finalGoogleAccount);
 
-  showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! هذا الحساب يخضع لعملية دفع واشتراك (50,000 د.ع) لتفعيل كافة الصلاحيات 💳🔒`, 'warning');
-  if (typeof window.openSubscriptionModal === 'function') {
-    window.openSubscriptionModal();
-  }
+  showToast(`تم إنشاء حسابك أستاذ ${name} بنجاح! تم تفعيل اشتراك تجريبي مجاني لمدة يومين (48 ساعة) لتجربة كافة إمكانيات المنصة 🎁✨`, 'success');
 };
 
 window.loginWithSelectedGoogleAccount = function(name, email) {
@@ -9078,18 +11920,10 @@ window.performGoogleLoginSuccess = async function(account) {
   }
   sessionStorage.setItem('moallem_session_active', 'true');
 
-  // Update profile
-  teacherProfile.name = account.name || teacherProfile.name;
-  teacherProfile.username = account.username || teacherProfile.username;
-  teacherProfile.password = account.password || teacherProfile.password;
-  teacherProfile.email = account.email || teacherProfile.email;
-  teacherProfile.subject = account.subject || teacherProfile.subject;
-  teacherProfile.school = account.school || teacherProfile.school;
-  teacherProfile.governorate = account.governorate || teacherProfile.governorate;
-  teacherProfile.rights = account.rights || teacherProfile.rights;
-  teacherProfile.contact = account.contact || teacherProfile.contact;
-  teacherProfile.isGoogleUser = true;
-  saveTeacherProfile();
+  // Update profile with clean account data
+  teacherProfile = { ...account };
+  syncProfileModalInputs(account);
+  saveTeacherProfile(false, account);
   syncHeaderInputs();
   applyProfileToExamHeader();
   updateUserAuthUI();
@@ -9162,15 +11996,61 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
   const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
   const archiveStorageKey = getAccountStorageKey('moallem_saved_exams_archive');
 
+  // 1. Questions Bank
   let questionsBank = [];
   try {
     const rawBank = localStorage.getItem(bankStorageKey) || localStorage.getItem('moallem_questions_bank');
     if (rawBank) questionsBank = JSON.parse(rawBank);
   } catch(e) {}
 
+  // 2. Exams Archive
   let examsArchive = [];
   try {
     examsArchive = getSavedExamsArchive();
+  } catch(e) {}
+
+  // 3. Student Grades Rosters (User Isolated)
+  let studentGradesRosters = null;
+  let studentGradesActiveId = null;
+  try {
+    const gradesKey = getAccountStorageKey('masar_teacher_grades_rosters_v1');
+    const gradesActiveKey = getAccountStorageKey('masar_teacher_grades_active_roster_id');
+    const rawGrades = localStorage.getItem(gradesKey);
+    if (rawGrades) studentGradesRosters = JSON.parse(rawGrades);
+    studentGradesActiveId = localStorage.getItem(gradesActiveKey) || '';
+  } catch(e) {}
+
+  // 4. Student Daily Behavior & Conduct (User Isolated)
+  let studentBehaviorRecords = null;
+  let studentBehaviorRosters = null;
+  try {
+    const behKey = getAccountStorageKey('masar_student_behavior_records');
+    const rostKey = getAccountStorageKey('masar_student_rosters');
+    const rawBehavior = localStorage.getItem(behKey);
+    if (rawBehavior) studentBehaviorRecords = JSON.parse(rawBehavior);
+    const rawBRosters = localStorage.getItem(rostKey);
+    if (rawBRosters) studentBehaviorRosters = JSON.parse(rawBRosters);
+  } catch(e) {}
+
+  // 5. Lesson Plans Studio & Archive
+  let lessonPlanCurrent = null;
+  let lessonPlanArchive = null;
+  try {
+    const rawPlan = localStorage.getItem('masar_current_lesson_plan');
+    if (rawPlan) lessonPlanCurrent = JSON.parse(rawPlan);
+    const rawArch = localStorage.getItem('masar_lesson_plans_archive');
+    if (rawArch) lessonPlanArchive = JSON.parse(rawArch);
+  } catch(e) {}
+
+  // 6. Teacher Profile & Platform Settings
+  let profileData = null;
+  try {
+    profileData = teacherProfile || JSON.parse(localStorage.getItem('moallem_teacher_profile') || '{}');
+  } catch(e) {}
+
+  let privacyData = null;
+  try {
+    privacyData = privacySettings || JSON.parse(localStorage.getItem('moallem_privacy_settings') || '{}');
   } catch(e) {}
 
   const payload = {
@@ -9185,6 +12065,14 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
       questions: appState.questions,
       settings: appState.settings
     },
+    studentGradesRosters: studentGradesRosters,
+    studentGradesActiveId: studentGradesActiveId,
+    studentBehaviorRecords: studentBehaviorRecords,
+    studentBehaviorRosters: studentBehaviorRosters,
+    lessonPlanCurrent: lessonPlanCurrent,
+    lessonPlanArchive: lessonPlanArchive,
+    teacherProfile: profileData,
+    privacySettings: privacyData,
     savedAt: new Date().toISOString()
   };
 
@@ -9208,7 +12096,7 @@ window.syncUserDataToServer = async function(user, isSilent = false) {
     if (res.ok) {
       const resJson = await res.json();
       if (!isSilent && resJson.success) {
-        showToast('تمت مزامنة وحفظ كافة أسئلتك واختباراتك سحابياً بنجاح! ☁️', 'success');
+        showToast('تم حفظ ومزامنة كافة بيانات المنصة (الأسئلة، الاختبارات، سجل الدرجات، السلوك، والخطط) في السيرفر بنجاح! ☁️💾', 'success');
       }
     }
   } catch (e) {
@@ -9283,13 +12171,69 @@ window.restoreUserDataFromServer = async function(user) {
         }
       }
 
+      // 4. Restore Student Grades Rosters (User Isolated)
+      if (Array.isArray(data.studentGradesRosters) && data.studentGradesRosters.length > 0) {
+        const gradesKey = getAccountStorageKey('masar_teacher_grades_rosters_v1');
+        const gradesActiveKey = getAccountStorageKey('masar_teacher_grades_active_roster_id');
+        localStorage.setItem(gradesKey, JSON.stringify(data.studentGradesRosters));
+        if (data.studentGradesActiveId) {
+          localStorage.setItem(gradesActiveKey, data.studentGradesActiveId);
+        }
+        if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+          window.reloadStudentGradesForCurrentUser();
+        } else if (window.StudentGradesModule && typeof window.StudentGradesModule.init === 'function') {
+          window.StudentGradesModule.init();
+        }
+      }
+
+      // 5. Restore Student Daily Behavior & Conduct (User Isolated)
+      if (data.studentBehaviorRecords && typeof data.studentBehaviorRecords === 'object' && Object.keys(data.studentBehaviorRecords).length > 0) {
+        const behKey = getAccountStorageKey('masar_student_behavior_records');
+        localStorage.setItem(behKey, JSON.stringify(data.studentBehaviorRecords));
+      }
+      if (Array.isArray(data.studentBehaviorRosters) && data.studentBehaviorRosters.length > 0) {
+        const rostKey = getAccountStorageKey('masar_student_rosters');
+        localStorage.setItem(rostKey, JSON.stringify(data.studentBehaviorRosters));
+      }
+      if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+        window.reloadStudentBehaviorForCurrentUser();
+      } else if (window.StudentBehaviorModule && typeof window.StudentBehaviorModule.init === 'function') {
+        window.StudentBehaviorModule.init();
+      }
+
+      // 6. Restore Lesson Plans Studio & Archive
+      if (data.lessonPlanCurrent && typeof data.lessonPlanCurrent === 'object') {
+        localStorage.setItem('masar_current_lesson_plan', JSON.stringify(data.lessonPlanCurrent));
+      }
+      if (Array.isArray(data.lessonPlanArchive) && data.lessonPlanArchive.length > 0) {
+        localStorage.setItem('masar_lesson_plans_archive', JSON.stringify(data.lessonPlanArchive));
+      }
+      if (window.LessonPlanModule && typeof window.LessonPlanModule.reload === 'function') {
+        window.LessonPlanModule.reload();
+      }
+
+      // 7. Restore Teacher Profile & Settings
+      if (data.teacherProfile && typeof data.teacherProfile === 'object') {
+        const curUser = getCurrentUser();
+        // Do not let stale cloud snapshot overwrite active user's customized name
+        if (curUser && curUser.name && curUser.name.trim()) {
+          data.teacherProfile.name = curUser.name;
+        }
+        teacherProfile = { ...teacherProfile, ...data.teacherProfile };
+        localStorage.setItem('moallem_teacher_profile', JSON.stringify(teacherProfile));
+        applyProfileToExamHeader();
+        if (typeof updateProfileModalInputs === 'function') updateProfileModalInputs();
+      }
+      if (data.privacySettings && typeof data.privacySettings === 'object') {
+        privacySettings = { ...privacySettings, ...data.privacySettings };
+        localStorage.setItem('moallem_privacy_settings', JSON.stringify(privacySettings));
+        updatePrivacySettingsUI();
+      }
+
       renderAll();
       if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
 
-      const totalItems = restoredCount + (Array.isArray(data.examsArchive) ? data.examsArchive.length : 0);
-      if (totalItems > 0) {
-        showToast(`تمت مزامنة واسترجاع جميع أسئلتك واختباراتك (${restoredCount} سؤال) من السيرفر بنجاح! ☁️📱`, 'success');
-      }
+      showToast(`تم استرجاع ومزامنة كافة بيانات المنصة بالكامل من السيرفر بنجاح! ☁️📱`, 'success');
       return true;
     }
   } catch (err) {
@@ -9653,10 +12597,12 @@ window.openMobileSyncModal = function() {
   const examBadge = document.getElementById('syncExamsCountBadge');
   if (examBadge) examBadge.innerText = `${archive.length} اختبار`;
 
-  // Determine direct URL
-  let baseUrl = window.location.origin;
+  // Determine direct URL (prioritize worldwide Cloudflare URL so it opens anywhere on 4G)
+  const savedPub = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : '';
+  const preferredUrl = window.MOALLEM_PUBLIC_SERVER_URL || savedPub;
+  let baseUrl = preferredUrl || window.location.origin;
   if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
-    baseUrl = 'http://192.168.0.29:8080';
+    baseUrl = preferredUrl || 'http://localhost:8080';
   }
   const wifiUrlEl = document.getElementById('syncWifiDirectUrl');
   if (wifiUrlEl) wifiUrlEl.innerText = baseUrl;
@@ -9710,13 +12656,15 @@ window.copyDirectMobileSyncLink = function() {
 };
 
 window.copyWifiDirectUrl = function() {
-  let baseUrl = window.location.origin;
+  const savedPub = (typeof localStorage !== 'undefined') ? localStorage.getItem('moallem_public_server_url') : '';
+  const preferredUrl = window.MOALLEM_PUBLIC_SERVER_URL || savedPub;
+  let baseUrl = preferredUrl || window.location.origin;
   if (!baseUrl || baseUrl === 'null' || window.location.protocol === 'file:') {
-    baseUrl = 'http://192.168.0.29:8080';
+    baseUrl = preferredUrl || 'http://localhost:8080';
   }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(baseUrl).then(() => {
-      showToast('تم نسخ رابط الواي فاي المباشر: ' + baseUrl + ' 📋', 'success');
+      showToast('تم نسخ رابط المنصة: ' + baseUrl + ' 📋', 'success');
     }).catch(() => {
       prompt('رابط الواي فاي المباشر:', baseUrl);
     });
@@ -9774,8 +12722,8 @@ window.importFullSyncFile = function(event) {
 
 // Automatic listener on tab focus / visibilitychange
 document.addEventListener('visibilitychange', () => {
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (document.visibilityState === 'visible') {
-    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
     if (user && user.id && user.id !== 'usr_guest') {
       if (typeof window.restoreUserDataFromServer === 'function') {
         window.restoreUserDataFromServer(user).catch(() => {});
@@ -9784,8 +12732,24 @@ document.addEventListener('visibilitychange', () => {
     if (typeof syncAccountsWithServer === 'function') {
       syncAccountsWithServer().catch(() => {});
     }
+  } else if (document.visibilityState === 'hidden') {
+    if (user && user.id && user.id !== 'usr_guest') {
+      if (typeof window.syncUserDataToServer === 'function') {
+        window.syncUserDataToServer(user, true).catch(() => {});
+      }
+    }
   }
 });
+
+// Continuous background auto-save to server (حفظ دوري لكافة أعمال وبيانات المنصة في السيرفر)
+setInterval(() => {
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (user && user.id && user.id !== 'usr_guest') {
+    if (typeof window.syncUserDataToServer === 'function') {
+      window.syncUserDataToServer(user, true).catch(() => {});
+    }
+  }
+}, 90000);
 
 // Run immediate check for URL sync token on load
 if (typeof window !== 'undefined') {
@@ -9800,7 +12764,7 @@ if (typeof window !== 'undefined') {
 };
 
 /* ==========================================================================
-   VIP Annual Subscription (50,000 IQD) Management & View-Only Permissions
+   VIP Annual Subscription & 24h Free Trial Management
    ========================================================================== */
 function isUserSubscribedOrAdmin() {
   const current = getCurrentUser();
@@ -9810,11 +12774,24 @@ function isUserSubscribedOrAdmin() {
     return true;
   }
   const now = Date.now();
-  // Check subscription expiration (1 year limit)
+  // Check subscription expiration (24h free trial or annual/monthly subscription)
   if (current.subscriptionExpiresAt) {
     const expTime = new Date(current.subscriptionExpiresAt).getTime();
     if (!isNaN(expTime) && now > expTime) {
-      return false; // Expired after 1 year!
+      if (current.isSubscribed || current.isVip) {
+        current.isSubscribed = false;
+        current.isVip = false;
+        try {
+          const accs = getAuthAccounts();
+          const idx = accs.findIndex(a => a.id === current.id);
+          if (idx !== -1) {
+            accs[idx].isSubscribed = false;
+            accs[idx].isVip = false;
+            saveAuthAccounts(accs);
+          }
+        } catch(e) {}
+      }
+      return false; // Expired!
     }
   }
   // Check user subscription status
@@ -9826,7 +12803,7 @@ function isUserSubscribedOrAdmin() {
     if (expStr) {
       const expTime = new Date(expStr).getTime();
       if (!isNaN(expTime) && now > expTime) {
-        return false; // Expired after 1 year!
+        return false; // Expired!
       }
     }
     return true;
@@ -9847,28 +12824,310 @@ function requireSubscription(featureName = 'هذه الميزة') {
 }
 window.requireSubscription = requireSubscription;
 
-window.selectSubscriptionPlan = function(planKey) {
-  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-  const userIdentifier = current ? ` (${current.name || current.username} - ${current.email || ''})` : '';
-
-  let planMsg = '';
-  if (planKey === '1_month') {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاشتراك في (الباقة الشهرية - 25,000 د.ع) لتفعيل حسابي${userIdentifier}.`;
-  } else if (planKey === '4_months' || planKey === '3_months') {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفادة من عرض الأكثر طلباً (باقة الـ 4 أشهر - 75,000 د.ع بدلاً من 100 ألف / شهر مجاناً) لتفعيل حسابي${userIdentifier}.`;
-  } else if (planKey === '1_year') {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود تفعيل العرض السنوي الشامل بنصف السعر (الباقة السنوية الأكاديمية - 150,000 د.ع بدلاً من 300 ألف) لتفعيل حسابي${userIdentifier}.`;
-  } else {
-    planMsg = `مرحباً إدارة منصة مسار المعلم، أود الاستفسار عن باقات الاشتراك وتفعيل حسابي${userIdentifier}.`;
+/* ==========================================================================
+   Subscription Pricing & Admin Control Management
+   ========================================================================== */
+const DEFAULT_SUBSCRIPTION_PRICING = {
+  promoBanner: 'عروض الموسم الدراسي الجديد: خصومات حصرية وتفعيل فوري لحسابك عبر واتساب خلال دقائق معدودة! ⏳',
+  plan1: {
+    price: 25000,
+    note: 'يعادل ~830 د.ع فقط باليوم الواحد'
+  },
+  plan2: {
+    price: 75000,
+    oldPrice: 150000,
+    discountPill: 'خصم 50% — وفر 75,000 د.ع',
+    note: 'احصل على 6 أشهر كاملة بسعر 3 أشهر (3 أشهر إضافية مجاناً 🎁)'
+  },
+  plan3: {
+    price: 200000,
+    oldPrice: 300000,
+    discountPill: 'خصم 33% — وفر 100,000 د.ع كاش!',
+    note: 'فقط ~16,600 د.ع شهرياً (احصل على 12 شهراً بسعر 8 أشهر!)'
   }
+};
+window.DEFAULT_SUBSCRIPTION_PRICING = DEFAULT_SUBSCRIPTION_PRICING;
 
-  const url = `https://wa.me/9647700000000?text=${encodeURIComponent(planMsg)}`;
-  window.open(url, '_blank');
+function formatIraqiDinar(num) {
+  const n = parseInt(num, 10);
+  if (isNaN(n)) return num || '0';
+  return n.toLocaleString('en-US');
+}
+
+window.getSubscriptionPricing = function() {
+  try {
+    const saved = localStorage.getItem('moallem_subscription_pricing');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return {
+        promoBanner: parsed.promoBanner || DEFAULT_SUBSCRIPTION_PRICING.promoBanner,
+        plan1: Object.assign({}, DEFAULT_SUBSCRIPTION_PRICING.plan1, parsed.plan1),
+        plan2: Object.assign({}, DEFAULT_SUBSCRIPTION_PRICING.plan2, parsed.plan2),
+        plan3: Object.assign({}, DEFAULT_SUBSCRIPTION_PRICING.plan3, parsed.plan3)
+      };
+    }
+  } catch (e) {
+    console.warn('Failed to parse subscription pricing from storage:', e);
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_SUBSCRIPTION_PRICING));
 };
 
-window.openSubscriptionModal = function() {
+window.renderSubscriptionPricingUI = function() {
+  const pricing = window.getSubscriptionPricing();
+  
+  // 1. Promo banner
+  const bannerEl = document.getElementById('vipUrgencyBannerText');
+  if (bannerEl && pricing.promoBanner) {
+    bannerEl.textContent = pricing.promoBanner;
+  }
+
+  // 2. Plan 1 (Monthly)
+  const p1Amount = document.getElementById('plan1AmountNum');
+  if (p1Amount) p1Amount.textContent = formatIraqiDinar(pricing.plan1.price);
+  const p1Math = document.getElementById('plan1MentalMath');
+  if (p1Math && pricing.plan1.note) p1Math.textContent = pricing.plan1.note;
+  const p1Cta = document.getElementById('plan1CtaBtn');
+  if (p1Cta) {
+    const span = p1Cta.querySelector('span');
+    if (span) span.textContent = 'اشتراك';
+  }
+
+  // 3. Plan 2 (6 Months)
+  const p2Amount = document.getElementById('plan2AmountNum');
+  if (p2Amount) p2Amount.textContent = formatIraqiDinar(pricing.plan2.price);
+  const p2Old = document.getElementById('plan2OldPriceNum');
+  if (p2Old) p2Old.textContent = `${formatIraqiDinar(pricing.plan2.oldPrice)} د.ع`;
+  const p2Pill = document.getElementById('plan2DiscountPillText');
+  if (p2Pill && pricing.plan2.discountPill) p2Pill.textContent = pricing.plan2.discountPill;
+  const p2Math = document.getElementById('plan2MentalMath');
+  if (p2Math && pricing.plan2.note) {
+    p2Math.innerHTML = `<i class="fa-solid fa-gift"></i> ${pricing.plan2.note}`;
+  }
+  const p2Cta = document.getElementById('plan2CtaBtn');
+  if (p2Cta) {
+    const span = p2Cta.querySelector('span');
+    if (span) span.textContent = 'اشتراك';
+  }
+
+  // 4. Plan 3 (1 Year VIP)
+  const p3Amount = document.getElementById('plan3AmountNum');
+  if (p3Amount) p3Amount.textContent = formatIraqiDinar(pricing.plan3.price);
+  const p3Old = document.getElementById('plan3OldPriceNum');
+  if (p3Old) p3Old.textContent = `${formatIraqiDinar(pricing.plan3.oldPrice)} د.ع`;
+  const p3Pill = document.getElementById('plan3DiscountPillText');
+  if (p3Pill && pricing.plan3.discountPill) p3Pill.textContent = pricing.plan3.discountPill;
+  const p3Math = document.getElementById('plan3MentalMath');
+  if (p3Math && pricing.plan3.note) {
+    p3Math.innerHTML = `<i class="fa-solid fa-crown text-warning"></i> ${pricing.plan3.note}`;
+  }
+  const p3Cta = document.getElementById('plan3CtaBtn');
+  if (p3Cta) {
+    const span = p3Cta.querySelector('span');
+    if (span) span.textContent = 'اشتراك';
+  }
+};
+
+window.toggleAdminPricingForm = function(forceOpen) {
+  const formContent = document.getElementById('adminPricingFormContent');
+  const toggleBtnText = document.getElementById('adminPricingToggleBtnText');
+  if (!formContent) return;
+
+  const isCurrentlyOpen = formContent.style.display === 'block';
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isCurrentlyOpen;
+
+  if (shouldOpen) {
+    const pricing = window.getSubscriptionPricing();
+    const inPromo = document.getElementById('adminInputPromoBanner');
+    if (inPromo) inPromo.value = pricing.promoBanner || '';
+
+    const inP1 = document.getElementById('adminInputPrice1');
+    if (inP1) inP1.value = pricing.plan1.price || 25000;
+    const inN1 = document.getElementById('adminInputNote1');
+    if (inN1) inN1.value = pricing.plan1.note || '';
+
+    const inP2 = document.getElementById('adminInputPrice2');
+    if (inP2) inP2.value = pricing.plan2.price || 75000;
+    const inOP2 = document.getElementById('adminInputOldPrice2');
+    if (inOP2) inOP2.value = pricing.plan2.oldPrice || 150000;
+    const inPill2 = document.getElementById('adminInputPill2');
+    if (inPill2) inPill2.value = pricing.plan2.discountPill || '';
+    const inN2 = document.getElementById('adminInputNote2');
+    if (inN2) inN2.value = pricing.plan2.note || '';
+
+    const inP3 = document.getElementById('adminInputPrice3');
+    if (inP3) inP3.value = pricing.plan3.price || 200000;
+    const inOP3 = document.getElementById('adminInputOldPrice3');
+    if (inOP3) inOP3.value = pricing.plan3.oldPrice || 300000;
+    const inPill3 = document.getElementById('adminInputPill3');
+    if (inPill3) inPill3.value = pricing.plan3.discountPill || '';
+    const inN3 = document.getElementById('adminInputNote3');
+    if (inN3) inN3.value = pricing.plan3.note || '';
+
+    formContent.style.display = 'block';
+    if (toggleBtnText) toggleBtnText.textContent = 'إغلاق لوحة التعديل';
+  } else {
+    formContent.style.display = 'none';
+    if (toggleBtnText) toggleBtnText.textContent = 'تعديل الأسعار والخصومات';
+  }
+};
+
+window.saveSubscriptionPricingFromAdmin = async function() {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  if (!isAdmin) {
+    if (typeof showToast === 'function') showToast('تعديل الأسعار مخصص لحساب المدير العام فقط 👑', 'error');
+    return;
+  }
+
+  const inPromo = document.getElementById('adminInputPromoBanner');
+  const inP1 = document.getElementById('adminInputPrice1');
+  const inN1 = document.getElementById('adminInputNote1');
+  const inP2 = document.getElementById('adminInputPrice2');
+  const inOP2 = document.getElementById('adminInputOldPrice2');
+  const inPill2 = document.getElementById('adminInputPill2');
+  const inN2 = document.getElementById('adminInputNote2');
+  const inP3 = document.getElementById('adminInputPrice3');
+  const inOP3 = document.getElementById('adminInputOldPrice3');
+  const inPill3 = document.getElementById('adminInputPill3');
+  const inN3 = document.getElementById('adminInputNote3');
+
+  const newPricing = {
+    promoBanner: (inPromo && inPromo.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.promoBanner,
+    plan1: {
+      price: parseInt(inP1 ? inP1.value : 25000, 10) || 25000,
+      note: (inN1 && inN1.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.plan1.note
+    },
+    plan2: {
+      price: parseInt(inP2 ? inP2.value : 75000, 10) || 75000,
+      oldPrice: parseInt(inOP2 ? inOP2.value : 150000, 10) || 150000,
+      discountPill: (inPill2 && inPill2.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.plan2.discountPill,
+      note: (inN2 && inN2.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.plan2.note
+    },
+    plan3: {
+      price: parseInt(inP3 ? inP3.value : 200000, 10) || 200000,
+      oldPrice: parseInt(inOP3 ? inOP3.value : 300000, 10) || 300000,
+      discountPill: (inPill3 && inPill3.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.plan3.discountPill,
+      note: (inN3 && inN3.value.trim()) || DEFAULT_SUBSCRIPTION_PRICING.plan3.note
+    }
+  };
+
+  localStorage.setItem('moallem_subscription_pricing', JSON.stringify(newPricing));
+  window.renderSubscriptionPricingUI();
+
+  // Also sync to server API if accessible
+  try {
+    const serverUrl = (window.MOALLEM_PUBLIC_SERVER_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
+    await fetch(`${serverUrl}/api/pricing`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newPricing)
+    });
+  } catch (err) {
+    console.log('Server pricing sync skipped/failed:', err);
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('تم حفظ وتحديث أسعار الباقات وعروض المناسبات بنجاح! 👑✨', 'success');
+  }
+  window.toggleAdminPricingForm(false);
+};
+
+window.resetSubscriptionPricing = function() {
+  if (confirm('هل أنت متأكد من استعادة أسعار الباقات والخصومات الافتراضية؟')) {
+    localStorage.removeItem('moallem_subscription_pricing');
+    window.renderSubscriptionPricingUI();
+    window.toggleAdminPricingForm(true);
+    if (typeof showToast === 'function') {
+      showToast('تمت استعادة الأسعار والخصومات الأصلية بنجاح 🔄', 'info');
+    }
+  }
+};
+
+window.selectSubscriptionPlan = function(planKey) {
+  if (typeof window.openQiCardPaymentModal === 'function') {
+    window.openQiCardPaymentModal(planKey);
+  } else {
+    showToast('بوابة الدفع الإلكتروني عبر كي كارد (Qi Card API) قيد التحضير 💳', 'info');
+  }
+};
+
+window.openQiCardPaymentModal = function(planKey = '1_month') {
+  const modal = document.getElementById('qiCardPaymentModal');
+  if (!modal) return;
+
+  const subModal = document.getElementById('subscriptionModal');
+  if (subModal) subModal.classList.remove('open');
+
+  const pricing = typeof window.getSubscriptionPricing === 'function' ? window.getSubscriptionPricing() : DEFAULT_SUBSCRIPTION_PRICING;
+  const planNameEl = document.getElementById('qiModalPlanName');
+  const planPriceEl = document.getElementById('qiModalPlanPrice');
+
+  let name = 'الباقة الشهرية (30 يوماً)';
+  let price = (pricing.plan1 && pricing.plan1.price) || 25000;
+
+  if (planKey === '6_months' || planKey === '4_months' || planKey === '3_months') {
+    name = 'باقة الـ 6 أشهر (نصف سنة دراسية - الأكثر طلباً 🔥)';
+    price = (pricing.plan2 && pricing.plan2.price) || 75000;
+  } else if (planKey === '1_year') {
+    name = 'الباقة السنوية الأكاديمية VIP (عام دراسي كامل 👑)';
+    price = (pricing.plan3 && pricing.plan3.price) || 200000;
+  }
+
+  if (planNameEl) planNameEl.textContent = name;
+  if (planPriceEl) planPriceEl.textContent = typeof formatIraqiDinar === 'function' ? formatIraqiDinar(price) : price.toLocaleString();
+
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+};
+
+window.closeQiCardPaymentModal = function() {
+  const modal = document.getElementById('qiCardPaymentModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
+  const subModal = document.getElementById('subscriptionModal');
+  if (subModal) subModal.classList.add('open');
+};
+
+window.confirmQiCardPayment = function() {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (!current) {
+    if (typeof showToast === 'function') showToast('يرجى تسجيل الدخول أولاً لتفعيل الاشتراك بحسابك!', 'warning');
+    return;
+  }
+  if (typeof showToast === 'function') {
+    showToast('💳 جاري استكمال تفعيل بوابة Qi Card API المباشرة... شكراً لاختياركم كي كارد!', 'success');
+  }
+  setTimeout(() => {
+    window.closeQiCardPaymentModal();
+  }, 1200);
+};
+
+window.openSubscriptionModal = function(openAdminDirectly = false) {
   const modal = document.getElementById('subscriptionModal');
   if (modal) modal.classList.add('open');
+
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+
+  const adminPanel = document.getElementById('adminPricingControlPanel');
+  if (adminPanel) {
+    adminPanel.style.display = isAdmin ? 'block' : 'none';
+  }
+
+  if (typeof window.renderSubscriptionPricingUI === 'function') {
+    window.renderSubscriptionPricingUI();
+  }
+
+  if (isAdmin && openAdminDirectly) {
+    window.toggleAdminPricingForm(true);
+    setTimeout(() => {
+      if (adminPanel) adminPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  }
+
   if (typeof window.updateVipUIStatus === 'function') {
     window.updateVipUIStatus();
   }
@@ -9878,6 +13137,25 @@ window.closeSubscriptionModal = function() {
   const modal = document.getElementById('subscriptionModal');
   if (modal) modal.classList.remove('open');
 };
+
+// Initial background sync from server if connected
+(async function syncPricingFromServer() {
+  try {
+    const serverUrl = (window.MOALLEM_PUBLIC_SERVER_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
+    const res = await fetch(`${serverUrl}/api/pricing`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.pricing) {
+        localStorage.setItem('moallem_subscription_pricing', JSON.stringify(data.pricing));
+        if (typeof window.renderSubscriptionPricingUI === 'function') {
+          window.renderSubscriptionPricingUI();
+        }
+      }
+    }
+  } catch (e) {
+    // offline or local, gracefully fallback
+  }
+})();
 
 window.toggleVipSubscriptionDemo = function() {
   const current = getCurrentUser();
@@ -9890,31 +13168,147 @@ window.toggleVipSubscriptionDemo = function() {
     return;
   }
 
-  showToast('🔒 اختر الخطة المناسبة لك وسيتم تحويلك للواتساب لإرسال إشعار الدفع وتفعيل حسابك فوراً 💳', 'info');
-  
-  const textMsg = encodeURIComponent(`مرحباً إدارة منصة مسار المعلم، أود إرسال إشعار تسديد رسوم الاشتراك لتفعيل حسابي: (${current.name || current.username} - ${current.email || ''})`);
-  window.open(`https://wa.me/9647700000000?text=${textMsg}`, '_blank');
+  if (typeof window.openQiCardPaymentModal === 'function') {
+    window.openQiCardPaymentModal('6_months');
+  } else {
+    showToast('💳 بوابة الدفع الإلكتروني الحصرية عبر كي كارد (Qi Card API) قيد التحضير والربط المباشر', 'info');
+  }
 };
+
+let trialTickerInterval = null;
+function updateTrialWarningBanner() {
+  const banner = document.getElementById('trialWarningBanner');
+  const floatingBadge = document.getElementById('trialFloatingBadge');
+
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  // If not logged in, or super admin:
+  if (!current || !current.id || current.id === 'usr_guest' || current.isAdmin || current.role === 'admin' || current.username === 'admin') {
+    if (banner) banner.style.display = 'none';
+    if (floatingBadge) floatingBadge.style.display = 'none';
+    if (trialTickerInterval) {
+      clearInterval(trialTickerInterval);
+      trialTickerInterval = null;
+    }
+    return;
+  }
+
+  // Check if trial user
+  const isTrialUser = !!(current.isTrial || current.subscriptionType === 'free_trial_48h' || current.subscriptionType === 'free_trial_24h' || (current.trialDurationHours && current.subscriptionExpiresAt));
+  if (!isTrialUser) {
+    if (banner) banner.style.display = 'none';
+    if (floatingBadge) floatingBadge.style.display = 'none';
+    if (trialTickerInterval) {
+      clearInterval(trialTickerInterval);
+      trialTickerInterval = null;
+    }
+    return;
+  }
+
+  // Show trial warning banner & floating emblem badge
+  if (banner) banner.style.display = 'block';
+  if (floatingBadge) floatingBadge.style.display = 'flex';
+
+  const expTimeStr = current.subscriptionExpiresAt || (current.id && localStorage.getItem(`moallem_vip_subscription_exp_${current.id}`));
+  const expTime = expTimeStr ? new Date(expTimeStr).getTime() : 0;
+  const now = Date.now();
+  const diffMs = expTime - now;
+
+  const timerDigits = document.getElementById('trialTimerDisplay');
+  const floatingTimer = document.getElementById('trialFloatingTimer');
+  const badgeTitle = document.getElementById('trialBadgeTitle');
+  const descEl = document.getElementById('trialBannerDesc');
+  const actionBtnText = document.getElementById('trialActionBtnText');
+
+  if (diffMs > 0) {
+    if (banner) banner.classList.remove('trial-expired');
+    if (floatingBadge) floatingBadge.classList.remove('trial-expired');
+
+    const totalSecs = Math.floor(diffMs / 1000);
+    const days = Math.floor(totalSecs / 86400);
+    const hrs = Math.floor((totalSecs % 86400) / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    let formattedTime = '';
+    let floatCountdownText = '';
+    if (days > 0) {
+      formattedTime = `${days} يوم و ${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      floatCountdownText = `متبقي ${days} يوم و ${hrs} ساعة`;
+    } else {
+      formattedTime = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      floatCountdownText = `متبقي ${formattedTime}`;
+    }
+
+    if (timerDigits) timerDigits.innerText = formattedTime;
+    if (floatingTimer) floatingTimer.innerText = floatCountdownText;
+    if (badgeTitle) badgeTitle.innerText = 'فترة تجريبية مجانية (يومان ⚡)';
+    if (descEl) {
+      descEl.innerHTML = `<strong>تحذير تجريبي:</strong> تم تفعيل حسابك بصلاحيات كاملة للتجربة لمدة <strong>يومين (48 ساعة) مجاناً</strong>. متبقي <strong>${formattedTime}</strong> — اشترك الآن لتفادي إيقاف الميزات والطباعة!`;
+    }
+    if (actionBtnText) actionBtnText.innerText = 'ترقية الحساب والاشتراك الآن 👑';
+  } else {
+    // Expired state
+    if (banner) banner.classList.add('trial-expired');
+    if (floatingBadge) floatingBadge.classList.add('trial-expired');
+    if (timerDigits) timerDigits.innerText = '00:00:00';
+    if (floatingTimer) floatingTimer.innerText = 'انتهت التجربة!';
+    if (badgeTitle) badgeTitle.innerText = '⛔ انتهت الفترة التجريبية (يومان)';
+    if (descEl) {
+      descEl.innerHTML = `<strong>تنبيه عاجل:</strong> انتهت فترة اليومين التجريبية المجانية لحسابك. المنصة الآن في <strong>وضع المشاهدة فقط</strong>. يرجى تفعيل اشتراكك لاستئناف التعديل والطباعة فوراً!`;
+    }
+    if (actionBtnText) actionBtnText.innerText = 'تفعيل الاشتراك الكامل 👑';
+
+    if (current.isSubscribed || current.isVip) {
+      current.isSubscribed = false;
+      current.isVip = false;
+      try {
+        const accs = getAuthAccounts();
+        const aIdx = accs.findIndex(a => a.id === current.id);
+        if (aIdx !== -1) {
+          accs[aIdx].isSubscribed = false;
+          accs[aIdx].isVip = false;
+          saveAuthAccounts(accs);
+        }
+      } catch(e) {}
+    }
+  }
+
+  if (!trialTickerInterval) {
+    trialTickerInterval = setInterval(() => {
+      updateTrialWarningBanner();
+    }, 1000);
+  }
+}
+window.updateTrialWarningBanner = updateTrialWarningBanner;
 
 window.updateVipUIStatus = function() {
   const current = getCurrentUser();
   const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin');
   const isSubscribed = isUserSubscribedOrAdmin();
 
+  // Update trial warning banner & countdown clock
+  updateTrialWarningBanner();
+
   // View-Only Mode Banner & Body class
   const banner = document.getElementById('viewOnlyModeBanner');
+  const isTrial = current && (current.isTrial || current.subscriptionType === 'free_trial_48h' || current.subscriptionType === 'free_trial_24h');
+
   if (isSubscribed) {
     document.body.classList.remove('view-only-mode');
     if (banner) banner.style.display = 'none';
   } else {
     document.body.classList.add('view-only-mode');
-    if (banner) banner.style.display = 'flex';
+    if (banner) {
+      banner.style.display = isTrial ? 'none' : 'flex';
+    }
   }
 
   const btnTxt = document.getElementById('vipToggleBtnText');
   if (btnTxt) {
     if (isAdmin) {
       btnTxt.innerText = 'حساب الآدمن (مفعل مدى الحياة 👑)';
+    } else if (isTrial && isSubscribed) {
+      btnTxt.innerText = 'فترة تجريبية مجانية (يومان) 🎁';
     } else if (isSubscribed) {
       btnTxt.innerText = 'حسابك مفعل بنجاح ✔';
     } else {
@@ -9928,6 +13322,8 @@ window.updateVipUIStatus = function() {
     if (span) {
       if (isAdmin) {
         span.innerHTML = 'باقة الآدمن (كافة الصلاحيات 👑)';
+      } else if (isTrial && isSubscribed) {
+        span.innerHTML = 'تجربة مجانية نشطة (يومان) 🎁';
       } else if (isSubscribed) {
         span.innerHTML = 'الاشتراك مفعل 👑';
       } else {
@@ -10007,7 +13403,8 @@ document.addEventListener('DOMContentLoaded', () => {
    ========================================================================== */
 window.openAdminControlPanel = function() {
   const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin' || current.id === 'usr_admin');
   if (!isAdmin) {
     if (typeof showToast === 'function') showToast('هذه اللوحة مخصصة لحساب المدير العام فقط 🛡️', 'warning');
     return;
@@ -10032,9 +13429,10 @@ window.openAdminGrantSubscriptions = function() {
 
 window.openSubscriptionManagementModal = function() {
   const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
-  const isAdmin = current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin');
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin' || current.id === 'usr_admin');
   if (!isAdmin) {
-    if (typeof showToast === 'function') showToast('إدارة الاشتراكات مخصصة لحساب المدير العام فقط 👑', 'warning');
+    if (typeof showToast === 'function') showToast('إدارة المشتركين مخصصة لحساب المدير العام فقط 👑', 'warning');
     return;
   }
   const modal = document.getElementById('subscriptionManagementModal');
@@ -10042,6 +13440,9 @@ window.openSubscriptionManagementModal = function() {
     modal.classList.add('open');
     if (typeof window.renderSubscribersManagementUI === 'function') {
       window.renderSubscribersManagementUI();
+    }
+    if (typeof window.loadAndRenderActivationCodes === 'function') {
+      window.loadAndRenderActivationCodes();
     }
     setTimeout(() => {
       const input = document.getElementById('subActivationQueryInput');
@@ -10055,6 +13456,207 @@ window.closeSubscriptionManagementModal = function() {
   if (modal) modal.classList.remove('open');
 };
 
+/* ==========================================================================
+   Server Status & Cloud Gateway Diagnostics Center
+   ========================================================================== */
+window.openServerStatusModal = function() {
+  const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const loggedIn = typeof isUserLoggedIn === 'function' ? isUserLoggedIn() : false;
+  const isAdmin = loggedIn && current && (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.email === 'admin' || current.id === 'acc_admin' || current.id === 'usr_admin');
+  if (!isAdmin) {
+    if (typeof showToast === 'function') showToast('تفاصيل السيرفر ونوع الكيت وي مخصصة لحساب المدير العام فقط 🛡️', 'warning');
+    return;
+  }
+  const modal = document.getElementById('serverStatusModal');
+  if (modal) {
+    modal.classList.add('open');
+    window.checkServerStatusLive(false);
+  }
+};
+
+window.closeServerStatusModal = function() {
+  const modal = document.getElementById('serverStatusModal');
+  if (modal) modal.classList.remove('open');
+};
+
+window.copyServerModalUrl = function(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input || !input.value) return;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(input.value).then(() => {
+      if (btn) {
+        const oldHtml = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> تم النسخ!`;
+        setTimeout(() => { btn.innerHTML = oldHtml; }, 1800);
+      }
+      if (typeof showToast === 'function') showToast('تم نسخ الرابط بنجاح 📋', 'success');
+    }).catch(() => {
+      input.select();
+      document.execCommand('copy');
+      if (typeof showToast === 'function') showToast('تم نسخ الرابط بنجاح 📋', 'success');
+    });
+  } else {
+    input.select();
+    document.execCommand('copy');
+    if (typeof showToast === 'function') showToast('تم نسخ الرابط بنجاح 📋', 'success');
+  }
+};
+
+window.saveCustomServerTunnelUrl = function() {
+  const input = document.getElementById('srvCustomTunnelInput');
+  if (!input || !input.value.trim()) {
+    if (typeof showToast === 'function') showToast('يرجى إدخال رابط كيت وي صالح', 'warning');
+    return;
+  }
+  const url = input.value.trim().replace(/\/+$/, '');
+  window.MOALLEM_PUBLIC_SERVER_URL = url;
+  try {
+    localStorage.setItem('moallem_public_server_url', url);
+  } catch (_) {}
+  input.value = '';
+  if (typeof showToast === 'function') showToast('تم حفظ واعتماد رابط الكيت وي الجديد بنجاح 💾', 'success');
+  window.checkServerStatusLive(true);
+};
+
+window.checkServerStatusLive = async function(isManual = false) {
+  const statusText = document.getElementById('srvModalStatusText');
+  const statusDot = document.getElementById('srvModalStatusDot');
+  const gatewayText = document.getElementById('srvModalGatewayTypeText');
+  const pingText = document.getElementById('srvModalPingText');
+  const uptimeText = document.getElementById('srvModalUptimeText');
+  const descEl = document.getElementById('srvModalGatewayDescription');
+  const protocolBadge = document.getElementById('srvModalProtocolBadge');
+  const publicInput = document.getElementById('srvModalPublicUrlInput');
+  const localInput = document.getElementById('srvModalLocalUrlInput');
+  const openPublicBtn = document.getElementById('srvModalOpenPublicUrlBtn');
+
+  const topbarDot = document.getElementById('topbarServerLiveDot');
+  const topbarLabel = document.getElementById('topbarServerStatusLabel');
+
+  if (isManual && statusText) {
+    statusText.innerHTML = `<span class="server-live-dot" style="background:#f59e0b;"></span> <span>جاري فحص الاتصال...</span>`;
+    if (pingText) pingText.innerText = 'فحص...';
+  }
+
+  const startTime = Date.now();
+  let isOnline = false;
+  let serverData = null;
+  let pingMs = 0;
+  let detectedPublicUrl = window.MOALLEM_PUBLIC_SERVER_URL || localStorage.getItem('moallem_public_server_url') || 'https://detroit-jill-diversity-camel.trycloudflare.com';
+
+  const testEndpoints = [
+    typeof getBackendApiUrl === 'function' ? getBackendApiUrl('/api/public_url') : '/api/public_url',
+    'http://localhost:8080/api/public_url',
+    typeof getBackendApiUrl === 'function' ? getBackendApiUrl('/health') : '/health',
+    'http://localhost:8080/health'
+  ];
+
+  for (const ep of testEndpoints) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(ep, { cache: 'no-store', signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        isOnline = true;
+        pingMs = Date.now() - startTime;
+        try {
+          serverData = await res.json();
+        } catch (_) {}
+        break;
+      }
+    } catch (_) {}
+  }
+
+  if (serverData && serverData.public_url) {
+    detectedPublicUrl = serverData.public_url;
+    window.MOALLEM_PUBLIC_SERVER_URL = detectedPublicUrl;
+    try { localStorage.setItem('moallem_public_server_url', detectedPublicUrl); } catch (_) {}
+  }
+
+  // Detect Gateway Architecture
+  const urlLower = String(detectedPublicUrl).toLowerCase();
+  let gatewayType = 'Cloudflare Zero Trust Argo Tunnel 🌐';
+  let gatewayBadgeHtml = '<i class="fa-solid fa-lock"></i> HTTPS (TLS 1.3) مشفر وآمن';
+  let gatewayDescription = 'السيرفر مربوط عبر نفق <strong>Cloudflare Zero Trust Argo Tunnel</strong> العالمي. يتيح هذا الكيت وي فتح المنصة ومزامنة الحسابات من أي جهاز وهاتف 4G (زين، آسيا سيل، كورك) حول العالم دون الحاجة لنفس الراوتر مع تشفير SSL قوي وحماية فائقة ضد أي هجمات.';
+
+  if (urlLower.includes('trycloudflare.com') || urlLower.includes('cloudflare')) {
+    gatewayType = 'Cloudflare Argo Tunnel 🌐 (TryCloudflare)';
+    gatewayBadgeHtml = '<i class="fa-solid fa-cloud" style="color:#f97316;"></i> Cloudflare Zero Trust (TLS 1.3)';
+    gatewayDescription = 'نوع الكيت وي الحالي: <strong>Cloudflare Argo Tunnel</strong>. وهو كيت وي عالمي مشفر بدرجة أمان عسكرية يربط السيرفر الداخلي بالإنترنت العالمي مباشرة، ويتيح للمدرسين الدخول للمنصة أينما كانوا وحفظ الاختبارات في السيرفر دون انقطاع.';
+  } else if (urlLower.includes('ngrok')) {
+    gatewayType = 'Ngrok Edge Gateway ⚡';
+    gatewayBadgeHtml = '<i class="fa-solid fa-bolt"></i> Ngrok TLS Gateway';
+    gatewayDescription = 'نوع الكيت وي: <strong>Ngrok Secure Edge Gateway</strong>. بوابة مشفرة عبر نفق نغروك لنقل البيانات.';
+  } else if (urlLower.includes('localhost') || urlLower.includes('127.0.0.1') || urlLower.includes('192.168.')) {
+    gatewayType = 'Localhost LAN Direct Gateway 💻';
+    gatewayBadgeHtml = '<i class="fa-solid fa-network-wired"></i> Local HTTP Gateway';
+    gatewayDescription = 'نوع الكيت وي: <strong>بوابة محلية داخلية (Localhost / LAN)</strong>. يعمل السيرفر عبر الشبكة المحلية على المنفذ 8080.';
+  } else if (urlLower.includes('onrender.com') || urlLower.includes('vercel.app')) {
+    gatewayType = 'Cloud VPS Gateway ☁️';
+    gatewayBadgeHtml = '<i class="fa-solid fa-cloud"></i> Cloud HTTPS';
+  }
+
+  // Update Topbar status indicator
+  if (topbarDot) {
+    topbarDot.className = isOnline ? 'server-live-dot online' : 'server-live-dot offline';
+  }
+  if (topbarLabel) {
+    topbarLabel.innerText = isOnline ? `السيرفر: متصل (${pingMs}ms)` : 'السيرفر: غير متصل';
+  }
+
+  // Update Modal Fields
+  if (statusDot) {
+    statusDot.className = isOnline ? 'server-live-dot online' : 'server-live-dot offline';
+  }
+  if (statusText) {
+    statusText.innerHTML = isOnline 
+      ? `<span class="server-live-dot online"></span> <span style="color:#10b981;">شغال ومتصل 24/7 (Online 🟢)</span>` 
+      : `<span class="server-live-dot offline"></span> <span style="color:#ef4444;">متوقف أو غير مشغل (Offline 🔴)</span>`;
+  }
+  if (gatewayText) {
+    gatewayText.innerText = gatewayType;
+  }
+  if (pingText) {
+    pingText.innerText = isOnline ? `${pingMs} مللي ثانية (ms)` : 'غير متاح (السيرفر غير مشغل)';
+    pingText.style.color = isOnline ? '#10b981' : '#ef4444';
+  }
+  if (uptimeText) {
+    if (isOnline && serverData && serverData.uptime) {
+      uptimeText.innerText = serverData.uptime;
+      uptimeText.style.color = '#10b981';
+    } else if (isOnline) {
+      uptimeText.innerText = 'نشط ومتاح 24/7 🟢';
+      uptimeText.style.color = '#10b981';
+    } else {
+      uptimeText.innerText = 'متوقف (يمكن تشغيله عبر ملف bat)';
+      uptimeText.style.color = '#ef4444';
+    }
+  }
+  if (descEl) {
+    descEl.innerHTML = gatewayDescription;
+  }
+  if (protocolBadge) {
+    protocolBadge.innerHTML = gatewayBadgeHtml;
+  }
+  if (publicInput) {
+    publicInput.value = detectedPublicUrl;
+  }
+  if (openPublicBtn) {
+    openPublicBtn.href = detectedPublicUrl;
+  }
+  if (localInput && serverData && serverData.local_url) {
+    localInput.value = serverData.local_url;
+  }
+
+  if (isManual && typeof showToast === 'function') {
+    showToast(isOnline 
+      ? `🟢 السيرفر شغال ومتصل بنجاح! نوع الكيت وي: ${gatewayType} (${pingMs}ms)` 
+      : `🔴 السيرفر غير متصل حالياً. لتشغيله انقر نقراً مزدوجاً على «تشغيل_السيرفر_24_ساعة.bat» في مجلد المنصة`, 
+      isOnline ? 'success' : 'warning');
+  }
+};
+
 window.currentSubscribersFilterMode = 'all';
 
 window.setSubscribersFilter = function(mode) {
@@ -10064,12 +13666,10 @@ window.setSubscribersFilter = function(mode) {
     if (btn) {
       if (m.toLowerCase() === mode.toLowerCase()) {
         btn.classList.add('active');
-        btn.style.fontWeight = '800';
-        btn.style.boxShadow = '0 2px 8px rgba(245, 158, 11, 0.25)';
+        btn.setAttribute('aria-selected', 'true');
       } else {
         btn.classList.remove('active');
-        btn.style.fontWeight = 'normal';
-        btn.style.boxShadow = 'none';
+        btn.setAttribute('aria-selected', 'false');
       }
     }
   });
@@ -10112,6 +13712,8 @@ window.renderSubscribersManagementUI = function() {
   if (totalCountEl) totalCountEl.innerText = teacherAccounts.length;
   if (pendingCountEl) pendingCountEl.innerText = pendingAccounts.length;
   if (drawerSubCountBadge) drawerSubCountBadge.innerText = `${activeAccounts.length} مشترك 👑`;
+  const topbarSubsBadge = document.getElementById('topbarActiveSubsBadge');
+  if (topbarSubsBadge) topbarSubsBadge.innerText = activeAccounts.length;
 
   if (pillAll) pillAll.innerText = teacherAccounts.length;
   if (pillPending) pillPending.innerText = pendingAccounts.length;
@@ -10159,12 +13761,12 @@ window.renderSubscribersManagementUI = function() {
   if (filtered.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="5" style="text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
-          <div style="font-size: 2rem; color: var(--text-dim); margin-bottom: 0.5rem;">
+        <td colspan="5" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+          <div style="width: 64px; height: 64px; border-radius: 18px; background: rgba(245, 158, 11, 0.1); border: 1.5px dashed rgba(245, 158, 11, 0.35); display: inline-flex; align-items: center; justify-content: center; font-size: 1.75rem; color: #f59e0b; margin-bottom: 0.85rem;">
             <i class="fa-solid fa-users-slash"></i>
           </div>
-          <div style="font-weight: 800; font-size: 1rem; color: var(--text-main);">لا توجد أي حسابات مطابقة للفلتر المحدد</div>
-          <div style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">عند تسجيل أي معلم أو مستخدم جديد في العالم، سيصعد حسابه تلقائياً هنا مع إمكانية التفعيل أو الإلغاء بنقرة زر واحدة.</div>
+          <div style="font-weight: 850; font-size: 1.05rem; color: var(--text-main); margin-bottom: 4px;">لا توجد أي حسابات مطابقة للفلتر المحدد</div>
+          <div style="font-size: 0.82rem; color: var(--text-muted); max-width: 480px; margin: 0 auto; line-height: 1.5;">عند تسجيل أي معلم جديد في المنصة من أي مكان، سيظهر حسابه مباشرة هنا مع إمكانية التفعيل الفوري أو التعديل بنقرة واحدة.</div>
         </td>
       </tr>
     `;
@@ -10177,67 +13779,97 @@ window.renderSubscribersManagementUI = function() {
     const expiryDate = acc.subscriptionExpiryFormatted || (acc.subscriptionExpiresAt ? acc.subscriptionExpiresAt.slice(0, 10) : 'سنة كاملة');
     const planName = acc.subscriptionPlanName || 'الباقة السنوية (365 يوماً)';
 
+    // Remaining days calculation
+    let remainingBadge = '';
+    if (active && acc.subscriptionExpiresAt) {
+      const expTime = new Date(acc.subscriptionExpiresAt).getTime();
+      const diffDays = Math.ceil((expTime - now) / (1000 * 60 * 60 * 24));
+      if (diffDays > 0) {
+        remainingBadge = `<span style="font-size: 0.68rem; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">باقي ${diffDays} يوم</span>`;
+      } else {
+        remainingBadge = `<span style="font-size: 0.68rem; font-weight: 800; color: #ef4444; background: rgba(239, 68, 68, 0.12); padding: 1px 6px; border-radius: 4px; border: 1px solid rgba(239, 68, 68, 0.3);">منتهي الصلاحية</span>`;
+      }
+    }
+
     const statusBadge = active 
       ? `<div>
-           <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); font-weight: 800; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;">
-             <i class="fa-solid fa-crown"></i> مفعل (${planName})
+           <span class="sub-status-pill-active">
+             <i class="fa-solid fa-crown"></i> ${planName}
            </span>
-           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
-             <i class="fa-solid fa-calendar-check text-success"></i> ينتهي: <strong>${expiryDate}</strong>
+           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+             <span><i class="fa-solid fa-calendar-check" style="color: #10b981;"></i> ينتهي: <strong>${expiryDate}</strong></span>
+             ${remainingBadge}
            </div>
          </div>`
       : `<div>
-           <span class="badge-tag" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); font-weight: 800; font-size: 0.72rem; padding: 3px 8px; border-radius: 999px;">
-             <i class="fa-solid fa-clock"></i> بانتظار التفعيل (مجاني)
+           <span class="sub-status-pill-pending">
+             <i class="fa-solid fa-hourglass-half"></i> بانتظار التفعيل (مجاني)
            </span>
-           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
-             بانتظار موافقة الإدارة
+           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 4px;">
+             <i class="fa-solid fa-clock-rotate-left text-warning"></i> بانتظار موافقة الإدارة وتحديد الباقة
            </div>
          </div>`;
 
     const actionButton = active
-      ? `<button type="button" class="btn btn-outline" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.4); padding: 0.35rem 0.75rem; font-size: 0.76rem; font-weight: 800; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" onclick="window.manageRevokeSubscription('${acc.id}')" title="إلغاء التفعيل لهذا الحساب">
-           <i class="fa-solid fa-ban"></i>
+      ? `<button type="button" class="sub-btn-row-revoke" onclick="window.manageRevokeSubscription('${acc.id}')" title="إلغاء التفعيل لهذا الحساب">
+           <i class="fa-solid fa-user-xmark"></i>
            <span>إلغاء التفعيل</span>
          </button>`
-      : `<button type="button" class="btn btn-success" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 0.38rem 0.9rem; font-size: 0.78rem; font-weight: 800; border-radius: 6px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 5px;" onclick="window.manageDirectActivateUser('${acc.id}')" title="تفعيل الاشتراك لهذا الحساب فوراً">
-           <i class="fa-solid fa-circle-check"></i>
+      : `<button type="button" class="sub-btn-row-activate" onclick="window.manageDirectActivateUser('${acc.id}')" title="تفعيل الاشتراك لهذا الحساب بالباقة المحددة أعلاه">
+           <i class="fa-solid fa-crown"></i>
            <span>تفعيل الحساب</span>
          </button>`;
 
     const deleteButton = `
-      <button type="button" class="btn btn-outline" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.06); padding: 0.35rem 0.65rem; font-size: 0.76rem; font-weight: 800; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px;" onclick="window.manageDeleteSubscriberAccount('${acc.id}')" title="حذف الحساب / الإيميل نهائياً">
+      <button type="button" class="sub-btn-row-delete" onclick="window.manageDeleteSubscriberAccount('${acc.id}')" title="حذف الحساب / الإيميل نهائياً">
         <i class="fa-solid fa-trash-can"></i>
-        <span>حذف الإيميل</span>
+        <span>حذف</span>
       </button>
     `;
 
+    const teacherInitial = (acc.name && acc.name.trim()) ? acc.name.trim()[0] : (acc.username ? acc.username[0] : 'م');
+
     return `
-      <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s ease;">
-        <td style="padding: 0.75rem 0.85rem; font-weight: 700; color: var(--text-main);">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${active ? 'rgba(245, 158, 11, 0.2)' : 'rgba(148, 163, 184, 0.15)'}; color: ${active ? '#fbbf24' : 'var(--text-muted)'}; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-              <i class="fa-solid ${active ? 'fa-crown' : 'fa-user'}"></i>
+      <tr>
+        <td>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="sub-user-avatar ${active ? 'avatar-active' : 'avatar-pending'}">
+              ${active ? '<i class="fa-solid fa-crown"></i>' : teacherInitial}
             </div>
             <div>
-              <div style="font-weight: 800; color: var(--text-main); font-size: 0.88rem;">${acc.name || acc.username}</div>
-              <small style="color: var(--text-muted); font-size: 0.72rem;">${acc.school || 'مدرسة عامة'} • ${acc.governorate || 'العراق'}</small>
+              <div style="font-weight: 850; color: var(--text-main); font-size: 0.9rem; line-height: 1.2;">${acc.name || acc.username}</div>
+              <div style="color: var(--text-muted); font-size: 0.74rem; margin-top: 3px; display: flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-school" style="color: var(--text-dim); font-size: 0.7rem;"></i>
+                <span>${acc.school || 'مدرسة عامة'}</span>
+                <span>•</span>
+                <i class="fa-solid fa-location-dot" style="color: var(--text-dim); font-size: 0.7rem;"></i>
+                <span>${acc.governorate || 'العراق'}</span>
+              </div>
             </div>
           </div>
         </td>
-        <td style="padding: 0.75rem 0.85rem;">
-          <code style="font-weight: bold; color: var(--primary); font-size: 0.82rem;">${acc.username || ''}</code>
-          ${acc.email ? `<span style="font-size: 0.74rem; color: var(--text-muted); display: block; margin-top: 1px;">${acc.email}</span>` : ''}
-          ${acc.contact ? `<span style="font-size: 0.7rem; color: var(--text-dim); display: block;" dir="ltr"><i class="fa-solid fa-phone"></i> ${acc.contact}</span>` : ''}
+        <td>
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div><code style="background: rgba(37, 99, 235, 0.08); color: var(--primary); padding: 2px 7px; border-radius: 6px; font-weight: 800; font-size: 0.8rem; border: 1px solid rgba(37, 99, 235, 0.2);"><i class="fa-solid fa-user-circle" style="font-size: 0.75rem;"></i> ${acc.username || ''}</code></div>
+            ${acc.email ? `<span style="font-size: 0.75rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;"><i class="fa-regular fa-envelope"></i> ${acc.email}</span>` : ''}
+            ${acc.contact ? `<span style="font-size: 0.72rem; color: var(--text-dim); display: inline-flex; align-items: center; gap: 4px;" dir="ltr"><i class="fa-solid fa-phone"></i> ${acc.contact}</span>` : ''}
+          </div>
         </td>
-        <td style="padding: 0.75rem 0.85rem; font-size: 0.78rem; color: var(--text-muted);">
-          <div><i class="fa-solid fa-calendar-plus text-info"></i> ${regDate}</div>
-          <span style="font-size: 0.68rem; color: var(--text-dim); display: block; margin-top: 2px;">مادة: ${acc.subject || 'عام'}</span>
+        <td>
+          <div style="font-size: 0.78rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-calendar-plus" style="color: #0284c7;"></i>
+            <span>${regDate}</span>
+          </div>
+          <div style="margin-top: 4px;">
+            <span style="font-size: 0.7rem; font-weight: 750; background: rgba(148, 163, 184, 0.12); color: var(--text-main); padding: 1px 7px; border-radius: 4px; border: 1px solid var(--border-color); display: inline-block;">
+              مادة: ${acc.subject || 'عام'}
+            </span>
+          </div>
         </td>
-        <td style="padding: 0.75rem 0.85rem;">
+        <td>
           ${statusBadge}
         </td>
-        <td style="padding: 0.75rem 0.85rem; text-align: center;">
+        <td style="text-align: center;">
           <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap;">
             ${actionButton}
             ${deleteButton}
@@ -10262,20 +13894,20 @@ window.manageDirectActivateUser = function(accId) {
 
   const now = new Date();
   const expiryDate = new Date(now);
-  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
   let durationCode = '1_year';
 
   if (chosenPlan === '1_month') {
     expiryDate.setDate(now.getDate() + 30);
     durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
     durationCode = '1_month';
-  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
-    expiryDate.setDate(now.getDate() + 120);
-    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
-    durationCode = '4_months';
+  } else if (chosenPlan === '6_months' || chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 180);
+    durationLabel = 'باقة 6 أشهر - نصف سنة دراسية (75 ألف د.ع)';
+    durationCode = '6_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
-    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     durationCode = '1_year';
   }
 
@@ -10293,6 +13925,7 @@ window.manageDirectActivateUser = function(accId) {
 
   localStorage.setItem(`moallem_vip_subscription_${acc.id}`, 'true');
   localStorage.setItem(`moallem_vip_subscription_exp_${acc.id}`, expiryDate.toISOString());
+  localStorage.setItem(`moallem_user_plan_code_${acc.id}`, durationCode);
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
@@ -10357,20 +13990,20 @@ window.manageApproveGrantSubscription = function() {
 
   const now = new Date();
   const expiryDate = new Date(now);
-  let durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+  let durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
   let durationCode = '1_year';
 
   if (chosenPlan === '1_month') {
     expiryDate.setDate(now.getDate() + 30);
     durationLabel = 'باقة شهر واحد (25 ألف د.ع)';
     durationCode = '1_month';
-  } else if (chosenPlan === '4_months' || chosenPlan === '3_months') {
-    expiryDate.setDate(now.getDate() + 120);
-    durationLabel = 'باقة 4 أشهر - فصل دراسي (75 ألف د.ع)';
-    durationCode = '4_months';
+  } else if (chosenPlan === '6_months' || chosenPlan === '4_months' || chosenPlan === '3_months') {
+    expiryDate.setDate(now.getDate() + 180);
+    durationLabel = 'باقة 6 أشهر - نصف سنة دراسية (75 ألف د.ع)';
+    durationCode = '6_months';
   } else {
     expiryDate.setFullYear(now.getFullYear() + 1);
-    durationLabel = 'الباقة السنوية الأكاديمية (150 ألف د.ع)';
+    durationLabel = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     durationCode = '1_year';
   }
 
@@ -10388,6 +14021,7 @@ window.manageApproveGrantSubscription = function() {
 
   localStorage.setItem(`moallem_vip_subscription_${targetAcc.id}`, 'true');
   localStorage.setItem(`moallem_vip_subscription_exp_${targetAcc.id}`, expiryDate.toISOString());
+  localStorage.setItem(`moallem_user_plan_code_${targetAcc.id}`, durationCode);
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
@@ -10425,11 +14059,14 @@ window.manageRevokeSubscription = function(accId) {
   acc.isVip = false;
   acc.isSubscribed = false;
   acc.role = 'teacher';
+  delete acc.subscriptionDuration;
+  delete acc.subscriptionPlanName;
   delete acc.subscriptionExpiresAt;
   delete acc.subscriptionExpiryFormatted;
 
   localStorage.removeItem(`moallem_vip_subscription_${acc.id}`);
   localStorage.removeItem(`moallem_vip_subscription_exp_${acc.id}`);
+  localStorage.removeItem(`moallem_user_plan_code_${acc.id}`);
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
@@ -10545,6 +14182,650 @@ window.addEventListener('moallem_accounts_updated', () => {
   }
 });
 
+/* ==========================================================================
+   Activation Codes Management System (نظام توليد وإدارة أكواد التفعيل VIP لمرة واحدة)
+   ========================================================================== */
+window.currentSubscribersModalTab = 'accounts';
+window.currentActivationCodesFilter = 'all';
+window.activationCodes = [];
+
+window.switchSubscribersModalTab = function(tabName) {
+  window.currentSubscribersModalTab = tabName;
+  const accountsTabBtn = document.getElementById('subTabAccountsBtn');
+  const codesTabBtn = document.getElementById('subTabCodesBtn');
+  const accountsSection = document.getElementById('subSectionAccounts');
+  const codesSection = document.getElementById('subSectionCodes');
+
+  if (tabName === 'codes') {
+    if (accountsTabBtn) {
+      accountsTabBtn.classList.remove('active');
+      accountsTabBtn.setAttribute('aria-selected', 'false');
+    }
+    if (codesTabBtn) {
+      codesTabBtn.classList.add('active');
+      codesTabBtn.setAttribute('aria-selected', 'true');
+    }
+    if (accountsSection) accountsSection.style.display = 'none';
+    if (codesSection) codesSection.style.display = 'block';
+
+    window.loadAndRenderActivationCodes();
+  } else {
+    if (accountsTabBtn) {
+      accountsTabBtn.classList.add('active');
+      accountsTabBtn.setAttribute('aria-selected', 'true');
+    }
+    if (codesTabBtn) {
+      codesTabBtn.classList.remove('active');
+      codesTabBtn.setAttribute('aria-selected', 'false');
+    }
+    if (accountsSection) accountsSection.style.display = 'block';
+    if (codesSection) codesSection.style.display = 'none';
+
+    window.renderSubscribersManagementUI();
+  }
+};
+
+window.setActivationCodesFilter = function(mode) {
+  window.currentActivationCodesFilter = mode;
+  ['All', 'Available', 'Used'].forEach(m => {
+    const btn = document.getElementById(`codeFilter${m}Btn`);
+    if (btn) {
+      if (m.toLowerCase() === mode.toLowerCase()) {
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+      } else {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      }
+    }
+  });
+  window.renderActivationCodesUI();
+};
+
+window.loadAndRenderActivationCodes = async function() {
+  // 1. Try local cache first for instant rendering
+  try {
+    const local = localStorage.getItem('moallem_activation_codes');
+    if (local) {
+      window.activationCodes = JSON.parse(local) || [];
+      window.renderActivationCodesUI();
+    }
+  } catch (e) {}
+
+  // 2. Fetch fresh codes from Server Backend API
+  try {
+    const res = await fetch(getBackendApiUrl('/api/activation_codes'), { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.codes)) {
+        window.activationCodes = data.codes;
+        localStorage.setItem('moallem_activation_codes', JSON.stringify(data.codes));
+      }
+    }
+  } catch (err) {
+    // Offline resilient fallback
+  }
+
+  window.renderActivationCodesUI();
+};
+
+window.renderActivationCodesUI = function() {
+  const codes = window.activationCodes || [];
+  const totalCountEl = document.getElementById('codesTotalCount');
+  const availableCountEl = document.getElementById('codesAvailableCount');
+  const usedCountEl = document.getElementById('codesUsedCount');
+  const badgeEl = document.getElementById('subTabCodesBadge');
+  const pillAll = document.getElementById('pillCodeAll');
+  const pillAvailable = document.getElementById('pillCodeAvailable');
+  const pillUsed = document.getElementById('pillCodeUsed');
+  const tbody = document.getElementById('activationCodesListTableBody');
+
+  const availableCodes = codes.filter(c => !c.is_used);
+  const usedCodes = codes.filter(c => c.is_used);
+
+  if (totalCountEl) totalCountEl.innerText = codes.length;
+  if (availableCountEl) availableCountEl.innerText = availableCodes.length;
+  if (usedCountEl) usedCountEl.innerText = usedCodes.length;
+  if (badgeEl) badgeEl.innerText = availableCodes.length;
+  if (pillAll) pillAll.innerText = codes.length;
+  if (pillAvailable) pillAvailable.innerText = availableCodes.length;
+  if (pillUsed) pillUsed.innerText = usedCodes.length;
+
+  if (!tbody) return;
+
+  const mode = window.currentActivationCodesFilter || 'all';
+  let filtered = [...codes];
+  if (mode === 'available') {
+    filtered = availableCodes;
+  } else if (mode === 'used') {
+    filtered = usedCodes;
+  }
+
+  const searchInput = document.getElementById('codesSearchFilterInput');
+  const q = searchInput ? (searchInput.value || '').trim().toLowerCase() : '';
+  if (q) {
+    filtered = filtered.filter(c => {
+      const codeStr = (c.code || '').toLowerCase();
+      const planStr = (c.plan_name || '').toLowerCase();
+      const noteStr = (c.note || '').toLowerCase();
+      const userStr = (c.used_by_name || c.used_by_username || '').toLowerCase();
+      return codeStr.includes(q) || planStr.includes(q) || noteStr.includes(q) || userStr.includes(q);
+    });
+  }
+
+  // Sort: unused first, then by date descending
+  filtered.sort((a, b) => {
+    if (!a.is_used && b.is_used) return -1;
+    if (a.is_used && !b.is_used) return 1;
+    const aTime = new Date(a.created_at || 0).getTime();
+    const bTime = new Date(b.created_at || 0).getTime();
+    return bTime - aTime;
+  });
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" style="text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+          <div style="width: 60px; height: 60px; border-radius: 16px; background: rgba(245, 158, 11, 0.1); border: 1.5px dashed rgba(245, 158, 11, 0.35); display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #f59e0b; margin-bottom: 0.75rem;">
+            <i class="fa-solid fa-ticket-simple"></i>
+          </div>
+          <div style="font-weight: 850; font-size: 1.05rem; color: var(--text-main); margin-bottom: 4px;">لا توجد أي أكواد مطابقة حالياً</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted); max-width: 440px; margin: 0 auto; line-height: 1.5;">
+            يمكنك توليد أكواد تفعيل اشتراك جديدة بسهولة عبر الاستوديو في الأعلى مع اختيار الخطة والكمية المناسبة.
+          </div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(item => {
+    const isUsed = !!item.is_used;
+    const createdDate = item.created_at ? item.created_at.slice(0, 10) : 'اليوم';
+    const usedDate = item.used_at ? item.used_at.slice(0, 16).replace('T', ' ') : '';
+    const safeCode = item.code || '';
+
+    // Plan color & icon
+    let planBadge = '';
+    if (item.plan_code === '1_month') {
+      planBadge = `<span style="font-size: 0.72rem; font-weight: 800; background: rgba(59, 130, 246, 0.12); color: #2563eb; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(59, 130, 246, 0.3); display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-calendar-day"></i> ${item.plan_name || 'شهر واحد'}</span>`;
+    } else if (item.plan_code === '6_months') {
+      planBadge = `<span style="font-size: 0.72rem; font-weight: 800; background: rgba(16, 185, 129, 0.12); color: #059669; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-fire"></i> ${item.plan_name || '6 أشهر'}</span>`;
+    } else {
+      planBadge = `<span style="font-size: 0.72rem; font-weight: 800; background: rgba(245, 158, 11, 0.15); color: #d97706; padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.4); display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-crown"></i> ${item.plan_name || 'باقة سنوية'}</span>`;
+    }
+
+    const noteHtml = item.note 
+      ? `<div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 3px; display: inline-flex; align-items: center; gap: 4px;"><i class="fa-solid fa-tag" style="font-size: 0.65rem;"></i> ${item.note}</div>`
+      : '';
+
+    const statusBadge = isUsed
+      ? `<div>
+           <span style="font-size: 0.72rem; font-weight: 800; background: rgba(139, 92, 246, 0.12); color: #7c3aed; padding: 3px 8px; border-radius: 999px; border: 1px solid rgba(139, 92, 246, 0.3); display: inline-flex; align-items: center; gap: 5px;">
+             <i class="fa-solid fa-lock"></i> تم التفعيل والاستهلاك
+           </span>
+           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; line-height: 1.3;">
+             <span>المستفيد: <strong>${item.used_by_name || item.used_by_username || 'معلم'}</strong></span>
+             <br><span style="color: var(--text-dim);"><i class="fa-regular fa-clock"></i> ${usedDate}</span>
+           </div>
+         </div>`
+      : `<div>
+           <span style="font-size: 0.72rem; font-weight: 850; background: rgba(16, 185, 129, 0.12); color: #059669; padding: 3px 10px; border-radius: 999px; border: 1.5px solid rgba(16, 185, 129, 0.4); display: inline-flex; align-items: center; gap: 5px;">
+             <span class="sub-live-dot" style="width: 7px; height: 7px;"></span> متاح للاستخدام 🟢
+           </span>
+           <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+             صالح لمرة واحدة لأي معلم
+           </div>
+         </div>`;
+
+    const shareBtn = !isUsed
+      ? `<button type="button" class="btn-code-row-share" onclick="window.shareActivationCodeViaWhatsApp('${safeCode}')" title="إرسال ومشاركة الكود للأستاذ عبر واتساب مع رسالة فاخرة">
+           <i class="fa-brands fa-whatsapp"></i>
+           <span>واتساب</span>
+         </button>`
+      : '';
+
+    return `
+      <tr>
+        <td>
+          <div class="code-ticket-wrap">
+            <span class="code-ticket-badge ${isUsed ? 'code-used' : ''}">${safeCode}</span>
+            <button type="button" class="btn-copy-code-inline" onclick="window.copyActivationCode('${safeCode}', this)" title="نسخ الكود بنقرة واحدة">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+        </td>
+        <td>
+          ${planBadge}
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 3px;">
+            صلاحية: ${item.duration_days || 365} يوماً
+          </div>
+        </td>
+        <td>
+          <div style="font-size: 0.78rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-calendar-plus" style="color: var(--primary);"></i>
+            <span>${createdDate}</span>
+          </div>
+          ${noteHtml}
+        </td>
+        <td>
+          ${statusBadge}
+        </td>
+        <td style="text-align: center;">
+          <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap;">
+            ${shareBtn}
+            <button type="button" class="sub-btn-row-delete" onclick="window.deleteActivationCode('${safeCode}')" title="حذف هذا الكود نهائياً">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+};
+
+window.handleGenerateActivationCodes = async function() {
+  const planSelect = document.getElementById('codePlanSelect');
+  const qtySelect = document.getElementById('codeQuantitySelect');
+  const noteInput = document.getElementById('codeNoteInput');
+  const generateBtn = document.getElementById('btnGenerateCodes');
+
+  const plan_code = planSelect ? planSelect.value : '1_year';
+  const count = qtySelect ? parseInt(qtySelect.value, 10) || 1 : 1;
+  const note = noteInput ? (noteInput.value || '').trim() : '';
+
+  if (generateBtn) {
+    generateBtn.disabled = true;
+    generateBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>جاري التوليد...</span>`;
+  }
+
+  try {
+    const res = await fetch(getBackendApiUrl('/api/activation_codes/generate'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ plan_code, count, note })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.codes)) {
+        window.activationCodes = data.codes;
+        localStorage.setItem('moallem_activation_codes', JSON.stringify(data.codes));
+        if (noteInput) noteInput.value = '';
+        showToast(`🎉 تم توليد (${count}) كود تفعيل بنجاح! جاهزة للاستخدام الآن 👑`, 'success');
+        window.renderActivationCodesUI();
+        return;
+      }
+    }
+    throw new Error('Server returned non-ok');
+  } catch (err) {
+    // Offline client-side generation fallback!
+    const plansInfo = {
+      '1_month': { name: 'باقة شهر واحد (25 ألف د.ع)', days: 30, prefix: 'VIP-1MO' },
+      '6_months': { name: 'باقة 6 أشهر دراسية (75 ألف د.ع)', days: 180, prefix: 'VIP-6MO' },
+      '1_year': { name: 'الباقة السنوية الأكاديمية (200 ألف د.ع)', days: 365, prefix: 'VIP-YEAR' },
+      'lifetime': { name: 'باقة VIP مدى الحياة (صلاحيات كاملة 👑)', days: 3650, prefix: 'VIP-LIFE' }
+    };
+    const pInfo = plansInfo[plan_code] || plansInfo['1_year'];
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const genChunk = () => Array.from({length: 4}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    const nowIso = new Date().toISOString();
+
+    for (let i = 0; i < count; i++) {
+      const newCode = `${pInfo.prefix}-${genChunk()}-${genChunk()}`;
+      window.activationCodes.unshift({
+        code: newCode,
+        plan_code: plan_code,
+        plan_name: pInfo.name,
+        duration_days: pInfo.days,
+        is_used: false,
+        created_at: nowIso,
+        note: note
+      });
+    }
+    localStorage.setItem('moallem_activation_codes', JSON.stringify(window.activationCodes));
+    if (noteInput) noteInput.value = '';
+    showToast(`🎉 تم توليد (${count}) كود تفعيل بنجاح! 👑`, 'success');
+    window.renderActivationCodesUI();
+  } finally {
+    if (generateBtn) {
+      generateBtn.disabled = false;
+      generateBtn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>توليد الأكواد الآن</span>`;
+    }
+  }
+};
+
+window.copyActivationCode = function(codeStr, btnElement) {
+  if (!codeStr) return;
+  navigator.clipboard.writeText(codeStr).then(() => {
+    if (btnElement) {
+      btnElement.classList.add('copied');
+      btnElement.innerHTML = `<i class="fa-solid fa-check"></i>`;
+      setTimeout(() => {
+        btnElement.classList.remove('copied');
+        btnElement.innerHTML = `<i class="fa-regular fa-copy"></i>`;
+      }, 1600);
+    }
+    showToast(`📋 تم نسخ كود التفعيل (${codeStr}) بنجاح!`, 'success');
+  }).catch(() => {
+    prompt('انسخ كود التفعيل التالي:', codeStr);
+  });
+};
+
+window.bulkCopyAvailableCodes = function() {
+  const codes = window.activationCodes || [];
+  const available = codes.filter(c => !c.is_used);
+  if (available.length === 0) {
+    showToast('لا توجد أي أكواد متاحة لنسخها حالياً!', 'warning');
+    return;
+  }
+
+  const textLines = [
+    '👑 منصة مسار المعلم الذكية — قائمة أكواد تفعيل الاشتراكات VIP:',
+    '--------------------------------------------------',
+    ...available.map((c, i) => `${i + 1}. كود: ${c.code} | باقة: ${c.plan_name}${c.note ? ` (${c.note})` : ''}`),
+    '--------------------------------------------------',
+    'طريقة التفعيل: ادخل على منصة مسار المعلم > باقات الاشتراك > تفعيل كود VIP.'
+  ];
+  const output = textLines.join('\n');
+
+  navigator.clipboard.writeText(output).then(() => {
+    showToast(`📋 تم نسخ (${available.length}) كود متاح للحافظة دفعة واحدة بنجاح!`, 'success');
+  }).catch(() => {
+    prompt('انسخ الأكواد:', output);
+  });
+};
+
+window.shareActivationCodeViaWhatsApp = function(codeStr) {
+  const codes = window.activationCodes || [];
+  const item = codes.find(c => c.code === codeStr) || { code: codeStr, plan_name: 'الباقة السنوية VIP' };
+
+  const msg = 
+`تحية طيبة أستاذنا الفاضل 🌸
+يسر إدارة منصة مسار المعلم الذكية تزويدكم بكود تفعيل اشتراك VIP الخاص بكم:
+
+🎫 رمز كود التفعيل: *${item.code}*
+👑 باقة الاشتراك: *${item.plan_name}*
+${item.note ? `📌 ملاحظة: ${item.note}\n` : ''}
+⚡ طريقة التفعيل:
+1. افتح منصة مسار المعلم على جهازك.
+2. انقر على خيار (تفعيل كود اشتراك VIP).
+3. ألصق رمز الكود أعلاه واضغط (تفعيل الحساب فوراً).
+
+نتمنى لكم دوام التوفيق والتميز الأكاديمي! 🌹✨`;
+
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+};
+
+window.deleteActivationCode = async function(codeStr) {
+  if (!confirm(`هل أنت متأكد من حذف كود التفعيل (${codeStr}) نهائياً؟`)) return;
+
+  try {
+    const res = await fetch(getBackendApiUrl(`/api/activation_codes?code=${encodeURIComponent(codeStr)}`), {
+      method: 'DELETE'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.codes)) {
+        window.activationCodes = data.codes;
+        localStorage.setItem('moallem_activation_codes', JSON.stringify(data.codes));
+        showToast('تم حذف كود التفعيل بنجاح 🗑️', 'info');
+        window.renderActivationCodesUI();
+        return;
+      }
+    }
+  } catch (err) {}
+
+  // Local fallback
+  window.activationCodes = (window.activationCodes || []).filter(c => c.code !== codeStr);
+  localStorage.setItem('moallem_activation_codes', JSON.stringify(window.activationCodes));
+  showToast('تم حذف كود التفعيل بنجاح 🗑️', 'info');
+  window.renderActivationCodesUI();
+};
+
+window.handleClearUsedCodes = async function() {
+  const codes = window.activationCodes || [];
+  const used = codes.filter(c => c.is_used);
+  if (used.length === 0) {
+    showToast('لا توجد أي أكواد مستهلكة لحذفها!', 'info');
+    return;
+  }
+  if (!confirm(`هل أنت متأكد من حذف وتنظيف كافة الأكواد المستهلكة (${used.length} كود)؟ لا يمكن التراجع عن هذا الإجراء.`)) {
+    return;
+  }
+
+  try {
+    const res = await fetch(getBackendApiUrl('/api/activation_codes?clear_used=true'), {
+      method: 'DELETE'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.codes)) {
+        window.activationCodes = data.codes;
+        localStorage.setItem('moallem_activation_codes', JSON.stringify(data.codes));
+        showToast('تم تنظيف كافة الأكواد المستهلكة بنجاح 🧹', 'success');
+        window.renderActivationCodesUI();
+        return;
+      }
+    }
+  } catch (err) {}
+
+  window.activationCodes = codes.filter(c => !c.is_used);
+  localStorage.setItem('moallem_activation_codes', JSON.stringify(window.activationCodes));
+  showToast('تم تنظيف كافة الأكواد المستهلكة بنجاح 🧹', 'success');
+  window.renderActivationCodesUI();
+};
+
+window.printActivationCardsModal = function() {
+  const codes = window.activationCodes || [];
+  const available = codes.filter(c => !c.is_used);
+  const container = document.getElementById('printCardsContainer');
+  const modal = document.getElementById('printActivationCardsModal');
+
+  if (available.length === 0) {
+    showToast('لا توجد أي أكواد متاحة صالحة للطباعة حالياً!', 'warning');
+    return;
+  }
+
+  if (container) {
+    container.innerHTML = available.map(item => `
+      <div class="voucher-card-printable">
+        <div class="voucher-card-top">
+          <div class="voucher-card-brand">
+            <i class="fa-solid fa-crown" style="color: #f59e0b;"></i>
+            <span>مسار المعلم VIP</span>
+          </div>
+          <span class="voucher-card-badge">بطاقة تفعيل رسمية</span>
+        </div>
+        <div class="voucher-card-plan">
+          ${item.plan_name || 'الباقة السنوية الأكاديمية'}
+        </div>
+        <div class="voucher-card-code-box">
+          <div style="font-size: 0.68rem; color: #78350f; font-weight: 800; margin-bottom: 2px;">رمز كود التفعيل:</div>
+          <div class="voucher-card-code-text">${item.code}</div>
+        </div>
+        <div class="voucher-card-footer">
+          استخدام لمرة واحدة حصراً • لتفعيل البطاقة: افتح منصة مسار المعلم > باقات الاشتراك > تفعيل كود VIP.
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+};
+
+window.closePrintActivationCardsModal = function() {
+  const modal = document.getElementById('printActivationCardsModal');
+  if (modal) modal.style.display = 'none';
+};
+
+/* ==========================================================================
+   Activation Code Redemption Engine (محرك فحص وتفعيل الأكواد للمعلمين)
+   ========================================================================== */
+window.openRedeemCodeModal = function() {
+  const modal = document.getElementById('redeemCodeModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      const input = document.getElementById('standaloneRedeemInput');
+      if (input) input.focus();
+    }, 150);
+  }
+};
+
+window.closeRedeemCodeModal = function() {
+  const modal = document.getElementById('redeemCodeModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.handleStandaloneRedeemCode = function() {
+  const input = document.getElementById('standaloneRedeemInput');
+  const code = input ? (input.value || '').trim() : '';
+  window.executeCodeRedemption(code, () => {
+    if (input) input.value = '';
+    window.closeRedeemCodeModal();
+  });
+};
+
+window.handleRedeemActivationCode = function() {
+  const input = document.getElementById('vipCodeRedeemInput');
+  const code = input ? (input.value || '').trim() : '';
+  window.executeCodeRedemption(code, () => {
+    if (input) input.value = '';
+    if (typeof window.closeSubscriptionModal === 'function') {
+      window.closeSubscriptionModal();
+    }
+  });
+};
+
+window.executeCodeRedemption = async function(codeStr, onSuccessCallback) {
+  const cleanCode = (codeStr || '').trim().toUpperCase();
+  if (!cleanCode) {
+    showToast('يرجى إدخال رمز كود التفعيل أولاً ⚠️', 'warning');
+    return;
+  }
+
+  // Verify User is logged in
+  const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  if (!currentUser || !currentUser.id) {
+    showToast('يرجى تسجيل الدخول إلى حسابك أولاً لتفعيل الكود عليه!', 'warning');
+    if (typeof window.openAuthModal === 'function') window.openAuthModal();
+    return;
+  }
+
+  // Submit to Server Backend
+  try {
+    const res = await fetch(getBackendApiUrl('/api/activation_codes/redeem'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: cleanCode,
+        user: currentUser,
+        deviceInfo: typeof detectCurrentDeviceName === 'function' ? detectCurrentDeviceName() : ''
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data && data.success) {
+      // Success from server!
+      const updatedUser = data.account || currentUser;
+      updatedUser.isVip = true;
+      updatedUser.isSubscribed = true;
+      updatedUser.role = 'teacher_vip';
+      localStorage.setItem('moallem_current_user', JSON.stringify(updatedUser));
+      localStorage.setItem(`moallem_vip_subscription_${updatedUser.id}`, 'true');
+      if (data.details && data.details.expiry_iso) {
+        localStorage.setItem(`moallem_vip_subscription_exp_${updatedUser.id}`, data.details.expiry_iso);
+      }
+
+      // Update accounts list
+      const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+      const idx = accounts.findIndex(a => a.id === updatedUser.id);
+      if (idx !== -1) {
+        accounts[idx] = { ...accounts[idx], ...updatedUser };
+      } else {
+        accounts.push(updatedUser);
+      }
+      if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
+
+      if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+      if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+      if (typeof window.renderSubscribersManagementUI === 'function') window.renderSubscribersManagementUI();
+
+      showToast(data.message || `🎉 مبارك! تم تفعيل اشتراكك بنجاح عبر كود التفعيل (${cleanCode}) 👑`, 'success');
+      if (typeof onSuccessCallback === 'function') onSuccessCallback();
+      return;
+    } else {
+      showToast(data.message || 'كود التفعيل غير صالح أو مستخدم مسبقاً ❌', 'error');
+      return;
+    }
+  } catch (err) {
+    // Offline client-side verification fallback
+    let codes = [];
+    try {
+      codes = JSON.parse(localStorage.getItem('moallem_activation_codes') || '[]');
+    } catch (e) {}
+
+    const matchedIndex = codes.findIndex(c => (c.code || '').trim().toUpperCase() === cleanCode);
+    if (matchedIndex === -1) {
+      showToast(`كود التفعيل (${cleanCode}) غير صحيح أو غير مسجل في المنظومة ❌`, 'error');
+      return;
+    }
+
+    const codeObj = codes[matchedIndex];
+    if (codeObj.is_used) {
+      showToast(`عذراً! هذا الكود مستخدم مسبقاً من قبل (${codeObj.used_by_name || 'مستخدم آخر'}) ولا يمكن إعادة استعماله 🔒`, 'error');
+      return;
+    }
+
+    // Mark as used
+    const now = new Date();
+    const durationDays = codeObj.duration_days || 365;
+    const expiry = new Date(now);
+    expiry.setDate(expiry.getDate() + durationDays);
+    const expiryStr = expiry.toISOString().slice(0, 10);
+
+    codeObj.is_used = true;
+    codeObj.used_by_id = currentUser.id;
+    codeObj.used_by_name = currentUser.name || currentUser.username;
+    codeObj.used_by_username = currentUser.username || '';
+    codeObj.used_at = now.toISOString();
+    localStorage.setItem('moallem_activation_codes', JSON.stringify(codes));
+    window.activationCodes = codes;
+
+    // Upgrade user
+    currentUser.isVip = true;
+    currentUser.isSubscribed = true;
+    currentUser.role = 'teacher_vip';
+    currentUser.subscriptionDuration = codeObj.plan_code || '1_year';
+    currentUser.subscriptionPlanName = codeObj.plan_name || 'الباقة السنوية';
+    currentUser.subscriptionStartDate = now.toISOString();
+    currentUser.subscriptionExpiresAt = expiry.toISOString();
+    currentUser.subscriptionExpiryFormatted = expiryStr;
+
+    localStorage.setItem('moallem_current_user', JSON.stringify(currentUser));
+    localStorage.setItem(`moallem_vip_subscription_${currentUser.id}`, 'true');
+    localStorage.setItem(`moallem_vip_subscription_exp_${currentUser.id}`, expiry.toISOString());
+
+    const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+    const idx = accounts.findIndex(a => a.id === currentUser.id);
+    if (idx !== -1) {
+      accounts[idx] = { ...accounts[idx], ...currentUser };
+    }
+    if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
+
+    if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+    if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+    if (typeof window.renderSubscribersManagementUI === 'function') window.renderSubscribersManagementUI();
+
+    showToast(`🎉 مبارك يا أستاذ ${currentUser.name || currentUser.username}! تم تفعيل [${codeObj.plan_name}] بنجاح لحسابك حتى (${expiryStr}) 👑`, 'success');
+    if (typeof onSuccessCallback === 'function') onSuccessCallback();
+  }
+};
+
 window.renderAdminAccountsTable = function() {
   const tbody = document.getElementById('adminAccountsTableBody');
   const countEl = document.getElementById('adminStatAccountsCount');
@@ -10575,8 +14856,16 @@ window.renderAdminAccountsTable = function() {
               ${isSuperAdmin ? '<i class="fa-solid fa-crown" style="font-size: 0.75rem;"></i>' : initial}
             </div>
             <div>
-              <div style="font-weight: 800; color: var(--text-main);">${acc.name || 'معلم بدون اسم'}</div>
-              <div style="font-size: 0.7rem; color: var(--text-muted);">${acc.governorate || 'العراق'}</div>
+              <div style="font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px;">
+                <span>${acc.name || 'معلم بدون اسم'}</span>
+                ${acc.isOnline 
+                  ? `<span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.65rem; font-weight: 800; padding: 1px 5px;"><i class="fa-solid fa-circle text-success" style="font-size: 0.45rem;"></i> متصل الآن 🟢</span>` 
+                  : `<span class="badge-tag" style="background: rgba(100, 116, 139, 0.12); color: var(--text-muted); font-size: 0.65rem; font-weight: 700; padding: 1px 5px;"><i class="fa-solid fa-circle text-muted" style="font-size: 0.45rem; opacity: 0.5;"></i> غير متصل ⚪</span>`}
+              </div>
+              <div style="font-size: 0.7rem; color: var(--text-muted);">
+                ${acc.governorate || 'العراق'}
+                ${acc.lastLogin ? ` • <span title="آخر تسجيل دخول">آخر دخول: ${acc.lastLogin}</span>` : ''}
+              </div>
             </div>
           </div>
         </td>
@@ -10943,7 +15232,7 @@ window.triggerMasarLogoWelcome = function(event) {
   if (bubbleText && bubble) {
     bubble.style.animation = 'none';
     void bubble.offsetWidth;
-    bubble.style.animation = 'speechBubblePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    bubble.style.animation = 'speechBubblePop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
     bubbleText.innerHTML = MASAR_WELCOME_GREETINGS[currentMasarGreetingIndex];
   }
 };
@@ -10967,505 +15256,328 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// AI Studio removed per user request
+window.switchToAiGeneratorTab = function() {};
+window.generateTripleAiExams = function() {};
+
 /* ==========================================================================
-   AI Triple Generator Studio (توليد 3 نماذج متوازية بالذكاء الاصطناعي)
+   Platform Showcase & Teacher Guide Interactive Engine
+   (محرك واجهة عرض ودليل مميزات المنصة الشامل للمعلم — واجهة أساسية ومحاكاة حية)
    ========================================================================== */
-window.currentAiTripleExams = null;
-window.currentActiveAiVersionKey = 'versionA';
 
-window.switchToAiGeneratorTab = function() {
-  const tabs = document.querySelectorAll('.tab-btn');
-  tabs.forEach(btn => btn.classList.remove('active'));
+// Platform Showcase Module removed per user request
+window.switchToPlatformShowcaseTab = function() {};
+window.openPlatformShowcaseModal = function() {};
+window.closePlatformShowcaseModal = function() {};
+window.showcaseJumpTo = function() {};
+window.showcaseScrollToSection = function() {};
+window.switchSimulatorTab = function() {};
+window.nextCinemaSlide = function() {};
+window.prevCinemaSlide = function() {};
+window.jumpToCinemaSlide = function() {};
+window.toggleLiveEcoSimulation = function() {};
 
-  const aiTabBtn = document.getElementById('mainTabAiGeneratorBtn');
-  if (aiTabBtn) aiTabBtn.classList.add('active');
+/* ==========================================================================
+   Floating Animated Quick Sidebar Controller
+   (التحكم في شريط الإحصائيات والأدوات العائم السلس القابل للظهور والإخفاء)
+   ========================================================================== */
+window.toggleFloatingQuickSidebar = function(forceState) {
+  const sidebar = document.getElementById('floatingQuickSidebar');
+  const overlay = document.getElementById('floatingSidebarOverlay');
+  const toggleBtn = document.getElementById('floatingSidebarToggleBtn');
+  if (!sidebar) return;
 
-  document.querySelectorAll('.tab-content').forEach(tc => tc.style.display = 'none');
-  const genTab = document.getElementById('tab-generator');
-  if (genTab) {
-    genTab.style.display = 'block';
+  const willExpand = (typeof forceState === 'boolean') 
+    ? forceState 
+    : !sidebar.classList.contains('expanded');
+
+  sidebar.classList.toggle('expanded', willExpand);
+  if (overlay) overlay.classList.toggle('active', willExpand);
+  if (toggleBtn) {
+    toggleBtn.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+    toggleBtn.classList.toggle('expanded-state', willExpand);
   }
 
-  // Pre-fill fields from appState if available
-  const gradeEl = document.getElementById('aiGenGrade');
-  if (gradeEl && !gradeEl.value && appState.header.grade) {
-    for (let opt of gradeEl.options) {
-      if (opt.value && appState.header.grade.includes(opt.value)) {
-        gradeEl.value = opt.value;
-        break;
-      }
-    }
-  }
-
-  const subjEl = document.getElementById('aiGenSubject');
-  if (subjEl && !subjEl.value && appState.header.subject) {
-    for (let opt of subjEl.options) {
-      if (opt.value && appState.header.subject.includes(opt.value)) {
-        subjEl.value = opt.value;
-        break;
-      }
-    }
-  }
-
-  const scrollPane = document.querySelector('.builder-body-scrollable');
-  if (scrollPane) scrollPane.scrollTo({ top: 0, behavior: 'smooth' });
-};
-
-window.clearAiValidationError = function(inputId) {
-  const el = document.getElementById(inputId);
-  if (el) el.classList.remove('input-error');
-
-  if (inputId === 'aiGenGrade') {
-    const err = document.getElementById('aiGradeErrorAlert');
-    if (err) err.style.display = 'none';
-  } else if (inputId === 'aiGenSubject') {
-    const err = document.getElementById('aiSubjectErrorAlert');
-    if (err) err.style.display = 'none';
-  } else if (inputId === 'aiGenDifficulty') {
-    const err = document.getElementById('aiDifficultyErrorAlert');
-    if (err) err.style.display = 'none';
+  if (willExpand && typeof window.updateAppsHubStats === 'function') {
+    try { window.updateAppsHubStats(); } catch(e) {}
   }
 };
 
-/* ==========================================================================
-   AI Chapters Selection Controller (تحديد نطاق الفصول والوحدات للاختبار)
-   ========================================================================== */
-window.selectedAiChapters = ['all'];
+// Keyboard shortcut: close with Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' || e.key === 'Esc') {
+    const sidebar = document.getElementById('floatingQuickSidebar');
+    if (sidebar && sidebar.classList.contains('expanded')) {
+      window.toggleFloatingQuickSidebar(false);
+    }
+  }
+});
 
-window.updateAiChaptersUI = function() {
-  const isAll = window.selectedAiChapters.includes('all') || window.selectedAiChapters.length === 0;
-  
-  // 1. Update Pills active state
-  const container = document.getElementById('aiChapterPillsContainer');
-  if (container) {
-    const pills = container.querySelectorAll('.ai-ch-pill');
-    pills.forEach(pill => {
-      const chAttr = pill.getAttribute('data-chapter');
-      if (chAttr === 'all') {
-        if (isAll) pill.classList.add('active');
-        else pill.classList.remove('active');
-      } else {
-        const num = parseInt(chAttr);
-        if (!isAll && window.selectedAiChapters.includes(num)) {
-          pill.classList.add('active');
+/* ==========================================================================
+   Interactive Card Action Buttons Controller
+   (تشغيل أزرار العمليات التفاعلية مباشرة من الشاشة الرئيسية)
+   ========================================================================== */
+window.handleCardAction = function(targetTab, actionType, event) {
+  if (event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  // Visual click feedback on button
+  const btn = event?.currentTarget || event?.target?.closest('.btn-card-action');
+  if (btn) {
+    btn.classList.add('btn-action-clicked');
+    setTimeout(() => btn.classList.remove('btn-action-clicked'), 400);
+  }
+
+  // Check subscription if needed
+  if ((actionType === 'print' || actionType === 'pdf') && typeof isUserSubscribedOrAdmin === 'function' && !isUserSubscribedOrAdmin()) {
+    if (typeof requireSubscription === 'function') {
+      requireSubscription(actionType === 'print' ? 'طباعة ورقة الامتحان' : 'تصدير ورقة الامتحان بصيغة PDF');
+    }
+    return;
+  }
+
+  const tabId = targetTab || 'tab-questions';
+
+  // Check section access for Plan 1
+  if (typeof window.checkSectionPlanAccess === 'function' && !window.checkSectionPlanAccess(tabId)) {
+    return;
+  }
+
+  switch(actionType) {
+    case 'preview': {
+      // 1. Enter the application tab
+      window.switchToTab(tabId);
+
+      // 2. Force preview pane to be visible and wide-mode removed
+      const mainCont = document.querySelector('.main-container');
+      if (mainCont) {
+        mainCont.classList.remove('wide-mode');
+        mainCont.classList.remove('preview-hidden');
+      }
+      if (typeof appState !== 'undefined' && appState.settings) {
+        appState.settings.previewVisible = true;
+      }
+      const prevBtn = document.getElementById('togglePreviewBtn');
+      if (prevBtn) prevBtn.classList.add('active');
+
+      // 3. If mobile/tablet, switch to mobile preview mode
+      if (typeof window.setMobileWorkstationMode === 'function' && window.innerWidth <= 900) {
+        window.setMobileWorkstationMode('preview');
+      }
+
+      // 4. Smooth scroll to preview pane
+      setTimeout(() => {
+        const previewPane = document.querySelector('.preview-pane') || document.getElementById('examPaperA4');
+        if (previewPane && window.innerWidth <= 1200) {
+          previewPane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
+
+      if (typeof showToast === 'function') {
+        showToast('تم فتح التطبيق وعرض ورقة المعاينة A4 بنجاح 👁️', 'success');
+      }
+      break;
+    }
+
+    case 'print': {
+      // 1. Enter the application tab to ensure exam paper DOM is fully rendered
+      window.switchToTab(tabId);
+      const mainCont = document.querySelector('.main-container');
+      if (mainCont) {
+        mainCont.classList.remove('wide-mode');
+        mainCont.classList.remove('preview-hidden');
+      }
+      if (typeof appState !== 'undefined' && appState.settings) {
+        appState.settings.previewVisible = true;
+      }
+
+      if (typeof showToast === 'function') {
+        showToast('جاري تحضير ورقة الامتحان للطباعة فوراً... 🖨️', 'info');
+      }
+
+      // 2. Trigger print dialog after layout settles
+      setTimeout(() => {
+        if (typeof window.triggerPrintExam === 'function') {
+          window.triggerPrintExam();
+        } else if (window.ExamExporter && typeof window.ExamExporter.printExam === 'function') {
+          window.ExamExporter.printExam();
         } else {
-          pill.classList.remove('active');
+          window.print();
+        }
+      }, 350);
+      break;
+    }
+
+    case 'save': {
+      // 1. Save current exam immediately
+      if (typeof window.saveCurrentExamToArchive === 'function') {
+        window.saveCurrentExamToArchive(false);
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('تم حفظ الاختبار في الأرشيف بنجاح 💾', 'success');
         }
       }
-    });
-  }
 
-  // 2. Update Summary Badge
-  const badge = document.getElementById('aiChaptersSelectedSummaryBadge');
-  if (badge) {
-    if (isAll) {
-      badge.style.color = '#10b981';
-      badge.style.background = 'rgba(16, 185, 129, 0.12)';
-      badge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
-      badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> تم تحديد: كامل فصول الكتاب المنهجي المقررة 📚';
-    } else {
-      const sorted = [...window.selectedAiChapters].sort((a,b) => a - b);
-      const chOrdinals = sorted.map(n => {
-        const ords = ['الأول', 'الثاني', 'الثالث', 'الرابع', 'الخامس', 'السادس', 'السابع', 'الثامن', 'التاسع', 'العاشر'];
-        return ords[n-1] ? `الفصل ${ords[n-1]}` : `الفصل ${n}`;
-      }).join(' + ');
-
-      badge.style.color = '#6366f1';
-      badge.style.background = 'rgba(99, 102, 241, 0.12)';
-      badge.style.borderColor = 'rgba(99, 102, 241, 0.3)';
-      badge.innerHTML = `<i class="fa-solid fa-bullseye"></i> تم حصر الأسئلة في: <strong>${chOrdinals}</strong> فقط 🎯`;
-    }
-  }
-
-  // 3. Update Preset Dropdown
-  const select = document.getElementById('aiGenChaptersPreset');
-  if (select) {
-    if (isAll) {
-      select.value = 'all';
-    } else {
-      const joined = [...window.selectedAiChapters].sort((a,b) => a - b).join(',');
-      if (select.querySelector(`option[value="${joined}"]`)) {
-        select.value = joined;
-      } else {
-        select.value = 'custom';
+      // 2. Update quick stats
+      if (typeof window.updateAppsHubStats === 'function') {
+        try { window.updateAppsHubStats(); } catch(e) {}
       }
+      break;
     }
-  }
 
-  // 4. Update Preset Shortcut Chips
-  const joinedVal = isAll ? 'all' : [...window.selectedAiChapters].sort((a,b) => a - b).join('_');
-  const targetChipId = 'presetChip_' + joinedVal;
-  const allChips = document.querySelectorAll('.ai-preset-chip');
-  if (allChips && allChips.length > 0) {
-    allChips.forEach(chip => {
-      if (chip.id === targetChipId) {
-        chip.classList.add('active');
-      } else {
-        chip.classList.remove('active');
+    case 'pdf': {
+      // Direct PDF generation and download without redirecting or navigating away
+      if (typeof window.exportCurrentExamToPdf === 'function') {
+        window.exportCurrentExamToPdf();
       }
-    });
-  }
-};
-
-window.toggleAiChapterPill = function(chapterVal) {
-  if (chapterVal === 'all') {
-    window.selectedAiChapters = ['all'];
-    const customInput = document.getElementById('aiGenCustomChaptersInput');
-    if (customInput) customInput.value = '';
-  } else {
-    const num = parseInt(chapterVal);
-    if (window.selectedAiChapters.includes('all')) {
-      window.selectedAiChapters = [];
-    }
-    const idx = window.selectedAiChapters.indexOf(num);
-    if (idx !== -1) {
-      window.selectedAiChapters.splice(idx, 1);
-    } else {
-      window.selectedAiChapters.push(num);
-    }
-    if (window.selectedAiChapters.length === 0) {
-      window.selectedAiChapters = ['all'];
+      break;
     }
   }
-  window.updateAiChaptersUI();
 };
 
-window.selectAiChaptersPreset = function(presetVal) {
-  if (presetVal === 'all') {
-    window.selectedAiChapters = ['all'];
-    const customInput = document.getElementById('aiGenCustomChaptersInput');
-    if (customInput) customInput.value = '';
-  } else if (presetVal === 'custom') {
-    const customInput = document.getElementById('aiGenCustomChaptersInput');
-    if (customInput) customInput.focus();
-  } else {
-    const parts = presetVal.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-    window.selectedAiChapters = parts.length > 0 ? parts : ['all'];
-  }
-  window.updateAiChaptersUI();
-};
 
-window.resetAiChaptersToAll = function() {
-  window.selectedAiChapters = ['all'];
-  const customInput = document.getElementById('aiGenCustomChaptersInput');
-  if (customInput) customInput.value = '';
-  window.updateAiChaptersUI();
-  if (typeof showToast === 'function') {
-    showToast('تمت إعادة ضبط نطاق الفصول ليشمل كامل فصول الكتاب المقررة 📚', 'info');
-  }
-};
 
-window.handleCustomChaptersTextInput = function(val) {
-  if (!val || !val.trim()) {
-    return;
-  }
-  const clean = val.trim();
-  const detected = [];
-  const map = [
-    { num: 1, pat: /(الأول|الاول|1|الأولى|الاولى)/i },
-    { num: 2, pat: /(الثاني|الثانية|2)/i },
-    { num: 3, pat: /(الثالث|الثالثة|3)/i },
-    { num: 4, pat: /(الرابع|الرابعة|4)/i },
-    { num: 5, pat: /(الخامس|الخامسة|5)/i },
-    { num: 6, pat: /(السادس|السادسة|6)/i },
-    { num: 7, pat: /(السابع|السابعة|7)/i },
-    { num: 8, pat: /(الثامن|الثامنة|8)/i },
-    { num: 9, pat: /(التاسع|التاسعة|9)/i },
-    { num: 10, pat: /(العاشر|العاشرة|10)/i }
-  ];
-  map.forEach(item => {
-    if (item.pat.test(clean)) detected.push(item.num);
-  });
 
-  if (detected.length > 0) {
-    window.selectedAiChapters = detected;
-    window.updateAiChaptersUI();
-  }
-};
 
-window.generateTripleAiExams = function() {
-  const gradeEl = document.getElementById('aiGenGrade');
-  const subjEl = document.getElementById('aiGenSubject');
-  const diffEl = document.getElementById('aiGenDifficulty');
-  const notesEl = document.getElementById('aiGenTeacherNotes');
 
-  const grade = gradeEl ? gradeEl.value.trim() : '';
-  const subject = subjEl ? subjEl.value.trim() : '';
-  const difficulty = diffEl ? diffEl.value.trim() : '';
-  const teacherNotes = notesEl ? notesEl.value.trim() : '';
 
-  let hasError = false;
 
-  if (!grade) {
-    if (gradeEl) gradeEl.classList.add('input-error');
-    const alert = document.getElementById('aiGradeErrorAlert');
-    if (alert) alert.style.display = 'block';
-    hasError = true;
-  }
-  if (!subject) {
-    if (subjEl) subjEl.classList.add('input-error');
-    const alert = document.getElementById('aiSubjectErrorAlert');
-    if (alert) alert.style.display = 'block';
-    hasError = true;
-  }
-  if (!difficulty) {
-    if (diffEl) diffEl.classList.add('input-error');
-    const alert = document.getElementById('aiDifficultyErrorAlert');
-    if (alert) alert.style.display = 'block';
-    hasError = true;
-  }
 
-  if (hasError) {
-    showToast('⚠️ يرجى ملء الحقول الإجبارية (المرحلة الدراسية، المادة، مستوى الصعوبة) لتوليد الأسئلة', 'error');
-    return;
-  }
 
-  // Show Loading Spinner
-  const resultsSec = document.getElementById('aiTripleResultsSection');
-  const spinner = document.getElementById('aiGeneratingSpinner');
-  const content = document.getElementById('aiGeneratedVersionsContent');
-
-  if (resultsSec) resultsSec.style.display = 'block';
-  if (spinner) spinner.style.display = 'flex';
-  if (content) content.style.display = 'none';
-
-  // Smooth scroll down to results
-  if (resultsSec) {
-    resultsSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  setTimeout(() => {
-    try {
-      if (!window.AiCurriculumEngine || typeof window.AiCurriculumEngine.generateTripleExamVersions !== 'function') {
-        throw new Error('محرك الذكاء الاصطناعي للمناهج غير متوفر');
-      }
-
-      window.__aiClickCount = (window.__aiClickCount || 0) + 1;
-      const generated = window.AiCurriculumEngine.generateTripleExamVersions({
-        grade,
-        subject,
-        difficulty,
-        teacherNotes,
-        selectedChapters: window.selectedAiChapters || ['all'],
-        clickSeed: window.__aiClickCount
-      });
-
-      window.currentAiTripleExams = generated;
-      if (spinner) spinner.style.display = 'none';
-      if (content) content.style.display = 'block';
-
-      window.switchAiExamVersion('versionA');
-      const isEnglish = (generated.versionA && generated.versionA.settings && generated.versionA.settings.direction === 'ltr');
-      showToast(isEnglish 
-        ? '🎉 3 Brand-New Smart English Exam Models Generated Successfully!' 
-        : '🎉 تم توليد 3 نماذج امتحانية ذكية جديدة بنجاح! اختر النسخة التي تعجبك لاعتمادها في ورقة الامتحان', 'success');
-    } catch (err) {
-      if (spinner) spinner.style.display = 'none';
-      showToast('خطأ في توليد الأسئلة: ' + err.message, 'error');
-    }
-  }, 600);
-};
-
-window.switchAiExamVersion = function(versionKey) {
-  if (!window.currentAiTripleExams) return;
-  const version = window.currentAiTripleExams[versionKey];
-  if (!version) return;
-
-  window.currentActiveAiVersionKey = versionKey;
-
-  // Update tabs UI
-  ['versionA', 'versionB', 'versionC'].forEach(key => {
-    const tab = document.getElementById(`tabAiVer${key.replace('version', '')}`);
-    if (tab) {
-      if (key === versionKey) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
-      }
-    }
-  });
-
-  const isEnglish = (version.settings && version.settings.direction === 'ltr') || 
-                    (version.header && version.header.subject && (version.header.subject.toLowerCase().includes('eng') || version.header.subject.includes('إنكل') || version.header.subject.includes('انكل')));
-
-  // Render Version Header Details
-  const titleEl = document.getElementById('aiActiveVerTitle');
-  const metaEl = document.getElementById('aiActiveVerMeta');
-  if (titleEl) {
-    titleEl.innerHTML = `<span style="color: ${version.badgeColor};"><i class="fa-solid fa-file-signature"></i></span> ${version.versionName}`;
-  }
-  if (metaEl) {
-    if (isEnglish) {
-      metaEl.innerHTML = `
-        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
-        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
-        <span>Difficulty: <strong>${version.difficulty}</strong></span> • 
-        <span>Total: <strong>${version.totalScore} Marks</strong> (${version.questionsCount} Questions)</span>
-      `;
-    } else {
-      metaEl.innerHTML = `
-        <span style="font-weight: 700; color: var(--text-main);">${version.header.grade}</span> • 
-        <span style="font-weight: 700; color: var(--text-main);">${version.header.subject}</span> • 
-        <span>مستوى الصعوبة: <strong>${version.difficulty}</strong></span> • 
-        <span>المجموع: <strong>${version.totalScore} درجة</strong> (${version.questionsCount} أسئلة)</span>
-      `;
-    }
-  }
-
-  // Render Questions List Preview
-  const listEl = document.getElementById('aiActiveVerQuestionsList');
-  if (listEl) {
-    listEl.innerHTML = version.questions.map((q, idx) => {
-      let branchesHTML = '';
-      if (Array.isArray(q.branches) && q.branches.length > 0) {
-        const branchBorder = isEnglish 
-          ? 'padding-left: 12px; border-left: 2px solid var(--border-color); direction: ltr; text-align: left;'
-          : 'padding-right: 12px; border-right: 2px solid var(--border-color); direction: rtl; text-align: right;';
-        const scoreLabel = isEnglish ? `(${b => (b.score || 10)} Marks)` : `(${b => (b.score || 10)} درجات)`;
-
-        branchesHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 6px; ${branchBorder}">
-            ${q.branches.map(b => `
-              <div style="font-size: 0.84rem;">
-                <strong>${b.title}:</strong> ${b.text} 
-                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.12); color: #10b981; font-size: 0.68rem; margin-${isEnglish ? 'left' : 'right'}: 4px;">(${b.score || 10} ${isEnglish ? 'Marks' : 'درجات'})</span>
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      let optionsHTML = '';
-      if (Array.isArray(q.options) && q.options.length > 0) {
-        optionsHTML = `
-          <div style="margin-top: 8px; display: flex; flex-direction: column; gap: 4px; padding-${isEnglish ? 'left' : 'right'}: 12px; direction: ${isEnglish ? 'ltr' : 'rtl'};">
-            ${q.options.map(opt => `
-              <div style="font-size: 0.82rem; ${opt.isCorrect ? 'color: #10b981; font-weight: 700;' : ''}">
-                ${opt.isCorrect ? '✔' : '○'} ${opt.text}
-              </div>
-            `).join('')}
-          </div>
-        `;
-      }
-
-      let answerHTML = '';
-      if (q.modelAnswer) {
-        const answerBtnLabel = isEnglish ? 'Show Model Answer & Marking Scheme' : 'إظهار الجواب النموذجي وسلّم الدرجات';
-        answerHTML = `
-          <details style="margin-top: 8px; background: rgba(16, 185, 129, 0.05); border: 1px dashed rgba(16, 185, 129, 0.3); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
-            <summary style="cursor: pointer; font-weight: 700; color: #10b981;">
-              <i class="fa-solid fa-key"></i> ${answerBtnLabel}
-            </summary>
-            <div style="margin-top: 6px; white-space: pre-line; color: var(--text-main);">${q.modelAnswer}</div>
-          </details>
-        `;
-      }
-
-      return `
-        <div class="ai-question-card-preview" style="direction: ${isEnglish ? 'ltr' : 'rtl'}; text-align: ${isEnglish ? 'left' : 'right'};">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 4px; flex-direction: ${isEnglish ? 'row' : 'row'};">
-            <div style="font-weight: 800; font-size: 0.92rem; color: var(--text-main);">
-              ${q.title || (isEnglish ? `Question ${idx + 1}` : `السؤال ${idx + 1}`)}
-            </div>
-            <div style="display: flex; gap: 6px; align-items: center;">
-              <span class="badge-tag" style="background: rgba(99, 102, 241, 0.12); color: #6366f1; font-weight: 800; font-size: 0.72rem;">${q.score || 20} ${isEnglish ? 'Marks' : 'درجة'}</span>
-              <span class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: var(--text-muted); font-size: 0.68rem;">${q.sourceType || (isEnglish ? 'Ministerial Standard' : 'وزاري + كتاب')}</span>
-            </div>
-          </div>
-          <div style="font-size: 0.88rem; line-height: 1.6; color: var(--text-main);">${q.text}</div>
-          ${branchesHTML}
-          ${optionsHTML}
-          ${answerHTML}
-        </div>
-      `;
-    }).join('');
-  }
-};
-
-window.applyCurrentAiVersionToWorkstation = function() {
-  if (!window.currentAiTripleExams || !window.currentActiveAiVersionKey) return;
-  const version = window.currentAiTripleExams[window.currentActiveAiVersionKey];
-  if (!version) return;
-
-  // Apply to workstation appState
-  appState.questions = JSON.parse(JSON.stringify(version.questions));
-  appState.header.grade = version.header.grade;
-  appState.header.subject = version.header.subject;
-  appState.header.examTitle = version.header.examTitle;
-  appState.header.instructions = version.header.instructions;
-  if (version.header.country) appState.header.country = version.header.country;
-  if (version.header.ministry) appState.header.ministry = version.header.ministry;
-  if (version.header.school) appState.header.school = version.header.school;
-  if (version.header.time) appState.header.time = version.header.time;
-  if (version.header.year) appState.header.year = version.header.year;
-  if (version.header.term) appState.header.term = version.header.term;
-  if (version.header.teacher) appState.header.teacher = version.header.teacher;
-
-  if (version.settings && version.settings.direction) {
-    appState.settings.direction = version.settings.direction;
-  }
-  if (version.settings && version.settings.fontFamily) {
-    appState.settings.fontFamily = version.settings.fontFamily;
-  }
-
-  // Sync UI and render
-  syncHeaderInputs();
-  saveStateToStorage();
-  applyPaperSettings();
-  applyPaperMargins();
-  renderAll();
-
-  // Switch to Questions Builder tab
-  const qTabBtn = document.querySelector('.tab-btn[data-tab="tab-questions"]');
-  if (qTabBtn) qTabBtn.click();
-
-  const isEnglish = (version.settings && version.settings.direction === 'ltr');
-  showToast(isEnglish 
-    ? `🎉 «${version.versionName}» applied to A4 Examination Paper successfully! Ready for printing or customization 🚀` 
-    : `🎉 تم اعتماد «${version.versionName}» في ورقة الامتحان A4 بنجاح! جاهزة الآن للتعديل أو الطباعة 🚀`, 'success');
-};
-
-window.saveAllAiVersionsToArchive = function() {
-  if (!window.currentAiTripleExams) {
-    showToast('لا توجد نماذج مولدة لحفظها حالياً', 'error');
-    return;
-  }
-
+/**
+ * Global Opener for Account and Teacher Settings Modal
+ */
+window.openTeacherProfileModal = function() {
   try {
-    const archive = getSavedExamsArchive();
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-    ['versionA', 'versionB', 'versionC'].forEach(verKey => {
-      const ver = window.currentAiTripleExams[verKey];
-      if (ver) {
-        archive.unshift({
-          id: `archive_ai_${verKey.toLowerCase()}_${Date.now()}_${Math.floor(Math.random()*1000)}`,
-          title: `[ذكاء اصطناعي] ${ver.versionName} - ${ver.header.subject}`,
-          subject: ver.header.subject,
-          grade: ver.header.grade,
-          createdAt: dateStr,
-          updatedAt: dateStr,
-          questionsCount: ver.questionsCount,
-          totalScore: ver.totalScore,
-          isAiTripleModel: true,
-          data: {
-            header: ver.header,
-            settings: ver.settings,
-            questions: ver.questions
+    const current = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (current) {
+      if (current.id) {
+        try {
+          const savedUserProf = localStorage.getItem(`moallem_teacher_profile_${current.id}`);
+          if (savedUserProf) {
+            const parsed = JSON.parse(savedUserProf);
+            Object.assign(current, parsed);
           }
-        });
+        } catch (_) {}
       }
-    });
-
-    saveExamsArchive(archive);
-    updateArchiveCountBadge();
-    showToast('💾 تم حفظ النماذج الثلاثة (أ، ب، ج) في أرشيف اختباراتك بنجاح!', 'success');
+      syncProfileModalInputs(current);
+    }
+    if (typeof updateAuthUI === 'function') updateAuthUI();
   } catch (err) {
-    showToast('خطأ في حفظ النماذج في الأرشيف: ' + err.message, 'error');
+    console.warn('openTeacherProfileModal sync error:', err);
+  }
+
+  const modal = document.getElementById('profileModal');
+  if (modal) {
+    modal.classList.add('open');
+    if (typeof window.renderSessionsLog === 'function') {
+      window.renderSessionsLog();
+    }
   }
 };
+window.openProfileModal = window.openTeacherProfileModal;
 
+function checkMandatoryTeacherProfileOnStartup() {
+  try {
+    const current = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (current) {
+      const isComplete = !!(
+        (current.name && current.name.trim() && current.name !== 'أستاذ المادة') &&
+        (current.governorate && current.governorate.trim()) &&
+        (current.school && current.school.trim()) &&
+        (current.subject && current.subject.trim()) &&
+        (current.contact || current.email || current.phone)
+      );
+      if (!isComplete) {
+        setTimeout(() => {
+          if (typeof window.openTeacherProfileModal === 'function') {
+            window.openTeacherProfileModal();
+            if (typeof showToast === 'function') {
+              showToast('يرجى إكمال بيانات الأستاذ الأساسية والإجبارية ✍️', 'warning');
+            }
+          }
+        }, 900);
+      }
+    }
+  } catch (e) {
+    console.warn('checkMandatoryTeacherProfile error:', e);
+  }
+}
 
+// Smooth horizontal scrolling for Question Types strip + mini scroll buttons
+(function initQBuilderToolbarEnhancements() {
+  function setup() {
+    const qtypesContainer = document.getElementById('sideQTypeButtonsContainer');
+    if (qtypesContainer && !qtypesContainer._wheelAttached) {
+      qtypesContainer._wheelAttached = true;
+      qtypesContainer.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          qtypesContainer.scrollLeft += (e.deltaY * 0.9);
+        }
+      }, { passive: false });
+    }
 
+    const scrollUpBtn = document.getElementById('scrollQuestionsTopBtn');
+    const scrollDownBtn = document.getElementById('scrollQuestionsBottomBtn');
+    if (scrollUpBtn && !scrollUpBtn._hasClick) {
+      scrollUpBtn._hasClick = true;
+      scrollUpBtn.addEventListener('click', () => {
+        const mainContent = document.querySelector('.questions-main-content');
+        if (mainContent && mainContent.scrollTop > 0) {
+          mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+    }
+    if (scrollDownBtn && !scrollDownBtn._hasClick) {
+      scrollDownBtn._hasClick = true;
+      scrollDownBtn.addEventListener('click', () => {
+        const mainContent = document.querySelector('.questions-main-content');
+        if (mainContent) {
+          mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+      });
+    }
+  }
 
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setTimeout(setup, 150);
+  }
+})();
+
+/* ==========================================================================
+   Platform Fixed Floating Footer & Social Bar Toggle Logic
+   ========================================================================== */
+window.toggleBottomFloatingBar = function() {
+  const bar = document.getElementById('platformFixedBottomBar');
+  const icon = document.getElementById('bottomBarToggleIcon');
+  if (!bar) return;
+  bar.classList.toggle('minimized');
+  const isMin = bar.classList.contains('minimized');
+  if (icon) {
+    icon.className = isMin ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
+  }
+  try {
+    localStorage.setItem('moallem_bottom_bar_minimized', isMin ? 'true' : 'false');
+  } catch (_) {}
+};
+
+// Restore saved state
+(function restoreBottomBarState() {
+  try {
+    if (localStorage.getItem('moallem_bottom_bar_minimized') === 'true') {
+      const bar = document.getElementById('platformFixedBottomBar');
+      const icon = document.getElementById('bottomBarToggleIcon');
+      if (bar) bar.classList.add('minimized');
+      if (icon) icon.className = 'fa-solid fa-chevron-up';
+    }
+  } catch (_) {}
+})();
