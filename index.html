@@ -142,7 +142,7 @@
 <body>
 
   <!-- Main Application Workstation (استوديو ومنصة الاختبارات) -->
-  <div id="appWorkstation" class="app-workstation">
+  <div id="appWorkstation" class="app-workstation portal-locked">
 
     <!-- Fixed Free Trial Warning Banner (تحذير ثابت للفترة التجريبية المجانية لمدة يومين) -->
     <aside id="trialWarningBanner" class="trial-warning-banner no-print" style="display: none;"
@@ -1462,6 +1462,11 @@
                     <i class="fa-solid fa-file-pdf"></i>
                     <span>PDF</span>
                   </button>
+                  <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.clearQuestionsSection()"
+                    title="تفريغ ومسح كافة الأسئلة المفتوحة في ورقة الاختبار">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>تفريغ الأسئلة</span>
+                  </button>
                   <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                     title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
                     <i class="fa-solid fa-xmark"></i>
@@ -1824,6 +1829,11 @@
                   <i class="fa-solid fa-file-pdf"></i>
                   <span>تصدير PDF</span>
                 </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.clearExamHeaderSection()"
+                  title="تفريغ ومسح جميع حقول وبيانات ترويسة الاختبار">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ الترويسة</span>
+                </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
@@ -1917,6 +1927,13 @@
                 <span class="return-app-pill"><i class="fa-solid fa-graduation-cap"></i> تطبيق 04</span>
                 <span class="return-app-title">سجل ورصد درجات الطلاب</span>
               </div>
+              <div class="exam-top-actions-group">
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.sgClearAllOpenData()"
+                  title="تفريغ ومسح كافة بيانات وسجلات الطلاب والدرجات المفتوحة">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ السجل</span>
+                </button>
+              </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
                 <i class="fa-solid fa-xmark"></i>
@@ -1993,6 +2010,11 @@
                     title="حفظ فوري في السجل والانتقال إلى واجهة التقرير اليومي">
                     <i class="fa-solid fa-floppy-disk"></i>
                     <span>حفظ السجل</span>
+                  </button>
+                  <button type="button" class="sg-btn-hero sg-btn-hero-clear" onclick="window.sgClearAllOpenData()"
+                    title="تفريغ ومسح كافة بيانات وسجلات الطلاب والدرجات المفتوحة">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>تفريغ السجل</span>
                   </button>
                 </div>
               </div>
@@ -2357,6 +2379,13 @@
                 <span class="return-app-pill"><i class="fa-solid fa-clipboard-user"></i> تطبيق 05</span>
                 <span class="return-app-title">المتابعة اليومية وحسن السلوك</span>
               </div>
+              <div class="exam-top-actions-group">
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.sbClearAllStudents()"
+                  title="تفريغ ومسح كافة بيانات وسجلات الطلاب والمتابعة اليومية المفتوحة">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ السجل</span>
+                </button>
+              </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
                 <i class="fa-solid fa-xmark"></i>
@@ -2691,6 +2720,11 @@
                   title="تنزيل وحفظ جميع الشهادات في ملف PDF واحد لجهازك مباشرة">
                   <i class="fa-solid fa-file-pdf"></i>
                   <span>تنزيل PDF</span>
+                </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.certClearAllOpenData()"
+                  title="تفريغ ومسح كافة شهادات وبيانات الطلاب المفتوحة">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ الشهادات</span>
                 </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
@@ -3166,6 +3200,11 @@
                   <i class="fa-solid fa-box-archive"></i>
                   <span>أرشيف الجداول</span>
                 </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.schedClearEntireGrid()"
+                  title="تفريغ ومسح كافة الحصص والدروس من جدول الحصص الأسبوعي">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ الجدول</span>
+                </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
@@ -3479,6 +3518,11 @@
                   <i class="fa-solid fa-file-import"></i>
                   <span>جلب من سجل الدرجات</span>
                 </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.seatingClearAllData()"
+                  title="تفريغ ومسح كافة بيانات توزيع المقاعد والطلاب من القاعات">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ المقاعد</span>
+                </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
@@ -3734,10 +3778,26 @@
                 </div>
               </div>
               <div class="exam-top-actions-group">
+                <div class="ec-top-color-switcher" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.06); padding: 3px 6px; border-radius: 10px;">
+                  <span style="font-size: 0.74rem; font-weight: 800; color: #475569; margin-left: 2px;">لون البطاقة:</span>
+                  <button type="button" class="btn btn-sm ec-top-color-btn active" id="ecTopColorBlue" onclick="window.examCardSetColor('blue')" style="font-weight: 850; border-radius: 7px; padding: 4px 10px; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #0b3577; background: #eff6ff; color: #0b3577;" title="اللون الأزرق الوزاري الرسمي">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #0b3577; display: inline-block;"></span>
+                    <span>أزرق 🔵</span>
+                  </button>
+                  <button type="button" class="btn btn-sm ec-top-color-btn" id="ecTopColorRed" onclick="window.examCardSetColor('red')" style="font-weight: 850; border-radius: 7px; padding: 4px 10px; font-size: 0.76rem; display: inline-flex; align-items: center; gap: 4px; border: 1.5px solid #cbd5e1; background: #ffffff; color: #64748b;" title="اللون الأحمر الوزاري الرسمي">
+                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #a81111; display: inline-block;"></span>
+                    <span>أحمر 🔴</span>
+                  </button>
+                </div>
                 <button type="button" class="btn-exam-action active ec-view-mode-btn" data-view="cards" onclick="window.examCardSetView('cards')"
                   title="عرض أوراق الطباعة A4 المجمعة">
                   <i class="fa-solid fa-table-cells"></i>
                   <span>بطاقات A4 للطباعة</span>
+                </button>
+                <button type="button" class="btn-exam-action" id="ecTopToggleBlankBtn" onclick="window.examCardTogglePrintBlank()"
+                  title="التبديل بين نموذج فارغ مطابق للصورة المعتمدة ونموذج معبأ بأسماء الطلاب" style="border: 1.5px solid #cbd5e1; font-weight: 850;">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>نموذج فارغ كالصورة 📄</span>
                 </button>
                 <button type="button" class="btn-exam-action ec-view-mode-btn" data-view="single" onclick="window.examCardSetView('single')"
                   title="معاينة فردية لباجة الطالب مكبرة">
@@ -3768,6 +3828,11 @@
                   title="استيراد وتزامن مع خريطة الجلوس (App 09)">
                   <i class="fa-solid fa-chair"></i>
                   <span>جلب من خريطة الجلوس</span>
+                </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.examCardsClearAllData()"
+                  title="تفريغ ومسح كافة بيانات وبطاقات الامتحان والطلاب المفتوحة">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ البطاقات</span>
                 </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
@@ -3915,14 +3980,26 @@
                       </div>
                     </div>
 
-                    <div class="form-group mb-2">
-                      <label class="form-label">المديرية / المحافظة:</label>
-                      <input type="text" id="ecGovInput" class="form-control" placeholder="المديرية العامة للتربية" oninput="window.examCardUpdateField('governorate', this.value)">
+                    <div class="form-row-2 mb-2">
+                      <div class="form-group">
+                        <label class="form-label">المرحلة الدراسية:</label>
+                        <input type="text" id="ecStageInput" class="form-control" placeholder="للدراسة المتوسطة" oninput="window.examCardUpdateField('studyStage', this.value)">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">المديرية / المحافظة:</label>
+                        <input type="text" id="ecGovInput" class="form-control" placeholder="المديرية العامة للتربية" oninput="window.examCardUpdateField('governorate', this.value)">
+                      </div>
                     </div>
 
-                    <div class="form-group">
-                      <label class="form-label">صفة التوقيع والاعتماد:</label>
-                      <input type="text" id="ecPrincipalTitleInput" class="form-control" placeholder="مدير المدرسة / رئيس اللجنة الامتحانية" oninput="window.examCardUpdateField('principalTitle', this.value)">
+                    <div class="form-row-2">
+                      <div class="form-group">
+                        <label class="form-label">اسم مدير المدرسة (للتوقيع):</label>
+                        <input type="text" id="ecPrincipalNameInput" class="form-control" placeholder="أ. حسين علي" oninput="window.examCardUpdateField('principalName', this.value)">
+                      </div>
+                      <div class="form-group">
+                        <label class="form-label">صفة التوقيع والاعتماد:</label>
+                        <input type="text" id="ecPrincipalTitleInput" class="form-control" placeholder="مدير المدرسة" oninput="window.examCardUpdateField('principalTitle', this.value)">
+                      </div>
                     </div>
                   </div>
 
@@ -3931,25 +4008,53 @@
                     <div class="sched-panel-title">
                       <div class="panel-title-icon icon-blue"><i class="fa-solid fa-palette"></i></div>
                       <div>
-                        <span class="panel-title-text">تخطيط وتنسيق البطاقات</span>
-                        <small class="panel-title-sub">التقسيم في صفحة A4 والألوان</small>
+                        <span class="panel-title-text">تخطيط ولون البطاقة</span>
+                        <small class="panel-title-sub">التحكم باللون (أزرق / أحمر) والتخطيط</small>
                       </div>
+                    </div>
+
+                    <!-- Dedicated Blue / Red Color Controller requested by user -->
+                    <div class="form-group mb-2">
+                      <label class="form-label" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span><i class="fa-solid fa-palette text-blue"></i> لون البطاقة الامتحانية:</span>
+                        <span class="badge" id="ecColorBadge" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; font-weight: 800; background: #eff6ff; color: #0b3577; border: 1px solid #93c5fd;">أزرق وزاري 🔵</span>
+                      </label>
+                      <div class="ec-color-toggle-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <button type="button" class="btn ec-color-btn ec-color-blue active" id="ecColorBtnBlue" onclick="window.examCardSetColor('blue')" style="font-weight: 850; border-radius: 8px; padding: 8px 10px; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; border: 2px solid #0b3577; background: #eff6ff; color: #0b3577; cursor: pointer;">
+                          <span style="width: 12px; height: 12px; border-radius: 50%; background: #0b3577; display: inline-block;"></span>
+                          <span>أزرق وزاري 🔵</span>
+                        </button>
+                        <button type="button" class="btn ec-color-btn ec-color-red" id="ecColorBtnRed" onclick="window.examCardSetColor('red')" style="font-weight: 850; border-radius: 8px; padding: 8px 10px; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; gap: 6px; border: 2px solid #cbd5e1; background: #ffffff; color: #64748b; cursor: pointer;">
+                          <span style="width: 12px; height: 12px; border-radius: 50%; background: #a81111; display: inline-block;"></span>
+                          <span>أحمر وزاري 🔴</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                      <label class="form-label">نموذج وتصميم البطاقة:</label>
+                      <select id="ecTemplateSelect" class="form-control" onchange="window.examCardUpdateField('cardTemplate', this.value)">
+                        <option value="ministerialOfficial" selected>النموذج الوزاري المعتمد (بطاقة الاشتراك في الامتحانات العامة) 🏛️</option>
+                        <option value="modernBadge">باجة الاختبارات الحديثة (مع الباركود وجدول المواد) 🎫</option>
+                      </select>
                     </div>
 
                     <div class="form-group mb-2">
                       <label class="form-label">عدد البطاقات في صفحة A4:</label>
                       <select id="ecCardsPerPageSelect" class="form-control" onchange="window.examCardUpdateField('cardsPerPage', Number(this.value))">
-                        <option value="4" selected>4 بطاقات بالورقة (2 × 2) - القياسي المعتمد لباجة الامتحان</option>
+                        <option value="4" selected>4 بطاقات بالورقة (2 × 2) - القياسي المعتمد لبطاقة الامتحان الوزارية</option>
                         <option value="6">6 بطاقات بالورقة (2 × 3) - مدمج واقتصادي</option>
-                        <option value="8">8 بطاقات بالورقة (2 × 4) - حجم تعليق مصغر</option>
-                        <option value="2">بطاقتان بالورقة (1 × 2) - حجم كبير مفصل</option>
+                        <option value="8">8 بطاقات بالورقة (2 × 4) - حجم متابعة مصغر</option>
+                        <option value="2">بطاقتان بالورقة (1 × 2) - حجم كبير مكبر</option>
                       </select>
                     </div>
 
                     <div class="form-group mb-2">
-                      <label class="form-label">النمط اللوني المعتمد:</label>
+                      <label class="form-label">النمط اللوني العام:</label>
                       <select id="ecThemeSelect" class="form-control" onchange="window.examCardUpdateField('cardTheme', this.value)">
-                        <option value="royalIndigo" selected>نيلي ملكي وزاري (رسمي ومعتمد)</option>
+                        <option value="ministerialBlue" selected>النموذج الوزاري المعتمد - أزرق رسمي 🔵</option>
+                        <option value="ministerialRed">النموذج الوزاري المعتمد - أحمر رسمي 🔴</option>
+                        <option value="royalIndigo">نيلي ملكي وزاري (باجة حديثة)</option>
                         <option value="officialGold">ذهبي ملكي مذهب</option>
                         <option value="emeraldGreen">أخضر زمردي أكاديمي</option>
                         <option value="rubyBurgundy">عنابي رئاسي</option>
@@ -4060,6 +4165,11 @@
                   title="تصدير وتحميل ورقة الامتحان بصيغة PDF">
                   <i class="fa-solid fa-file-pdf"></i>
                   <span>تصدير PDF</span>
+                </button>
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.clearExamSettingsSection()"
+                  title="إعادة ضبط وتفريغ كافة تخصيصات وتنسيقات الورقة للوضع الافتراضي">
+                  <i class="fa-solid fa-rotate-left"></i>
+                  <span>إعادة ضبط</span>
                 </button>
               </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
@@ -4450,6 +4560,13 @@
                 <span class="return-app-pill"><i class="fa-solid fa-chart-line"></i> تطبيق 06 • تحليلي</span>
                 <span class="return-app-title">مركز الإحصائيات اليومية والفلترة الشاملة لكل ما يدور بالمنصة</span>
               </div>
+              <div class="exam-top-actions-group">
+                <button type="button" class="btn-exam-action btn-exam-clear" onclick="window.resetReportFilters()"
+                  title="تفريغ كافة فلاتر البحث وإعادة الضبط الشامل">
+                  <i class="fa-solid fa-trash-can"></i>
+                  <span>تفريغ الفلاتر</span>
+                </button>
+              </div>
               <button type="button" class="btn-close-hub" onclick="window.switchToTab('tab-apps')"
                 title="إغلاق والعودة للرئيسية" aria-label="إغلاق">
                 <i class="fa-solid fa-xmark"></i>
@@ -4486,6 +4603,10 @@
                   <button type="button" class="btn btn-soft-success" onclick="window.refreshFullDailyReport()"
                     title="تحديث وقراءة كافة بيانات وسجلات المنصة الحالية فوراً">
                     <i class="fa-solid fa-rotate"></i> <span>تحديث البيانات 🔄</span>
+                  </button>
+                  <button type="button" class="btn btn-soft-danger" onclick="window.resetReportFilters()"
+                    title="تفريغ ومسح كافة فلاتر البحث وإعادة الضبط">
+                    <i class="fa-solid fa-filter-circle-xmark"></i> <span>تفريغ الفلاتر</span>
                   </button>
                   <button type="button" class="btn btn-outline" onclick="window.startNewExamFromDrawer()"
                     title="تفريغ وبدء كتابة اختبار جديد فوراً">
@@ -4868,7 +4989,7 @@
         <div class="paper-wrapper" id="exam-paper">
           <div id="exam-paper-container" class="exam-paper-container-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
             <div class="exam-paper-container" id="examPaperDoc">
-            <article class="exam-paper exam-paper-page" id="examPaperPage_1" data-page="1">
+            <article class="exam-paper exam-paper-page" id="examPaperPage_1" data-page="1" data-pdf-page>
 
               <!-- Watermark -->
               <div class="paper-watermark" id="paperWatermarkEl" style="display: none;"></div>
@@ -5118,7 +5239,7 @@
   </div>
 
   <!-- Full-Screen Dedicated Authentication Portal (الواجهة الكاملة لتسجيل الدخول - تصميم هادئ ومريح ومبسط) -->
-  <div id="fullscreenAuthPortal" class="fullscreen-auth-portal portal-hidden">
+  <div id="fullscreenAuthPortal" class="fullscreen-auth-portal">
     <!-- Ambient Calming Background Glow -->
     <div class="portal-ambient-glow glow-1"></div>
     <div class="portal-ambient-glow glow-2"></div>
@@ -5507,6 +5628,36 @@
     </main>
   </div>
 
+  <script>
+    (function () {
+      try {
+        var portal = document.getElementById('fullscreenAuthPortal');
+        var workstation = document.getElementById('appWorkstation');
+        var status = localStorage.getItem('moallem_logged_in');
+        var portalOpen = localStorage.getItem('moallem_auth_portal_open');
+        var rawUser = localStorage.getItem('moallem_current_user');
+        var hasValidUser = false;
+        if (rawUser) {
+          var parsedUser = JSON.parse(rawUser);
+          hasValidUser = !!(parsedUser && (parsedUser.id || parsedUser.username || parsedUser.email));
+        }
+        var autoLogoutVal = localStorage.getItem('moallem_auto_logout_on_exit');
+        var autoLogoutEnabled = (autoLogoutVal === null) ? true : (autoLogoutVal === 'true');
+        var sessionActive = sessionStorage.getItem('moallem_session_active') === 'true';
+
+        var isLogged = (status === 'true') && (portalOpen !== 'true') && hasValidUser && (!autoLogoutEnabled || sessionActive);
+        if (isLogged) {
+          if (portal) portal.classList.add('portal-hidden');
+          if (workstation) workstation.classList.remove('portal-locked');
+        } else {
+          localStorage.setItem('moallem_logged_in', 'false');
+          localStorage.setItem('moallem_auth_portal_open', 'true');
+          if (portal) portal.classList.remove('portal-hidden');
+          if (workstation) workstation.classList.add('portal-locked');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <!-- Teacher Login / Profile Modal -->
   <div class="modal-overlay" id="profileModal"
     onclick="if(event.target === this) window.validateAndCloseProfileModal();">
@@ -7420,6 +7571,26 @@
         </div>
         <div class="form-row-2 mb-2">
           <div class="form-group">
+            <label class="form-label">اسم الأم:</label>
+            <input type="text" id="ecModalStudentMother" class="form-control" placeholder="زينب كاظم">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المواليد (سنة / تاريخ):</label>
+            <input type="text" id="ecModalStudentDob" class="form-control" placeholder="2009 / 4 / 15">
+          </div>
+        </div>
+        <div class="form-row-2 mb-2">
+          <div class="form-group">
+            <label class="form-label">المدرسة:</label>
+            <input type="text" id="ecModalStudentSchool" class="form-control" placeholder="متوسطة الأمل للبنين">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المحافظة:</label>
+            <input type="text" id="ecModalStudentGov" class="form-control" placeholder="بغداد / الرصافة الأولى">
+          </div>
+        </div>
+        <div class="form-row-2 mb-2">
+          <div class="form-group">
             <label class="form-label">الرقم الامتحاني:</label>
             <input type="text" id="ecModalStudentRoll" class="form-control" placeholder="1001">
           </div>
@@ -7441,7 +7612,7 @@
         <div class="form-group">
           <label class="form-label">رابط الصورة الشخصية (اختياري):</label>
           <input type="text" id="ecModalStudentPhoto" class="form-control" placeholder="رابط صورة الطالب (URL أو تركها فارغة)">
-          <small class="text-muted" style="font-size: 0.75rem;">في حال ترك الحقل فارغاً سيتم إظهار الشارة الأكاديمية الافتراضية الرسمية.</small>
+          <small class="text-muted" style="font-size: 0.75rem;">في حال ترك الحقل فارغاً سيتم إظهار مربع الصورة الرسمي بعبارة (صورة حديثة تختم وتوقع من قبل المدير).</small>
         </div>
       </div>
 
@@ -8956,10 +9127,14 @@
                 <input type="text" id="codeNoteInput" class="form-control codes-field-input" placeholder="مثال: مدرسة المتفوقين أو أستاذ علي..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.handleGenerateActivationCodes(); }">
               </div>
 
-              <div class="codes-form-group" style="align-self: flex-end;">
+              <div class="codes-form-group" style="align-self: flex-end; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 <button type="button" id="btnGenerateCodes" class="btn codes-btn-generate" onclick="window.handleGenerateActivationCodes()" title="توليد كود التفعيل فوراً">
                   <i class="fa-solid fa-wand-magic-sparkles"></i>
                   <span>توليد الأكواد الآن</span>
+                </button>
+                <button type="button" class="btn codes-btn-print-studio" onclick="window.printActivationCardsModal()" title="معاينة وطباعة بطاقات كروت التفعيل الفاخرة للوكلاء على ورق A4">
+                  <i class="fa-solid fa-print"></i>
+                  <span>طباعة بطاقات VIP للوكلاء 🖨️</span>
                 </button>
               </div>
             </div>
@@ -9321,26 +9496,65 @@
     </div>
   </div>
 
-  <!-- Modal: طباعة ومعاينة بطاقات الاشتراك VIP الفاخرة (Print Activation Voucher Cards) -->
+  <!-- Modal: استوديو بطاقات تفعيل كروت VIP للوكلاء والموزعين (Print Activation Voucher Cards) -->
   <div class="modal-overlay" id="printActivationCardsModal" style="display: none; align-items: center; justify-content: center; z-index: 10000010;">
     <div class="modal-container print-cards-modal-container">
       <div class="modal-header print-cards-header no-print">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="sub-header-crown-icon" style="width: 40px; height: 40px; font-size: 1.15rem;">
-            <i class="fa-solid fa-print"></i>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="sub-header-crown-icon" style="width: 44px; height: 44px; font-size: 1.25rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);">
+            <i class="fa-solid fa-crown"></i>
           </div>
           <div>
-            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 850;">بطاقات قسائم اشتراك VIP الفاخرة 🖨️</h3>
-            <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">جاهزة للطباعة الورقية أو الحفظ كـ PDF وتوزيعها على المعلمين</p>
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 850;">استوديو بطاقات تفعيل VIP الفاخرة للوكلاء والموزعين 🖨️🎫</h3>
+            <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--text-muted);">تصميم رسمي معتمد جاهز للطباعة على ورق A4 أو كروت منفردة لتوزيعها على المكاتب والمعلمين</p>
           </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <button type="button" class="btn btn-primary" onclick="window.print()" style="font-weight: 800; border-radius: 8px; padding: 6px 14px; font-size: 0.82rem;">
-            <i class="fa-solid fa-print"></i> طباعة الآن (Print)
+          <button type="button" class="btn btn-outline" onclick="window.exportActivationCardsPDF()" style="font-weight: 800; border-radius: 10px; padding: 7px 14px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; border-color: #38bdf8; color: #0284c7;">
+            <i class="fa-solid fa-file-pdf"></i> تصدير PDF عالي الدقة
           </button>
-          <button type="button" class="btn-drawer-close sub-close-btn" onclick="window.closePrintActivationCardsModal()">✖</button>
+          <button type="button" class="btn btn-primary" onclick="window.executePrintActivationCards()" style="font-weight: 800; border-radius: 10px; padding: 7px 16px; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(37,99,235,0.35);">
+            <i class="fa-solid fa-print"></i> طباعة فورية (Print A4)
+          </button>
+          <button type="button" class="btn-drawer-close sub-close-btn" onclick="window.closePrintActivationCardsModal()" style="font-size: 1.1rem; width: 34px; height: 34px;">✖</button>
         </div>
       </div>
+
+      <!-- Luxury Control Bar for Agents & Customization -->
+      <div class="voucher-controls-bar no-print">
+        <div class="voucher-ctrl-col">
+          <label class="voucher-ctrl-label"><i class="fa-solid fa-store text-warning"></i> اسم المكتبة / الوكيل المعتمد:</label>
+          <input type="text" id="voucherAgentNameInput" class="form-control voucher-ctrl-input" placeholder="مثال: مكتبة المتنبي المركزية - بغداد" oninput="window.updateVoucherCardsLivePreview()">
+        </div>
+        <div class="voucher-ctrl-col">
+          <label class="voucher-ctrl-label"><i class="fa-solid fa-palette text-primary"></i> النمط والثيم البصري:</label>
+          <select id="voucherThemeSelect" class="form-control voucher-ctrl-select" onchange="window.updateVoucherCardsLivePreview()">
+            <option value="pearl" selected>✨ الأبيض اللؤلؤي السحري الفاخر (White Pearl Magic ✨)</option>
+            <option value="gold">🌟 الذهبي الملكي الداكن (Royal Onyx Gold)</option>
+            <option value="emerald">🌿 الزمردي الدبلوماسي الأكاديمي (Academic Emerald)</option>
+            <option value="sapphire">💎 الياقوتي الأزرق الإمبراطوري (Imperial Sapphire)</option>
+          </select>
+        </div>
+        <div class="voucher-ctrl-col">
+          <label class="voucher-ctrl-label"><i class="fa-solid fa-table-cells text-success"></i> تخطيط الورقة (A4 Layout):</label>
+          <select id="voucherLayoutSelect" class="form-control voucher-ctrl-select" onchange="window.updateVoucherCardsLivePreview()">
+            <option value="8" selected>8 كروت في ورقة A4 (2×4 اقتصادي للوكلاء)</option>
+            <option value="6">6 كروت في ورقة A4 (2×3 حجم كبير فاخر)</option>
+            <option value="4">4 كروت في ورقة A4 (2×2 حجم عملاق فائق الفخامة VIP)</option>
+            <option value="single">كارت منفرد كبير (هدية VIP خاصة)</option>
+          </select>
+        </div>
+        <div class="voucher-ctrl-col">
+          <label class="voucher-ctrl-label"><i class="fa-solid fa-filter text-info"></i> فرز الأكواد:</label>
+          <select id="voucherFilterSelect" class="form-control voucher-ctrl-select" onchange="window.updateVoucherCardsLivePreview()">
+            <option value="available" selected>الأكواد المتاحة غير المستهلكة فقط 🟢</option>
+            <option value="all">كافة الأكواد المسجلة (المتاحة والمستهلكة)</option>
+            <option value="1_year">الباقة السنوية فقط 👑</option>
+            <option value="6_months">باقة 6 أشهر فقط ⚡</option>
+          </select>
+        </div>
+      </div>
+
       <div class="modal-body print-cards-body" id="printCardsContainer">
         <!-- Dynamically rendered printable voucher cards -->
       </div>
@@ -9374,6 +9588,9 @@
 
   <!-- Teacher's Path PDF Export Engine (Universal High-Fidelity Engine with CORS & Canvas Security) -->
   <script src="js/pdf-export.js?v=3.0"></script>
+
+  <!-- Masar Print PDF Vector Engine (تصدير PDF عربي سليم لمنصة مسار المعلم) -->
+  <script src="js/masar-print-pdf.js?v=1.0"></script>
 
   <!-- MasarPDF v1.0 — High-Performance Memory-Safe PDF Engine for Teacher's Path -->
   <script src="js/masar-pdf.js?v=1.0"></script>

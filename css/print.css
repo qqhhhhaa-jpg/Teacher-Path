@@ -59,15 +59,58 @@
     overflow: hidden !important;
   }
 
-  /* Reports Isolation: When printing academic or daily reports, hide workstation & exam paper completely */
+  /* ==========================================================================
+     UNIVERSAL SECTION PRINT ISOLATION (عزل وضبط طباعة الأقسام بدقة وحسب القسم الفعال)
+     ========================================================================== */
+  /* Hide Exam Paper whenever printing any non-exam section */
+  body.printing-activation-cards #appWorkstation,
+  body.printing-activation-cards #examPaperDoc,
+  body.printing-activation-cards .main-container,
+  body.printing-activation-cards .preview-pane,
+  body.printing-certificates #appWorkstation,
+  body.printing-certificates #examPaperDoc,
+  body.printing-certificates .main-container,
+  body.printing-certificates .preview-pane,
+  body.printing-grades #appWorkstation,
+  body.printing-grades #examPaperDoc,
+  body.printing-grades .main-container,
+  body.printing-grades .preview-pane,
+  body.printing-behavior #appWorkstation,
+  body.printing-behavior #examPaperDoc,
+  body.printing-behavior .main-container,
+  body.printing-behavior .preview-pane,
+  body.printing-seating #appWorkstation,
+  body.printing-seating #examPaperDoc,
+  body.printing-seating .main-container,
+  body.printing-seating .preview-pane,
+  body.printing-exam-cards #appWorkstation,
+  body.printing-exam-cards #examPaperDoc,
+  body.printing-exam-cards .main-container,
+  body.printing-exam-cards .preview-pane,
+  body.printing-schedule #appWorkstation,
+  body.printing-schedule #examPaperDoc,
+  body.printing-schedule .main-container,
+  body.printing-schedule .preview-pane,
   body.printing-academic-report #appWorkstation,
+  body.printing-academic-report #examPaperDoc,
   body.printing-academic-report .main-container,
   body.printing-academic-report .preview-pane,
-  body.printing-academic-report #examPaperDoc,
   body.printing-daily-report #appWorkstation,
+  body.printing-daily-report #examPaperDoc,
   body.printing-daily-report .main-container,
   body.printing-daily-report .preview-pane,
-  body.printing-daily-report #examPaperDoc {
+  body:has(#tab-certificates:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-certificates:not([style*="display: none"])) .preview-pane,
+  body:has(#tab-student-grades:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-student-grades:not([style*="display: none"])) .preview-pane,
+  body:has(#tab-student-behavior:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-student-behavior:not([style*="display: none"])) .preview-pane,
+  body:has(#tab-seating:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-seating:not([style*="display: none"])) .preview-pane,
+  body:has(#tab-exam-cards:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-exam-cards:not([style*="display: none"])) .preview-pane,
+  body:has(#tab-schedule:not([style*="display: none"])) #examPaperDoc,
+  body:has(#tab-schedule:not([style*="display: none"])) .preview-pane {
     display: none !important;
     visibility: hidden !important;
     height: 0 !important;
@@ -77,20 +120,235 @@
     overflow: hidden !important;
   }
 
-  /* Always guarantee all containers expand to 100% full printable width without clipping or offset */
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .app-workstation,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #appWorkstation,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #appWorkstation.portal-locked,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode],
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode="builder"],
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container[data-mobile-mode="preview"],
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container.preview-hidden,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .preview-pane,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .main-container .preview-pane,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) .paper-wrapper,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #examPaperDoc.exam-paper-container,
-  body:not(.printing-academic-report):not(.printing-daily-report):not(.dual-print-active) #examPaperDoc {
+  /* 1. طباعة بطاقات تفعيل كروت VIP للوكلاء */
+  body.printing-activation-cards #printActivationCardsModal {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  body.printing-activation-cards #printActivationCardsModal * {
+    visibility: visible !important;
+  }
+  body.printing-activation-cards .voucher-a4-sheet {
+    display: flex !important;
+    visibility: visible !important;
+    box-shadow: none !important;
+    margin: 0 auto !important;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  /* 2. طباعة شهادات التقدير والتفوق (A4 أفقي / عمودي حسب الاختيار بدقة 100%) */
+  body.printing-certificates .cert-category-switcher-bar,
+  body.printing-certificates .cert-executive-hero-card,
+  body.printing-certificates .cert-header-card,
+  body.printing-certificates .cert-controls-column,
+  body.printing-certificates .cert-preview-actions-bar,
+  body.printing-certificates .cert-preview-nav-bar,
+  body.printing-certificates .cert-preview-zoom-bar,
+  body.printing-certificates .cert-preview-header-bar,
+  body.printing-certificates .cert-category-switcher-bar,
+  body.printing-certificates .section-return-bar,
+  body.printing-certificates .cert-layout-grid > *:not(.cert-preview-column),
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-category-switcher-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-executive-hero-card,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-header-card,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-controls-column,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-actions-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-nav-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-zoom-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-header-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .section-return-bar,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-layout-grid > *:not(.cert-preview-column) {
+    display: none !important;
+  }
+
+  body.printing-certificates #tab-certificates,
+  body:has(#tab-certificates:not([style*="display: none"])) #tab-certificates,
+  body.printing-certificates .cert-studio-container,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-studio-container,
+  body.printing-certificates .cert-layout-grid,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-layout-grid,
+  body.printing-certificates .cert-preview-column,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-column,
+  body.printing-certificates .cert-preview-canvas-wrapper,
+  body:has(#tab-certificates:not([style*="display: none"])) .cert-preview-canvas-wrapper,
+  body.printing-certificates #certPreviewCanvasWrapper,
+  body:has(#tab-certificates:not([style*="display: none"])) #certPreviewCanvasWrapper {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  body.printing-certificates .certificate-paper,
+  body:has(#tab-certificates:not([style*="display: none"])) .certificate-paper,
+  body.printing-all-certificates #certBatchDirectPrintContainer {
+    display: flex !important;
+    visibility: visible !important;
+    position: relative !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    background: #ffffff !important;
+    overflow: hidden !important;
+  }
+
+  /* شهادة أفقية بالعرض A4 Landscape */
+  body.printing-certificates .certificate-paper.orientation-landscape,
+  body.printing-certificates .certificate-paper:not(.orientation-portrait),
+  body:has(#tab-certificates:not([style*="display: none"])) .certificate-paper.orientation-landscape,
+  body:has(#tab-certificates:not([style*="display: none"])) .certificate-paper:not(.orientation-portrait) {
+    width: 297mm !important;
+    height: 209mm !important;
+    max-width: 297mm !important;
+    max-height: 209mm !important;
+    padding: 5mm 7mm !important;
+    margin: 0 auto !important;
+  }
+
+  /* شهادة رأسية بالطول A4 Portrait */
+  body.printing-certificates .certificate-paper.orientation-portrait,
+  body:has(#tab-certificates:not([style*="display: none"])) .certificate-paper.orientation-portrait {
+    width: 210mm !important;
+    height: 296mm !important;
+    max-width: 210mm !important;
+    max-height: 296mm !important;
+    padding: 7mm 5mm !important;
+    margin: 0 auto !important;
+  }
+
+  /* 3. طباعة سجل درجات الطلاب */
+  body.printing-grades #tab-student-grades,
+  body:has(#tab-student-grades:not([style*="display: none"])) #tab-student-grades,
+  body.printing-grades .student-grades-container,
+  body.printing-grades .grades-roster-content,
+  body.printing-grades .sg-table-card,
+  body.printing-grades .grades-table-scroll {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+
+  /* 4. طباعة سجل المتابعة اليومية وحسن السلوك */
+  body.printing-behavior #tab-student-behavior,
+  body:has(#tab-student-behavior:not([style*="display: none"])) #tab-student-behavior,
+  body.printing-behavior .behavior-studio-container,
+  body.printing-behavior .sb-table-card {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+  }
+
+  /* 5. طباعة أرقام الجلوس والبطاقات الامتحانية */
+  body.printing-seating #tab-seating,
+  body:has(#tab-seating:not([style*="display: none"])) #tab-seating,
+  body.printing-seating .seating-a4-paper,
+  body.printing-exam-cards #tab-exam-cards,
+  body:has(#tab-exam-cards:not([style*="display: none"])) #tab-exam-cards,
+  body.printing-exam-cards .exam-card-paper,
+  body:has(#tab-exam-cards:not([style*="display: none"])) .exam-card-a4-paper {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+  }
+
+  .exam-card-item.ministerial-card {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    aspect-ratio: 1.42 / 1 !important;
+  }
+  .exam-card-item.ministerial-card.theme-blue {
+    color: #08295e !important;
+    --min-color: #08295e !important;
+  }
+  .exam-card-item.ministerial-card.theme-red {
+    color: #991b1b !important;
+    --min-color: #991b1b !important;
+  }
+  .ec-min-outer-frame,
+  .ec-min-inner-frame,
+  .ec-min-photo-box,
+  .ec-min-dotted-line,
+  .ec-min-sig-dots {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .exam-card-a4-paper.paper-landscape {
+    width: 297mm !important;
+    max-width: 297mm !important;
+    min-height: 205mm !important;
+    padding: 6mm 8mm !important;
+  }
+  .exam-card-a4-paper.paper-landscape .exam-cards-grid.grid-count-4 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(92mm, 1fr)) !important;
+    gap: 5mm 6mm !important;
+  }
+
+  /* 6. طباعة جدول الدروس الأسبوعي (A3 / A4 عريض بالعرض تلقائياً) */
+  body.printing-schedule .sched-controls-column,
+  body.printing-schedule .sched-header-card,
+  body.printing-schedule .schedule-actions-bar,
+  body.printing-schedule .sched-subnav-bar,
+  body.printing-schedule .sched-panel-card,
+  body.printing-schedule .section-return-bar,
+  body:has(#tab-schedule:not([style*="display: none"])) .sched-controls-column,
+  body:has(#tab-schedule:not([style*="display: none"])) .sched-header-card,
+  body:has(#tab-schedule:not([style*="display: none"])) .schedule-actions-bar,
+  body:has(#tab-schedule:not([style*="display: none"])) .sched-subnav-bar,
+  body:has(#tab-schedule:not([style*="display: none"])) .sched-panel-card,
+  body:has(#tab-schedule:not([style*="display: none"])) .section-return-bar {
+    display: none !important;
+  }
+
+  body.printing-schedule #tab-schedule,
+  body:has(#tab-schedule:not([style*="display: none"])) #tab-schedule,
+  body.printing-schedule .schedule-studio-container,
+  body:has(#tab-schedule:not([style*="display: none"])) .schedule-studio-container,
+  body.printing-schedule .schedule-paper-doc,
+  body:has(#tab-schedule:not([style*="display: none"])) .schedule-paper-doc,
+  body.printing-schedule .sched-preview-canvas,
+  body:has(#tab-schedule:not([style*="display: none"])) .sched-preview-canvas {
+    display: block !important;
+    visibility: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+  }
+
+  /* 7. طباعة ورقة الأسئلة الامتحانية حصراً عند عدم تفعيل أي قسم آخر */
+  body:not(.printing-activation-cards):not(.printing-certificates):not(.printing-grades):not(.printing-behavior):not(.printing-seating):not(.printing-exam-cards):not(.printing-schedule):not(.printing-academic-report):not(.printing-daily-report):not(.printing-all-certificates):not(:has(#tab-certificates:not([style*="display: none"]))):not(:has(#tab-student-grades:not([style*="display: none"]))):not(:has(#tab-student-behavior:not([style*="display: none"]))):not(:has(#tab-seating:not([style*="display: none"]))):not(:has(#tab-exam-cards:not([style*="display: none"]))):not(:has(#tab-schedule:not([style*="display: none"]))) #appWorkstation,
+  body:not(.printing-activation-cards):not(.printing-certificates):not(.printing-grades):not(.printing-behavior):not(.printing-seating):not(.printing-exam-cards):not(.printing-schedule):not(.printing-academic-report):not(.printing-daily-report):not(.printing-all-certificates):not(:has(#tab-certificates:not([style*="display: none"]))):not(:has(#tab-student-grades:not([style*="display: none"]))):not(:has(#tab-student-behavior:not([style*="display: none"]))):not(:has(#tab-seating:not([style*="display: none"]))):not(:has(#tab-exam-cards:not([style*="display: none"]))):not(:has(#tab-schedule:not([style*="display: none"]))) .main-container,
+  body:not(.printing-activation-cards):not(.printing-certificates):not(.printing-grades):not(.printing-behavior):not(.printing-seating):not(.printing-exam-cards):not(.printing-schedule):not(.printing-academic-report):not(.printing-daily-report):not(.printing-all-certificates):not(:has(#tab-certificates:not([style*="display: none"]))):not(:has(#tab-student-grades:not([style*="display: none"]))):not(:has(#tab-student-behavior:not([style*="display: none"]))):not(:has(#tab-seating:not([style*="display: none"]))):not(:has(#tab-exam-cards:not([style*="display: none"]))):not(:has(#tab-schedule:not([style*="display: none"]))) .preview-pane,
+  body:not(.printing-activation-cards):not(.printing-certificates):not(.printing-grades):not(.printing-behavior):not(.printing-seating):not(.printing-exam-cards):not(.printing-schedule):not(.printing-academic-report):not(.printing-daily-report):not(.printing-all-certificates):not(:has(#tab-certificates:not([style*="display: none"]))):not(:has(#tab-student-grades:not([style*="display: none"]))):not(:has(#tab-student-behavior:not([style*="display: none"]))):not(:has(#tab-seating:not([style*="display: none"]))):not(:has(#tab-exam-cards:not([style*="display: none"]))):not(:has(#tab-schedule:not([style*="display: none"]))) #examPaperDoc {
     display: block !important;
     visibility: visible !important;
     width: 100% !important;
@@ -507,10 +765,125 @@
   .iq-math-root .iq-radicand {
     border-top: 1.5px solid #000000 !important;
   }
+  #certDedicatedPrintIframe {
+    display: none !important;
+  }
 }
 
 /* Screen Mode Isolation */
-#dualPrintContainer {
+#dualPrintContainer,
+#certBatchDirectPrintContainer {
   display: none !important;
 }
+
+@media print {
+  .pdf-toolbar,
+  [data-pdf-hide] {
+    display: none !important;
+  }
+
+  .pdf-document {
+    margin: 0 !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 12mm !important;
+  }
+}
+
+/* ==========================================================================
+   OFFICIAL AGENT VIP VOUCHER CARDS PRINT ISOLATION
+   ========================================================================== */
+@media print {
+  body.printing-activation-cards {
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  body.printing-activation-cards > *:not(#printActivationCardsModal),
+  body.printing-activation-cards #appWorkstation,
+  body.printing-activation-cards .main-container {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+  }
+  body.printing-activation-cards #printActivationCardsModal,
+  body.printing-activation-cards .modal-overlay#printActivationCardsModal {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    background: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+    overflow: visible !important;
+  }
+  body.printing-activation-cards #printActivationCardsModal * {
+    visibility: visible !important;
+  }
+  body.printing-activation-cards .no-print,
+  body.printing-activation-cards .print-cards-header,
+  body.printing-activation-cards .voucher-controls-bar,
+  body.printing-activation-cards .voucher-sheet-header {
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  body.printing-activation-cards .print-cards-modal-container {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  body.printing-activation-cards .print-cards-body {
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+  }
+  body.printing-activation-cards .voucher-a4-sheet {
+    display: block !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    max-height: 297mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 auto !important;
+    padding: 5mm 6mm !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body.printing-activation-cards .voucher-cards-grid {
+    height: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
+  }
+  body.printing-activation-cards .voucher-agent-card {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
+
+
 

@@ -33,13 +33,37 @@
     }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: #0b1120;
       background-image: 
-        radial-gradient(at 0% 0%, rgba(30, 58, 138, 0.25) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(13, 148, 136, 0.2) 0px, transparent 50%);
+        /* 1. إضاءة شفقية سماوية علوية ساحرة (Top Cyan/Electric Aurora Glow) */
+        radial-gradient(ellipse 75% 50% at 50% -10%, rgba(56, 189, 248, 0.28) 0px, transparent 65%),
+        /* 2. إضاءة محيطية زرقاء ملكية في الزاوية العلوية اليمنى */
+        radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.22) 0px, transparent 55%),
+        /* 3. إضاءة محيطية بنفسجية نيون في الزاوية السفلية اليسرى */
+        radial-gradient(at 0% 100%, rgba(139, 92, 246, 0.18) 0px, transparent 55%),
+        /* 4. لمسة إضاءة مركزية نيليّة ناعمة تمنع عتمة المنتصف */
+        radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.09) 0px, transparent 60%),
+        /* 5. نقش الرموز التعليمية المدمج (SVG) */
+        url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2394a3b8' stroke-width='1.2' stroke-opacity='0.06'%3E%3Cpath d='M30 20 L50 30 L30 40 L10 30 Z M18 34 L18 45 C18 48 42 48 42 45 L42 34'/%3E%3Cpath d='M85 25 C80 25 75 28 75 33 L75 50 C75 46 80 44 85 44 L105 44 L105 25 Z M85 25 C90 25 95 28 95 33 L95 50 C95 46 90 44 85 44 L65 44 L65 25 Z'/%3E%3Ccircle cx='30' cy='85' r='12'/%3E%3Cellipse cx='30' cy='85' rx='22' ry='7' transform='rotate(30 30 85)'/%3E%3Cellipse cx='30' cy='85' rx='22' ry='7' transform='rotate(-30 30 85)'/%3E%3Cpath d='M85 75 L95 100 L75 100 Z'/%3E%3C/g%3E%3C/svg%3E");
+      background-attachment: fixed;
+      background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 140px 140px;
+      background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
       color: var(--text-main);
       min-height: 100vh;
       padding-bottom: 50px;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.8) 20%, rgba(168, 85, 247, 0.9) 50%, rgba(59, 130, 246, 0.8) 80%, transparent 100%);
+      filter: blur(1.5px);
+      z-index: 99999;
+      pointer-events: none;
     }
 
     /* Header & Navigation */
@@ -923,7 +947,14 @@
           <tr>
             <td style="color: var(--text-muted); font-size: 0.8rem;">${idx + 1}</td>
             <td style="font-weight: 800; color: #38bdf8;">${escapeHtml(acc.username || '—')}</td>
-            <td style="font-weight: 700;">${escapeHtml(acc.name || '—')}</td>
+            <td style="font-weight: 700;">
+              <div>${escapeHtml(acc.name || '—')}</div>
+              <div style="font-size: 0.72rem; margin-top: 3px;">
+                ${acc.isOnline 
+                  ? `<span style="color: #10b981; font-weight: 800;"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> متصل الآن 🟢</span>` 
+                  : `<span style="color: var(--text-muted);"><i class="fa-solid fa-circle" style="font-size: 0.5rem; opacity: 0.5;"></i> ${acc.lastLogout ? 'آخر خروج: ' + escapeHtml(acc.lastLogout) : 'غير متصل ⚪'}</span>`}
+              </div>
+            </td>
             <td style="color: #cbd5e1; direction: ltr; text-align: right;">${escapeHtml(acc.email || '—')}</td>
             <td style="font-family: monospace; background: rgba(0,0,0,0.25); border-radius: 6px; padding: 4px 8px;">
               ${escapeHtml(acc.password || '—')}

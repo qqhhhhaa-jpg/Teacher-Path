@@ -676,6 +676,7 @@
       window.showToast('تم تفريغ سجل الطلاب بنجاح! السجل الآن فارغ وجاهز لإضافة طلاب أو استيراد ملف إكسل 🗑️✨', 'success');
     }
   };
+  window.sbClearAllOpenData = window.sbClearAllStudents;
 
   window.sbMarkAllPresent = function () {
     const key = getRecordKey(activeDate, activeRosterId);
@@ -994,6 +995,195 @@
     `);
     printWin.document.close();
   };
+
+  /**
+   * Direct PDF Exporter for Student Behavior & Conduct Sheet (تنزيل ملف PDF حقيقي ومباشر دون نوافذ طباعة)
+   */
+  window.sbExportOfficialPdf = async function (targetDate, targetRosterId) {
+    const theDate = targetDate || activeDate;
+    const theRosterId = targetRosterId || activeRosterId;
+    const key = getRecordKey(theDate, theRosterId);
+    const record = behaviorRecords[key];
+    const roster = (rosters && rosters.find(r => r.id === theRosterId)) || getActiveRoster();
+    if (!record || !record.students || !record.students.length) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('لا توجد بيانات طلاب في جلسة المتابعة لتنزيل PDF!', 'warning');
+      } else {
+        alert('لا توجد بيانات طلاب لتنزيل PDF.');
+      }
+      return;
+    }
+
+    const meta = (roster && roster.meta) || {};
+    const school = meta.school || (roster && roster.schoolName) || 'ثانوية المتميزين للبنين';
+    const teacher = meta.teacher || (roster && roster.teacherName) || 'أستاذ المادة';
+    const subject = record.subject || meta.subject || 'الرياضيات';
+    const grade = meta.grade || (roster && roster.name) || 'الثالث المتوسط';
+    let dayName = 'اليوم';
+    try {
+      dayName = ARABIC_DAYS[new Date(theDate).getDay()] || 'اليوم';
+    } catch (e) {
+      dayName = 'اليوم';
+    }
+
+    let present = 0, absent = 0, excused = 0, late = 0;
+    record.students.forEach(st => {
+      if (st.attendance === 'present') present++;
+      else if (st.attendance === 'absent') absent++;
+      else if (st.attendance === 'excused') excused++;
+      else if (st.attendance === 'late') late++;
+    });
+
+    let rowsHtml = '';
+    record.students.forEach((st, idx) => {
+      const attMap = {
+        present: '<span style="color: #059669; font-weight: 800;">حاضر ✔</span>',
+        absent: '<span style="color: #dc2626; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px;">غائب ✖</span>',
+        excused: '<span style="color: #d97706; font-weight: 800;">مجاز 📋</span>',
+        late: '<span style="color: #ea580c; font-weight: 800;">متأخر ⏱</span>'
+      };
+      const partMap = { excellent: '🌟 متميز', active: '👍 متفاعل', average: '➖ متوسط', none: '❌ لم يشارك' };
+      const hwMap = { done: '📘 منجز', partial: '📙 جزئي', not_done: '📕 غير منجز' };
+      const conductMap = { excellent: '🌟 مثالي', good: '🟢 منضبط', needs_attention: '⚠️ تنبيه', warning: '⛔ مخالف' };
+
+      rowsHtml += `
+        <tr style="border-bottom: 1px solid #cbd5e1; background: ${idx % 2 === 1 ? '#f8fafc' : '#ffffff'};">
+          <td style="text-align: center; font-weight: 800; padding: 4px; border: 1px solid #cbd5e1;">${idx + 1}</td>
+          <td style="text-align: right; font-weight: 800; padding: 4px 8px; border: 1px solid #cbd5e1;">${escapeHtml(st.name || '')}</td>
+          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${attMap[st.attendance] || ''}</td>
+          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${partMap[st.participation] || ''}</td>
+          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${hwMap[st.homework] || ''}</td>
+          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${conductMap[st.conduct] || ''}</td>
+          <td style="text-align: center; font-weight: 900; font-size: 0.95rem; padding: 4px; border: 1px solid #cbd5e1;">${st.score !== undefined ? st.score : 10}</td>
+          <td style="text-align: right; font-size: 0.8rem; color: #475569; padding: 4px 8px; border: 1px solid #cbd5e1;">${escapeHtml(st.notes || '—')}</td>
+        </tr>
+      `;
+    });
+
+    let exportDiv = document.getElementById('sbPdfExportContainer');
+    if (!exportDiv) {
+      exportDiv = document.createElement('div');
+      exportDiv.id = 'sbPdfExportContainer';
+      document.body.appendChild(exportDiv);
+    }
+
+    const cleanClassName = (record.className || (roster && roster.name) || 'الصف').replace(/[\/\\?%*:|"<>]/g, '-').trim();
+    const cleanSub = subject.replace(/[\/\\?%*:|"<>]/g, '-').trim();
+    const filename = `كشف-متابعة-وسلوك-${cleanClassName}-${cleanSub}-${theDate}.pdf`;
+
+    exportDiv.style.display = 'block';
+    exportDiv.style.position = 'relative';
+    exportDiv.innerHTML = `
+      <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 20px 25px; line-height: 1.35; background: #fff; width: 100%; box-sizing: border-box;">
+        
+        <!-- Header -->
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+          <tr>
+            <td style="width: 28%; font-size: 0.85rem; font-weight: 700; line-height: 1.6; vertical-align: middle;">
+              جمهورية العراق<br>
+              وزارة التربية<br>
+              المديرية العامة للتربية<br>
+              <strong>${escapeHtml(school)}</strong>
+            </td>
+            <td style="width: 44%; text-align: center; vertical-align: middle;">
+              <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية" style="width: 54px; height: 54px; object-fit: contain; margin-bottom: 2px; display: inline-block;">
+              <div style="font-size: 1.25rem; font-weight: 900; margin: 2px 0;">سجل المتابعة والتقييم اليومي وحسن السلوك</div>
+              <div style="font-size: 0.88rem; font-weight: 700; color: #333;">كشف رسمي معتمد للإشراف التربوي والإدارة المدرسية</div>
+            </td>
+            <td style="width: 28%; text-align: left; font-size: 0.85rem; font-weight: 700; line-height: 1.6; vertical-align: middle;">
+              اليوم: <strong>${dayName}</strong><br>
+              التاريخ: <strong>${theDate}</strong><br>
+              الصف: <strong>${escapeHtml(cleanClassName)}</strong><br>
+              المادة: <strong>${escapeHtml(subject)}</strong>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Meta Strip -->
+        <div style="display: flex; justify-content: space-between; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700;">
+          <div>الحصة: <strong>${escapeHtml(record.period || 'الأولى')}</strong></div>
+          <div>عنوان الدرس / الموضوع: <strong>${escapeHtml(record.topic || 'سير الدرس اليومي')}</strong></div>
+          <div>مدرس المادة: <strong>${escapeHtml(teacher)}</strong></div>
+        </div>
+
+        <!-- Stats Strip -->
+        <div style="display: flex; gap: 12px; margin-bottom: 10px; font-size: 0.82rem; flex-wrap: wrap;">
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa;">العدد الكلي: <strong>${record.students.length}</strong></div>
+          <div style="border: 1px solid #10b981; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #ecfdf5; color: #059669;">الحاضرون: <strong>${present}</strong></div>
+          <div style="border: 1px solid #ef4444; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fef2f2; color: #dc2626;">الغائبون: <strong>${absent}</strong></div>
+          <div style="border: 1px solid #f59e0b; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fffbeb; color: #d97706;">المجازون: <strong>${excused}</strong></div>
+          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa;">نسبة الحضور: <strong>${record.students.length > 0 ? Math.round(((present + late) / record.students.length) * 100) : 0}%</strong></div>
+        </div>
+
+        <!-- Data Table -->
+        <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 15px;">
+          <thead>
+            <tr style="background: #f1f5f9; font-weight: 900;">
+              <th style="width: 32px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">ت</th>
+              <th style="border: 1px solid #334155; padding: 5px 6px; text-align: right;">اسم الطالب الثلاثي والرباعي</th>
+              <th style="width: 75px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الحضور</th>
+              <th style="width: 80px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">المشاركة</th>
+              <th style="width: 80px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الواجب البيتي</th>
+              <th style="width: 85px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">السلوك والمواظبة</th>
+              <th style="width: 50px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الدرجة</th>
+              <th style="border: 1px solid #334155; padding: 5px 6px; text-align: right;">ملاحظات المعلم / أسباب الغياب</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rowsHtml}
+          </tbody>
+        </table>
+
+        <!-- Signatures -->
+        <div style="display: flex; justify-content: space-between; margin-top: 25px; padding: 0 15px; font-weight: 800; font-size: 0.85rem;">
+          <div style="text-align: center; width: 170px;">
+            <div>مدرس / معلم المادة</div>
+            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">${escapeHtml(teacher)}</div>
+          </div>
+          <div style="text-align: center; width: 170px;">
+            <div>المشرف التربوي الزائر</div>
+            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">التوقيع والختم</div>
+          </div>
+          <div style="text-align: center; width: 170px;">
+            <div>مدير المدرسة</div>
+            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">الختم والتوقيع الرسمي</div>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    try {
+      if (typeof window.exportToPDF === 'function') {
+        await window.exportToPDF(exportDiv, {
+          title: filename.replace(/\.pdf$/i, ''),
+          filename: filename,
+          pageSize: 'a4',
+          format: 'a4',
+          orientation: 'portrait',
+          margin: '8mm',
+          fit: true
+        });
+        if (typeof window.showToast === 'function') {
+          window.showToast('تم تنزيل كشف المتابعة وحسن السلوك بصيغة PDF بنجاح ✅', 'success');
+        }
+      } else {
+        throw new Error('محرك تصدير PDF المباشر غير متوفر');
+      }
+    } catch (err) {
+      console.error('sbExportOfficialPdf error:', err);
+      if (typeof window.showToast === 'function') {
+        window.showToast('تعذر تنزيل ملف PDF: ' + (err.message || 'خطأ غير متوقع'), 'danger');
+      }
+    } finally {
+      if (exportDiv) exportDiv.style.display = 'none';
+    }
+  };
+
+  window.sbExportSessionFromArchivePdf = async function (date, rosterId) {
+    await window.sbExportOfficialPdf(date, rosterId);
+  };
+
 
   // Auto Init on DOM Ready
   if (document.readyState === 'loading') {
@@ -1330,6 +1520,9 @@
           <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
             <button type="button" class="btn btn-sm btn-primary" onclick="window.sbSelectSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; padding: 0.35rem 0.75rem;">
               <i class="fa-solid fa-folder-open"></i> فتح الكشف
+            </button>
+            <button type="button" class="btn btn-sm btn-danger" onclick="window.sbExportSessionFromArchivePdf('${rec.date}', '${rec.rosterId}')" style="background: linear-gradient(135deg, #e11d48, #be123c); font-weight: 800; padding: 0.35rem 0.75rem; border: none;" title="تنزيل كشف هذا اليوم بصيغة PDF مباشرة">
+              <i class="fa-solid fa-file-pdf"></i> تنزيل PDF
             </button>
             <button type="button" class="btn btn-sm btn-outline" onclick="window.sbPrintSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="border-color: #7c3aed; color: #7c3aed; font-weight: 700; padding: 0.35rem 0.75rem;" title="طباعة كشف هذا اليوم A4">
               <i class="fa-solid fa-print"></i> طباعة A4

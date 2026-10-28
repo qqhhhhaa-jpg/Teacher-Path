@@ -1,7 +1,7 @@
 [
   {
     "id": "usr_admin",
-    "name": "الأستاذ حسين علي (المدير العام)",
+    "name": "الأستاذ حسين قصي (المدير العام)",
     "username": "admin",
     "email": "admin@moallem.iq",
     "password": "qq7878aassdd",
@@ -14,7 +14,16 @@
     "subject": "الإشراف العام والتطوير",
     "rights": "إعداد وتنظيم الأستاذ حسين علي - الإدارة العامة لمنصة مُعَلِّم برو",
     "contact": "07700000000",
-    "createdAt": "2026-01-01T00:00:00.000Z"
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-10-26T19:49:48.088Z",
+    "isOnline": false,
+    "lastActivityTime": "٢٦ تشرين الأول ٢٠٢٦، ١٠:١٠ م",
+    "lastActivityType": "خروج",
+    "lastDevice": "حاسبة / لابتوب 💻 (Windows)",
+    "lastLogin": "٢٦ تشرين الأول ٢٠٢٦، ١٠:٠١ م",
+    "lastLogout": "٢٦ تشرين الأول ٢٠٢٦، ١٠:١٠ م",
+    "isSubscribed": true,
+    "isTrial": false
   },
   {
     "id": "usr_gfgfg",
@@ -134,7 +143,7 @@
   },
   {
     "id": "usr_test1",
-    "name": "الأستاذ (حساب تجريبي test1)",
+    "name": "الأستاذ (test1)",
     "username": "test1",
     "email": "test1@moallem.iq",
     "password": "test2025",
@@ -146,12 +155,7 @@
     "governorate": "العراق",
     "school": "مدرسة مسار المعلم",
     "subject": "عام",
-    "createdAt": "2026-10-17T00:00:00.000Z",
-    "subscriptionDuration": "6_months",
-    "subscriptionPlanName": "باقة 6 أشهر - نصف سنة دراسية (75 ألف د.ع)",
-    "subscriptionStartDate": "2026-10-16T21:12:55.917Z",
-    "subscriptionExpiresAt": "2027-02-13T21:12:55.917Z",
-    "subscriptionExpiryFormatted": "2027-02-14"
+    "createdAt": "2026-10-17T00:00:00.000Z"
   },
   {
     "id": "usr_google_1792250638871",
@@ -181,5 +185,41 @@
     "registeredDateFormatted": "2026-10-17",
     "createdAt": "2026-10-17T18:23:59.477048",
     "subscriptionDuration": "1_year"
+  },
+  {
+    "id": "usr_google_1792776869376",
+    "name": "الاستاذة رود",
+    "username": "roud1234",
+    "password": "roud1234",
+    "email": "rord@gmail.com",
+    "avatar": "",
+    "googleId": "",
+    "subject": "عربي",
+    "school": "ثانوية المتميزين للبنين",
+    "governorate": "بغداد - الكرخ الثانية",
+    "rights": "مدرس المادة",
+    "contact": "07700000000",
+    "isGoogleUser": true,
+    "isVerified": true,
+    "role": "teacher_vip",
+    "isSubscribed": true,
+    "isVip": true,
+    "isTrial": false,
+    "subscriptionType": "1_year",
+    "subscriptionStartDate": "2026-10-26T19:10:24.978Z",
+    "registeredAt": "2026-10-23T17:34:29.314Z",
+    "registeredDateFormatted": "2026-10-23",
+    "isOnline": false,
+    "lastActivityTime": "٢٦ تشرين الأول ٢٠٢٦، ١٠:٣٤ م",
+    "lastActivityType": "خروج",
+    "lastDevice": "حاسبة / لابتوب 💻 (Windows)",
+    "lastLogin": "٢٣ تشرين الأول ٢٠٢٦، ٠٨:٣٤ م",
+    "updatedAt": "2026-10-26T19:09:45.871Z",
+    "lastLogout": "٢٦ تشرين الأول ٢٠٢٦، ١٠:٣٤ م",
+    "createdAt": "2026-10-26T21:04:10.985780",
+    "subscriptionDuration": "1_year",
+    "subscriptionPlanName": "الباقة السنوية الأكاديمية (200 ألف د.ع)",
+    "subscriptionExpiresAt": "2027-10-26T19:10:24.978Z",
+    "subscriptionExpiryFormatted": "2027-10-26"
   }
 ]

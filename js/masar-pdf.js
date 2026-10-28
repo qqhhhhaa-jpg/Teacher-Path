@@ -94,23 +94,65 @@
     return [Math.round(wmm * 10) / 10, Math.round(hmm * 10) / 10];
   }
 
+  // كشف أبعاد واتجاه الصفحة بدقة متناهية وفق معايير A4 القياسية
+  function getPageDimensions(el, opts) {
+    var o = opts || {};
+    var isLandscape = false;
+    if (o.orientation === 'landscape' || o.orientation === 'l') {
+      isLandscape = true;
+    } else if (el.classList.contains('cert-sheet') && !el.classList.contains('portrait')) {
+      isLandscape = true;
+    } else if (el.classList.contains('landscape')) {
+      isLandscape = true;
+    } else if (el.offsetWidth > el.offsetHeight * 1.15) {
+      isLandscape = true;
+    }
+
+    // مقاسات A4 القياسية:
+    var widthMM = isLandscape ? 297 : 210;
+    var heightMM = isLandscape ? 210 : 297;
+    // الدقة القياسية للشاشات (96 DPI): A4 = 794px × 1123px
+    var widthPx = isLandscape ? 1123 : 794;
+    var heightPx = isLandscape ? 794 : 1123;
+
+    return {
+      isLandscape: isLandscape,
+      widthMM: widthMM,
+      heightMM: heightMM,
+      widthPx: widthPx,
+      heightPx: heightPx,
+      orientation: isLandscape ? 'l' : 'p',
+      size: [widthMM, heightMM]
+    };
+  }
+
   function resolvePages(p) {
-    var list;
+    var list = [];
     if (!p) p = DEFAULTS.pages;
     if (typeof p === 'string') {
       list = Array.prototype.slice.call(document.querySelectorAll(p));
       // فحص ذكي في حال لم توجد عناصر بالمحدد الافتراضي
       if (!list.length && p === DEFAULTS.pages) {
-        list = Array.prototype.slice.call(document.querySelectorAll('.exam-paper-page, [data-pdf-page], .cert-sheet, .cert-pdf-export-single-page, .seating-a4-paper, .exam-card-paper, #examPaperDoc'));
+        list = Array.prototype.slice.call(document.querySelectorAll('.exam-paper-page, [data-pdf-page], .voucher-a4-sheet, .cert-sheet, .cert-pdf-export-single-page, .seating-a4-paper, .exam-card-paper'));
       }
     }
     else if (p && p.nodeType === 1) {
       // إذا كان العنصر حاوية بها صفحات فرعية، نقوم بتجزئة الصفحات الفرعية تلقائياً
-      var sub = Array.prototype.slice.call(p.querySelectorAll('.exam-paper-page, [data-pdf-page], .cert-sheet, .cert-pdf-export-single-page, .seating-a4-paper, .exam-card-paper'));
+      var sub = Array.prototype.slice.call(p.querySelectorAll('.exam-paper-page, [data-pdf-page], .voucher-a4-sheet, .cert-sheet, .cert-pdf-export-single-page, .seating-a4-paper, .exam-card-paper'));
       list = sub.length > 0 ? sub : [p];
     }
     else list = Array.prototype.slice.call(p || []);
-    return list.filter(function (el) { return el && el.nodeType === 1; });
+
+    list = list.filter(function (el) { return el && el.nodeType === 1; });
+
+    // استبعاد الحاويات العامة في حال وجود صفحات فرعية داخلها (منع تكرار الصفحات مع الحاوية الأب)
+    list = list.filter(function (el, idx) {
+      return !list.some(function (other, otherIdx) {
+        return otherIdx !== idx && el.contains(other);
+      });
+    });
+
+    return list;
   }
 
   function loadScript(src) {
@@ -184,61 +226,188 @@
 
   /* --------------------------- تجهيز النسخة الملتقطة --------------------------- */
 
-  function prepareClone(doc, opts) {
+  function prepareClone(doc, opts, dim) {
     var target = doc.querySelector('[data-mpdf-target]');
     if (!target) return;
 
-    // إلغاء أي تكبير/تصغير للمعاينة (transform / zoom) على الصفحة وآبائها
-    var n = target;
-    while (n && n.nodeType === 1) {
+    var targetW = dim ? dim.widthPx : 794;
+    var targetH = dim ? dim.heightPx : 1123;
+
+    // 1. تثبيت الوضع النهاري واتجاه RTL
+    try {
+      doc.documentElement.setAttribute('data-theme', 'light');
+      doc.documentElement.style.colorScheme = 'light';
+      doc.documentElement.dir = 'rtl';
+      doc.body.setAttribute('data-theme', 'light');
+      doc.body.dir = 'rtl';
+    } catch(e){}
+
+    // 2. قفل أبعاد الصفحة الحاوية بدقة A4
+    doc.documentElement.style.setProperty('margin', '0', 'important');
+    doc.documentElement.style.setProperty('padding', '0', 'important');
+    doc.documentElement.style.setProperty('width', targetW + 'px', 'important');
+    doc.documentElement.style.setProperty('min-width', targetW + 'px', 'important');
+    doc.documentElement.style.setProperty('max-width', targetW + 'px', 'important');
+    doc.documentElement.style.setProperty('background', '#ffffff', 'important');
+    doc.documentElement.style.setProperty('overflow', 'visible', 'important');
+
+    doc.body.style.setProperty('margin', '0', 'important');
+    doc.body.style.setProperty('padding', '0', 'important');
+    doc.body.style.setProperty('width', targetW + 'px', 'important');
+    doc.body.style.setProperty('min-width', targetW + 'px', 'important');
+    doc.body.style.setProperty('max-width', targetW + 'px', 'important');
+    doc.body.style.setProperty('background', '#ffffff', 'important');
+    doc.body.style.setProperty('overflow', 'visible', 'important');
+
+    // 3. إلغاء أي قيود grid / flex / responsive من جميع العناصر الآباء لمنع انضغاط الورقة
+    var n = target.parentElement;
+    while (n && n !== doc.body && n !== doc.documentElement) {
+      n.style.setProperty('margin', '0', 'important');
+      n.style.setProperty('padding', '0', 'important');
+      n.style.setProperty('width', targetW + 'px', 'important');
+      n.style.setProperty('min-width', targetW + 'px', 'important');
+      n.style.setProperty('max-width', targetW + 'px', 'important');
+      n.style.setProperty('display', 'block', 'important');
+      n.style.setProperty('overflow', 'visible', 'important');
+      n.style.setProperty('border', 'none', 'important');
+      n.style.setProperty('background', 'transparent', 'important');
       n.style.setProperty('transform', 'none', 'important');
       n.style.setProperty('zoom', '1', 'important');
-      if (n !== target) {
-        n.style.setProperty('overflow', 'visible', 'important');
-        n.style.setProperty('max-height', 'none', 'important');
-        n.style.setProperty('opacity', '1', 'important');
-        n.style.setProperty('filter', 'none', 'important');
+      n.style.setProperty('grid-template-columns', 'none', 'important');
+      n.style.setProperty('flex', 'none', 'important');
+      n.style.setProperty('float', 'none', 'important');
+      n.style.setProperty('position', 'static', 'important');
+
+      // إخفاء العناصر الجانبية في نفس المستوى لمنع التأثير على موقع الورقة
+      if (n.parentElement) {
+        for (var ci = 0; ci < n.parentElement.children.length; ci++) {
+          var sib = n.parentElement.children[ci];
+          if (sib !== n && sib.nodeType === 1) {
+            sib.style.setProperty('display', 'none', 'important');
+          }
+        }
       }
       n = n.parentElement;
     }
 
-    if (opts.hideSelector) {
-      Array.prototype.forEach.call(target.querySelectorAll(opts.hideSelector), function (e) {
-        e.style.setProperty('display', 'none', 'important');
-      });
+    // إخفاء إخوة الورقة المباشرين (الصفحات الأخرى والفواصل) حتى تُرسم الورقة المستهدفة فقط
+    if (target.parentElement) {
+      for (var cj = 0; cj < target.parentElement.children.length; cj++) {
+        var child = target.parentElement.children[cj];
+        if (child !== target && child.nodeType === 1) {
+          child.style.setProperty('display', 'none', 'important');
+        }
+      }
     }
 
-    // تفعيل خاصية CORS للصور داخل الصفحة المستنسخة
+    // 4. فرض تنسيق A4 الحقيقي والمثالي على الصفحة المستهدفة
+    target.style.setProperty('width', targetW + 'px', 'important');
+    target.style.setProperty('min-width', targetW + 'px', 'important');
+    target.style.setProperty('max-width', targetW + 'px', 'important');
+    target.style.setProperty('min-height', targetH + 'px', 'important');
+    target.style.setProperty('box-sizing', 'border-box', 'important');
+    target.style.setProperty('margin', '0 auto', 'important');
+    target.style.setProperty('box-shadow', 'none', 'important');
+    target.style.setProperty('border', 'none', 'important');
+    target.style.setProperty('border-radius', '0', 'important');
+    target.style.setProperty('transform', 'none', 'important');
+    target.style.setProperty('zoom', '1', 'important');
+    target.style.setProperty('overflow', 'visible', 'important');
+    target.style.setProperty('background', '#ffffff', 'important');
+    target.style.setProperty('color', '#111827', 'important');
+    target.style.setProperty('display', 'flex', 'important');
+    target.style.setProperty('flex-direction', 'column', 'important');
+    target.style.setProperty('justify-content', 'space-between', 'important');
+
+    if (target.classList.contains('voucher-a4-sheet') || target.classList.contains('exam-card-paper') || target.classList.contains('seating-a4-paper')) {
+      target.style.setProperty('height', targetH + 'px', 'important');
+      target.style.setProperty('max-height', targetH + 'px', 'important');
+      target.style.setProperty('overflow', 'hidden', 'important');
+    }
+
+    // 5. إخفاء العناصر غير الطباعية وأزرار التحكم
+    var hideSelector = opts.hideSelector || DEFAULTS.hideSelector;
+    Array.prototype.forEach.call(target.querySelectorAll(hideSelector), function (e) {
+      e.style.setProperty('display', 'none', 'important');
+    });
+    Array.prototype.forEach.call(target.querySelectorAll('.paper-page-separator, button:not(.show-in-pdf), .mobile-floating-preview-cta'), function (e) {
+      e.style.setProperty('display', 'none', 'important');
+    });
+
+    // 6. تفعيل CORS للصور داخل الصفحة المستنسخة
     Array.prototype.forEach.call(doc.querySelectorAll('img'), function (img) {
       try { img.crossOrigin = 'anonymous'; } catch (e) {}
     });
 
+    // 7. حقن قواعد CSS الحاسمة لضمان سلامة اتصال الحروف والجدول والترويسة
     var css =
-      '*,*::before,*::after{animation:none!important;transition:none!important;' +
-      '-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
-      '[data-mpdf-target]{margin:0!important;box-shadow:none!important;}' +
-      (opts.arabicSafe ? '[data-mpdf-target],[data-mpdf-target] *{letter-spacing:0!important;}' : '');
+      '*, *::before, *::after {' +
+      '  animation: none !important;' +
+      '  transition: none !important;' +
+      '  -webkit-print-color-adjust: exact !important;' +
+      '  print-color-adjust: exact !important;' +
+      '}' +
+      '[data-mpdf-target], [data-mpdf-target] * {' +
+      '  letter-spacing: normal !important;' +
+      '  word-spacing: normal !important;' +
+      '  text-rendering: geometricPrecision !important;' +
+      '  font-feature-settings: "liga" 1, "calt" 1 !important;' +
+      '  -webkit-font-smoothing: antialiased !important;' +
+      '  box-sizing: border-box !important;' +
+      '}' +
+      '[data-mpdf-target] .exam-header, [data-mpdf-target] .header-grid {' +
+      '  width: 100% !important;' +
+      '  display: flex !important;' +
+      '  justify-content: space-between !important;' +
+      '  align-items: center !important;' +
+      '}' +
+      '[data-mpdf-target] .grading-table {' +
+      '  width: 100% !important;' +
+      '  max-width: 100% !important;' +
+      '  border-collapse: collapse !important;' +
+      '}' +
+      '[data-mpdf-target] .grading-table th, [data-mpdf-target] .grading-table td {' +
+      '  text-align: center !important;' +
+      '  vertical-align: middle !important;' +
+      '}' +
+      '[data-mpdf-target] .paper-content {' +
+      '  width: 100% !important;' +
+      '  flex-grow: 1 !important;' +
+      '  display: flex !important;' +
+      '  flex-direction: column !important;' +
+      '}' +
+      '[data-mpdf-target] .paper-question {' +
+      '  page-break-inside: avoid !important;' +
+      '  break-inside: avoid !important;' +
+      '  width: 100% !important;' +
+      '}';
+
     var style = doc.createElement('style');
     style.textContent = css;
     doc.head.appendChild(style);
   }
 
-  async function capturePage(h2c, el, opts, scale) {
+  async function capturePage(h2c, el, opts, scale, dim) {
     el.setAttribute('data-mpdf-target', '1');
     try {
+      var targetW = dim ? dim.widthPx : 794;
+      var targetH = dim ? dim.heightPx : 1123;
       return await h2c(el, {
         scale: scale,
         useCORS: true,
         allowTaint: false,
         logging: false,
-        backgroundColor: opts.background,
+        backgroundColor: opts.background || '#ffffff',
         imageTimeout: 15000,
         removeContainer: true,
         scrollX: 0,
         scrollY: 0,
-        // عرض نافذة افتراضي كبير حتى لا تتحول الصفحة لتخطيط الموبايل أثناء الالتقاط
-        windowWidth: Math.max(document.documentElement.clientWidth, 1280),
-        onclone: function (doc) { prepareClone(doc, opts); }
+        x: 0,
+        y: 0,
+        width: targetW,
+        windowWidth: targetW,
+        windowHeight: targetH,
+        onclone: function (doc) { prepareClone(doc, opts, dim); }
       });
     } finally {
       el.removeAttribute('data-mpdf-target');
@@ -417,31 +586,60 @@
         for (var pi = 0; pi < group.length; pi++) {
           if (controller.signal.aborted) throw abortError();
           var el = group[pi];
+          var dim = getPageDimensions(el, opts);
           var scale = pickScale(total, el, opts);
           if (ui) ui.update(done, 'جاري معالجة الصفحة ' + (done + 1) + ' من ' + total + '…');
 
-          var canvas = await capturePage(libs.h2c, el, opts, scale);
-          // القياس الحقيقي بعد إلغاء التكبير: عرض الـ canvas ÷ الدقة
-          var wmm = (canvas.width / scale) / PX_PER_MM;
-          var hmm = (canvas.height / scale) / PX_PER_MM;
-          var size = snapSize(wmm, hmm);
-          var orient = size[0] > size[1] ? 'l' : 'p';
+          var canvas = await capturePage(libs.h2c, el, opts, scale, dim);
 
-          var dataUrl = canvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', opts.quality);
-          canvas.width = 0; canvas.height = 0;   // تحرير الذاكرة فوراً لمنع الانهيار
+          // قياس ارتفاع الصفحة الفعلي مقارنة بارتفاع A4 المعياري
+          var stdCanvasH = dim.heightPx * scale;
+          var isLongPage = canvas.height > (stdCanvasH * 1.12);
 
-          if (!pdf) {
-            pdf = new libs.JsPDF({ orientation: orient, unit: 'mm', format: size, compress: true });
+          if (!isLongPage) {
+            var dataUrl = canvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', opts.quality);
+            canvas.width = 0; canvas.height = 0; // تحرير الذاكرة فوراً لمنع الانهيار
+
+            if (!pdf) {
+              pdf = new libs.JsPDF({ orientation: dim.orientation, unit: 'mm', format: dim.size, compress: true });
+            } else {
+              pdf.addPage(dim.size, dim.orientation);
+            }
+            pdf.addImage(dataUrl, isPng ? 'PNG' : 'JPEG', 0, 0, dim.widthMM, dim.heightMM, undefined, 'FAST');
+            dataUrl = null;
           } else {
-            pdf.addPage(size, orient);
+            // تجزئة ذكية للصفحات الطويلة الفائضة عن A4 لضمان عدم ضغط أو تشويه المحتوى
+            var totalSlices = Math.ceil(canvas.height / stdCanvasH);
+            for (var sIdx = 0; sIdx < totalSlices; sIdx++) {
+              var sY = sIdx * stdCanvasH;
+              var sH = Math.min(stdCanvasH, canvas.height - sY);
+
+              var sliceCanvas = document.createElement('canvas');
+              sliceCanvas.width = canvas.width;
+              sliceCanvas.height = stdCanvasH;
+              var sCtx = sliceCanvas.getContext('2d');
+              sCtx.fillStyle = '#ffffff';
+              sCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+              sCtx.drawImage(canvas, 0, sY, canvas.width, sH, 0, 0, canvas.width, sH);
+
+              var sDataUrl = sliceCanvas.toDataURL(isPng ? 'image/png' : 'image/jpeg', opts.quality);
+              sliceCanvas.width = 0; sliceCanvas.height = 0;
+
+              if (!pdf) {
+                pdf = new libs.JsPDF({ orientation: dim.orientation, unit: 'mm', format: dim.size, compress: true });
+              } else {
+                pdf.addPage(dim.size, dim.orientation);
+              }
+              pdf.addImage(sDataUrl, isPng ? 'PNG' : 'JPEG', 0, 0, dim.widthMM, dim.heightMM, undefined, 'FAST');
+              sDataUrl = null;
+            }
+            canvas.width = 0; canvas.height = 0;
           }
-          pdf.addImage(dataUrl, isPng ? 'PNG' : 'JPEG', 0, 0, size[0], size[1], undefined, 'FAST');
-          dataUrl = null;
 
           done++;
           if (ui) ui.update(done);
           if (typeof opts.onProgress === 'function') opts.onProgress(done, total);
-          await tick();   // يعطي المتصفح فرصة لتحديث الواجهة
+          await tick(); // يعطي المتصفح فرصة لتحديث الواجهة
         }
 
         var from = gi * maxPerFile + 1;
@@ -582,15 +780,35 @@
     var safeTitle = sanitizeName(rawTitle);
     var filename = opts.filename || opts.path || safeTitle;
 
-    // تحديد صفحات الاختبار
+    // تحديد صفحات الاختبار بدقة فائقة بدون تكرار
     var pages = opts.pages;
     if (!pages) {
       var subpages = document.querySelectorAll('.exam-paper-page');
-      if (subpages && subpages.length > 0) {
-        pages = '.exam-paper-page';
-      } else {
-        pages = '.exam-paper, #examPaperDoc';
+      if (!subpages || subpages.length === 0) {
+        if (typeof global.renderPaperQuestions === 'function') try { global.renderPaperQuestions(); } catch(e){}
+        subpages = document.querySelectorAll('.exam-paper-page');
       }
+      if (subpages && subpages.length > 0) {
+        pages = Array.prototype.slice.call(subpages);
+      } else {
+        var docPaper = document.getElementById('examPaperDoc');
+        pages = docPaper ? [docPaper] : '.exam-paper';
+      }
+    }
+
+    var printFn = (typeof global.masarPrintToPDF === 'function') ? global.masarPrintToPDF : (typeof global.exportToPDF === 'function' ? global.exportToPDF : null);
+    if (printFn) {
+      var targetEl = (pages && pages.length) ? pages : (document.getElementById('exam-paper') || document.querySelector('.exam-paper-sheet') || '.exam-paper');
+      await printFn(targetEl, {
+        title: safeTitle,
+        orientation: (global.appState && global.appState.settings && global.appState.settings.orientation) || 'portrait',
+        pageSize: 'a4',
+        margin: '8mm'
+      });
+      if (typeof global.showToast === 'function') {
+        global.showToast('تم تصدير ملف «' + safeTitle + '» بصيغة PDF بنجاح! 📥📄', 'success');
+      }
+      return [safeTitle];
     }
 
     var res = await exportPdf(Object.assign({}, opts, {
@@ -622,7 +840,11 @@
     var pages = opts.pages;
     if (!pages) {
       var subpages = document.querySelectorAll('.exam-paper-page');
-      pages = (subpages && subpages.length > 0) ? '.exam-paper-page' : '.exam-paper, #examPaperDoc';
+      if (!subpages || subpages.length === 0) {
+        if (typeof global.renderPaperQuestions === 'function') try { global.renderPaperQuestions(); } catch(e){}
+        subpages = document.querySelectorAll('.exam-paper-page');
+      }
+      pages = (subpages && subpages.length > 0) ? Array.prototype.slice.call(subpages) : '#examPaperDoc';
     }
 
     return await printVector(Object.assign({}, opts, {
@@ -649,6 +871,7 @@
 
   global.MasarPDF = {
     export: exportPdf,
+    exportPdf: exportPdf,
     print: printVector,
     hook: hook,
     exportExam: exportExam,
@@ -665,31 +888,10 @@
     return exportExam(opts);
   });
 
-  // تفعيل MasarPDF كمعالج فائق السرعة والأمان لدالة exportToPDF العامة
-  var originalExportToPDF = global.exportToPDF;
-  global.exportToPDF = async function (target, customOptions) {
-    var opts = customOptions || {};
-    var el = typeof target === 'string' ? (document.getElementById(target) || document.querySelector(target)) : target;
-    if (!el) {
-      if (typeof originalExportToPDF === 'function') return originalExportToPDF(target, customOptions);
-      throw new Error('لم يتم العثور على العنصر المطلوب تصديره.');
-    }
-
-    try {
-      var res = await exportPdf({
-        pages: el,
-        filename: opts.filename || 'مسار-المعلم-تقرير',
-        output: opts.output || 'download',
-        scale: opts.scale || 'auto'
-      });
-      return { success: true, pages: res ? res.length : 1, filename: opts.filename };
-    } catch (err) {
-      console.warn('[MasarPDF] Fallback to original exportToPDF:', err);
-      if (typeof originalExportToPDF === 'function') {
-        return await originalExportToPDF(target, customOptions);
-      }
-      throw err;
-    }
-  };
-
+  // ربط MasarPDF المباشر بمحرك masarPrintToPDF الفيكتوري السليم
+  if (typeof global.masarPrintToPDF === 'function') {
+    global.exportToPDF = global.masarPrintToPDF;
+  } else if (typeof global.exportToPDF === 'function') {
+    global.masarPrintToPDF = global.exportToPDF;
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

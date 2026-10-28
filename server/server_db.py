@@ -12,12 +12,15 @@ import json
 import sqlite3
 import logging
 from datetime import datetime
+import random
+import string
 from threading import Lock
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 DB_FILE = os.path.join(DATA_DIR, 'masar_system.db')
 ACCOUNTS_JSON = os.path.join(DATA_DIR, 'accounts.json')
+CODES_JSON = os.path.join(DATA_DIR, 'activation_codes.json')
 
 db_lock = Lock()
 
@@ -119,18 +122,39 @@ def init_database():
             )
         ''')
 
+        # 5. جدول أكواد تفعيل الاشتراكات VIP ذات الاستخدام لمرة واحدة (Single-Use Activation Codes)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS activation_codes (
+                code TEXT PRIMARY KEY,
+                plan_code TEXT NOT NULL,
+                plan_name TEXT NOT NULL,
+                duration_days INTEGER NOT NULL,
+                is_used INTEGER DEFAULT 0,
+                used_by_id TEXT,
+                used_by_name TEXT,
+                used_by_username TEXT,
+                used_at TEXT,
+                created_at TEXT,
+                note TEXT,
+                raw_json TEXT
+            )
+        ''')
+
         # الفهارس لسرعة الاستعلام والبحث
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_accounts_username ON accounts(username)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_accounts_email ON accounts(email)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_activity_created ON activity_logs(created_at DESC)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_activity_user ON activity_logs(user_id)')
         cursor.execute('CREATE INDEX IF NOT EXISTS idx_activity_type ON activity_logs(action_type)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_used ON activation_codes(is_used)')
+        cursor.execute('CREATE INDEX IF NOT EXISTS idx_codes_created ON activation_codes(created_at DESC)')
 
         conn.commit()
         conn.close()
 
     # استيراد البيانات الموجودة مسبقاً في ملف accounts.json إن وجدت
     migrate_initial_data()
+    migrate_activation_codes()
 
 def migrate_initial_data():
     """استيراد الحسابات من accounts.json إلى SQLite إذا لم تكن موجودة"""
@@ -206,9 +230,19 @@ def upsert_account(acc, sync_json=True):
     password = acc.get('password') or ''
     role = acc.get('role') or ('admin' if aid == 'usr_admin' or username == 'admin' else 'teacher')
     is_admin = 1 if (acc.get('isAdmin') or role == 'admin' or username == 'admin') else 0
-    is_vip = 1 if (acc.get('isVip') or is_admin) else 0
+    is_vip = 1 if (acc.get('isVip') or is_admin or role == 'teacher_vip') else 0
     is_verified = 1 if (acc.get('isVerified') or is_admin) else 0
-    is_subscribed = 1 if (acc.get('isSubscribed') or is_admin) else 0
+    is_subscribed = 1 if (acc.get('isSubscribed') or is_admin or is_vip) else 0
+
+    # إذا كان الحساب يمتلك اشتراكاً VIP سارياً، يتم إلغاء الفترة التجريبية وتثبيت الاشتراك
+    if is_vip or is_subscribed:
+        acc['isSubscribed'] = True
+        acc['isVip'] = True
+        if acc.get('subscriptionDuration') in ('1_year', '6_months', '1_month', 'annual_vip_50k') or acc.get('role') == 'teacher_vip':
+            acc['isTrial'] = False
+            acc.pop('trialDurationHours', None)
+            acc.pop('trialStartedAt', None)
+
     governorate = acc.get('governorate') or ''
     school = acc.get('school') or ''
     subject = acc.get('subject') or ''
@@ -563,13 +597,320 @@ def get_platform_statistics():
         'database_path': DB_FILE
     }
 
+# ==============================================================================
+# نظام توليد وإدارة أكواد التفعيل VIP لمرة واحدة (Single-Use Activation Codes)
+# ==============================================================================
+
+ACTIVATION_PLANS = {
+    '1_month': {
+        'code': '1_month',
+        'name': 'باقة شهر واحد (25,000 د.ع)',
+        'days': 30,
+        'prefix': 'VIP-1MO'
+    },
+    '6_months': {
+        'code': '6_months',
+        'name': 'باقة 6 أشهر - نصف سنة دراسية (75,000 د.ع)',
+        'days': 180,
+        'prefix': 'VIP-6MO'
+    },
+    '1_year': {
+        'code': '1_year',
+        'name': 'الباقة السنوية الأكاديمية الكاملة (200,000 د.ع)',
+        'days': 365,
+        'prefix': 'VIP-YEAR'
+    },
+    'lifetime': {
+        'code': 'lifetime',
+        'name': 'باقة VIP مدى الحياة (صلاحيات كاملة دائمة 👑)',
+        'days': 3650,
+        'prefix': 'VIP-LIFE'
+    }
+}
+
+def migrate_activation_codes():
+    """استيراد أكواد التفعيل من activation_codes.json إلى SQLite إذا وجدت"""
+    try:
+        if os.path.exists(CODES_JSON):
+            with open(CODES_JSON, 'r', encoding='utf-8') as f:
+                codes_list = json.load(f)
+                if isinstance(codes_list, list):
+                    with db_lock:
+                        conn = get_connection()
+                        cursor = conn.cursor()
+                        for c in codes_list:
+                            code_str = (c.get('code') or '').strip().upper()
+                            if not code_str:
+                                continue
+                            cursor.execute('''
+                                INSERT OR IGNORE INTO activation_codes (
+                                    code, plan_code, plan_name, duration_days,
+                                    is_used, used_by_id, used_by_name, used_by_username,
+                                    used_at, created_at, note, raw_json
+                                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            ''', (
+                                code_str,
+                                c.get('plan_code') or c.get('plan') or '1_year',
+                                c.get('plan_name') or 'الباقة السنوية',
+                                int(c.get('duration_days') or 365),
+                                1 if c.get('is_used') else 0,
+                                c.get('used_by_id') or '',
+                                c.get('used_by_name') or '',
+                                c.get('used_by_username') or '',
+                                c.get('used_at') or '',
+                                c.get('created_at') or datetime.now().isoformat(),
+                                c.get('note') or '',
+                                json.dumps(c, ensure_ascii=False)
+                            ))
+                        conn.commit()
+                        conn.close()
+    except Exception as e:
+        logging.error(f"خطأ أثناء استيراد أكواد التفعيل: {e}")
+
+def sync_activation_codes_to_json():
+    """مزامنة الأكواد إلى ملف JSON للنسخ الاحتياطي السريع"""
+    try:
+        codes = get_all_activation_codes()
+        with open(CODES_JSON, 'w', encoding='utf-8') as f:
+            json.dump(codes, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logging.error(f"خطأ في كتابة ملف activation_codes.json: {e}")
+
+def get_all_activation_codes():
+    """استرجاع كافة أكواد التفعيل المسجلة في السيرفر مع تفاصيلها"""
+    with db_lock:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM activation_codes ORDER BY created_at DESC')
+        rows = cursor.fetchall()
+        conn.close()
+
+        result = []
+        for r in rows:
+            result.append({
+                'code': r['code'],
+                'plan_code': r['plan_code'],
+                'plan_name': r['plan_name'],
+                'duration_days': r['duration_days'],
+                'is_used': bool(r['is_used']),
+                'used_by_id': r['used_by_id'] or '',
+                'used_by_name': r['used_by_name'] or '',
+                'used_by_username': r['used_by_username'] or '',
+                'used_at': r['used_at'] or '',
+                'created_at': r['created_at'] or '',
+                'note': r['note'] or ''
+            })
+        return result
+
+def _generate_random_coupon_chunk(length=4):
+    """توليد مقطع كود عشوائي واضح بدون حروف ملتبسة"""
+    chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    return ''.join(random.choice(chars) for _ in range(length))
+
+def generate_activation_codes(plan_code='1_year', count=1, note='', custom_prefix=''):
+    """توليد حزمة من أكواد التفعيل الجديدة لمرة واحدة وحفظها في SQLite"""
+    plan_info = ACTIVATION_PLANS.get(plan_code, ACTIVATION_PLANS['1_year'])
+    count = max(1, min(int(count), 100))  # أقصى حد 100 كود في الطلب الواحد
+    prefix = (custom_prefix.strip().upper() if custom_prefix else plan_info['prefix'])
+
+    now_iso = datetime.now().isoformat()
+    generated_list = []
+
+    with db_lock:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        for _ in range(count):
+            # التأكد من فرادة الكود وعدم تكراره
+            for attempt in range(10):
+                chunk1 = _generate_random_coupon_chunk(4)
+                chunk2 = _generate_random_coupon_chunk(4)
+                candidate_code = f"{prefix}-{chunk1}-{chunk2}"
+                cursor.execute('SELECT 1 FROM activation_codes WHERE code = ?', (candidate_code,))
+                if not cursor.fetchone():
+                    break
+
+            code_item = {
+                'code': candidate_code,
+                'plan_code': plan_info['code'],
+                'plan_name': plan_info['name'],
+                'duration_days': plan_info['days'],
+                'is_used': 0,
+                'used_by_id': '',
+                'used_by_name': '',
+                'used_by_username': '',
+                'used_at': '',
+                'created_at': now_iso,
+                'note': note.strip()
+            }
+
+            cursor.execute('''
+                INSERT INTO activation_codes (
+                    code, plan_code, plan_name, duration_days,
+                    is_used, used_by_id, used_by_name, used_by_username,
+                    used_at, created_at, note, raw_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                candidate_code,
+                code_item['plan_code'],
+                code_item['plan_name'],
+                code_item['duration_days'],
+                0,
+                '', '', '', '',
+                now_iso,
+                code_item['note'],
+                json.dumps(code_item, ensure_ascii=False)
+            ))
+            generated_list.append(code_item)
+
+        conn.commit()
+        conn.close()
+
+    sync_activation_codes_to_json()
+    log_activity(
+        'usr_admin', 'admin', 'توليد أكواد تفعيل VIP',
+        f"تم توليد ({count}) كود تفعيل لباقة [{plan_info['name']}]",
+        action_type='GENERATE_CODES'
+    )
+    return generated_list
+
+def redeem_activation_code(code_str, user_dict, ip_address='', device_info=''):
+    """التحقق من كود التفعيل واستعماله لحساب مستخدم (استعمال مرة واحدة حصراً)"""
+    clean_code = (code_str or '').strip().upper()
+    if not clean_code:
+        return False, "يرجى إدخال رمز كود التفعيل أولاً ⚠️", None
+
+    if not isinstance(user_dict, dict) or not user_dict.get('id'):
+        return False, "بيانات حساب المعلم غير صالحة ⚠️", None
+
+    uid = user_dict.get('id')
+    user_name = user_dict.get('name') or user_dict.get('username') or 'المعلم'
+    username = user_dict.get('username') or ''
+    now = datetime.now()
+    now_iso = now.isoformat()
+
+    with db_lock:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM activation_codes WHERE code = ?', (clean_code,))
+        code_row = cursor.fetchone()
+
+        if not code_row:
+            conn.close()
+            return False, f"كود التفعيل ({clean_code}) غير صحيح أو غير مسجل في المنظومة ❌", None
+
+        if code_row['is_used']:
+            used_name = code_row['used_by_name'] or code_row['used_by_username'] or 'مستخدم آخر'
+            used_date = (code_row['used_at'] or '')[:10]
+            conn.close()
+            return False, f"عذراً! تم استهلاك هذا الكود مسبقاً بواسطة ({used_name}) في ({used_date})، لا يمكن إعادة استخدامه 🔒", None
+
+        # حساب مدة وتاريخ انتهاء الاشتراك
+        duration_days = int(code_row['duration_days'] or 365)
+        from datetime import timedelta
+        expiry_date = now + timedelta(days=duration_days)
+        expiry_iso = expiry_date.isoformat()
+        expiry_str = expiry_date.strftime('%Y-%m-%d')
+        start_str = now.strftime('%Y-%m-%d')
+        plan_name = code_row['plan_name']
+        plan_code = code_row['plan_code']
+
+        # 1. وسم الكود بأنه تم استخدامه واستهلاكه نهائياً
+        cursor.execute('''
+            UPDATE activation_codes SET
+                is_used = 1,
+                used_by_id = ?,
+                used_by_name = ?,
+                used_by_username = ?,
+                used_at = ?
+            WHERE code = ?
+        ''', (uid, user_name, username, now_iso, clean_code))
+
+        conn.commit()
+        conn.close()
+
+    # 2. تحديث الحساب وترقيته إلى VIP وإلغاء الفترة التجريبية نهائياً
+    user_dict['isVip'] = True
+    user_dict['isSubscribed'] = True
+    user_dict['isTrial'] = False
+    user_dict['role'] = 'teacher_vip'
+    user_dict['subscriptionType'] = plan_code
+    user_dict['subscriptionDuration'] = plan_code
+    user_dict['subscriptionPlanName'] = plan_name
+    user_dict['subscriptionStartDate'] = now_iso
+    user_dict['subscriptionExpiresAt'] = expiry_iso
+    user_dict['subscriptionExpiryFormatted'] = expiry_str
+    user_dict.pop('trialDurationHours', None)
+    user_dict.pop('trialStartedAt', None)
+
+    upsert_account(user_dict, sync_json=True)
+    sync_activation_codes_to_json()
+
+    # 3. تسجيل الحدث في سجل الأنشطة الشامل
+    log_activity(
+        uid, username, 'تفعيل اشتراك عبر كود VIP',
+        f"قام الأستاذ [{user_name}] بتفعيل [{plan_name}] بنجاح عبر كود التفعيل ({clean_code}) حتى ({expiry_str})",
+        action_type='CODE_REDEEMED',
+        ip_address=ip_address,
+        device_info=device_info,
+        user_name=user_name
+    )
+
+    msg = f"🎉 مبارك يا أستاذ {user_name}! تم تفعيل [{plan_name}] لحسابك بنجاح حتى ({expiry_str}) 👑"
+    return True, msg, {
+        'account': user_dict,
+        'code': clean_code,
+        'plan_name': plan_name,
+        'plan_code': plan_code,
+        'duration_days': duration_days,
+        'expiry_formatted': expiry_str,
+        'expiry_iso': expiry_iso
+    }
+
+def delete_activation_code(code_str):
+    """حذف كود تفعيل محدد من قاعدة البيانات"""
+    clean_code = (code_str or '').strip().upper()
+    if not clean_code:
+        return False, "رمز الكود مفقود"
+
+    with db_lock:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM activation_codes WHERE code = ?', (clean_code,))
+        deleted = cursor.rowcount > 0
+        conn.commit()
+        conn.close()
+
+    if deleted:
+        sync_activation_codes_to_json()
+        log_activity('usr_admin', 'admin', 'حذف كود تفعيل', f"تم حذف كود التفعيل ({clean_code})", 'DELETE_CODE')
+        return True, "تم حذف الكود بنجاح"
+    return False, "الكود غير موجود"
+
+def clear_used_activation_codes():
+    """تنظيف وحذف كافة الأكواد المستهلكة مسبقاً دفعة واحدة"""
+    with db_lock:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM activation_codes WHERE is_used = 1')
+        count = cursor.rowcount
+        conn.commit()
+        conn.close()
+
+    if count > 0:
+        sync_activation_codes_to_json()
+        log_activity('usr_admin', 'admin', 'تنظيف الأكواد المستهلكة', f"تم تنظيف وحذف ({count}) كود مستهلك", 'CLEAR_CODES')
+        return True, f"تم حذف ({count}) كود مستهلك بنجاح"
+    return True, "لا توجد أي أكواد مستهلكة للحذف"
+
 def export_full_backup_data():
-    """تصدير شامل لجميع بيانات السيرفر (الحسابات، الأنشطة، المزامنة، الجلسات) بصيغة JSON متكاملة"""
+    """تصدير شامل لجميع بيانات السيرفر (الحسابات، الأنشطة، الأكواد، المزامنة، الجلسات) بصيغة JSON متكاملة"""
     return {
         'exported_at': datetime.now().isoformat(),
         'platform': 'Masar Al-Moallem Pro 4.0',
         'stats': get_platform_statistics(),
         'accounts': get_all_accounts(),
+        'activation_codes': get_all_activation_codes(),
         'activities': get_activities(limit=500),
     }
 

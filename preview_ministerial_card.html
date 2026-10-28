@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بطاقة الاشتراك في الامتحانات العامة - النموذج الوزاري المعتمد</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700;900&family=Cairo:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --min-color: #08295e;
+      --bg-desk: #f1f5f9;
+    }
+    body.theme-red {
+      --min-color: #991b1b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: var(--bg-desk);
+      font-family: 'Cairo', sans-serif;
+      direction: rtl;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 15px;
+      color: #0f172a;
+    }
+
+    /* Top Action Bar */
+    .action-bar {
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      max-width: 820px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+    }
+    .action-title {
+      font-weight: 850;
+      font-size: 0.95rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-btns {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: 'Cairo', sans-serif;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 7px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1.5px solid #cbd5e1;
+      background: #ffffff;
+      color: #334155;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .btn-primary {
+      background: #08295e;
+      color: #ffffff;
+      border-color: #08295e;
+    }
+    .btn-primary:hover {
+      background: #0d3880;
+    }
+    .btn.active {
+      background: #eff6ff;
+      border-color: #08295e;
+      color: #08295e;
+    }
+
+    /* Card Desk Wrapper */
+    .card-preview-stage {
+      width: 100%;
+      max-width: 740px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       THE OFFICIAL MINISTERIAL CARD (مطابقة للصورة 100%)
+       ========================================================================== */
+    .ministerial-card {
+      width: 100%;
+      aspect-ratio: 1.42 / 1;
+      background: #ffffff;
+      padding: 6px;
+      border: 1.5px dashed #94a3b8;
+      box-shadow: 0 12px 30px rgba(8, 41, 94, 0.08), 0 2px 6px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Outer Border Frame */
+    .ec-min-outer-frame {
+      flex: 1;
+      border: 2px solid var(--min-color);
+      padding: 4px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      background: #ffffff;
+    }
+
+    /* 4 Arabesque Decorative Corners */
+    .ec-min-corner {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      z-index: 3;
+      color: var(--min-color);
+      pointer-events: none;
+    }
+    .ec-min-corner-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .ec-min-corner.ec-corner-tr {
+      top: 1px;
+      right: 1px;
+    }
+    .ec-min-corner.ec-corner-tl {
+      top: 1px;
+      left: 1px;
+      transform: scaleX(-1);
+    }
+    .ec-min-corner.ec-corner-br {
+      bottom: 1px;
+      right: 1px;
+      transform: scaleY(-1);
+    }
+    .ec-min-corner.ec-corner-bl {
+      bottom: 1px;
+      left: 1px;
+      transform: scale(-1, -1);
+    }
+
+    /* Inner Border Frame */
+    .ec-min-inner-frame {
+      flex: 1;
+      border: 1px solid var(--min-color);
+      padding: 12px 18px 8px 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* Centered Header Section */
+    .ec-min-header {
+      text-align: center;
+      color: var(--min-color);
+      padding-bottom: 2px;
+    }
+    .ec-min-ministry {
+      font-size: 11pt;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -0.2px;
+    }
+    .ec-min-title {
+      font-size: 18pt;
+      font-weight: 900;
+      margin: 1px 0 0 0;
+      line-height: 1.2;
+      letter-spacing: 0.2px;
+      font-family: 'Amiri', 'Cairo', serif;
+    }
+    .ec-min-stage {
+      font-size: 12.5pt;
+      font-weight: 850;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+    .ec-min-year {
+      font-size: 10.5pt;
+      font-weight: 750;
+      letter-spacing: 2px;
+      direction: ltr;
+      display: inline-block;
+      margin: 1px auto 2px auto;
+      font-family: monospace, 'Cairo', sans-serif;
+    }
+
+    /* Middle Body: Form Fields on Right, Photo on Left */
+    .ec-min-body {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex: 1;
+      direction: rtl;
+      margin-top: 4px;
+    }
+
+    /* Right Column: 6 Form Fields with Dotted Lines */
+    .ec-min-fields-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 3px;
+    }
+
+    .ec-min-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      min-height: 24px;
+    }
+
+    .ec-min-lbl {
+      font-size: 10.5pt;
+      font-weight: 850;
+      color: var(--min-color);
+      white-space: nowrap;
+      min-width: 106px;
+      text-align: right;
+      flex-shrink: 0;
+      letter-spacing: 0.3px;
+    }
+
+    .ec-min-dotted-line {
+      flex: 1;
+      border-bottom: 1.8px dotted var(--min-color);
+      color: var(--min-color);
+      font-weight: 800;
+      padding: 0 6px;
+      line-height: 1.2;
+      min-height: 20px;
+      display: flex;
+      align-items: flex-end;
+      font-size: 10.5pt;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ec-min-dotted-line.ec-name-val {
+      font-size: 12pt;
+      font-weight: 900;
+    }
+    .ec-min-dotted-line.ec-roll-val {
+      font-family: monospace, 'Cairo', sans-serif;
+      font-size: 12.5pt;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+    .ec-min-dotted-line.ec-dob-split {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      letter-spacing: 1.5px;
+    }
+    .ec-min-dotted-line .dob-slash {
+      font-weight: 900;
+      font-size: 10.5pt;
+      margin: 0 4px;
+      color: var(--min-color);
+    }
+
+    /* Left Column: Photo Box */
+    .ec-min-photo-col {
+      width: 110px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .ec-min-photo-box {
+      width: 102px;
+      height: 125px;
+      border: 1.8px solid var(--min-color);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      padding: 4px;
+      box-sizing: border-box;
+    }
+
+    .ec-min-photo-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 8.5pt;
+      font-weight: 850;
+      line-height: 1.35;
+      color: var(--min-color);
+    }
+
+    /* Bottom Footer: Signatures on the left */
+    .ec-min-footer {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+      direction: rtl;
+      margin-top: 8px;
+    }
+
+    .ec-min-sig-block {
+      width: 48%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ec-min-sig-line {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      min-height: 22px;
+    }
+
+    .ec-min-sig-lbl {
+      font-size: 9.8pt;
+      font-weight: 850;
+      color: var(--min-color);
+      white-space: nowrap;
+      min-width: 72px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .ec-min-sig-dots {
+      flex: 1;
+      border-bottom: 1.8px dotted var(--min-color);
+      min-height: 18px;
+      color: var(--min-color);
+      font-weight: 800;
+      padding: 0 4px;
+      font-size: 9.5pt;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .ec-min-footer-spacer {
+      width: 48%;
+    }
+
+    /* Print Setup */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .action-bar {
+        display: none !important;
+      }
+      .ministerial-card {
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+        page-break-inside: avoid !important;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 8mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Actions Toolbar -->
+  <div class="action-bar no-print">
+    <div class="action-title">
+      <i class="fa-solid fa-stamp" style="color: #08295e;"></i>
+      <span>بطاقة الاشتراك في الامتحانات العامة (وزارة التربية العراقية)</span>
+    </div>
+    <div class="action-btns">
+      <button type="button" class="btn active" id="btnToggleBlank" onclick="toggleBlank()">
+        <i class="fa-solid fa-file-pen"></i>
+        <span id="btnBlankText">نموذج فارغ (مطابق للصورة تماماً) 📄</span>
+      </button>
+      <button type="button" class="btn" id="btnToggleColor" onclick="toggleColor()">
+        <i class="fa-solid fa-palette"></i>
+        <span>أزرق وزاري 🔵</span>
+      </button>
+      <button type="button" class="btn btn-primary" onclick="window.print()">
+        <i class="fa-solid fa-print"></i>
+        <span>طباعة البطاقة A4 🖨️</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Card Preview Stage -->
+  <div class="card-preview-stage">
+    <div class="ministerial-card" id="examCard">
+      <!-- Outer Border Frame -->
+      <div class="ec-min-outer-frame">
+        <!-- 4 Arabesque Decorative Corners -->
+        <div class="ec-min-corner ec-corner-tr">
+          <svg class="ec-min-corner-svg" viewBox="0 0 54 54" fill="currentColor">
+            <path d="M 0,0 L 52,0 L 52,2.4 L 2.4,2.4 L 2.4,52 L 0,52 Z" />
+            <path d="M 5,5 C 15,7 23,15 25,25 C 27,15 35,7 45,5 C 37,13 34,22 38,31 C 31,30 26,34 25,44 C 23,34 18,30 11,31 C 15,22 12,13 5,5 Z" opacity="0.95"/>
+            <path d="M 25,25 C 29,29 33,33 44,34 C 33,38 29,45 27,53 C 25,45 21,38 10,34 C 21,33 25,29 25,25 Z" opacity="0.9"/>
+            <circle cx="25" cy="25" r="2.8"/>
+            <circle cx="10" cy="10" r="1.8"/>
+            <path d="M 46,2 C 50,3 53,6 52,10 C 49,8 47,5 46,2 Z"/>
+            <path d="M 2,46 C 3,50 6,53 10,52 C 8,49 5,47 2,46 Z"/>
+          </svg>
+        </div>
+        <div class="ec-min-corner ec-corner-tl">
+          <svg class="ec-min-corner-svg" viewBox="0 0 54 54" fill="currentColor">
+            <path d="M 0,0 L 52,0 L 52,2.4 L 2.4,2.4 L 2.4,52 L 0,52 Z" />
+            <path d="M 5,5 C 15,7 23,15 25,25 C 27,15 35,7 45,5 C 37,13 34,22 38,31 C 31,30 26,34 25,44 C 23,34 18,30 11,31 C 15,22 12,13 5,5 Z" opacity="0.95"/>
+            <path d="M 25,25 C 29,29 33,33 44,34 C 33,38 29,45 27,53 C 25,45 21,38 10,34 C 21,33 25,29 25,25 Z" opacity="0.9"/>
+            <circle cx="25" cy="25" r="2.8"/>
+            <circle cx="10" cy="10" r="1.8"/>
+            <path d="M 46,2 C 50,3 53,6 52,10 C 49,8 47,5 46,2 Z"/>
+            <path d="M 2,46 C 3,50 6,53 10,52 C 8,49 5,47 2,46 Z"/>
+          </svg>
+        </div>
+        <div class="ec-min-corner ec-corner-br">
+          <svg class="ec-min-corner-svg" viewBox="0 0 54 54" fill="currentColor">
+            <path d="M 0,0 L 52,0 L 52,2.4 L 2.4,2.4 L 2.4,52 L 0,52 Z" />
+            <path d="M 5,5 C 15,7 23,15 25,25 C 27,15 35,7 45,5 C 37,13 34,22 38,31 C 31,30 26,34 25,44 C 23,34 18,30 11,31 C 15,22 12,13 5,5 Z" opacity="0.95"/>
+            <path d="M 25,25 C 29,29 33,33 44,34 C 33,38 29,45 27,53 C 25,45 21,38 10,34 C 21,33 25,29 25,25 Z" opacity="0.9"/>
+            <circle cx="25" cy="25" r="2.8"/>
+            <circle cx="10" cy="10" r="1.8"/>
+            <path d="M 46,2 C 50,3 53,6 52,10 C 49,8 47,5 46,2 Z"/>
+            <path d="M 2,46 C 3,50 6,53 10,52 C 8,49 5,47 2,46 Z"/>
+          </svg>
+        </div>
+        <div class="ec-min-corner ec-corner-bl">
+          <svg class="ec-min-corner-svg" viewBox="0 0 54 54" fill="currentColor">
+            <path d="M 0,0 L 52,0 L 52,2.4 L 2.4,2.4 L 2.4,52 L 0,52 Z" />
+            <path d="M 5,5 C 15,7 23,15 25,25 C 27,15 35,7 45,5 C 37,13 34,22 38,31 C 31,30 26,34 25,44 C 23,34 18,30 11,31 C 15,22 12,13 5,5 Z" opacity="0.95"/>
+            <path d="M 25,25 C 29,29 33,33 44,34 C 33,38 29,45 27,53 C 25,45 21,38 10,34 C 21,33 25,29 25,25 Z" opacity="0.9"/>
+            <circle cx="25" cy="25" r="2.8"/>
+            <circle cx="10" cy="10" r="1.8"/>
+            <path d="M 46,2 C 50,3 53,6 52,10 C 49,8 47,5 46,2 Z"/>
+            <path d="M 2,46 C 3,50 6,53 10,52 C 8,49 5,47 2,46 Z"/>
+          </svg>
+        </div>
+
+        <!-- Inner Border Frame -->
+        <div class="ec-min-inner-frame">
+          <!-- Centered Header Section -->
+          <div class="ec-min-header">
+            <div class="ec-min-ministry">وزارة التربية / المديرية العامة للتقويم والامتحانات</div>
+            <h3 class="ec-min-title">بطاقة الاشتراك في الامتحانات العامة</h3>
+            <div class="ec-min-stage">للدراسة المتوسطة</div>
+            <div class="ec-min-year">201 _ 201</div>
+          </div>
+
+          <!-- Middle Body: Form Fields on Right, Photo on Left -->
+          <div class="ec-min-body" dir="rtl">
+            <!-- Right Column: 6 Form Fields with Dotted Lines -->
+            <div class="ec-min-fields-col">
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">الأسم الرباعي :</span>
+                <div class="ec-min-dotted-line ec-name-val" id="valName"></div>
+              </div>
+
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">أســـــــم الام :</span>
+                <div class="ec-min-dotted-line" id="valMother"></div>
+              </div>
+
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">المواليــــــــد :</span>
+                <div class="ec-min-dotted-line ec-dob-split" id="valDob">
+                  <span>...............</span> <span class="dob-slash">/</span> <span>....</span> <span class="dob-slash">/</span> <span>....</span>
+                </div>
+              </div>
+
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">المدرســــــــة :</span>
+                <div class="ec-min-dotted-line" id="valSchool"></div>
+              </div>
+
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">الرقم الأمتحاني :</span>
+                <div class="ec-min-dotted-line ec-roll-val" id="valRoll"></div>
+              </div>
+
+              <div class="ec-min-row">
+                <span class="ec-min-lbl">المحافظــــــــة :</span>
+                <div class="ec-min-dotted-line" id="valGov"></div>
+              </div>
+            </div>
+
+            <!-- Left Column: Photo Box -->
+            <div class="ec-min-photo-col">
+              <div class="ec-min-photo-box">
+                <div class="ec-min-photo-text">
+                  <span>صورة</span>
+                  <span>حديثة تختم</span>
+                  <span>وتوقع من قبل</span>
+                  <span>المدير</span>
+                </div>
+              </div>
+            </div>
+          </div><!-- /.ec-min-body -->
+
+          <!-- Bottom Footer: Signatures on the left -->
+          <div class="ec-min-footer" dir="rtl">
+            <div class="ec-min-sig-block">
+              <div class="ec-min-sig-line">
+                <span class="ec-min-sig-lbl">اسم المدير :</span>
+                <div class="ec-min-sig-dots" id="valPrincipal"></div>
+              </div>
+              <div class="ec-min-sig-line">
+                <span class="ec-min-sig-lbl">التوقيـــــع :</span>
+                <div class="ec-min-sig-dots"></div>
+              </div>
+            </div>
+            <div class="ec-min-footer-spacer"></div>
+          </div><!-- /.ec-min-footer -->
+
+        </div><!-- /.ec-min-inner-frame -->
+      </div><!-- /.ec-min-outer-frame -->
+    </div>
+  </div>
+
+  <script>
+    let isBlank = true;
+    let isRed = false;
+
+    const sampleStudent = {
+      name: 'أحمد علي عبد الحسين',
+      mother: 'فاطمة كريم',
+      dob: '<span>2009</span> <span class="dob-slash">/</span> <span>04</span> <span class="dob-slash">/</span> <span>15</span>',
+      school: 'ثانوية المتميزين للبنين',
+      roll: '1001',
+      gov: 'بغداد / الرصافة الأولى',
+      principal: 'أ. حسين علي فاضل'
+    };
+
+    function toggleBlank() {
+      isBlank = !isBlank;
+      const btn = document.getElementById('btnToggleBlank');
+      const text = document.getElementById('btnBlankText');
+      if (isBlank) {
+        btn.classList.add('active');
+        text.textContent = 'نموذج فارغ (مطابق للصورة تماماً) 📄';
+        document.getElementById('valName').textContent = '';
+        document.getElementById('valMother').textContent = '';
+        document.getElementById('valDob').innerHTML = '<span>...............</span> <span class="dob-slash">/</span> <span>....</span> <span class="dob-slash">/</span> <span>....</span>';
+        document.getElementById('valSchool').textContent = '';
+        document.getElementById('valRoll').textContent = '';
+        document.getElementById('valGov').textContent = '';
+        document.getElementById('valPrincipal').textContent = '';
+      } else {
+        btn.classList.remove('active');
+        text.textContent = 'نموذج معبأ ببيانات الطالب 📝';
+        document.getElementById('valName').textContent = sampleStudent.name;
+        document.getElementById('valMother').textContent = sampleStudent.mother;
+        document.getElementById('valDob').innerHTML = sampleStudent.dob;
+        document.getElementById('valSchool').textContent = sampleStudent.school;
+        document.getElementById('valRoll').textContent = sampleStudent.roll;
+        document.getElementById('valGov').textContent = sampleStudent.gov;
+        document.getElementById('valPrincipal').textContent = sampleStudent.principal;
+      }
+    }
+
+    function toggleColor() {
+      isRed = !isRed;
+      const btn = document.getElementById('btnToggleColor');
+      if (isRed) {
+        document.body.classList.add('theme-red');
+        btn.innerHTML = '<i class="fa-solid fa-palette"></i> <span>أحمر وزاري 🔴</span>';
+      } else {
+        document.body.classList.remove('theme-red');
+        btn.innerHTML = '<i class="fa-solid fa-palette"></i> <span>أزرق وزاري 🔵</span>';
+      }
+    }
+  </script>
+</body>
+</html>

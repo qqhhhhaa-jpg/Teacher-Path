@@ -241,6 +241,66 @@ def api_backup():
         return response
     return jsonify({"error": "database_unavailable"}), 500
 
+# Activation Codes API
+@app.route('/api/activation_codes', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/activation_codes/generate', methods=['POST'])
+def api_activation_codes():
+    if not server_db:
+        return jsonify({"success": False, "error": "database_offline"}), 500
+
+    if request.method == 'GET':
+        codes = server_db.get_all_activation_codes()
+        return jsonify({"success": True, "codes": codes}), 200
+
+    if request.method == 'POST':
+        try:
+            payload = request.get_json(force=True, silent=True) or {}
+            plan_code = payload.get('plan_code') or payload.get('plan') or '1_year'
+            count = int(payload.get('count') or 1)
+            note = payload.get('note') or ''
+            prefix = payload.get('prefix') or ''
+            new_codes = server_db.generate_activation_codes(plan_code=plan_code, count=count, note=note, custom_prefix=prefix)
+            all_codes = server_db.get_all_activation_codes()
+            return jsonify({"success": True, "generated_codes": new_codes, "codes": all_codes}), 200
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
+
+    if request.method == 'DELETE':
+        clear_used = request.args.get('clear_used', 'false').lower() == 'true'
+        if clear_used:
+            ok, msg = server_db.clear_used_activation_codes()
+            codes = server_db.get_all_activation_codes()
+            return jsonify({"success": ok, "message": msg, "codes": codes}), 200
+
+        code_str = request.args.get('code', '').strip()
+        if not code_str:
+            return jsonify({"success": False, "message": "Missing code"}), 400
+        ok, msg = server_db.delete_activation_code(code_str)
+        codes = server_db.get_all_activation_codes()
+        return jsonify({"success": ok, "message": msg, "codes": codes}), 200
+
+@app.route('/api/activation_codes/redeem', methods=['POST'])
+def api_redeem_activation_code():
+    if not server_db:
+        return jsonify({"success": False, "message": "قاعدة البيانات غير متصلة"}), 500
+
+    try:
+        payload = request.get_json(force=True, silent=True) or {}
+        code_str = payload.get('code') or ''
+        user_dict = payload.get('user') or payload.get('account') or {}
+        device_info = payload.get('deviceInfo') or ''
+        client_ip = request.remote_addr or ''
+
+        ok, msg, details = server_db.redeem_activation_code(code_str, user_dict, ip_address=client_ip, device_info=device_info)
+        return jsonify({
+            "success": ok,
+            "message": msg,
+            "details": details,
+            "account": details.get('account') if details else None
+        }), 200 if ok else 400
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
+
 @app.route('/<path:path>')
 def serve_file(path):
     # Security: do not serve sensitive files

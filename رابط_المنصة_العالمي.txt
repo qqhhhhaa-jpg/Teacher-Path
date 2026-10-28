@@ -2,10 +2,10 @@
 ===========================================================
 
 الرابط المباشر للمنصة:
-https://detroit-jill-diversity-camel.trycloudflare.com
+https://hewlett-job-adapters-ann.trycloudflare.com
 
 لوحة تحكم السيرفر المركزية:
-https://detroit-jill-diversity-camel.trycloudflare.com/dashboard
+https://hewlett-job-adapters-ann.trycloudflare.com/dashboard
 
 -----------------------------------------------------------
 💡 مميزات هذا الرابط:
@@ -13,4 +13,4 @@ https://detroit-jill-diversity-camel.trycloudflare.com/dashboard
 2. يعمل على شبكات الهاتف 4G (زين، آسيا سيل، كورك) دون الحاجة لنفس الراوتر.
 3. أي تعديل أو خطة أو حساب أو اختبار يتم حفظه فوراً في قاعدة البيانات المركزية.
 
-تاريخ التحديث: 2026-10-17 05:12:26 PM
+تاريخ التحديث: 2026-10-27 06:36:22 PM

@@ -20,6 +20,9 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from socketserver import ThreadingMixIn
 import json
 import re
+import subprocess
+import threading
+import atexit
 from urllib.parse import urlparse, parse_qs
 
 # Fix Windows console UTF-8 encoding safely
@@ -69,6 +72,113 @@ def get_local_ip():
         return ip
     except Exception:
         return '127.0.0.1'
+
+# ===============================================================================
+# Cloudflare Global Tunnel Manager (Worldwide Access from 4G / Any Network)
+# ===============================================================================
+PUBLIC_TUNNEL_URL = None
+tunnel_process = None
+tunnel_status = "initializing"
+
+def start_cloudflare_tunnel(port):
+    """
+    Launches Cloudflare Tunnel to provide world-wide HTTPS access
+    Works from 4G mobile data, different Wi-Fi networks, and anywhere worldwide
+    without requiring router port forwarding or static IP.
+    """
+    global PUBLIC_TUNNEL_URL, tunnel_process, tunnel_status
+
+    cf_path = os.path.join(WORKSPACE_DIR, 'tools', 'cloudflared.exe')
+    if not os.path.exists(cf_path):
+        logging.info("أداة Cloudflare Tunnel غير موجودة في مجلد tools، يعمل السيرفر بنمط الشبكة المحلية فقط.")
+        tunnel_status = "not_found"
+        return
+
+    tunnel_status = "connecting"
+    logging.info("جاري إطلاق نفق Cloudflare العالمي لتشغيل المنصة عبر مختلف الشبكات وبيانات 4G...")
+
+    cmd = [
+        cf_path,
+        'tunnel',
+        '--url', f'http://127.0.0.1:{port}',
+        '--no-autoupdate'
+    ]
+
+    try:
+        creation_flags = 0x08000000 if os.name == 'nt' else 0 # CREATE_NO_WINDOW
+        tunnel_process = subprocess.Popen(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            creationflags=creation_flags
+        )
+
+        url_found = False
+        for line in iter(tunnel_process.stdout.readline, ''):
+            if not line:
+                break
+            match = re.search(r'https://[a-zA-Z0-9-]+\.trycloudflare\.com', line)
+            if match and not url_found:
+                PUBLIC_TUNNEL_URL = match.group(0)
+                tunnel_status = "online"
+                url_found = True
+
+                tunnel_banner = f"""
+===============================================================================
+  🌐 تم تفعيل الرابط العالمي بنجاح (Cloudflare Tunnel - متاح من أي مكان بالعالم):
+  * رابط المنصة العالمي:   {PUBLIC_TUNNEL_URL}
+  * لوحة تحكم السيرفر:     {PUBLIC_TUNNEL_URL}/dashboard
+  * الاتصال متاح من:       بيانات الهاتف 4G، راوترات أخرى، وأي مكان بالعالم!
+===============================================================================
+"""
+                try:
+                    print(tunnel_banner)
+                except Exception:
+                    pass
+                logging.info(f"🌐 [الربط العالمي] الرابط العام الفعال: {PUBLIC_TUNNEL_URL}")
+
+                try:
+                    pub_txt = os.path.join(WORKSPACE_DIR, 'رابط_المنصة_العالمي.txt')
+                    with open(pub_txt, 'w', encoding='utf-8') as f:
+                        f.write("🌐 رابط منصة مسار المعلم الذكية العالمي (Cloudflare Tunnel)\n")
+                        f.write("===========================================================\n\n")
+                        f.write(f"الرابط المباشر للمنصة:\n{PUBLIC_TUNNEL_URL}\n\n")
+                        f.write(f"لوحة تحكم السيرفر المركزية:\n{PUBLIC_TUNNEL_URL}/dashboard\n\n")
+                        f.write("-----------------------------------------------------------\n")
+                        f.write("💡 مميزات هذا الرابط:\n")
+                        f.write("1. يفتح على أي موبايل أو تابلت أو لابتوب من أي مكان بالعالم.\n")
+                        f.write("2. يعمل على شبكات الهاتف 4G (زين، آسيا سيل، كورك) دون الحاجة لنفس الراوتر.\n")
+                        f.write("3. أي تعديل أو خطة أو حساب أو اختبار يتم حفظه فوراً في قاعدة البيانات المركزية.\n")
+                        f.write(f"\nتاريخ التحديث: {datetime.now().strftime('%Y-%m-%d %I:%M:%S %p')}\n")
+
+                    data_dir = os.path.join(WORKSPACE_DIR, 'data')
+                    os.makedirs(data_dir, exist_ok=True)
+                    with open(os.path.join(data_dir, 'public_server_url.txt'), 'w', encoding='utf-8') as f:
+                        f.write(PUBLIC_TUNNEL_URL)
+                except Exception as e:
+                    logging.warning(f"تعذر كتابة ملف الرابط العالمي: {e}")
+
+        tunnel_process.wait()
+    except Exception as e:
+        tunnel_status = "error"
+        logging.warning(f"ملاحظة في نفق Cloudflare: {e}")
+
+def stop_cloudflare_tunnel():
+    global tunnel_process
+    if tunnel_process and tunnel_process.poll() is None:
+        try:
+            tunnel_process.terminate()
+            tunnel_process.wait(timeout=2)
+        except Exception:
+            try:
+                tunnel_process.kill()
+            except Exception:
+                pass
+        tunnel_process = None
+
+atexit.register(stop_cloudflare_tunnel)
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     """Multi-threaded server to handle simultaneous connections without blocking"""
@@ -130,6 +240,20 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                 "uptime": uptime_str,
                 "uptime_seconds": uptime_seconds,
                 "timestamp": datetime.now().isoformat()
+            })
+            return
+
+        # 2.5 Public Tunnel URL endpoint: /api/public_url
+        if clean_path == '/api/public_url':
+            local_ip = get_local_ip()
+            self.send_json_response({
+                "success": True,
+                "public_url": PUBLIC_TUNNEL_URL,
+                "tunnel_status": tunnel_status,
+                "local_ip": local_ip,
+                "local_url": f"http://{local_ip}:{PORT}",
+                "port": PORT,
+                "is_global": bool(PUBLIC_TUNNEL_URL)
             })
             return
 
@@ -203,7 +327,25 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                 return
             else:
                 self.send_json_response({"error": "database_unavailable"}, status=500)
-                return
+        # 9. Subscription Pricing GET: /api/pricing
+        if clean_path == '/api/pricing':
+            p_file = os.path.join(WORKSPACE_DIR, 'data', 'pricing.json')
+            if os.path.exists(p_file):
+                try:
+                    with open(p_file, 'r', encoding='utf-8') as pf:
+                        data = json.load(pf)
+                    self.send_json_response({"success": True, "pricing": data})
+                    return
+                except Exception:
+                    pass
+            self.send_json_response({"success": True, "pricing": None})
+            return
+
+        # 10. Activation Codes GET endpoint: /api/activation_codes
+        if clean_path == '/api/activation_codes':
+            codes = server_db.get_all_activation_codes() if server_db else []
+            self.send_json_response({"success": True, "codes": codes})
+            return
 
         return super().do_GET()
 
@@ -334,6 +476,59 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                 self.send_json_response({"success": True, "message": "تم تسجيل الجلسة النشطة"})
             except Exception as e:
                 self.send_json_response({"success": False, "error": str(e)}, status=500)
+        # 6. Subscription Pricing POST: /api/pricing
+        if clean_path == '/api/pricing':
+            pricing = payload.get('pricing') if isinstance(payload, dict) else None
+            if pricing:
+                data_dir = os.path.join(WORKSPACE_DIR, 'data')
+                os.makedirs(data_dir, exist_ok=True)
+                p_file = os.path.join(data_dir, 'pricing.json')
+                try:
+                    with open(p_file, 'w', encoding='utf-8') as pf:
+                        json.dump(pricing, pf, ensure_ascii=False, indent=2)
+                    self.send_json_response({"success": True, "message": "تم حفظ وتحديث الأسعار بنجاح"})
+                    return
+                except Exception as e:
+                    self.send_json_response({"success": False, "error": str(e)}, status=500)
+                    return
+            self.send_json_response({"success": False, "error": "Missing pricing payload"}, status=400)
+            return
+
+        # 7. Activation Codes Generate: /api/activation_codes/generate
+        if clean_path in ('/api/activation_codes/generate', '/api/activation_codes'):
+            if not server_db:
+                self.send_json_response({"success": False, "error": "Database offline"}, status=500)
+                return
+            plan_code = payload.get('plan_code') or payload.get('plan') or '1_year'
+            count = int(payload.get('count') or 1)
+            note = payload.get('note') or ''
+            prefix = payload.get('prefix') or ''
+            try:
+                new_codes = server_db.generate_activation_codes(plan_code=plan_code, count=count, note=note, custom_prefix=prefix)
+                all_codes = server_db.get_all_activation_codes()
+                self.send_json_response({"success": True, "generated_codes": new_codes, "codes": all_codes})
+            except Exception as e:
+                self.send_json_response({"success": False, "error": str(e)}, status=500)
+            return
+
+        # 8. Activation Code Redeem: /api/activation_codes/redeem
+        if clean_path == '/api/activation_codes/redeem':
+            if not server_db:
+                self.send_json_response({"success": False, "message": "قاعدة البيانات غير متصلة"}, status=500)
+                return
+            code_str = payload.get('code') or ''
+            user_dict = payload.get('user') or payload.get('account') or {}
+            device_info = payload.get('deviceInfo') or ''
+            try:
+                ok, msg, details = server_db.redeem_activation_code(code_str, user_dict, ip_address=client_ip, device_info=device_info)
+                self.send_json_response({
+                    "success": ok,
+                    "message": msg,
+                    "details": details,
+                    "account": details.get('account') if details else None
+                }, status=200 if ok else 400)
+            except Exception as e:
+                self.send_json_response({"success": False, "message": str(e)}, status=500)
             return
 
         self.send_response(404)
@@ -351,7 +546,27 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             ok, msg = server_db.delete_account(aid) if server_db else (False, "DB offline")
             self.send_json_response({"success": ok, "message": msg}, status=200 if ok else 400)
             return
-        
+
+        if clean_path == '/api/activation_codes':
+            query = parse_qs(urlparse(self.path).query)
+            code_str = query.get('code', [''])[0].strip()
+            clear_used = query.get('clear_used', ['false'])[0].strip().lower() == 'true'
+
+            if clear_used:
+                ok, msg = server_db.clear_used_activation_codes() if server_db else (False, "DB offline")
+                codes = server_db.get_all_activation_codes() if server_db else []
+                self.send_json_response({"success": ok, "message": msg, "codes": codes}, status=200 if ok else 400)
+                return
+
+            if not code_str:
+                self.send_json_response({"success": False, "message": "Missing code parameter"}, status=400)
+                return
+
+            ok, msg = server_db.delete_activation_code(code_str) if server_db else (False, "DB offline")
+            codes = server_db.get_all_activation_codes() if server_db else []
+            self.send_json_response({"success": ok, "message": msg, "codes": codes}, status=200 if ok else 400)
+            return
+
         self.send_response(404)
         self.end_headers()
 
@@ -365,6 +580,7 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             pass
 
 def print_banner(local_ip):
+    pub_info = f"  * رابط الإنترنت العالمي (4G / أي مكان): {PUBLIC_TUNNEL_URL}" if PUBLIC_TUNNEL_URL else "  * رابط الإنترنت العالمي (4G): جاري التوليد والربط عبر Cloudflare..."
     banner = f"""
 ===============================================================================
     [BOT] سيرفر منصة مسار المعلم الذكية 4.0 - قاعدة البيانات والمراقبة المركزية
@@ -372,10 +588,12 @@ def print_banner(local_ip):
   * حالة السيرفر: نشط وقاعدة البيانات المركزية متصلة [ONLINE 24/7]
   * رابط المنصة على جهازك:   http://localhost:{PORT}
   * لوحة تحكم السيرفر الحية: http://localhost:{PORT}/dashboard
-  * رابط الفتح من الهاتف:    http://{local_ip}:{PORT}
-  * فحص صحة السيرفر (Health):http://localhost:{PORT}/health
+  * رابط الفتح عبر نفس الراوتر (Wi-Fi): http://{local_ip}:{PORT}
+{pub_info}
+  * فحص صحة السيرفر (Health): http://localhost:{PORT}/health
   * ملف السجل الحي (Logs):   {LOG_FILE}
 ===============================================================================
+  * الوصول من خارج الشبكة: مدعوم تلقائياً عبر النفق العالمي دون الحاجة لفتح منافذ الراوتر.
   * الحماية الذكية: السيرفر محمي ضد الإغلاق، وسيُعاد تشغيله تلقائياً عند أي طارئ.
   * لإيقاف السيرفر: اضغط Ctrl + C أو شغل ملف ايقاف_السيرفر.bat
 ===============================================================================
@@ -390,6 +608,10 @@ def run_server():
     print_banner(local_ip)
     logging.info(f"تم إطلاق محرك قاعدة البيانات وسيرفر المراقبة على المنفذ {PORT}")
 
+    # Launch Cloudflare Global Tunnel in background thread
+    tunnel_thread = threading.Thread(target=start_cloudflare_tunnel, args=(PORT,), daemon=True)
+    tunnel_thread.start()
+
     restart_count = 0
     while True:
         try:
@@ -399,6 +621,7 @@ def run_server():
         except KeyboardInterrupt:
             logging.info("تم إيقاف السيرفر بواسطة المستخدم (Ctrl+C).")
             print("\nتم إيقاف السيرفر بنجاح.")
+            stop_cloudflare_tunnel()
             break
         except OSError as e:
             if "address already in use" in str(e).lower() or getattr(e, 'winerror', 0) == 10048:

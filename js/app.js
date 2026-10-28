@@ -307,14 +307,15 @@ let teacherProfile = {
 // DOM Ready initialization
 document.addEventListener('DOMContentLoaded', () => {
   if (typeof purgeTrialDataOnStartup === 'function') purgeTrialDataOnStartup();
-  loadTeacherProfile();
-  loadSavedState();
   initTheme();
   initAccentColor();
   initPreviewVisibility();
   if (typeof window.updatePreviewVisibilityForTab === 'function') {
     window.updatePreviewVisibilityForTab('tab-apps');
   }
+  // Enforce authentication gatekeeper FIRST before loading profile/state so login portal stays fixed on refresh
+  checkAuthGatekeeper();
+  initAuthPortalPersistenceGuard();
   initEventListeners();
   initSideQTypeBarMovable();
   initSubjectMode();
@@ -323,15 +324,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initQuestionsQuickFilter();
   updateArchiveBadge();
   renderAll();
-  checkAuthGatekeeper();
-  checkDraftRestore();
+  if (isUserLoggedIn()) {
+    checkDraftRestore();
+    checkMandatoryTeacherProfileOnStartup();
+  }
   initSingleDeviceWatchdog();
-  checkMandatoryTeacherProfileOnStartup();
 
   // Background sync accounts from server (for cross-device synchronization)
   if (typeof syncAccountsWithServer === 'function') {
     syncAccountsWithServer().then(() => {
       // If user is already logged in, restore their cloud-synced questions & archive
+      if (!isUserLoggedIn()) return;
       const u = getCurrentUser();
       if (u && u.id && u.id !== 'usr_guest' && typeof window.restoreUserDataFromServer === 'function') {
         window.restoreUserDataFromServer(u);
@@ -723,20 +726,27 @@ async function syncAccountsWithServer() {
           const k = String(acc.id || acc.email || acc.username || '').toLowerCase();
           if (k) {
             const existing = mergedMap.get(k) || {};
-            const merged = { ...acc, ...existing };
-            // Enforce server authoritative subscription/role privileges
-            if (acc.isSubscribed !== undefined) merged.isSubscribed = acc.isSubscribed;
-            if (acc.isVip !== undefined) merged.isVip = acc.isVip;
-            if (acc.isAdmin !== undefined) merged.isAdmin = acc.isAdmin;
-            if (acc.role) merged.role = acc.role;
-            if (acc.subscriptionExpire) merged.subscriptionExpire = acc.subscriptionExpire;
-
+            const merged = { ...existing, ...acc };
             // Preserve local teacher profile customizations if user edited them
             if (existing.name && existing.name.trim()) merged.name = existing.name;
             if (existing.school && existing.school.trim()) merged.school = existing.school;
             if (existing.governorate && existing.governorate.trim()) merged.governorate = existing.governorate;
             if (existing.subject && existing.subject.trim()) merged.subject = existing.subject;
             if (existing.contact && existing.contact.trim()) merged.contact = existing.contact;
+            if (existing.rights && existing.rights.trim()) merged.rights = existing.rights;
+
+            // Enforce server authoritative subscription/role privileges
+            if (acc.isSubscribed !== undefined) merged.isSubscribed = acc.isSubscribed;
+            if (acc.isVip !== undefined) merged.isVip = acc.isVip;
+            if (acc.isAdmin !== undefined) merged.isAdmin = acc.isAdmin;
+            if (acc.isTrial !== undefined) merged.isTrial = acc.isTrial;
+            if (acc.role) merged.role = acc.role;
+            if (acc.subscriptionExpiresAt) merged.subscriptionExpiresAt = acc.subscriptionExpiresAt;
+            if (acc.subscriptionDuration) merged.subscriptionDuration = acc.subscriptionDuration;
+            if (acc.subscriptionPlanName) merged.subscriptionPlanName = acc.subscriptionPlanName;
+            if (acc.subscriptionStartDate) merged.subscriptionStartDate = acc.subscriptionStartDate;
+            if (acc.subscriptionType) merged.subscriptionType = acc.subscriptionType;
+            if (acc.subscriptionExpiryFormatted) merged.subscriptionExpiryFormatted = acc.subscriptionExpiryFormatted;
 
             mergedMap.set(k, merged);
           }
@@ -744,6 +754,33 @@ async function syncAccountsWithServer() {
 
         const mergedList = Array.from(mergedMap.values());
         localStorage.setItem('moallem_auth_accounts', JSON.stringify(mergedList));
+
+        // Immediately update current session user if they match one of the merged accounts
+        const curUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+        if (curUser && curUser.id) {
+          const curServer = mergedList.find(a => a.id === curUser.id || (a.username && a.username.toLowerCase() === (curUser.username || '').toLowerCase()));
+          if (curServer) {
+            if (curServer.isSubscribed !== undefined) curUser.isSubscribed = curServer.isSubscribed;
+            if (curServer.isVip !== undefined) curUser.isVip = curServer.isVip;
+            if (curServer.isAdmin !== undefined) curUser.isAdmin = curServer.isAdmin;
+            if (curServer.isTrial !== undefined) curUser.isTrial = curServer.isTrial;
+            if (curServer.role) curUser.role = curServer.role;
+            if (curServer.subscriptionExpiresAt) curUser.subscriptionExpiresAt = curServer.subscriptionExpiresAt;
+            if (curServer.subscriptionDuration) curUser.subscriptionDuration = curServer.subscriptionDuration;
+            if (curServer.subscriptionPlanName) curUser.subscriptionPlanName = curServer.subscriptionPlanName;
+            if (curServer.subscriptionStartDate) curUser.subscriptionStartDate = curServer.subscriptionStartDate;
+            if (curServer.subscriptionType) curUser.subscriptionType = curServer.subscriptionType;
+            if (curServer.subscriptionExpiryFormatted) curUser.subscriptionExpiryFormatted = curServer.subscriptionExpiryFormatted;
+
+            localStorage.setItem('moallem_current_user', JSON.stringify(curUser));
+            localStorage.setItem(`moallem_vip_subscription_${curUser.id}`, (curUser.isSubscribed || curUser.isVip) ? 'true' : 'false');
+            if (curUser.subscriptionExpiresAt) {
+              localStorage.setItem(`moallem_vip_subscription_exp_${curUser.id}`, curUser.subscriptionExpiresAt);
+            }
+            if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+            if (typeof updateUserAuthUI === 'function') updateUserAuthUI();
+          }
+        }
 
         // If local had accounts that server didn't have yet, immediately push them to server!
         if (hasNewLocalAccounts) {
@@ -1020,9 +1057,18 @@ window.isAutoLogoutOnExitEnabled = isAutoLogoutOnExitEnabled;
 
 function isUserLoggedIn() {
   const status = localStorage.getItem('moallem_logged_in');
-  
-  // If explicitly logged out
-  if (status === 'false') {
+  const portalOpen = localStorage.getItem('moallem_auth_portal_open');
+
+  // If explicitly logged out or auth portal is open
+  if (status !== 'true' || portalOpen === 'true') {
+    return false;
+  }
+
+  // Verify that a valid user object exists in storage
+  const cur = getCurrentUser();
+  if (!cur || (!cur.id && !cur.username && !cur.email)) {
+    localStorage.setItem('moallem_logged_in', 'false');
+    localStorage.setItem('moallem_auth_portal_open', 'true');
     return false;
   }
 
@@ -1033,11 +1079,12 @@ function isUserLoggedIn() {
     if (!sessionActive || sessionActive !== 'true') {
       // Browser was closed and re-opened! Auto-logout for privacy!
       localStorage.setItem('moallem_logged_in', 'false');
+      localStorage.setItem('moallem_auth_portal_open', 'true');
       return false;
     }
   }
 
-  return status === 'true';
+  return true;
 }
 
 function updatePrivacySettingsUI() {
@@ -1097,6 +1144,7 @@ function checkAuthGatekeeper() {
   const loggedIn = isUserLoggedIn();
 
   if (loggedIn) {
+    localStorage.setItem('moallem_auth_portal_open', 'false');
     if (portal) portal.classList.add('portal-hidden');
     if (workstation) workstation.classList.remove('portal-locked');
     loadTeacherProfile();
@@ -1104,6 +1152,8 @@ function checkAuthGatekeeper() {
     syncHeaderInputs();
     renderAll();
   } else {
+    localStorage.setItem('moallem_logged_in', 'false');
+    localStorage.setItem('moallem_auth_portal_open', 'true');
     if (portal) portal.classList.remove('portal-hidden');
     if (workstation) workstation.classList.add('portal-locked');
     loadDefaultPreset();
@@ -1111,6 +1161,33 @@ function checkAuthGatekeeper() {
     renderAll();
   }
   updatePrivacySettingsUI();
+}
+
+function initAuthPortalPersistenceGuard() {
+  const portal = document.getElementById('fullscreenAuthPortal');
+  const workstation = document.getElementById('appWorkstation');
+  if (!portal) return;
+
+  // Whenever #fullscreenAuthPortal becomes visible (portal-hidden removed), persist open state so refresh keeps it fixed
+  const observer = new MutationObserver(() => {
+    const isPortalVisible = !portal.classList.contains('portal-hidden');
+    if (isPortalVisible) {
+      localStorage.setItem('moallem_auth_portal_open', 'true');
+      localStorage.setItem('moallem_logged_in', 'false');
+      if (workstation && !workstation.classList.contains('portal-locked')) {
+        workstation.classList.add('portal-locked');
+      }
+    }
+  });
+  observer.observe(portal, { attributes: true, attributeFilter: ['class'] });
+
+  // Before page refresh/unload, if the auth portal is currently visible on screen, lock state in localStorage
+  window.addEventListener('beforeunload', () => {
+    if (!portal.classList.contains('portal-hidden')) {
+      localStorage.setItem('moallem_auth_portal_open', 'true');
+      localStorage.setItem('moallem_logged_in', 'false');
+    }
+  });
 }
 
 /* ==========================================================================
@@ -1268,6 +1345,7 @@ window.logoutAndOpenAuthPortal = function(toastMsg = null) {
 
   sessionStorage.removeItem('moallem_session_active');
   localStorage.setItem('moallem_logged_in', 'false');
+  localStorage.setItem('moallem_auth_portal_open', 'true');
   localStorage.removeItem('moallem_current_user');
 
   // Clear workspace so next login doesn't see previous user's exams
@@ -1358,10 +1436,52 @@ function loadTeacherProfile() {
       const savedUserProf = localStorage.getItem(`moallem_teacher_profile_${current.id}`);
       if (savedUserProf) {
         const parsed = JSON.parse(savedUserProf);
-        Object.assign(current, parsed);
-        localStorage.setItem('moallem_current_user', JSON.stringify(current));
+        // استعادة بيانات الهوية والملف الشخصي فقط دون مساس ببيانات الاشتراك المحدثة
+        const profileFields = ['name', 'school', 'governorate', 'subject', 'contact', 'rights', 'avatar'];
+        profileFields.forEach(f => {
+          if (parsed[f] !== undefined && parsed[f] !== '') current[f] = parsed[f];
+        });
       }
     } catch (_) {}
+
+    // مزامنة حالة الاشتراك الرسمية دائماً من قائمة الحسابات المعتمدة (المرتبطة بقاعدة البيانات)
+    try {
+      const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
+      const acc = accounts.find(a => a.id === current.id || (a.username && a.username.toLowerCase() === (current.username || '').toLowerCase()));
+      if (acc) {
+        if (acc.isSubscribed !== undefined) current.isSubscribed = acc.isSubscribed;
+        if (acc.isVip !== undefined) current.isVip = acc.isVip;
+        if (acc.role) current.role = acc.role;
+        if (acc.isAdmin !== undefined) current.isAdmin = acc.isAdmin;
+        if (acc.isTrial !== undefined) current.isTrial = acc.isTrial;
+        if (acc.subscriptionExpiresAt) current.subscriptionExpiresAt = acc.subscriptionExpiresAt;
+        if (acc.subscriptionDuration) current.subscriptionDuration = acc.subscriptionDuration;
+        if (acc.subscriptionPlanName) current.subscriptionPlanName = acc.subscriptionPlanName;
+        if (acc.subscriptionStartDate) current.subscriptionStartDate = acc.subscriptionStartDate;
+        if (acc.subscriptionType) current.subscriptionType = acc.subscriptionType;
+        if (acc.subscriptionExpiryFormatted) current.subscriptionExpiryFormatted = acc.subscriptionExpiryFormatted;
+      }
+    } catch (_) {}
+
+    // التحقق من مفتاح VIP المعزول وتاريخ الصلاحية
+    if (localStorage.getItem(`moallem_vip_subscription_${current.id}`) === 'true') {
+      const expStr = localStorage.getItem(`moallem_vip_subscription_exp_${current.id}`);
+      if (expStr) {
+        const expTime = new Date(expStr).getTime();
+        if (!isNaN(expTime) && Date.now() < expTime) {
+          current.isSubscribed = true;
+          current.isVip = true;
+          current.isTrial = false;
+          current.subscriptionExpiresAt = expStr;
+        }
+      } else {
+        current.isSubscribed = true;
+        current.isVip = true;
+        current.isTrial = false;
+      }
+    }
+
+    localStorage.setItem('moallem_current_user', JSON.stringify(current));
     teacherProfile = { ...current };
   } else if (current) {
     teacherProfile = { ...current };
@@ -1929,9 +2049,14 @@ function applyPaperMargins() {
   });
 
   // Apply to print stylesheet dynamically
-  const printStyleEl = document.getElementById('dynamicPrintMarginStyle');
-  if (printStyleEl) {
-    printStyleEl.innerHTML = `@page { size: A4 portrait; margin: ${v}mm ${h}mm !important; }`;
+  const orientation = (appState && appState.settings && appState.settings.orientation) || 'portrait';
+  if (typeof window.setDynamicPrintPage === 'function') {
+    window.setDynamicPrintPage(orientation, `${v}mm ${h}mm`, 'A4');
+  } else {
+    const printStyleEl = document.getElementById('dynamicPrintMarginStyle');
+    if (printStyleEl) {
+      printStyleEl.innerHTML = `@page { size: A4 ${orientation} !important; margin: ${v}mm ${h}mm !important; }`;
+    }
   }
 }
 
@@ -3244,18 +3369,282 @@ function initEventListeners() {
     showToast('تم تفعيل وضع نموذج الإجابة الرسمي وتوزيع الدرجات للمصحح', 'success');
   });
 
-  // Action Buttons
-  window.triggerPrintExam = function() {
-    if (typeof isUserSubscribedOrAdmin === 'function' && !isUserSubscribedOrAdmin()) {
-      requireSubscription('طباعة الاختبار وفرز النسخ');
-      return;
+  /* ==========================================================================
+     UNIVERSAL SMART PRINT DISPATCHER (محرك الطباعة الذكي الشامل حسب القسم الفعال)
+     ========================================================================== */
+  window.detectCurrentActiveSection = function() {
+    // 1. فحص نافذة كروت وبطاقات التفعيل VIP
+    const voucherModal = document.getElementById('printActivationCardsModal');
+    if (voucherModal && (voucherModal.classList.contains('open') || voucherModal.style.display === 'flex' || voucherModal.style.display === 'block')) {
+      return 'activation-cards';
     }
-    if (window.ExamExporter && typeof window.ExamExporter.printExam === 'function') {
-      window.ExamExporter.printExam();
-    } else if (typeof window.print === 'function') {
-      window.print();
+
+    // 2. فحص الأقسام والتبويبات الفعالة
+    const activeTab = document.querySelector('.tab-content[style*="display: block"], .tab-content.active');
+    const tabId = activeTab ? activeTab.id : '';
+
+    if (tabId === 'tab-certificates') return 'certificates';
+    if (tabId === 'tab-student-grades') return 'grades';
+    if (tabId === 'tab-student-behavior') return 'behavior';
+    if (tabId === 'tab-seating') return 'seating';
+    if (tabId === 'tab-exam-cards') return 'exam-cards';
+    if (tabId === 'tab-schedule') return 'schedule';
+    if (tabId === 'tab-report') return 'academic-report';
+
+    // 3. فحص إضافي للحاويات المرئية
+    if (document.getElementById('tab-student-grades')?.style.display !== 'none' && document.getElementById('tab-student-grades')?.style.display !== '') return 'grades';
+    if (document.getElementById('tab-student-behavior')?.style.display !== 'none' && document.getElementById('tab-student-behavior')?.style.display !== '') return 'behavior';
+    if (document.getElementById('tab-certificates')?.style.display !== 'none' && document.getElementById('tab-certificates')?.style.display !== '') return 'certificates';
+    if (document.getElementById('tab-seating')?.style.display !== 'none' && document.getElementById('tab-seating')?.style.display !== '') return 'seating';
+    if (document.getElementById('tab-exam-cards')?.style.display !== 'none' && document.getElementById('tab-exam-cards')?.style.display !== '') return 'exam-cards';
+    if (document.getElementById('tab-schedule')?.style.display !== 'none' && document.getElementById('tab-schedule')?.style.display !== '') return 'schedule';
+
+    // الافتراضي: الأسئلة الامتحانية
+    return 'exam';
+  };
+
+  /* ==========================================================================
+     Dynamic Print Orientation Engine (محرك توجيه الطباعة الذكي: أفقي بالعرض / عمودي بالطول)
+     ========================================================================== */
+  window.setDynamicPrintPage = function(orientation = 'portrait', margin = '8mm 10mm', pageSize = 'A4') {
+    let styleEl = document.getElementById('dynamicPrintMarginStyle');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamicPrintMarginStyle';
+      document.head.appendChild(styleEl);
+    }
+    const cleanOrientation = (orientation === 'landscape') ? 'landscape' : 'portrait';
+    const cleanMargin = (margin !== undefined && margin !== null) ? margin : (cleanOrientation === 'landscape' ? '0' : '8mm 10mm');
+    const cleanPageSize = pageSize || 'A4';
+
+    styleEl.innerHTML = `
+      @page {
+        size: ${cleanPageSize} ${cleanOrientation} !important;
+        margin: ${cleanMargin} !important;
+      }
+    `;
+
+    if (cleanOrientation === 'landscape') {
+      document.body.classList.add('orientation-landscape');
+      document.body.classList.remove('orientation-portrait');
+    } else {
+      document.body.classList.add('orientation-portrait');
+      document.body.classList.remove('orientation-landscape');
     }
   };
+
+  window.applySectionPrintOrientation = function(section) {
+    if (!section) section = window.detectCurrentActiveSection ? window.detectCurrentActiveSection() : 'exam';
+
+    let orientation = 'portrait';
+    let margin = '8mm 10mm';
+    let pageSize = 'A4';
+
+    if (section === 'certificates') {
+      const sel = document.getElementById('certOrientationSelect');
+      const batchOri = (window.activeBatch && window.activeBatch.orientation) || (sel && sel.value) || 'landscape';
+      orientation = (batchOri === 'portrait') ? 'portrait' : 'landscape';
+      margin = '0';
+      pageSize = 'A4';
+    } else if (section === 'schedule') {
+      const isA3 = (window.activeSchedule && window.activeSchedule.pageSize === 'A4') ? false : true;
+      const isPortrait = (window.activeSchedule && window.activeSchedule.orientation === 'portrait');
+      orientation = isPortrait ? 'portrait' : 'landscape';
+      margin = '3mm';
+      pageSize = isA3 ? 'A3' : 'A4';
+    } else if (section === 'grades') {
+      const isLandscape = (window.__activeGradesPeriod === 'month1' || window.__activeGradesPeriod === 'month2') ? false : true;
+      orientation = isLandscape ? 'landscape' : 'portrait';
+      margin = isLandscape ? '6mm 8mm' : '8mm 10mm';
+      pageSize = 'A4';
+    } else if (section === 'behavior') {
+      orientation = 'portrait';
+      margin = '10mm 12mm';
+      pageSize = 'A4';
+    } else if (section === 'seating') {
+      orientation = 'portrait';
+      margin = '4mm';
+      pageSize = 'A4';
+    } else if (section === 'exam-cards') {
+      orientation = 'portrait';
+      margin = '0';
+      pageSize = 'A4';
+    } else if (section === 'activation-cards') {
+      orientation = 'portrait';
+      margin = '6mm';
+      pageSize = 'A4';
+    } else {
+      orientation = (window.appState && window.appState.settings && window.appState.settings.orientation) || 'portrait';
+      const v = (window.appState && window.appState.settings && window.appState.settings.marginV) || 12;
+      const h = (window.appState && window.appState.settings && window.appState.settings.marginH) || 14;
+      margin = `${v}mm ${h}mm`;
+      pageSize = 'A4';
+    }
+
+    window.setDynamicPrintPage(orientation, margin, pageSize);
+  };
+
+  // Automatic orientation update before native print (supports Ctrl+P, browser menu, and all buttons)
+  window.addEventListener('beforeprint', function() {
+    const sec = window.detectCurrentActiveSection ? window.detectCurrentActiveSection() : 'exam';
+    window.applySectionPrintOrientation(sec);
+  });
+
+  window.printCurrentCertificateDirectly = function() {
+    if (typeof window.certPrintCurrent === 'function') {
+      window.certPrintCurrent();
+    } else if (typeof window.certPrintAllBatch === 'function') {
+      window.certPrintAllBatch();
+    } else {
+      window.prepareAndPrintSection('certificates');
+    }
+  };
+
+  window.prepareAndPrintSection = function(section) {
+    const allPrintClasses = [
+      'printing-exam',
+      'printing-activation-cards',
+      'printing-certificates',
+      'printing-grades',
+      'printing-behavior',
+      'printing-seating',
+      'printing-exam-cards',
+      'printing-schedule',
+      'printing-academic-report',
+      'printing-daily-report'
+    ];
+    allPrintClasses.forEach(cls => document.body.classList.remove(cls));
+
+    document.body.classList.add(`printing-${section}`);
+
+    // Set correct orientation & margins before print dialog
+    window.applySectionPrintOrientation(section);
+
+    window.print();
+
+    setTimeout(() => {
+      document.body.classList.remove(`printing-${section}`);
+    }, 1600);
+  };
+
+  window.triggerSmartPrint = function() {
+    if (typeof isUserSubscribedOrAdmin === 'function' && !isUserSubscribedOrAdmin()) {
+      requireSubscription('طباعة المحتوى والتقارير');
+      return;
+    }
+
+    const section = window.detectCurrentActiveSection();
+
+    if (section === 'activation-cards') {
+      window.executePrintActivationCards();
+      return;
+    }
+
+    if (section === 'certificates') {
+      if (typeof window.printCurrentCertificateDirectly === 'function') {
+        window.printCurrentCertificateDirectly();
+        return;
+      }
+      window.prepareAndPrintSection('certificates');
+      return;
+    }
+
+    if (section === 'grades') {
+      if (typeof window.sgPrintOfficialLedger === 'function') {
+        window.sgPrintOfficialLedger();
+        return;
+      }
+      window.prepareAndPrintSection('grades');
+      return;
+    }
+
+    if (section === 'behavior') {
+      if (typeof window.sbPrintOfficialReport === 'function') {
+        window.sbPrintOfficialReport();
+        return;
+      }
+      window.prepareAndPrintSection('behavior');
+      return;
+    }
+
+    if (section === 'seating') {
+      if (typeof window.seatingPrintCards === 'function') {
+        window.seatingPrintCards();
+        return;
+      }
+      window.prepareAndPrintSection('seating');
+      return;
+    }
+
+    if (section === 'exam-cards') {
+      if (typeof window.examCardPrint === 'function') {
+        window.examCardPrint();
+        return;
+      }
+      window.prepareAndPrintSection('exam-cards');
+      return;
+    }
+
+    if (section === 'schedule') {
+      if (typeof window.schedPrintA3 === 'function') {
+        window.schedPrintA3();
+        return;
+      }
+      window.prepareAndPrintSection('schedule');
+      return;
+    }
+
+    if (section === 'academic-report') {
+      if (typeof window.printFullPlatformDailyReport === 'function') {
+        window.printFullPlatformDailyReport();
+        return;
+      }
+    }
+
+    // الافتراضي: الأسئلة الامتحانية
+    if (window.ExamExporter && typeof window.ExamExporter.printExam === 'function') {
+      window.ExamExporter.printExam();
+    } else {
+      window.prepareAndPrintSection('exam');
+    }
+  };
+
+  window.triggerPrintExam = window.triggerSmartPrint;
+
+  // الربط التلقائي قبل أمر الطباعة للتعرف على القسم أوتوماتيكياً (حتى عند الضغط على Ctrl+P)
+  window.addEventListener('beforeprint', function() {
+    const sec = window.detectCurrentActiveSection();
+    const allPrintClasses = [
+      'printing-exam',
+      'printing-activation-cards',
+      'printing-certificates',
+      'printing-grades',
+      'printing-behavior',
+      'printing-seating',
+      'printing-exam-cards',
+      'printing-schedule',
+      'printing-academic-report',
+      'printing-daily-report'
+    ];
+    allPrintClasses.forEach(cls => document.body.classList.remove(cls));
+    document.body.classList.add(`printing-${sec}`);
+  });
+
+  window.addEventListener('afterprint', function() {
+    const allPrintClasses = [
+      'printing-exam',
+      'printing-activation-cards',
+      'printing-certificates',
+      'printing-grades',
+      'printing-behavior',
+      'printing-seating',
+      'printing-exam-cards',
+      'printing-schedule',
+      'printing-academic-report',
+      'printing-daily-report'
+    ];
+    allPrintClasses.forEach(cls => document.body.classList.remove(cls));
+  });
 
   window.executeExamPaperPdf = async function(options) {
     if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
@@ -3631,31 +4020,39 @@ function initEventListeners() {
   };
 
   window.exportCurrentExamToPdf = async function(options) {
+    options = options || {};
+    const paper = document.getElementById('exam-paper') || document.querySelector('.exam-paper-sheet') || document.getElementById('exam-paper-container') || document.getElementById('examPaperDoc');
+    if (!paper) {
+      if (typeof showToast === 'function') showToast('تعذر العثور على ورقة الامتحان للتصدير!', 'warning');
+      return;
+    }
+    const rawTitle = options.title || options.filename || (appState && appState.header && appState.header.examTitle) || 'ورقة_الامتحان';
+    const cleanTitle = String(rawTitle).replace(/\.pdf$/i, '').replace(/[/\\?%*:|"<>]/g, '_').trim() || 'ورقة_الامتحان';
+
+    if (typeof showToast === 'function') {
+      showToast('جاري تجهيز وتصدير ورقة الامتحان بصيغة PDF عالية الدقة... 📄✨', 'info');
+    }
+
+    const printFn = (typeof window.masarPrintToPDF === 'function') ? window.masarPrintToPDF : (typeof window.exportToPDF === 'function' ? window.exportToPDF : null);
+    if (printFn) {
+      return await printFn(paper, {
+        title: cleanTitle,
+        orientation: (appState && appState.settings && appState.settings.orientation) || 'portrait',
+        pageSize: 'a4',
+        margin: '8mm'
+      });
+    }
+
     if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
       return await window.MasarPDF.exportExam(options);
     }
-
-    // Locate the configuration for the PDF export in app.js
-    const exportOptions = Object.assign({
-      timeout: 60000, // Increase timeout to 60 seconds (default is often 5-10s)
-      html2canvas: {
-        useCORS: true,
-        logging: false,
-        scale: 2 // Reducing scale can also prevent timeouts by lowering memory usage
-      }
-    }, options || {});
-
-    // If the error persists, wrap the execution in a check that ensures images are loaded
-    return await Promise.all(Array.from(document.images).map(img => {
-      if (img.complete) return Promise.resolve();
-      return new Promise(resolve => { img.onload = img.onerror = resolve; });
-    })).then(() => {
-      return window.executeExamPaperPdf(exportOptions);
-    });
   };
 
-  // Standalone html2pdf exporter helper
+  // Standalone exporter helper - upgraded to vector masarPrintToPDF
   window.exportExamWithHtml2Pdf = async function(customOpt) {
+    if (typeof window.masarPrintToPDF === 'function' || typeof window.exportToPDF === 'function') {
+      return await window.exportCurrentExamToPdf(customOpt);
+    }
     const element = document.getElementById('exam-paper-container') || document.getElementById('exam-paper') || document.getElementById('examPaperDoc');
     const opt = Object.assign({
       margin:       1,
@@ -3670,7 +4067,6 @@ function initEventListeners() {
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     }, customOpt || {});
 
-    // New usage:
     return html2pdf().set(opt).from(element).save();
   };
 
@@ -3903,6 +4299,7 @@ function initEventListeners() {
         setCurrentUser(found);
         registerActiveDeviceSession(found);
         localStorage.setItem('moallem_logged_in', 'true');
+        localStorage.setItem('moallem_auth_portal_open', 'false');
         sessionStorage.setItem('moallem_session_active', 'true');
         
         // Reload user's completely isolated workspace
@@ -4087,6 +4484,7 @@ function initEventListeners() {
       setCurrentUser(newAccount);
       registerActiveDeviceSession(newAccount);
       localStorage.setItem('moallem_logged_in', 'true');
+      localStorage.setItem('moallem_auth_portal_open', 'false');
       sessionStorage.setItem('moallem_session_active', 'true');
 
       // 1. Reset working exam workspace completely clean for this new user
@@ -4867,6 +5265,109 @@ function clearAndResetExamWorkspace(silent = false) {
   }
 }
 window.clearAndResetExamWorkspace = clearAndResetExamWorkspace;
+
+/**
+ * Clears only the questions section (with confirmation)
+ */
+window.clearQuestionsSection = function() {
+  if (!appState.questions || appState.questions.length === 0) {
+    if (typeof showToast === 'function') showToast('قسم الأسئلة فارغ بالفعل! لا توجد أسئلة لمسحها ℹ️', 'info');
+    return;
+  }
+  const count = appState.questions.length;
+  if (!confirm(`تحذير: هل أنت متأكد من تفريغ ومسح كافة الأسئلة المفتوحة (${count} سؤال) في ورقة الامتحان؟\nسيتم حذف جميع الأسئلة لتفريغ الورقة والبدء بأسئلة جديدة.`)) {
+    return;
+  }
+  if (autoSaveDraftTimer) {
+    clearTimeout(autoSaveDraftTimer);
+    autoSaveDraftTimer = null;
+  }
+  appState.questions = [];
+  appState.activeQuestionIndex = null;
+  saveStateToStorage();
+  renderAll();
+  if (typeof showToast === 'function') {
+    showToast('تم تفريغ كافة الأسئلة المفتوحة بنجاح 🗑️', 'info');
+  }
+};
+
+/**
+ * Clears only the header section inputs (with confirmation)
+ */
+window.clearExamHeaderSection = function() {
+  if (!confirm('هل ترغب بتفريغ ومسح كافة بيانات وحقول ترويسة الاختبار المفتوحة (المدرسة، المادة، الصف، العنوان، والتعليمات)؟')) {
+    return;
+  }
+  appState.header.ministry = '';
+  appState.header.school = '';
+  appState.header.examTitle = '';
+  appState.header.subject = '';
+  appState.header.grade = '';
+  appState.header.term = '';
+  appState.header.time = '';
+  appState.header.teacher = '';
+  appState.header.instructions = '';
+  if (typeof syncHeaderInputs === 'function') syncHeaderInputs();
+  ['hdrSchool', 'hdrTitle', 'hdrSubject', 'hdrGrade', 'hdrTerm', 'hdrTime', 'hdrTeacher', 'hdrInstructions'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  saveStateToStorage();
+  renderAll();
+  if (typeof showToast === 'function') {
+    showToast('تم تفريغ حقول وبيانات ترويسة الاختبار بنجاح 🗑️', 'info');
+  }
+};
+
+/**
+ * Resets exam settings / margins to default (with confirmation)
+ */
+window.clearExamSettingsSection = function() {
+  if (!confirm('هل ترغب بإعادة ضبط وتفريغ كافة تخصيصات وتنسيقات الورقة وهوامش الطباعة إلى الوضع الافتراضي؟')) {
+    return;
+  }
+  appState.settings.marginPreset = 'compact';
+  appState.settings.marginH = 10;
+  appState.settings.marginV = 8;
+  appState.settings.pageLayoutMode = '1_page';
+  if (typeof syncSettingsInputs === 'function') syncSettingsInputs();
+  saveStateToStorage();
+  renderAll();
+  if (typeof showToast === 'function') {
+    showToast('تمت إعادة ضبط تنسيقات وهوامش الورقة للوضع الافتراضي 🔄', 'info');
+  }
+};
+
+/**
+ * Master dispatcher to clear the currently open section
+ */
+window.clearCurrentOpenSection = function() {
+  const activeTabEl = document.querySelector('.tab-content[style*="display: block"], .tab-content.active');
+  const activeId = activeTabEl ? activeTabEl.id : '';
+  if (activeId === 'tab-questions') {
+    window.clearQuestionsSection();
+  } else if (activeId === 'tab-header') {
+    window.clearExamHeaderSection();
+  } else if (activeId === 'tab-settings') {
+    window.clearExamSettingsSection();
+  } else if (activeId === 'tab-student-grades') {
+    if (typeof window.sgClearAllOpenData === 'function') window.sgClearAllOpenData();
+  } else if (activeId === 'tab-student-behavior') {
+    if (typeof window.sbClearAllStudents === 'function') window.sbClearAllStudents();
+  } else if (activeId === 'tab-certificates') {
+    if (typeof window.certClearAllOpenData === 'function') window.certClearAllOpenData();
+  } else if (activeId === 'tab-schedule') {
+    if (typeof window.schedClearEntireGrid === 'function') window.schedClearEntireGrid();
+  } else if (activeId === 'tab-seating') {
+    if (typeof window.seatingClearAllData === 'function') window.seatingClearAllData();
+  } else if (activeId === 'tab-exam-cards') {
+    if (typeof window.examCardsClearAllData === 'function') window.examCardsClearAllData();
+  } else if (activeId === 'tab-report') {
+    if (typeof window.resetReportFilters === 'function') window.resetReportFilters();
+  } else {
+    window.resetExamSheet();
+  }
+};
 
 /**
  * Resets / Clears the Exam Sheet completely (manual button with confirmation)
@@ -10481,11 +10982,13 @@ window.exportFullPlatformDailyReportPdf = async function() {
   try {
     if (typeof window.exportToPDF === 'function') {
       await window.exportToPDF(printContainer, {
+        title: filename.replace(/\.pdf$/i, ''),
         filename: filename,
+        pageSize: 'a4',
         format: 'a4',
         orientation: 'portrait',
-        margin: [10, 10, 10, 10],
-        scale: 2
+        margin: '10mm',
+        fit: true
       });
       if (typeof showToast === 'function') showToast('تم تنزيل التقرير الأكاديمي الشامل بصيغة PDF بنجاح ✅', 'success');
     } else {
@@ -11915,6 +12418,7 @@ window.performGoogleLoginSuccess = async function(account) {
   setCurrentUser(account);
   registerActiveDeviceSession(account);
   localStorage.setItem('moallem_logged_in', 'true');
+  localStorage.setItem('moallem_auth_portal_open', 'false');
   if (account.email) {
     localStorage.setItem('moallem_last_google_email', account.email);
   }
@@ -12345,6 +12849,7 @@ window.handleUploadCloudBackup = function(event) {
     }
   };
   reader.readAsText(file);
+};
 
 
 /* ==========================================================================
@@ -12423,6 +12928,9 @@ window.applySyncPayload = function(data, showNotification = true) {
       const u = data.currentUser;
       localStorage.setItem('moallem_current_user', JSON.stringify(u));
       sessionStorage.setItem('moallem_current_user', JSON.stringify(u));
+      localStorage.setItem('moallem_logged_in', 'true');
+      localStorage.setItem('moallem_auth_portal_open', 'false');
+      sessionStorage.setItem('moallem_session_active', 'true');
       localStorage.setItem('moallem_active_session', JSON.stringify({
         userId: u.id,
         email: u.email,
@@ -12577,6 +13085,28 @@ window.checkAndApplyUrlSyncToken = function() {
   } catch (err) {
     console.error('Failed to parse sync token from URL:', err);
   }
+
+  // فحص تلقائي لكود التفعيل عند مسح الـ QR Code من بطاقة الوكيل المعتمد (?redeem=...)
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const redeemParam = urlParams.get('redeem') || urlParams.get('code');
+    if (redeemParam) {
+      const cleanRedeem = decodeURIComponent(redeemParam).trim().toUpperCase();
+      setTimeout(() => {
+        if (typeof window.openRedeemCodeModal === 'function') {
+          window.openRedeemCodeModal();
+          const input = document.getElementById('standaloneRedeemInput') || document.getElementById('vipCodeRedeemInput');
+          if (input) {
+            input.value = cleanRedeem;
+            input.focus();
+          }
+          if (typeof showToast === 'function') {
+            showToast(`🎫 تم التقاط كود التفعيل (${cleanRedeem}) بنجاح من بطاقة الوكيل! اضغط تفعيل الحساب فوراً 👑`, 'info');
+          }
+        }
+      }, 700);
+    }
+  } catch (e) {}
 };
 
 window.openMobileSyncModal = function() {
@@ -12761,7 +13291,6 @@ if (typeof window !== 'undefined') {
     window.checkAndApplyUrlSyncToken();
   }
 }
-};
 
 /* ==========================================================================
    VIP Annual Subscription & 24h Free Trial Management
@@ -12770,32 +13299,39 @@ function isUserSubscribedOrAdmin() {
   const current = getCurrentUser();
   if (!current) return false;
   // Super Admin always has full unrestricted control
-  if (current.isAdmin || current.role === 'admin' || current.username === 'admin') {
+  if (current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.id === 'usr_admin') {
     return true;
   }
   const now = Date.now();
-  // Check subscription expiration (24h free trial or annual/monthly subscription)
+  // Check subscription expiration
   if (current.subscriptionExpiresAt) {
     const expTime = new Date(current.subscriptionExpiresAt).getTime();
-    if (!isNaN(expTime) && now > expTime) {
-      if (current.isSubscribed || current.isVip) {
-        current.isSubscribed = false;
-        current.isVip = false;
-        try {
-          const accs = getAuthAccounts();
-          const idx = accs.findIndex(a => a.id === current.id);
-          if (idx !== -1) {
-            accs[idx].isSubscribed = false;
-            accs[idx].isVip = false;
-            saveAuthAccounts(accs);
-          }
-        } catch(e) {}
+    if (!isNaN(expTime)) {
+      if (now > expTime) {
+        if (current.isSubscribed || current.isVip) {
+          current.isSubscribed = false;
+          current.isVip = false;
+          try {
+            const accs = getAuthAccounts();
+            const idx = accs.findIndex(a => a.id === current.id);
+            if (idx !== -1) {
+              accs[idx].isSubscribed = false;
+              accs[idx].isVip = false;
+              saveAuthAccounts(accs);
+            }
+          } catch(e) {}
+        }
+        return false; // Expired!
+      } else {
+        // تاريخ الانتهاء ساري في المستقبل: الحساب مفعل رسمياً
+        if (current.isVip || current.isSubscribed || !current.isTrial || current.role === 'teacher_vip') {
+          return true;
+        }
       }
-      return false; // Expired!
     }
   }
   // Check user subscription status
-  if (current.isSubscribed || current.isVip) {
+  if (current.isSubscribed || current.isVip || current.role === 'teacher_vip') {
     return true;
   }
   if (current.id && localStorage.getItem(`moallem_vip_subscription_${current.id}`) === 'true') {
@@ -13182,7 +13718,23 @@ function updateTrialWarningBanner() {
 
   const current = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   // If not logged in, or super admin:
-  if (!current || !current.id || current.id === 'usr_guest' || current.isAdmin || current.role === 'admin' || current.username === 'admin') {
+  if (!current || !current.id || current.id === 'usr_guest' || current.isAdmin || current.role === 'admin' || current.username === 'admin' || current.id === 'usr_admin') {
+    if (banner) banner.style.display = 'none';
+    if (floatingBadge) floatingBadge.style.display = 'none';
+    if (trialTickerInterval) {
+      clearInterval(trialTickerInterval);
+      trialTickerInterval = null;
+    }
+    return;
+  }
+
+  // إذا كان المستخدم يمتلك اشتراكاً مفعلأً (VIP أو سنوي أو نصف سنوي) يتم إخفاء شارة وبانر اليومين التجريبيين نهائياً
+  const isPaidVip = (current.role === 'teacher_vip') ||
+                    (current.isSubscribed && !current.isTrial && current.subscriptionType !== 'free_trial_48h' && current.subscriptionType !== 'free_trial_24h') ||
+                    (current.subscriptionDuration && current.subscriptionDuration !== 'free_trial_48h' && current.subscriptionDuration !== 'free_trial_24h') ||
+                    (localStorage.getItem(`moallem_vip_subscription_${current.id}`) === 'true');
+
+  if (isPaidVip) {
     if (banner) banner.style.display = 'none';
     if (floatingBadge) floatingBadge.style.display = 'none';
     if (trialTickerInterval) {
@@ -13193,7 +13745,7 @@ function updateTrialWarningBanner() {
   }
 
   // Check if trial user
-  const isTrialUser = !!(current.isTrial || current.subscriptionType === 'free_trial_48h' || current.subscriptionType === 'free_trial_24h' || (current.trialDurationHours && current.subscriptionExpiresAt));
+  const isTrialUser = !!(current.isTrial || current.subscriptionType === 'free_trial_48h' || current.subscriptionType === 'free_trial_24h' || (current.trialDurationHours && !current.subscriptionDuration));
   if (!isTrialUser) {
     if (banner) banner.style.display = 'none';
     if (floatingBadge) floatingBadge.style.display = 'none';
@@ -13258,18 +13810,21 @@ function updateTrialWarningBanner() {
     }
     if (actionBtnText) actionBtnText.innerText = 'تفعيل الاشتراك الكامل 👑';
 
-    if (current.isSubscribed || current.isVip) {
-      current.isSubscribed = false;
-      current.isVip = false;
-      try {
-        const accs = getAuthAccounts();
-        const aIdx = accs.findIndex(a => a.id === current.id);
-        if (aIdx !== -1) {
-          accs[aIdx].isSubscribed = false;
-          accs[aIdx].isVip = false;
-          saveAuthAccounts(accs);
-        }
-      } catch(e) {}
+    // حماية: إلغاء الاشتراك فقط في حال كان حساباً تجريبياً حقيقياً وليس اشتراكاً مدفوعاً
+    if (current.isTrial && !current.subscriptionDuration && current.subscriptionType !== '1_year' && current.subscriptionType !== '6_months' && current.role !== 'teacher_vip') {
+      if (current.isSubscribed || current.isVip) {
+        current.isSubscribed = false;
+        current.isVip = false;
+        try {
+          const accs = getAuthAccounts();
+          const aIdx = accs.findIndex(a => a.id === current.id);
+          if (aIdx !== -1) {
+            accs[aIdx].isSubscribed = false;
+            accs[aIdx].isVip = false;
+            saveAuthAccounts(accs);
+          }
+        } catch(e) {}
+      }
     }
   }
 
@@ -13916,28 +14471,37 @@ window.manageDirectActivateUser = function(accId) {
 
   acc.isVip = true;
   acc.isSubscribed = true;
+  acc.isTrial = false;
   acc.role = 'teacher_vip';
+  acc.subscriptionType = durationCode;
   acc.subscriptionDuration = durationCode;
   acc.subscriptionPlanName = durationLabel;
   acc.subscriptionStartDate = now.toISOString();
   acc.subscriptionExpiresAt = expiryDate.toISOString();
   acc.subscriptionExpiryFormatted = expiryStr;
+  delete acc.trialDurationHours;
+  delete acc.trialStartedAt;
 
   localStorage.setItem(`moallem_vip_subscription_${acc.id}`, 'true');
   localStorage.setItem(`moallem_vip_subscription_exp_${acc.id}`, expiryDate.toISOString());
   localStorage.setItem(`moallem_user_plan_code_${acc.id}`, durationCode);
+  localStorage.setItem(`moallem_teacher_profile_${acc.id}`, JSON.stringify(acc));
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (sessionUser && sessionUser.id === acc.id) {
     sessionUser.isVip = true;
     sessionUser.isSubscribed = true;
+    sessionUser.isTrial = false;
     sessionUser.role = 'teacher_vip';
+    sessionUser.subscriptionType = durationCode;
     sessionUser.subscriptionDuration = durationCode;
     sessionUser.subscriptionPlanName = durationLabel;
     sessionUser.subscriptionStartDate = now.toISOString();
     sessionUser.subscriptionExpiresAt = expiryDate.toISOString();
     sessionUser.subscriptionExpiryFormatted = expiryStr;
+    delete sessionUser.trialDurationHours;
+    delete sessionUser.trialStartedAt;
     localStorage.setItem('moallem_current_user', JSON.stringify(sessionUser));
     if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
   }
@@ -14012,28 +14576,37 @@ window.manageApproveGrantSubscription = function() {
 
   targetAcc.isVip = true;
   targetAcc.isSubscribed = true;
+  targetAcc.isTrial = false;
   targetAcc.role = 'teacher_vip';
+  targetAcc.subscriptionType = durationCode;
   targetAcc.subscriptionDuration = durationCode;
   targetAcc.subscriptionPlanName = durationLabel;
   targetAcc.subscriptionStartDate = now.toISOString();
   targetAcc.subscriptionExpiresAt = expiryDate.toISOString();
   targetAcc.subscriptionExpiryFormatted = expiryStr;
+  delete targetAcc.trialDurationHours;
+  delete targetAcc.trialStartedAt;
 
   localStorage.setItem(`moallem_vip_subscription_${targetAcc.id}`, 'true');
   localStorage.setItem(`moallem_vip_subscription_exp_${targetAcc.id}`, expiryDate.toISOString());
   localStorage.setItem(`moallem_user_plan_code_${targetAcc.id}`, durationCode);
+  localStorage.setItem(`moallem_teacher_profile_${targetAcc.id}`, JSON.stringify(targetAcc));
   if (typeof saveAuthAccounts === 'function') saveAuthAccounts(accounts);
 
   const sessionUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
   if (sessionUser && sessionUser.id === targetAcc.id) {
     sessionUser.isVip = true;
     sessionUser.isSubscribed = true;
+    sessionUser.isTrial = false;
     sessionUser.role = 'teacher_vip';
+    sessionUser.subscriptionType = durationCode;
     sessionUser.subscriptionDuration = durationCode;
     sessionUser.subscriptionPlanName = durationLabel;
     sessionUser.subscriptionStartDate = now.toISOString();
     sessionUser.subscriptionExpiresAt = expiryDate.toISOString();
     sessionUser.subscriptionExpiryFormatted = expiryStr;
+    delete sessionUser.trialDurationHours;
+    delete sessionUser.trialStartedAt;
     localStorage.setItem('moallem_current_user', JSON.stringify(sessionUser));
     if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
   }
@@ -14414,6 +14987,9 @@ window.renderActivationCodesUI = function() {
         <td style="text-align: center;">
           <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap;">
             ${shareBtn}
+            <button type="button" class="btn-code-row-print" onclick="window.printSingleActivationCard('${safeCode}')" title="معاينة وطباعة بطاقة VIP لهذا الكود للوكيل">
+              <i class="fa-solid fa-print"></i>
+            </button>
             <button type="button" class="sub-btn-row-delete" onclick="window.deleteActivationCode('${safeCode}')" title="حذف هذا الكود نهائياً">
               <i class="fa-solid fa-trash-can"></i>
             </button>
@@ -14452,8 +15028,13 @@ window.handleGenerateActivationCodes = async function() {
         window.activationCodes = data.codes;
         localStorage.setItem('moallem_activation_codes', JSON.stringify(data.codes));
         if (noteInput) noteInput.value = '';
-        showToast(`🎉 تم توليد (${count}) كود تفعيل بنجاح! جاهزة للاستخدام الآن 👑`, 'success');
+        showToast(`🎉 تم توليد (${count}) كود تفعيل بنجاح! جاهزة للاستخدام والطباعة الآن 👑`, 'success');
         window.renderActivationCodesUI();
+        setTimeout(() => {
+          if (confirm(`🎉 تم توليد (${count}) كود بنجاح!\n\nهل ترغب بمعاينة وطباعة بطاقات VIP للوكلاء على ورق A4 الآن؟`)) {
+            window.printActivationCardsModal();
+          }
+        }, 400);
         return;
       }
     }
@@ -14487,6 +15068,11 @@ window.handleGenerateActivationCodes = async function() {
     if (noteInput) noteInput.value = '';
     showToast(`🎉 تم توليد (${count}) كود تفعيل بنجاح! 👑`, 'success');
     window.renderActivationCodesUI();
+    setTimeout(() => {
+      if (confirm(`🎉 تم توليد (${count}) كود بنجاح!\n\nهل ترغب بمعاينة وطباعة بطاقات VIP للوكلاء على ورق A4 الآن؟`)) {
+        window.printActivationCardsModal();
+      }
+    }, 400);
   } finally {
     if (generateBtn) {
       generateBtn.disabled = false;
@@ -14617,49 +15203,272 @@ window.handleClearUsedCodes = async function() {
   window.renderActivationCodesUI();
 };
 
-window.printActivationCardsModal = function() {
-  const codes = window.activationCodes || [];
-  const available = codes.filter(c => !c.is_used);
-  const container = document.getElementById('printCardsContainer');
+window.activeVoucherSingleCode = null;
+
+window.printSingleActivationCard = function(codeStr) {
+  window.activeVoucherSingleCode = codeStr;
+  const layoutSelect = document.getElementById('voucherLayoutSelect');
+  if (layoutSelect) layoutSelect.value = 'single';
+  window.printActivationCardsModal();
+};
+
+window.printActivationCardsModal = function(singleCode = null) {
+  if (singleCode && typeof singleCode === 'string') {
+    window.activeVoucherSingleCode = singleCode;
+    const layoutSelect = document.getElementById('voucherLayoutSelect');
+    if (layoutSelect) layoutSelect.value = 'single';
+  }
   const modal = document.getElementById('printActivationCardsModal');
+  if (!modal) return;
+  if (modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+  modal.style.opacity = '1';
+  modal.style.visibility = 'visible';
+  modal.style.pointerEvents = 'auto';
 
-  if (available.length === 0) {
-    showToast('لا توجد أي أكواد متاحة صالحة للطباعة حالياً!', 'warning');
-    return;
+  // Ensure codes are available from local cache or window
+  if (!window.activationCodes || window.activationCodes.length === 0) {
+    try {
+      window.activationCodes = JSON.parse(localStorage.getItem('moallem_activation_codes') || '[]');
+    } catch(e) {}
   }
 
-  if (container) {
-    container.innerHTML = available.map(item => `
-      <div class="voucher-card-printable">
-        <div class="voucher-card-top">
-          <div class="voucher-card-brand">
-            <i class="fa-solid fa-crown" style="color: #f59e0b;"></i>
-            <span>مسار المعلم VIP</span>
-          </div>
-          <span class="voucher-card-badge">بطاقة تفعيل رسمية</span>
-        </div>
-        <div class="voucher-card-plan">
-          ${item.plan_name || 'الباقة السنوية الأكاديمية'}
-        </div>
-        <div class="voucher-card-code-box">
-          <div style="font-size: 0.68rem; color: #78350f; font-weight: 800; margin-bottom: 2px;">رمز كود التفعيل:</div>
-          <div class="voucher-card-code-text">${item.code}</div>
-        </div>
-        <div class="voucher-card-footer">
-          استخدام لمرة واحدة حصراً • لتفعيل البطاقة: افتح منصة مسار المعلم > باقات الاشتراك > تفعيل كود VIP.
-        </div>
-      </div>
-    `).join('');
-  }
+  window.renderPrintableVouchers();
 
-  if (modal) {
-    modal.style.display = 'flex';
+  // If still empty, fetch fresh from server and re-render
+  if (!window.activationCodes || window.activationCodes.length === 0) {
+    fetch(getBackendApiUrl('/api/activation_codes'))
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.success && Array.isArray(d.codes)) {
+          window.activationCodes = d.codes;
+          localStorage.setItem('moallem_activation_codes', JSON.stringify(d.codes));
+          window.renderPrintableVouchers();
+        }
+      }).catch(() => {});
   }
 };
 
 window.closePrintActivationCardsModal = function() {
   const modal = document.getElementById('printActivationCardsModal');
-  if (modal) modal.style.display = 'none';
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+    modal.style.opacity = '0';
+    modal.style.visibility = 'hidden';
+    modal.style.pointerEvents = 'none';
+  }
+  window.activeVoucherSingleCode = null;
+};
+
+window.updateVoucherCardsLivePreview = function() {
+  window.renderPrintableVouchers();
+};
+
+window.renderPrintableVouchers = function() {
+  const container = document.getElementById('printCardsContainer');
+  if (!container) return;
+
+  const codes = window.activationCodes || [];
+  const theme = document.getElementById('voucherThemeSelect')?.value || 'pearl';
+  const layout = document.getElementById('voucherLayoutSelect')?.value || '8';
+  const filter = document.getElementById('voucherFilterSelect')?.value || 'available';
+  const agentName = (document.getElementById('voucherAgentNameInput')?.value || '').trim() || 'المكتبة / الوكيل المعتمد';
+
+  let list = [];
+  if (window.activeVoucherSingleCode) {
+    const single = codes.find(c => c.code === window.activeVoucherSingleCode);
+    list = single ? [single] : [{ code: window.activeVoucherSingleCode, plan_name: 'الباقة السنوية الأكاديمية (365 يوماً)', duration_days: 365 }];
+  } else {
+    list = [...codes];
+    if (filter === 'available') {
+      list = list.filter(c => !c.is_used);
+    } else if (filter === '1_year') {
+      list = list.filter(c => c.plan_code === '1_year' || (c.duration_days && c.duration_days >= 365));
+    } else if (filter === '6_months') {
+      list = list.filter(c => c.plan_code === '6_months' || (c.duration_days && c.duration_days >= 180 && c.duration_days < 365));
+    }
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="text-align: center; padding: 4rem 2rem; color: var(--text-muted); width: 100%;">
+        <div style="font-size: 2.2rem; color: #f59e0b; margin-bottom: 0.75rem;">🎫</div>
+        <div style="font-weight: 850; font-size: 1.1rem; color: var(--text-main); margin-bottom: 6px;">لا توجد أكواد مطابقة للمعايير المحددة</div>
+        <div style="font-size: 0.82rem; color: var(--text-muted);">يرجى اختيار فلتر مختلف أو توليد أكواد تفعيل جديدة من لوحة التحكم.</div>
+      </div>
+    `;
+    return;
+  }
+
+  // Cards per sheet
+  const cardsPerPage = layout === 'single' ? 1 : (layout === '4' ? 4 : (layout === '6' ? 6 : 8));
+  const gridClass = layout === 'single' ? 'layout-single' : (layout === '4' ? 'layout-4' : (layout === '6' ? 'layout-6' : 'layout-8'));
+  const sheetsCount = Math.ceil(list.length / cardsPerPage);
+  const originDisplay = (window.location.host || 'moallem.iq');
+
+  let sheetsHtml = '';
+  for (let sIdx = 0; sIdx < sheetsCount; sIdx++) {
+    const sheetItems = list.slice(sIdx * cardsPerPage, (sIdx + 1) * cardsPerPage);
+
+    const cardsHtml = sheetItems.map((item, cIdx) => {
+      const serial = String(sIdx * cardsPerPage + cIdx + 1).padStart(4, '0');
+      const cleanCode = item.code || '';
+      const planName = item.plan_name || 'الباقة السنوية الأكاديمية (365 يوماً)';
+      const redeemUrl = `${window.location.origin}/?redeem=${encodeURIComponent(cleanCode)}`;
+      const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(redeemUrl)}&margin=1`;
+
+      return `
+        <div class="voucher-agent-card theme-${theme}">
+          <div class="voucher-security-pattern"></div>
+          <span class="voucher-cut-marker top-left">✂</span>
+          <span class="voucher-cut-marker bottom-right">✂</span>
+
+          <!-- Header -->
+          <div class="voucher-header">
+            <div class="voucher-brand">
+              <div class="voucher-crown-icon">
+                <i class="fa-solid fa-crown"></i>
+              </div>
+              <div>
+                <div class="voucher-brand-title">منصة مُعَلِّم بـرو الذكية</div>
+                <div class="voucher-brand-sub">مسار المعلم • بطاقة شحن رصيد VIP</div>
+              </div>
+            </div>
+            <div class="voucher-hologram">
+              <span class="hologram-seal">
+                <i class="fa-solid fa-shield-halved"></i> كود رسمي معتمد
+              </span>
+            </div>
+          </div>
+
+          <!-- Plan strip -->
+          <div class="voucher-plan-strip">
+            <span class="voucher-plan-pill">
+              <i class="fa-solid fa-gem"></i> ${planName}
+            </span>
+            <span class="voucher-serial">S/N: VIP-2026-${serial}</span>
+          </div>
+
+          <!-- Center: Code Box + QR Code -->
+          <div class="voucher-core-grid">
+            <div class="voucher-code-section">
+              <div class="voucher-code-label">
+                <i class="fa-solid fa-key"></i> رمز كود التفعيل VIP الحصري:
+              </div>
+              <span class="voucher-code-display">${cleanCode}</span>
+              <div class="voucher-code-hint">
+                <i class="fa-solid fa-lock"></i> كود مشفر لمرة واحدة • مخصص لمعلم واحد
+              </div>
+            </div>
+
+            <div class="voucher-qr-section">
+              <div class="voucher-qr-box">
+                <img src="${qrApiUrl}" alt="QR Code" loading="lazy" onerror="this.src='https://quickchart.io/qr?text=${encodeURIComponent(redeemUrl)}&size=180'">
+              </div>
+              <div class="voucher-qr-caption">امسح للتفعيل 📱</div>
+            </div>
+          </div>
+
+          <!-- Footer: Instructions & Agent Stamp -->
+          <div class="voucher-footer">
+            <div class="voucher-steps">
+              <div class="voucher-step-line">
+                <span class="voucher-step-num">1</span>
+                <span>امسح الباركود أو ادخل: <strong>${originDisplay}</strong></span>
+              </div>
+              <div class="voucher-step-line">
+                <span class="voucher-step-num">2</span>
+                <span>سجّل الدخول بحسابك واضغط (تفعيل كود VIP)</span>
+              </div>
+              <div class="voucher-step-line">
+                <span class="voucher-step-num">3</span>
+                <span>ألصق الرمز أعلاه ومبارك التفعيل الفوري 👑</span>
+              </div>
+            </div>
+
+            <div class="voucher-agent-stamp-box">
+              <div class="voucher-agent-stamp-name">${agentName}</div>
+              <div>ختم وتوقيع الوكيل المعتمد</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    sheetsHtml += `
+      <div class="voucher-a4-sheet" data-pdf-page>
+        <div class="voucher-sheet-header no-print">
+          <div>
+            <strong>👑 منصة مسار المعلم الذكية — كروت شحن اشتراكات VIP</strong>
+            <span style="margin: 0 8px;">|</span>
+            <span>الوكيل / المكتبة: <strong>${agentName}</strong></span>
+          </div>
+          <div>
+            <span>صفحة ${sIdx + 1} من ${sheetsCount}</span>
+            <span style="margin: 0 6px;">•</span>
+            <span>✂ خطوط القص متطابقة لمكائن ومقصات الورق</span>
+          </div>
+        </div>
+
+        <div class="voucher-cards-grid ${gridClass}">
+          ${cardsHtml}
+        </div>
+      </div>
+    `;
+  }
+
+  container.innerHTML = sheetsHtml;
+};
+
+window.executePrintActivationCards = function() {
+  const modal = document.getElementById('printActivationCardsModal');
+  if (modal && modal.parentElement !== document.body) {
+    document.body.appendChild(modal);
+  }
+  document.body.classList.add('printing-activation-cards');
+  window.print();
+  setTimeout(() => {
+    document.body.classList.remove('printing-activation-cards');
+  }, 1600);
+};
+
+window.exportActivationCardsPDF = async function() {
+  const sheets = document.querySelectorAll('.voucher-a4-sheet');
+  if (!sheets || sheets.length === 0) {
+    showToast('لا توجد بطاقات معروضة للتصدير!', 'warning');
+    return;
+  }
+
+  const agentName = (document.getElementById('voucherAgentNameInput')?.value || '').trim() || 'الوكلاء';
+  const safeAgent = agentName.replace(/[^\u0621-\u064Aa-zA-Z0-9_-]/g, '_');
+  const filename = `بطاقات_تفعيل_كروت_VIP_${safeAgent}`;
+
+  showToast('جاري تصدير وتجهيز ملف PDF فائق الدقة للتنزيل... 📄⏳', 'info');
+
+  try {
+    const printFn = (typeof window.masarPrintToPDF === 'function') ? window.masarPrintToPDF : (typeof window.exportToPDF === 'function' ? window.exportToPDF : null);
+    if (printFn) {
+      await printFn(Array.prototype.slice.call(sheets), {
+        title: filename,
+        pageSize: 'a4',
+        orientation: 'portrait',
+        margin: '6mm',
+        fit: true
+      });
+      showToast('تم تصدير وتنزيل كروت VIP بصيغة PDF بنجاح! 📥🎫', 'success');
+      return;
+    }
+
+    window.executePrintActivationCards();
+  } catch (err) {
+    console.error('PDF export error:', err);
+    showToast('تعذر تصدير PDF تلقائياً، جاري فتح الطباعة المباشرة...', 'warning');
+    window.executePrintActivationCards();
+  }
 };
 
 /* ==========================================================================
@@ -14734,12 +15543,20 @@ window.executeCodeRedemption = async function(codeStr, onSuccessCallback) {
       const updatedUser = data.account || currentUser;
       updatedUser.isVip = true;
       updatedUser.isSubscribed = true;
+      updatedUser.isTrial = false;
       updatedUser.role = 'teacher_vip';
+      delete updatedUser.trialDurationHours;
+      delete updatedUser.trialStartedAt;
+      if (data.details && data.details.plan_code) {
+        updatedUser.subscriptionType = data.details.plan_code;
+        updatedUser.subscriptionDuration = data.details.plan_code;
+      }
       localStorage.setItem('moallem_current_user', JSON.stringify(updatedUser));
       localStorage.setItem(`moallem_vip_subscription_${updatedUser.id}`, 'true');
       if (data.details && data.details.expiry_iso) {
         localStorage.setItem(`moallem_vip_subscription_exp_${updatedUser.id}`, data.details.expiry_iso);
       }
+      localStorage.setItem(`moallem_teacher_profile_${updatedUser.id}`, JSON.stringify(updatedUser));
 
       // Update accounts list
       const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
@@ -14799,15 +15616,21 @@ window.executeCodeRedemption = async function(codeStr, onSuccessCallback) {
     // Upgrade user
     currentUser.isVip = true;
     currentUser.isSubscribed = true;
+    currentUser.isTrial = false;
     currentUser.role = 'teacher_vip';
+    currentUser.subscriptionType = codeObj.plan_code || '1_year';
     currentUser.subscriptionDuration = codeObj.plan_code || '1_year';
     currentUser.subscriptionPlanName = codeObj.plan_name || 'الباقة السنوية';
     currentUser.subscriptionStartDate = now.toISOString();
     currentUser.subscriptionExpiresAt = expiry.toISOString();
     currentUser.subscriptionExpiryFormatted = expiryStr;
+    delete currentUser.trialDurationHours;
+    delete currentUser.trialStartedAt;
 
     localStorage.setItem('moallem_current_user', JSON.stringify(currentUser));
     localStorage.setItem(`moallem_vip_subscription_${currentUser.id}`, 'true');
+    localStorage.setItem(`moallem_vip_subscription_exp_${currentUser.id}`, expiry.toISOString());
+    localStorage.setItem(`moallem_teacher_profile_${currentUser.id}`, JSON.stringify(currentUser));
     localStorage.setItem(`moallem_vip_subscription_exp_${currentUser.id}`, expiry.toISOString());
 
     const accounts = typeof getAuthAccounts === 'function' ? getAuthAccounts() : [];
@@ -14949,11 +15772,18 @@ window.adminToggleVip = function(id, explicitState) {
     const now = new Date();
     const oneYearLater = new Date(now);
     oneYearLater.setFullYear(now.getFullYear() + 1);
+    acc.isTrial = false;
+    delete acc.trialDurationHours;
+    delete acc.trialStartedAt;
+    acc.subscriptionType = 'annual_vip_50k';
+    acc.subscriptionDuration = '1_year';
+    acc.subscriptionPlanName = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     acc.subscriptionStartDate = now.toISOString();
     acc.subscriptionExpiresAt = oneYearLater.toISOString();
     acc.subscriptionExpiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth()+1).padStart(2,'0')}-${String(oneYearLater.getDate()).padStart(2,'0')}`;
     localStorage.setItem(`moallem_vip_subscription_${acc.id}`, 'true');
     localStorage.setItem(`moallem_vip_subscription_exp_${acc.id}`, oneYearLater.toISOString());
+    localStorage.setItem(`moallem_teacher_profile_${acc.id}`, JSON.stringify(acc));
   } else {
     delete acc.subscriptionExpiresAt;
     delete acc.subscriptionExpiryFormatted;
@@ -14970,6 +15800,12 @@ window.adminToggleVip = function(id, explicitState) {
     sessionUser.isSubscribed = newState;
     sessionUser.role = newState ? 'teacher_vip' : 'viewer';
     if (newState) {
+      sessionUser.isTrial = false;
+      delete sessionUser.trialDurationHours;
+      delete sessionUser.trialStartedAt;
+      sessionUser.subscriptionType = acc.subscriptionType;
+      sessionUser.subscriptionDuration = acc.subscriptionDuration;
+      sessionUser.subscriptionPlanName = acc.subscriptionPlanName;
       sessionUser.subscriptionStartDate = acc.subscriptionStartDate;
       sessionUser.subscriptionExpiresAt = acc.subscriptionExpiresAt;
       sessionUser.subscriptionExpiryFormatted = acc.subscriptionExpiryFormatted;
@@ -15036,8 +15872,12 @@ window.adminSubmitQuickActivate = function() {
 
   targetAcc.isVip = true;
   targetAcc.isSubscribed = true;
+  targetAcc.isTrial = false;
   targetAcc.role = 'teacher_vip';
+  delete targetAcc.trialDurationHours;
+  delete targetAcc.trialStartedAt;
   targetAcc.subscriptionDuration = '1_year';
+  targetAcc.subscriptionPlanName = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
   targetAcc.subscriptionStartDate = now.toISOString();
   targetAcc.subscriptionExpiresAt = oneYearLater.toISOString();
   targetAcc.subscriptionExpiryFormatted = expiryStr;
@@ -15047,6 +15887,7 @@ window.adminSubmitQuickActivate = function() {
   // Persist
   localStorage.setItem(`moallem_vip_subscription_${targetAcc.id}`, 'true');
   localStorage.setItem(`moallem_vip_subscription_exp_${targetAcc.id}`, oneYearLater.toISOString());
+  localStorage.setItem(`moallem_teacher_profile_${targetAcc.id}`, JSON.stringify(targetAcc));
   saveAuthAccounts(accounts);
 
   // Sync if it's the current user session
@@ -15054,8 +15895,13 @@ window.adminSubmitQuickActivate = function() {
   if (sessionUser && sessionUser.id === targetAcc.id) {
     sessionUser.isVip = true;
     sessionUser.isSubscribed = true;
+    sessionUser.isTrial = false;
     sessionUser.role = 'teacher_vip';
+    delete sessionUser.trialDurationHours;
+    delete sessionUser.trialStartedAt;
+    sessionUser.subscriptionType = 'annual_vip_50k';
     sessionUser.subscriptionDuration = '1_year';
+    sessionUser.subscriptionPlanName = 'الباقة السنوية الأكاديمية (200 ألف د.ع)';
     sessionUser.subscriptionStartDate = now.toISOString();
     sessionUser.subscriptionExpiresAt = oneYearLater.toISOString();
     sessionUser.subscriptionExpiryFormatted = expiryStr;

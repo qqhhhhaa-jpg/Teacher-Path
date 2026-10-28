@@ -327,7 +327,25 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                 return
             else:
                 self.send_json_response({"error": "database_unavailable"}, status=500)
-                return
+        # 9. Subscription Pricing GET: /api/pricing
+        if clean_path == '/api/pricing':
+            p_file = os.path.join(WORKSPACE_DIR, 'data', 'pricing.json')
+            if os.path.exists(p_file):
+                try:
+                    with open(p_file, 'r', encoding='utf-8') as pf:
+                        data = json.load(pf)
+                    self.send_json_response({"success": True, "pricing": data})
+                    return
+                except Exception:
+                    pass
+            self.send_json_response({"success": True, "pricing": None})
+            return
+
+        # 10. Activation Codes GET endpoint: /api/activation_codes
+        if clean_path == '/api/activation_codes':
+            codes = server_db.get_all_activation_codes() if server_db else []
+            self.send_json_response({"success": True, "codes": codes})
+            return
 
         return super().do_GET()
 
@@ -458,6 +476,59 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
                 self.send_json_response({"success": True, "message": "تم تسجيل الجلسة النشطة"})
             except Exception as e:
                 self.send_json_response({"success": False, "error": str(e)}, status=500)
+        # 6. Subscription Pricing POST: /api/pricing
+        if clean_path == '/api/pricing':
+            pricing = payload.get('pricing') if isinstance(payload, dict) else None
+            if pricing:
+                data_dir = os.path.join(WORKSPACE_DIR, 'data')
+                os.makedirs(data_dir, exist_ok=True)
+                p_file = os.path.join(data_dir, 'pricing.json')
+                try:
+                    with open(p_file, 'w', encoding='utf-8') as pf:
+                        json.dump(pricing, pf, ensure_ascii=False, indent=2)
+                    self.send_json_response({"success": True, "message": "تم حفظ وتحديث الأسعار بنجاح"})
+                    return
+                except Exception as e:
+                    self.send_json_response({"success": False, "error": str(e)}, status=500)
+                    return
+            self.send_json_response({"success": False, "error": "Missing pricing payload"}, status=400)
+            return
+
+        # 7. Activation Codes Generate: /api/activation_codes/generate
+        if clean_path in ('/api/activation_codes/generate', '/api/activation_codes'):
+            if not server_db:
+                self.send_json_response({"success": False, "error": "Database offline"}, status=500)
+                return
+            plan_code = payload.get('plan_code') or payload.get('plan') or '1_year'
+            count = int(payload.get('count') or 1)
+            note = payload.get('note') or ''
+            prefix = payload.get('prefix') or ''
+            try:
+                new_codes = server_db.generate_activation_codes(plan_code=plan_code, count=count, note=note, custom_prefix=prefix)
+                all_codes = server_db.get_all_activation_codes()
+                self.send_json_response({"success": True, "generated_codes": new_codes, "codes": all_codes})
+            except Exception as e:
+                self.send_json_response({"success": False, "error": str(e)}, status=500)
+            return
+
+        # 8. Activation Code Redeem: /api/activation_codes/redeem
+        if clean_path == '/api/activation_codes/redeem':
+            if not server_db:
+                self.send_json_response({"success": False, "message": "قاعدة البيانات غير متصلة"}, status=500)
+                return
+            code_str = payload.get('code') or ''
+            user_dict = payload.get('user') or payload.get('account') or {}
+            device_info = payload.get('deviceInfo') or ''
+            try:
+                ok, msg, details = server_db.redeem_activation_code(code_str, user_dict, ip_address=client_ip, device_info=device_info)
+                self.send_json_response({
+                    "success": ok,
+                    "message": msg,
+                    "details": details,
+                    "account": details.get('account') if details else None
+                }, status=200 if ok else 400)
+            except Exception as e:
+                self.send_json_response({"success": False, "message": str(e)}, status=500)
             return
 
         self.send_response(404)
@@ -475,7 +546,27 @@ class RobustRequestHandler(SimpleHTTPRequestHandler):
             ok, msg = server_db.delete_account(aid) if server_db else (False, "DB offline")
             self.send_json_response({"success": ok, "message": msg}, status=200 if ok else 400)
             return
-        
+
+        if clean_path == '/api/activation_codes':
+            query = parse_qs(urlparse(self.path).query)
+            code_str = query.get('code', [''])[0].strip()
+            clear_used = query.get('clear_used', ['false'])[0].strip().lower() == 'true'
+
+            if clear_used:
+                ok, msg = server_db.clear_used_activation_codes() if server_db else (False, "DB offline")
+                codes = server_db.get_all_activation_codes() if server_db else []
+                self.send_json_response({"success": ok, "message": msg, "codes": codes}, status=200 if ok else 400)
+                return
+
+            if not code_str:
+                self.send_json_response({"success": False, "message": "Missing code parameter"}, status=400)
+                return
+
+            ok, msg = server_db.delete_activation_code(code_str) if server_db else (False, "DB offline")
+            codes = server_db.get_all_activation_codes() if server_db else []
+            self.send_json_response({"success": ok, "message": msg, "codes": codes}, status=200 if ok else 400)
+            return
+
         self.send_response(404)
         self.end_headers()
 
