@@ -31,3 +31,9 @@ data/accounts.json
 data/masar_system.db
 data/*.db
 data/*.db-journal
+
+# ملفات تنفيذية وبيانات لا تُرفع إلى GitHub
+tools/cloudflared.exe
+*.exe
+data/activation_codes.json
+data/public_server_url.txt
