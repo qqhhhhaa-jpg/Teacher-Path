@@ -25,3 +25,9 @@ Thumbs.db
 *.bak
 *.swp
 *.zip
+
+# بيانات الحسابات وقاعدة البيانات (لا تُرفع إلى GitHub)
+data/accounts.json
+data/masar_system.db
+data/*.db
+data/*.db-journal

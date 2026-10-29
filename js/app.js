@@ -4033,6 +4033,11 @@ function initEventListeners() {
       showToast('جاري تجهيز وتصدير ورقة الامتحان بصيغة PDF عالية الدقة... 📄✨', 'info');
     }
 
+    // التصدير المباشر عبر خادم PDF أولاً (نص عربي vector سليم، بدون نافذة طباعة)
+    if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
+      return await window.MasarPDF.exportExam(options);
+    }
+
     const printFn = (typeof window.masarPrintToPDF === 'function') ? window.masarPrintToPDF : (typeof window.exportToPDF === 'function' ? window.exportToPDF : null);
     if (printFn) {
       return await printFn(paper, {
@@ -4041,10 +4046,6 @@ function initEventListeners() {
         pageSize: 'a4',
         margin: '8mm'
       });
-    }
-
-    if (window.MasarPDF && typeof window.MasarPDF.exportExam === 'function') {
-      return await window.MasarPDF.exportExam(options);
     }
   };
 
@@ -5569,7 +5570,49 @@ window.insertMathSymbol = function(sym) {
   window.insertMathFormula(sym);
 };
 
+window.closeAllQuestionStudiosExcept = function(exceptKey = null) {
+  const studios = [
+    { key: 'math', containerId: 'modalMathStudioContainer', btnId: 'btnToggleMathStudio' },
+    { key: 'chemistry', containerId: 'modalChemStudioContainer', btnId: 'btnToggleChemStudio' },
+    { key: 'physics', containerId: 'modalPhysicsStudioContainer', btnId: 'btnTogglePhysicsStudio' },
+    { key: 'islamic', containerId: 'modalIslamicStudioContainer', btnId: 'btnToggleIslamicStudio' }
+  ];
+  studios.forEach(s => {
+    if (s.key !== exceptKey) {
+      const cont = document.getElementById(s.containerId);
+      const btn = document.getElementById(s.btnId);
+      if (cont) cont.style.display = 'none';
+      if (btn) btn.classList.remove('active');
+    }
+  });
+  if (exceptKey) {
+    const subjSelect = document.getElementById('modalQSubject');
+    if (subjSelect && ['math', 'chemistry', 'physics', 'islamic'].includes(exceptKey)) {
+      subjSelect.value = exceptKey;
+    }
+  }
+};
+
 window.toggleMathStudio = function() {
+  const wrapper = document.getElementById('modalMathStudioWrapper');
+  let container = document.getElementById('modalMathStudioContainer');
+  if (!container && wrapper) {
+    wrapper.innerHTML = buildMathStudioHTML(false);
+    container = document.getElementById('modalMathStudioContainer');
+  }
+  if (!container) return;
+  const isHidden = (container.style.display === 'none' || !container.style.display);
+  if (isHidden && typeof window.closeAllQuestionStudiosExcept === 'function') {
+    window.closeAllQuestionStudiosExcept('math');
+  }
+  container.style.display = isHidden ? 'block' : 'none';
+  const toggleBtn = document.getElementById('btnToggleMathStudio');
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('active', isHidden);
+  }
+};
+
+window. _legacyToggleMathStudioUnused = function() {
   const wrapper = document.getElementById('modalMathStudioWrapper');
   let container = document.getElementById('modalMathStudioContainer');
   if (!container && wrapper) {
@@ -6276,6 +6319,25 @@ window.toggleChemStudio = function() {
   const wrapper = document.getElementById('modalChemStudioWrapper');
   let container = document.getElementById('modalChemStudioContainer');
   if (!container && wrapper) {
+    wrapper.innerHTML = buildChemStudioHTML(false);
+    container = document.getElementById('modalChemStudioContainer');
+  }
+  if (!container) return;
+  const isHidden = (container.style.display === 'none' || !container.style.display);
+  if (isHidden && typeof window.closeAllQuestionStudiosExcept === 'function') {
+    window.closeAllQuestionStudiosExcept('chemistry');
+  }
+  container.style.display = isHidden ? 'block' : 'none';
+  const toggleBtn = document.getElementById('btnToggleChemStudio');
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('active', isHidden);
+  }
+};
+
+window. _legacyToggleChemStudioUnused = function() {
+  const wrapper = document.getElementById('modalChemStudioWrapper');
+  let container = document.getElementById('modalChemStudioContainer');
+  if (!container && wrapper) {
     wrapper.innerHTML = buildChemStudioHTML(true);
     container = document.getElementById('modalChemStudioContainer');
   }
@@ -6924,7 +6986,7 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
               <i class="fa-solid fa-keyboard" style="color: #67e8f9;"></i>
               <span>محرر MathLive ⚡</span>
             </button>
-            <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
+            <button type="button" class="btn-math-studio-toggle-pill ${(qSubject === 'math' || (!['chemistry', 'physics', 'islamic'].includes(qSubject) && currentQuestion.type === 'math_problem')) ? 'active' : ''}" id="btnToggleMathStudio" onclick="window.toggleMathStudio()" title="فتح / إغلاق ستوديو معادلات ورموز الرياضيات الوزارية">
               <i class="fa-solid fa-square-root-variable text-accent"></i>
               <span>ستوديو الرياضيات</span>
               <span class="badge-math-pro">الأس والكسور</span>
@@ -6947,7 +7009,7 @@ function openQuestionModal(qId = null, defaultType = 'mcq') {
           </div>
         </div>
 
-        <div id="modalMathStudioWrapper">${(qSubject === 'math' || currentQuestion.type === 'math_problem') ? buildMathStudioHTML(true) : ''}</div>
+        <div id="modalMathStudioWrapper">${(qSubject === 'math' || (!['chemistry', 'physics', 'islamic'].includes(qSubject) && currentQuestion.type === 'math_problem')) ? buildMathStudioHTML(true) : ''}</div>
         <div id="modalChemStudioWrapper">${(qSubject === 'chemistry' || currentQuestion.type === 'chemistry_problem') ? buildChemStudioHTML(true) : ''}</div>
         <div id="modalPhysicsStudioWrapper">${(qSubject === 'physics' || currentQuestion.type === 'physics_problem') && typeof window.buildPhysicsStudioHTML === 'function' ? window.buildPhysicsStudioHTML(true) : ''}</div>
         <div id="modalIslamicStudioWrapper">${(qSubject === 'islamic' || currentQuestion.type === 'islamic_problem') && typeof window.buildIslamicStudioHTML === 'function' ? window.buildIslamicStudioHTML(true) : ''}</div>

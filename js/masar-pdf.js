@@ -796,6 +796,49 @@
       }
     }
 
+    // أولاً: التصدير المباشر عبر خادم PDF (نص عربي vector سليم، بدون نافذة طباعة)
+    // إذا السيرفر شغال (127.0.0.1:3005) نستخدمه، وإلا نقع على الطريقة القديمة.
+    try {
+      var directHtml = (pages && pages.length)
+        ? pages.map(function (p) { return p.outerHTML; }).join('\n')
+        : (document.getElementById('examPaperDoc') ? document.getElementById('examPaperDoc').outerHTML : '');
+      if (directHtml && directHtml.length > 50) {
+        var directRes = await fetch('http://127.0.0.1:3005/api/export-page', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer teacher-path-secure-token-2026'
+          },
+          body: JSON.stringify({
+            html: directHtml,
+            filename: safeTitle + '.pdf',
+            format: 'A4',
+            landscape: !!(global.appState && global.appState.settings && global.appState.settings.orientation === 'landscape')
+          })
+        });
+        if (directRes.ok) {
+          var blob = await directRes.blob();
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = safeTitle + '.pdf';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+          if (typeof global.showToast === 'function') {
+            global.showToast('تم تنزيل ملف «' + safeTitle + '.pdf» مباشرة! 📥📄', 'success');
+          }
+          return [safeTitle];
+        }
+      }
+    } catch (e) {
+      // سيرفر PDF غير متاح — نكمل بالطريقة القديمة
+      if (typeof global.showToast === 'function') {
+        global.showToast('خادم PDF غير متاح، جاري استخدام التصدير المحلي...', 'info');
+      }
+    }
+
     var printFn = (typeof global.masarPrintToPDF === 'function') ? global.masarPrintToPDF : (typeof global.exportToPDF === 'function' ? global.exportToPDF : null);
     if (printFn) {
       var targetEl = (pages && pages.length) ? pages : (document.getElementById('exam-paper') || document.querySelector('.exam-paper-sheet') || '.exam-paper');
@@ -877,7 +920,57 @@
     exportExam: exportExam,
     printExam: printExam,
     defaults: DEFAULTS,
-    _internals: { snapSize: snapSize, chunk: chunk, sanitizeName: sanitizeName }
+    _internals: { snapSize: snapSize, chunk: chunk, sanitizeName: sanitizeName },
+
+    /**
+     * تصدير مباشر عبر خادم PDF (server_pdf.mjs) — نص عربي vector سليم،
+     * صور كاملة، تنزيل فوري بدون نافذة طباعة.
+     * opts: { html, filename, format, landscape, margin, serverUrl, token }
+     */
+    exportDirect: async function (opts) {
+      opts = opts || {};
+      var html = opts.html;
+      if (!html) {
+        var pages = resolvePages(opts.pages);
+        if (!pages.length) throw new Error('لم يتم العثور على صفحات للتصدير.');
+        html = pages.map(function (p) { return p.outerHTML; }).join('\n');
+      }
+      var serverUrl = opts.serverUrl || 'http://127.0.0.1:3005';
+      var token = opts.token || 'teacher-path-secure-token-2026';
+      var filename = opts.filename || 'masar-export.pdf';
+
+      var res = await fetch(serverUrl + '/api/export-page', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          html: html,
+          filename: filename,
+          format: opts.format || 'A4',
+          landscape: !!opts.landscape,
+          margin: opts.margin
+        })
+      });
+
+      if (!res.ok) {
+        var errText = '';
+        try { errText = (await res.json()).error || ''; } catch (e) {}
+        throw new Error(errText || ('فشل التصدير (HTTP ' + res.status + ')'));
+      }
+
+      var blob = await res.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      return true;
+    }
   };
 
   // ربط تلقائي بأزرار ودوال المنصة الرئيسية

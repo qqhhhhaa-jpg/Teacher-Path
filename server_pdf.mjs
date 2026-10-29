@@ -40,6 +40,20 @@ app.use(
     contentSecurityPolicy: false // Allows inline scripts for web UI dashboard
   })
 );
+// CORS: allow the platform (localhost:3000) to call the PDF server directly
+const ALLOWED_ORIGINS = (process.env.PDF_ALLOWED_ORIGINS || "http://127.0.0.1:3000,http://localhost:3000")
+  .split(",").map((s) => s.trim()).filter(Boolean);
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Vary", "Origin");
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 app.use(express.json({ limit: "15mb" }));
 app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
@@ -450,6 +464,89 @@ app.post("/api/jobs", authenticate, async (req, res) => {
 });
 
 /**
+ * POST /api/export-page
+ * Direct page PDF export: receives full HTML + CSS and returns a PDF file.
+ * Vector Arabic text, real images, no print dialog — direct download.
+ * Body: { html: string, filename?: string, format?: 'A4'|'A5'|'A3'|'Letter',
+ *         landscape?: boolean, margin?: string (e.g. '10mm'), baseUrl?: string }
+ */
+app.post("/api/export-page", authenticate, async (req, res) => {
+  const { html, filename, format, landscape, margin, baseUrl } = req.body || {};
+
+  if (typeof html !== "string" || html.trim().length < 20) {
+    return res.status(400).json({ error: "Invalid request: 'html' content is required" });
+  }
+  if (Buffer.byteLength(html, "utf8") > 14 * 1024 * 1024) {
+    return res.status(413).json({ error: "HTML content too large (max 14MB)" });
+  }
+
+  const allowedFormats = ["A4", "A5", "A3", "Letter"];
+  const safeFormat = allowedFormats.includes(format) ? format : "A4";
+  const safeName = (typeof filename === "string" && filename.trim())
+    ? filename.trim().replace(/[\\/:*?"<>|]+/g, "_").slice(0, 120)
+    : "masar-export.pdf";
+  const finalName = safeName.toLowerCase().endsWith(".pdf") ? safeName : safeName + ".pdf";
+
+  let browser;
+  try {
+    browser = await getBrowser();
+  } catch (err) {
+    return res.status(503).json({ error: "PDF engine unavailable: no Chromium browser found" });
+  }
+
+  const page = await browser.newPage();
+  try {
+    await page.setViewportSize({ width: 1280, height: 900 });
+
+    await page.setContent(html, { waitUntil: "load", timeout: 45000 });
+
+    // Wait for fonts + images so Arabic text and pictures render fully
+    await page.evaluate(async () => {
+      const imgs = Array.from(document.images || []);
+      await Promise.all(imgs.map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise((r) => {
+          img.addEventListener("load", r, { once: true });
+          img.addEventListener("error", r, { once: true });
+          setTimeout(r, 8000);
+        });
+      }));
+      if (document.fonts && document.fonts.ready) {
+        await Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 8000))]);
+      }
+    });
+
+    // Screen media keeps the platform's visual design (colors, backgrounds)
+    if (page.emulateMedia) {
+      await page.emulateMedia({ media: "screen" });
+    } else if (page.emulateMediaType) {
+      await page.emulateMediaType("screen");
+    }
+
+    const pdfBuffer = await page.pdf({
+      format: safeFormat,
+      landscape: !!landscape,
+      printBackground: true,
+      margin: typeof margin === "string" && /^\d+(\.\d+)?(mm|px|in)$/.test(margin.trim())
+        ? { top: margin, right: margin, bottom: margin, left: margin }
+        : undefined,
+      preferCSSPageSize: false,
+      timeout: 60000
+    });
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename*=UTF-24''${encodeURIComponent(finalName)}`);
+    res.setHeader("Content-Length", pdfBuffer.length);
+    return res.status(200).send(pdfBuffer);
+  } catch (err) {
+    console.error("[export-page] Failed:", err);
+    return res.status(500).json({ error: "PDF generation failed: " + (err.message || "unknown") });
+  } finally {
+    await page.close().catch(() => {});
+  }
+});
+
+/**
  * GET /api/jobs/:id
  * Query current job status, completed count, and percentage
  */
@@ -817,11 +914,12 @@ app.get("/", (_req, res) => {
 // Server Startup & Graceful Shutdown
 // ============================================================================
 
-const server = app.listen(PORT, () => {
+const HOST = process.env.PDF_HOST || "127.0.0.1";
+const server = app.listen(PORT, HOST, () => {
   console.log(`=======================================================`);
   console.log(`🚀 Masar Almoallem PDF & ZIP Archiver Microservice`);
-  console.log(`📡 Server running on http://localhost:${PORT}`);
-  console.log(`🔑 Bearer API Token: ${API_TOKEN}`);
+  console.log(`📡 Server running on http://${HOST}:${PORT}`);
+  console.log(`🔒 API token loaded from environment/config (not printed)`);
   console.log(`=======================================================`);
 });
 
