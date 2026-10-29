@@ -4020,6 +4020,30 @@ textarea.form-control {
   box-shadow: 0 0 0 2.5px var(--primary);
 }
 
+/* TOUCH POLISH (تحسين أهداف اللمس على الموبايل) */
+@media (max-width: 768px) {
+  .palette-dot-btn {
+    width: 26px;
+    height: 26px;
+  }
+  .portal-topbar-actions .palette-dot-btn {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  .portal-topbar-actions .btn-icon-only {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .portal-secure-badge {
+    white-space: nowrap;
+    font-size: 0.72rem;
+  }
+  .portal-remember-row {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
 /* ==========================================================================
    Full-Screen Dedicated Authentication Portal (الواجهة الكاملة لتسجيل الدخول)
    ========================================================================== */
@@ -28598,6 +28622,282 @@ textarea:focus {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* ==========================================================================
+   11-B. Question Builder Topbar Anti-Overlap & Split-Preview Responsive Polish
+   منع التداخل نهائياً في الشريط العلوي لقسم بناء الأسئلة خصوصاً عند فتح المعاينة
+   ========================================================================== */
+.section-return-bar,
+.section-return-bar.qbuilder-unified-topbar,
+#tab-questions .section-return-bar {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  flex-wrap: wrap !important;
+}
+
+.qbuilder-topbar-main-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 0.45rem 0.6rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.qbuilder-unified-topbar .return-bar-start {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  flex-shrink: 0 !important;
+  min-width: 0 !important;
+}
+
+.qbuilder-unified-topbar .exam-top-actions-group,
+.section-return-bar .exam-top-actions-group {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem !important;
+  flex-shrink: 1 !important;
+  min-width: 0 !important;
+  justify-content: flex-end !important;
+}
+
+.qbuilder-unified-topbar .btn-exam-action {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.78rem !important;
+  border-radius: 9px !important;
+  gap: 0.35rem !important;
+}
+
+.qbuilder-unified-topbar .btn-return-hub {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 0.75rem !important;
+  font-size: 0.78rem !important;
+  border-radius: 9px !important;
+}
+
+.btn-close-hub,
+.qbuilder-unified-topbar .btn-close-hub {
+  width: 34px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  padding: 0 !important;
+  border-radius: 9px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Row 2: Subject Switcher + Question Type Dropdown + Scroll Controls */
+.qbuilder-add-strip-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 0.45rem !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding-top: 0.4rem !important;
+}
+
+.qbuilder-subject-switcher-wrap {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 3px !important;
+  padding: 3px !important;
+  border-radius: 10px !important;
+  max-width: 100% !important;
+  flex-shrink: 1 !important;
+  box-sizing: border-box !important;
+}
+
+.qbuilder-subject-switcher-wrap .side-sub-btn {
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 0.65rem !important;
+  font-size: 0.75rem !important;
+  border-radius: 7px !important;
+}
+
+.qbuilder-dropdown-trigger {
+  min-height: 34px !important;
+  height: 34px !important;
+  padding: 0 0.75rem !important;
+  border-radius: 9px !important;
+  gap: 0.5rem !important;
+}
+
+/* When Preview Pane is OPEN (Split Screen Mode): Compact & Zero-Overlap Layout */
+.main-container:not(.preview-hidden) .section-return-bar.qbuilder-unified-topbar,
+.main-container:not(.preview-hidden) #tab-questions .section-return-bar {
+  padding: 0.5rem 0.7rem !important;
+  gap: 0.4rem !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .return-app-pill,
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .return-bar-divider,
+.main-container:not(.preview-hidden) #tab-header .return-app-pill,
+.main-container:not(.preview-hidden) #tab-settings .return-app-pill {
+  display: none !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .return-app-title {
+  font-size: 0.82rem !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .btn-return-hub,
+.main-container:not(.preview-hidden) .section-return-bar .btn-return-hub {
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 0.6rem !important;
+  font-size: 0.74rem !important;
+  border-radius: 8px !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .btn-exam-action,
+.main-container:not(.preview-hidden) .section-return-bar .btn-exam-action {
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 0 0.58rem !important;
+  font-size: 0.74rem !important;
+  border-radius: 8px !important;
+  gap: 0.3rem !important;
+}
+
+.main-container:not(.preview-hidden) .btn-exam-action.btn-exam-preview {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.28) !important;
+}
+
+.main-container:not(.preview-hidden) .btn-close-hub,
+.main-container:not(.preview-hidden) .qbuilder-unified-topbar .btn-close-hub {
+  width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-sub-divider {
+  display: none !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-subject-switcher-wrap {
+  width: 100% !important;
+  justify-content: space-between !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-subject-switcher-wrap .side-sub-btn {
+  flex: 1 1 auto !important;
+  justify-content: center !important;
+  min-height: 28px !important;
+  height: 28px !important;
+  padding: 0 0.45rem !important;
+  font-size: 0.72rem !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-custom-dropdown {
+  flex: 1 1 auto !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-dropdown-trigger {
+  width: 100% !important;
+  justify-content: space-between !important;
+  min-height: 32px !important;
+  height: 32px !important;
+}
+
+.main-container:not(.preview-hidden) .qbuilder-dropdown-menu {
+  right: 0 !important;
+  left: auto !important;
+  width: min(350px, 100%) !important;
+  min-width: 280px !important;
+}
+
+/* Preview Toolbar Anti-Overlap & Light/Dark Theme Polish */
+.preview-toolbar {
+  width: 100% !important;
+  max-width: 210mm !important;
+  box-sizing: border-box !important;
+  padding: 0.55rem 0.75rem !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: wrap !important;
+  gap: 0.45rem 0.55rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.preview-toolbar .toolbar-controls {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.4rem !important;
+}
+
+.preview-toolbar .toolbar-controls .btn {
+  min-height: 32px !important;
+  height: 32px !important;
+  padding: 0 0.65rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  border-radius: 8px !important;
+  white-space: nowrap !important;
+}
+
+.preview-toolbar .margin-control-group {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.3rem !important;
+  background: var(--bg-surface, #f1f5f9) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  padding: 3px 6px !important;
+  border-radius: 8px !important;
+}
+
+[data-theme="dark"] .preview-toolbar .margin-control-group {
+  background: rgba(15, 23, 42, 0.65) !important;
+  border-color: #334155 !important;
+}
+
+.preview-toolbar .margin-chip {
+  padding: 3px 8px !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  border-radius: 6px !important;
+  white-space: nowrap !important;
+}
+
+.preview-toolbar .paper-pages-ctrl {
+  display: inline-flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem !important;
+}
+
+.preview-toolbar .paper-page-mode-dropdown {
+  background: var(--bg-surface, #f8fafc) !important;
+  color: var(--text-main, #0f172a) !important;
+  border: 1px solid var(--border-color, #cbd5e1) !important;
+  border-radius: 8px !important;
+  padding: 0.25rem 0.5rem !important;
+  height: 32px !important;
+  font-size: 0.74rem !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] .preview-toolbar .paper-page-mode-dropdown {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
 /* 12. Modal Close Buttons */
 .modal-close,
 .btn-modal-close {
@@ -33115,6 +33415,151 @@ textarea:focus {
 }
 
 /* 6. A4 VERTICAL / PORTRAIT PAPER (210mm x 297mm) */
+.seating-a4-paper.seating-page-hidden-screen {
+  display: none !important;
+}
+.seating-canvas-wrapper.seating-print-all-mode .seating-a4-paper.seating-page-hidden-screen {
+  display: flex !important;
+}
+.seating-a4-paper.seating-page-active {
+  animation: seatingPageFadeIn 0.22s ease-out;
+}
+@keyframes seatingPageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Seating Pagination Controls (السابق / التالي بين الصفحات) */
+.seating-pagination-bar {
+  width: 100%;
+  max-width: 210mm;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 10px 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
+}
+.seating-pagination-bottom {
+  margin-top: 18px;
+  margin-bottom: 0;
+}
+.seat-page-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0f766e, #0d9488);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+}
+.seat-page-nav-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #115e59, #0f766e);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(13, 148, 136, 0.35);
+}
+.seat-page-nav-btn:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+.seat-page-center-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.seat-page-status-text,
+.seat-page-counter-pill {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  padding: 5px 12px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.seat-page-numbers-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.seat-page-num-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.84rem;
+  font-weight: 800;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.seat-page-num-btn:hover {
+  border-color: #0d9488;
+  color: #0f766e;
+  background: #f0fdfa;
+}
+.seat-page-num-btn.active {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 118, 110, 0.3);
+}
+[data-theme="dark"] .seating-pagination-bar {
+  background: #1e293b;
+  border-color: #334155;
+}
+[data-theme="dark"] .seat-page-status-text,
+[data-theme="dark"] .seat-page-counter-pill {
+  background: rgba(13, 148, 136, 0.15);
+  border-color: rgba(20, 184, 166, 0.35);
+  color: #5eead4;
+}
+[data-theme="dark"] .seat-page-num-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+[data-theme="dark"] .seat-page-num-btn.active {
+  background: #0d9488;
+  border-color: #14b8a6;
+  color: #ffffff;
+}
+[data-theme="dark"] .seat-page-nav-btn:disabled {
+  background: #0f172a;
+  color: #475569;
+  border: 1px solid #334155;
+}
 .seating-a4-paper {
   width: 210mm;
   min-height: 297mm;
@@ -33457,6 +33902,42 @@ textarea:focus {
   border-style: dashed;
   align-items: center;
   justify-content: center;
+}
+.dc-slot-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3px;
+  margin-bottom: 2px;
+}
+.dc-dual-mode-tag {
+  font-size: 6.2pt;
+  font-weight: 800;
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 1px 5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.dc-slot-class-pill {
+  font-size: 6.2pt;
+  font-weight: 800;
+  color: #0f766e;
+  background: #f0fdfa;
+  border: 1px solid #99f6e4;
+  border-radius: 3px;
+  padding: 1px 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 65%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .dc-slot-tag {
   font-size: 6.2pt;
@@ -33994,6 +34475,13 @@ textarea:focus {
   }
 
   /* Paper setup on physical page */
+  .seating-pagination-bar {
+    display: none !important;
+  }
+  .seating-a4-paper,
+  .seating-a4-paper.seating-page-hidden-screen {
+    display: flex !important;
+  }
   .seating-a4-paper {
     width: 100% !important;
     max-width: 100% !important;
@@ -35784,7 +36272,6 @@ button[data-pdf-export]:disabled {
     padding: 15mm !important;
   }
 }
-
 
 
 

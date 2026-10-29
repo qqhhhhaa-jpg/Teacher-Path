@@ -369,10 +369,14 @@ window.togglePhysicsStudio = function() {
   let container = document.getElementById('modalPhysicsStudioContainer');
   if (!container && wrapper && typeof window.buildPhysicsStudioHTML === 'function') {
     wrapper.innerHTML = window.buildPhysicsStudioHTML(true);
+    wrapper.innerHTML = window.buildPhysicsStudioHTML(false);
     container = document.getElementById('modalPhysicsStudioContainer');
   }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
+  if (isHidden && typeof window.closeAllQuestionStudiosExcept === 'function') {
+    window.closeAllQuestionStudiosExcept('physics');
+  }
   container.style.display = isHidden ? 'block' : 'none';
   const toggleBtn = document.getElementById('btnTogglePhysicsStudio');
   if (toggleBtn) {

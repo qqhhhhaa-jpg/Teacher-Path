@@ -3613,6 +3613,15 @@
                       <span>معاينة فورية مطابقة للطباعة 100% (ورقة A4 عمودية 210 × 297 ملم)</span>
                     </div>
                     <div class="sct-buttons">
+                      <button type="button" class="seat-page-nav-btn" id="seatToolbarPrevBtn" onclick="window.seatingPrevPage()" title="الصفحة السابقة">
+                        <i class="fa-solid fa-chevron-right"></i>
+                        <span>السابق</span>
+                      </button>
+                      <span class="seat-page-counter-pill" id="seatToolbarPageIndicator">صفحة 1 من 1</span>
+                      <button type="button" class="seat-page-nav-btn" id="seatToolbarNextBtn" onclick="window.seatingNextPage()" title="الصفحة التالية">
+                        <span>التالي</span>
+                        <i class="fa-solid fa-chevron-left"></i>
+                      </button>
                       <button type="button" class="btn btn-sm btn-print-quick" onclick="window.seatingPrintCards()">
                         <i class="fa-solid fa-print"></i> طباعة الآن
                       </button>

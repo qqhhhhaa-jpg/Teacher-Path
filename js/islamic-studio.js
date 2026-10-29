@@ -166,10 +166,14 @@ window.toggleIslamicStudio = function() {
   let container = document.getElementById('modalIslamicStudioContainer');
   if (!container && wrapper && typeof window.buildIslamicStudioHTML === 'function') {
     wrapper.innerHTML = window.buildIslamicStudioHTML(true);
+    wrapper.innerHTML = window.buildIslamicStudioHTML(false);
     container = document.getElementById('modalIslamicStudioContainer');
   }
   if (!container) return;
   const isHidden = (container.style.display === 'none' || !container.style.display);
+  if (isHidden && typeof window.closeAllQuestionStudiosExcept === 'function') {
+    window.closeAllQuestionStudiosExcept('islamic');
+  }
   container.style.display = isHidden ? 'block' : 'none';
   const toggleBtn = document.getElementById('btnToggleIslamicStudio');
   if (toggleBtn) {

@@ -484,6 +484,11 @@
       return;
     }
 
+    // Close any other open subject studio first
+    if (typeof window.closeAllQuestionStudiosExcept === 'function') {
+      window.closeAllQuestionStudiosExcept('math');
+    }
+
     // Ensure Math Studio container is displayed
     const studioContainer = document.getElementById('modalMathStudioContainer');
     const wrapper = document.getElementById('modalMathStudioWrapper');

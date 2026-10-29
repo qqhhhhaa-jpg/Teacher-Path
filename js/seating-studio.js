@@ -15,6 +15,8 @@
   let seatingData = null;
   let activeHallTab = 'all'; // 'all' or hall id
   let activeStudioView = 'cards'; // 'cards' (A4 Print Cards) | 'map' (Hall Floor Plan) | 'list' (Students Table)
+  let currentSeatingPage = 1; // الصفحة الحالية المعروضة في معاينة A4
+  let totalSeatingPages = 1;  // إجمالي عدد صفحات A4
 
   // Default Seeding
   function getDefaultSeatingData() {
@@ -144,6 +146,11 @@
     syncSettingsInputs();
     updateStatsCounters();
     renderHallFilterTabs();
+
+    ['seatToolbarPrevBtn', 'seatToolbarPageIndicator', 'seatToolbarNextBtn'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = (activeStudioView === 'cards') ? 'inline-flex' : 'none';
+    });
 
     if (activeStudioView === 'cards') {
       renderA4SeatingCards();
@@ -288,9 +295,15 @@
     }
 
     const pagesCount = Math.max(1, Math.ceil(desks.length / perPage));
-    let html = '';
+    totalSeatingPages = pagesCount;
+    if (currentSeatingPage > pagesCount) currentSeatingPage = pagesCount;
+    if (currentSeatingPage < 1) currentSeatingPage = 1;
+
+    let html = buildSeatingPaginationBarHTML(currentSeatingPage, pagesCount, 'top');
 
     for (let p = 0; p < pagesCount; p++) {
+      const pageNo = p + 1;
+      const isPageActive = (pageNo === currentSeatingPage);
       const pageDesks = desks.slice(p * perPage, (p + 1) * perPage);
 
       // تحديد اسم ورقم القاعة ليظهر في الهامش العلوي للورقة
@@ -309,7 +322,7 @@
       }
 
       html += `
-        <div class="seating-a4-paper paper-theme-${esc(seatingData.cardTheme || 'royalNavy')}" data-page="${p + 1}">
+        <div class="seating-a4-paper paper-theme-${esc(seatingData.cardTheme || 'royalNavy')} ${isPageActive ? 'seating-page-active' : 'seating-page-hidden-screen'}" data-page="${pageNo}">
           <!-- Page Header Strip: الهامش العلوي للورقة يضم اسم ورقم القاعة وبيانات الامتحان والمدرسة -->
           <div class="seating-paper-header-strip">
             <div class="sp-hdr-right">
@@ -338,12 +351,13 @@
 
       pageDesks.forEach((desk, idx) => {
         const globalDeskIdx = p * perPage + idx + 1;
-        const cleanGrade = formatGradeWithoutSection(desk.className);
 
         if (studentsPerDesk === 2) {
-          // نمط الرحلة المزدوجة: طالبان بنفس المقعد في بطاقة واحدة مستطيلة مقسمة
+          // نمط الرحلة المزدوجة: طالبان بنفس المقعد في بطاقة واحدة مستطيلة مقسمة (يظهر لكل طالب الصف الخاص به)
           const st1 = desk.st1;
           const st2 = desk.st2;
+          const st1Class = (st1 && st1.className) ? String(st1.className).trim() : 'غير محدد';
+          const st2Class = (st2 && st2.className) ? String(st2.className).trim() : 'غير محدد';
 
           html += `
             <div class="seating-desk-card seating-dual-desk-card">
@@ -353,23 +367,28 @@
               <div class="card-cut-corner bl"></div>
               <div class="card-cut-corner br"></div>
 
-              <!-- رأس بطاقة الرحلة: رقم المقعد/الرحلة والمرحلة بدون شعبة -->
+              <!-- رأس بطاقة الرحلة: رقم المقعد/الرحلة -->
               <div class="desk-card-header dc-dual-header">
                 <span class="dc-seat-pill dc-dual-seat-badge">
                   <i class="fa-solid fa-couch"></i> رحلة رقم: ${esc(desk.deskNo)}
                 </span>
-                ${(seatingData.showClassName !== false) ? `
-                  <span class="dc-grade-pill" title="المرحلة الدراسية">
-                    <i class="fa-solid fa-graduation-cap"></i> ${esc(cleanGrade)}
-                  </span>
-                ` : ''}
+                <span class="dc-dual-mode-tag">
+                  <i class="fa-solid fa-user-group"></i> مقعد مزدوج
+                </span>
               </div>
 
-              <!-- بطاقة تضم اسمين للطالبين جنباً إلى جنب مع أرقامهم الامتحانية -->
+              <!-- بطاقة تضم اسمين للطالبين جنباً إلى جنب مع صف ورقم كل طالب بشكل مستقل -->
               <div class="dc-dual-students-wrap">
                 <!-- الطالب الأول (يمين في RTL) -->
                 <div class="dc-dual-student-slot">
-                  <div class="dc-slot-tag"><i class="fa-solid fa-user"></i> الطالب (1)</div>
+                  <div class="dc-slot-top-row">
+                    <span class="dc-slot-tag"><i class="fa-solid fa-user"></i> الطالب (1)</span>
+                    ${(seatingData.showClassName !== false) ? `
+                      <span class="dc-slot-class-pill" title="الصف: ${esc(st1Class)}">
+                        <i class="fa-solid fa-graduation-cap"></i> ${esc(st1Class)}
+                      </span>
+                    ` : ''}
+                  </div>
                   <div class="dc-name-block">
                     <span class="dc-field-label">اسم الطالب:</span>
                     <h4 class="dc-dual-name" title="${esc(st1.name)}">${esc(st1.name || 'اسم الطالب')}</h4>
@@ -386,7 +405,14 @@
                 <!-- الطالب الثاني (يسار في RTL) -->
                 ${st2 ? `
                   <div class="dc-dual-student-slot">
-                    <div class="dc-slot-tag"><i class="fa-solid fa-user"></i> الطالب (2)</div>
+                    <div class="dc-slot-top-row">
+                      <span class="dc-slot-tag"><i class="fa-solid fa-user"></i> الطالب (2)</span>
+                      ${(seatingData.showClassName !== false) ? `
+                        <span class="dc-slot-class-pill" title="الصف: ${esc(st2Class)}">
+                          <i class="fa-solid fa-graduation-cap"></i> ${esc(st2Class)}
+                        </span>
+                      ` : ''}
+                    </div>
                     <div class="dc-name-block">
                       <span class="dc-field-label">اسم الطالب:</span>
                       <h4 class="dc-dual-name" title="${esc(st2.name)}">${esc(st2.name || 'اسم الطالب')}</h4>
@@ -408,9 +434,10 @@
             </div>
           `;
         } else {
-          // نمط المقعد الفردي: بطاقة مدمجة لطالب واحد (اسم الطالب + الرقم الامتحاني + المرحلة بدون شعبة)
+          // نمط المقعد الفردي: بطاقة مدمجة لطالب واحد (اسم الطالب + الرقم الامتحاني + الصف)
           const student = desk.st1;
           const globalIdx = p * perPage + idx + 1;
+          const studentClass = (student && student.className) ? String(student.className).trim() : formatGradeWithoutSection(desk.className);
 
           html += `
             <div class="seating-desk-card">
@@ -420,7 +447,7 @@
               <div class="card-cut-corner bl"></div>
               <div class="card-cut-corner br"></div>
 
-              <!-- رأس البطاقة: رقم المقعد والمرحلة بدون شعبة -->
+              <!-- رأس البطاقة: رقم المقعد وصف الطالب -->
               <div class="desk-card-header">
                 ${seatingData.showSeatNo !== false ? `
                   <span class="dc-seat-pill">
@@ -428,8 +455,8 @@
                   </span>
                 ` : '<span></span>'}
                 ${seatingData.showClassName !== false ? `
-                  <span class="dc-grade-pill" title="المرحلة الدراسية">
-                    <i class="fa-solid fa-graduation-cap"></i> ${esc(cleanGrade)}
+                  <span class="dc-grade-pill" title="الصف الدراسي">
+                    <i class="fa-solid fa-graduation-cap"></i> ${esc(studentClass)}
                   </span>
                 ` : ''}
               </div>
@@ -476,7 +503,90 @@
       `;
     }
 
+    if (pagesCount > 1) {
+      html += buildSeatingPaginationBarHTML(currentSeatingPage, pagesCount, 'bottom');
+    }
+
     container.innerHTML = html;
+    syncToolbarPaginationControls(currentSeatingPage, pagesCount);
+  }
+
+  function buildSeatingPaginationBarHTML(currentPage, pagesCount, pos) {
+    let pageDots = '';
+    for (let i = 1; i <= pagesCount; i++) {
+      pageDots += `
+        <button type="button" class="seat-page-num-btn ${i === currentPage ? 'active' : ''}" onclick="window.seatingGoToPage(${i})" title="الانتقال إلى صفحة ${i}">
+          ${i}
+        </button>
+      `;
+    }
+
+    return `
+      <div class="seating-pagination-bar seating-pagination-${pos} no-print" role="navigation" aria-label="شريط التنقل بين صفحات خريطة الجلوس">
+        <button type="button" class="seat-page-nav-btn" onclick="window.seatingPrevPage()" ${currentPage <= 1 ? 'disabled' : ''} title="الصفحة السابقة">
+          <i class="fa-solid fa-chevron-right"></i>
+          <span>الصفحة السابقة</span>
+        </button>
+
+        <div class="seat-page-center-group">
+          <span class="seat-page-status-text">
+            <i class="fa-solid fa-file-lines"></i>
+            صفحة <strong>${currentPage}</strong> من <strong>${pagesCount}</strong>
+          </span>
+          <div class="seat-page-numbers-list">
+            ${pageDots}
+          </div>
+        </div>
+
+        <button type="button" class="seat-page-nav-btn" onclick="window.seatingNextPage()" ${currentPage >= pagesCount ? 'disabled' : ''} title="الصفحة التالية">
+          <span>الصفحة التالية</span>
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+      </div>
+    `;
+  }
+
+  function syncToolbarPaginationControls(currentPage, pagesCount) {
+    const prevBtn = document.getElementById('seatToolbarPrevBtn');
+    const nextBtn = document.getElementById('seatToolbarNextBtn');
+    const indicator = document.getElementById('seatToolbarPageIndicator');
+
+    if (prevBtn) prevBtn.disabled = (currentPage <= 1);
+    if (nextBtn) nextBtn.disabled = (currentPage >= pagesCount);
+    if (indicator) indicator.textContent = `صفحة ${currentPage} من ${pagesCount}`;
+  }
+
+  function updateActiveSeatingPageView() {
+    const container = document.getElementById('seatingCanvasWrapper');
+    if (!container) return;
+
+    const papers = container.querySelectorAll('.seating-a4-paper');
+    const total = papers.length || 1;
+    totalSeatingPages = total;
+    if (currentSeatingPage > total) currentSeatingPage = total;
+    if (currentSeatingPage < 1) currentSeatingPage = 1;
+
+    papers.forEach(paper => {
+      const pNo = parseInt(paper.getAttribute('data-page'), 10);
+      if (pNo === currentSeatingPage) {
+        paper.classList.remove('seating-page-hidden-screen');
+        paper.classList.add('seating-page-active');
+      } else {
+        paper.classList.remove('seating-page-active');
+        paper.classList.add('seating-page-hidden-screen');
+      }
+    });
+
+    const topBar = container.querySelector('.seating-pagination-top');
+    if (topBar) {
+      topBar.outerHTML = buildSeatingPaginationBarHTML(currentSeatingPage, total, 'top');
+    }
+    const bottomBar = container.querySelector('.seating-pagination-bottom');
+    if (bottomBar) {
+      bottomBar.outerHTML = buildSeatingPaginationBarHTML(currentSeatingPage, total, 'bottom');
+    }
+
+    syncToolbarPaginationControls(currentSeatingPage, total);
   }
 
   /**
@@ -649,12 +759,45 @@
 
   window.seatingFilterHall = function(hallId) {
     activeHallTab = hallId;
+    currentSeatingPage = 1;
     renderSeatingStudio();
+  };
+
+  window.seatingPrevPage = function() {
+    if (activeStudioView !== 'cards') {
+      window.seatingSetView('cards');
+      return;
+    }
+    if (currentSeatingPage > 1) {
+      currentSeatingPage--;
+      updateActiveSeatingPageView();
+    }
+  };
+
+  window.seatingNextPage = function() {
+    if (activeStudioView !== 'cards') {
+      window.seatingSetView('cards');
+      return;
+    }
+    if (currentSeatingPage < totalSeatingPages) {
+      currentSeatingPage++;
+      updateActiveSeatingPageView();
+    }
+  };
+
+  window.seatingGoToPage = function(pageNo) {
+    const p = parseInt(pageNo, 10);
+    if (isNaN(p) || p < 1 || p > totalSeatingPages) return;
+    currentSeatingPage = p;
+    updateActiveSeatingPageView();
   };
 
   window.seatingUpdateField = function(field, value) {
     if (!seatingData) return;
     seatingData[field] = value;
+    if (field === 'cardsPerPage' || field === 'studentsPerDesk') {
+      currentSeatingPage = 1;
+    }
     saveSeatingData(false);
     renderSeatingStudio();
   };
@@ -666,14 +809,21 @@
   // Printing A4 Portrait
   window.seatingPrintCards = function() {
     window.seatingSetView('cards');
+    const wrapper = document.getElementById('seatingCanvasWrapper');
+    if (wrapper) wrapper.classList.add('seating-print-all-mode');
     setTimeout(() => {
       window.print();
+      setTimeout(() => {
+        if (wrapper) wrapper.classList.remove('seating-print-all-mode');
+      }, 500);
     }, 200);
   };
 
   // PDF Export
   window.seatingExportPdf = async function() {
     window.seatingSetView('cards');
+    const wrapper = document.getElementById('seatingCanvasWrapper');
+    if (wrapper) wrapper.classList.add('seating-print-all-mode');
     if (typeof showToast === 'function') {
       showToast('جاري تجهيز وتصدير ملف PDF عالي الدقة لبطاقات الجلوس A4... 📄', 'info');
     }
@@ -699,6 +849,8 @@
       if (typeof showToast === 'function') {
         showToast('تعذر إنشاء ملف الـ PDF لبطاقات الجلوس: ' + (e.message || 'خطأ غير معروف'), 'error');
       }
+    } finally {
+      if (wrapper) wrapper.classList.remove('seating-print-all-mode');
     }
   };
 
