@@ -36,7 +36,7 @@
   <meta http-equiv="Expires" content="0">
 
   <!-- Core Styles -->
-  <link rel="stylesheet" href="css/style.css?v=2026.10.30.pro_gcloud_v5">
+  <link rel="stylesheet" href="css/style.css?v=2026.10.30.pro_login_v7">
   <link rel="stylesheet" href="css/print.css?v=2026.10.30.pro_fixed" media="print">
 
   <!-- Critical Fallback CSS (يضمن إخفاء النوافذ المنبثقة بشكل قاطع حتى اكتمال تحميل الأنماط) -->
@@ -5644,12 +5644,6 @@
           <button type="button" class="palette-dot-btn" data-color="orange" title="الجويتي (أزرق غامق)"
             style="background: #1e295d;" onclick="setAccentColor('orange')"></button>
         </div>
-        <button type="button" class="btn btn-outline" onclick="window.showMobileConnectModal()"
-          style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; border-radius: 12px; padding: 6px 12px; background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.25); color: var(--primary, #2563eb);"
-          title="عرض رابط الدخول من الهاتف الذكي عبر نفس شبكة الواي فاي">
-          <i class="fa-solid fa-mobile-screen-button"></i>
-          <span>فتح من الهاتف 📱</span>
-        </button>
         <button type="button" class="btn btn-outline btn-icon-only" onclick="toggleTheme()"
           title="التبديل بين الوضع الليلي والنهاري">
           <i class="fa-solid fa-moon"></i>
@@ -5782,7 +5776,7 @@
               <div class="portal-extra-actions-grid">
                 <!-- Google Cloud Official API Login Button -->
                 <button type="button" class="btn-portal-google-action" id="portalGoogleOAuthBtn"
-                  onclick="window.triggerGoogleCloudLogin()" title="تسجيل الدخول عبر بوابة Google Cloud API الرسمية">
+                  onclick="window.triggerGoogleCloudLogin()" title="تسجيل الدخول بحساب Google">
                   <div class="google-action-icon-wrap">
                     <svg viewBox="0 0 24 24">
                       <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
@@ -5792,8 +5786,8 @@
                     </svg>
                   </div>
                   <div class="register-btn-text">
-                    <strong>بوابة Google Cloud API</strong>
-                    <small>ربط موثق وحساب رسمي معتمد ☁️</small>
+                    <strong>تسجيل الدخول بحساب Google</strong>
+                    <small>اختر حسابك وسجّل دخولك بسهولة</small>
                   </div>
                   <i class="fa-solid fa-cloud-arrow-up" style="color: #4285F4; font-size: 0.95rem; margin-right: auto;"></i>
                 </button>
@@ -5812,16 +5806,7 @@
                 </button>
               </div>
 
-              <!-- Mobile Connect Quick Helper (توضيح رابط الجوال على نفس الشبكة) -->
-              <div class="portal-mobile-direct-cue" onclick="window.openMobileConnectModal()"
-                style="margin-top: 0.75rem; padding: 0.55rem 0.85rem; border-radius: 12px; background: rgba(37, 99, 235, 0.06); border: 1px dashed rgba(37, 99, 235, 0.28); display: flex; align-items: center; justify-content: space-between; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
-                <div style="display: flex; align-items: center; gap: 7px; min-width: 0;">
-                  <i class="fa-solid fa-mobile-screen-button text-primary" style="font-size: 1.05rem;"></i>
-                  <span style="font-size: 0.76rem; font-weight: 700; color: var(--text-main);">للفتح على الهاتف المحمول:</span>
-                  <code style="font-size: 0.76rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.1); padding: 2px 6px; border-radius: 6px; direction: ltr;">http://192.168.0.100:8080</code>
-                </div>
-                <span style="font-size: 0.72rem; color: #2563eb; font-weight: 800; white-space: nowrap;">تفاصيل الاتصال 📲</span>
-              </div>
+              
             </div>
 
             <!-- Portal Card Footer -->
@@ -8414,7 +8399,7 @@
             <div style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(52, 168, 83, 0.06)); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1rem; text-align: center;">
               <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 7px;">
                 <i class="fa-brands fa-google" style="color: #4285F4; font-size: 1.15rem;"></i>
-                <span>بوابة الربط والمصادقة الرسمية — Google Cloud API</span>
+                <span>تسجيل الدخول الرسمي عبر Google</span>
               </div>
 
               <button type="button" onclick="window.launchGoogleRealPopup()" class="btn-google-cloud-oauth"
@@ -8427,7 +8412,7 @@
                     <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 21.4 7.4 24 12 24z" />
                   </svg>
                 </span>
-                <strong style="font-size: 0.95rem; color: #0f172a;">اختيار وتأكيد حسابك عبر Google الرسمي (API)</strong>
+                <strong style="font-size: 0.95rem; color: #0f172a;">اختيار وتأكيد حسابك عبر Google</strong>
                 <i class="fa-solid fa-up-right-from-square" style="color: #4285F4; font-size: 0.9rem;"></i>
               </button>
 
@@ -8437,7 +8422,7 @@
               <!-- Status Notice while waiting for Google Popup -->
               <div id="googleAuthStatusNotice"
                 style="display: none; margin-top: 0.6rem; padding: 0.5rem; border-radius: 8px; background: rgba(66, 133, 244, 0.12); color: #2563eb; font-size: 0.78rem; font-weight: 700;">
-                <i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال ببوابة Google Cloud API الرسمية...
+                <i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال بـ Google...
               </div>
             </div>
 
@@ -10212,8 +10197,8 @@
   <!-- Teacher's Path Advanced Platform Features (Sound FX Engine, Chat System, Interactive Squares) -->
   <script src="js/platform-features.js?v=1.0"></script>
 
-  <script src="js/app.js?v=2026.10.30.pro_gcloud_v5"></script>
-  <script src="js/gcloud-gateway.js?v=2026.10.30.pro_gcloud_v5"></script>
+  <script src="js/app.js?v=2026.10.30.pro_login_v7"></script>
+  <script src="js/gcloud-gateway.js?v=2026.10.30.pro_login_v7"></script>
 
 
   <!-- Teacher's Path PDF Export Engine Initialization -->

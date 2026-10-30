@@ -12893,12 +12893,16 @@ window.launchGoogleRealPopup = function () {
 
   // 2. Identify the active / saved Google account (e.g. aqsys2004@gmail.com)
   const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
-  let target = accounts.find(a => (a.email && a.email.toLowerCase().includes('aqsys2004@gmail.com')) || a.isGoogleUser);
+  // حساب المدير العام خاص ولا يظهر في نافذة التأكيد
+  const isPrivateAdmin = (a) => !!(a && (a.isAdmin || a.role === 'admin' || a.username === 'admin' || a.id === 'usr_admin'));
+  const publicAccounts = accounts.filter(a => !isPrivateAdmin(a));
+  let target = publicAccounts.find(a => (a.email && a.email.toLowerCase().includes('aqsys2004@gmail.com')) || a.isGoogleUser);
   if (!target) {
-    target = accounts.find(a => a.email && a.email.toLowerCase().includes('@gmail'));
+    target = publicAccounts.find(a => a.email && a.email.toLowerCase().includes('@gmail'));
   }
   if (!target) {
-    const lastEmail = localStorage.getItem('moallem_last_google_email') || 'aqsys2004@gmail.com';
+    let lastEmail = localStorage.getItem('moallem_last_google_email') || 'aqsys2004@gmail.com';
+    if (accounts.some(a => isPrivateAdmin(a) && (a.email || '').toLowerCase() === lastEmail.toLowerCase())) lastEmail = 'aqsys2004@gmail.com';
     target = {
       name: 'الأستاذ أحمد',
       email: lastEmail,
@@ -12929,7 +12933,7 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
   overlay.style.display = 'flex';
   const safeName = name || ('أستاذ ' + (email || '').split('@')[0]);
   const avatarHtml = picture
-    ? `<img src="${picture}" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #4285F4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">`
+    ? `<img src="${picture}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='assets/masar_moallem_logo.png';this.style.objectFit='contain';this.style.background='#fff';" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #4285F4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">`
     : `<div style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #fff; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);"><i class="fa-brands fa-google"></i></div>`;
 
   overlay.innerHTML = `
@@ -12939,7 +12943,7 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
       </div>
       <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 3px 12px; border-radius: 999px; margin-bottom: 0.5rem;">
         <i class="fa-brands fa-google text-primary"></i>
-        <span>بوابة الربط مع Google Cloud API</span>
+        <span>تسجيل الدخول عبر Google</span>
       </div>
       <h3 style="margin: 0 0 0.5rem 0; font-size: 1.12rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
       <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 0.85rem; margin: 0.85rem 0 1.25rem 0;">
@@ -12948,10 +12952,10 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
       </div>
       <div style="display: flex; gap: 0.65rem;">
         <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1.3; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
-          <i class="fa-solid fa-cloud-arrow-up"></i> نعم، تسجيل الدخول (API)
+          <i class="fa-solid fa-check"></i> نعم
         </button>
         <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem;">
-          <i class="fa-solid fa-xmark"></i> لا، حساب آخر
+          <i class="fa-solid fa-xmark"></i> لا
         </button>
       </div>
     </div>

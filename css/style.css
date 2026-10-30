@@ -39952,3 +39952,26 @@ button[data-pdf-export]:disabled {
 }
 
 /* Google Saved Accounts allowed */
+
+/* ===== Login Portal v6 — refined compact size ===== */
+.portal-main-wrapper { min-height: calc(100vh - 65px) !important; padding: 2rem 1rem !important; }
+.portal-showcase-container, .portal-auth-section, .portal-auth-card { max-width: 430px !important; }
+.portal-auth-card { border-radius: 20px !important; }
+.portal-card-header { padding: 1.25rem 1.5rem 0.75rem !important; }
+.portal-card-body { padding: 0.9rem 1.5rem 1.35rem !important; }
+.portal-card-title { font-size: 1.25rem !important; margin: 0.35rem 0 0.25rem !important; }
+.portal-card-desc { font-size: 0.82rem !important; margin-bottom: 0.6rem !important; }
+.portal-form-group { margin-bottom: 0.85rem !important; }
+.portal-lux-input { height: 46px !important; }
+.portal-extra-actions-grid { grid-template-columns: 1fr !important; gap: 0.6rem !important; }
+#googleYesNoQuickOverlay .modal-container { max-width: 380px !important; }
+@media (max-width: 480px) {
+  .portal-main-wrapper { padding: 1rem 0.75rem !important; align-items: flex-start !important; }
+  .portal-showcase-container, .portal-auth-section, .portal-auth-card { max-width: 100% !important; }
+  .portal-card-header { padding: 1rem 1rem 0.5rem !important; }
+  .portal-card-body { padding: 0.75rem 1rem 1rem !important; }
+}
+
+/* v7: never clip the card top when it is taller than the viewport */
+.portal-main-wrapper { align-items: flex-start !important; }
+.portal-showcase-container { margin: auto !important; }
