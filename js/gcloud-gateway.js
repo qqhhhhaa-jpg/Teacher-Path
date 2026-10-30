@@ -77,7 +77,7 @@
     const card = document.createElement('div');
     card.id = 'settingsGCloudGatewayCard';
     card.className = 'card-box gcloud-settings-banner-card admin-only-hidden';
-    card.style.cssText = 'display: none !important; margin-bottom: 1.25rem; border: 2px solid rgba(66, 133, 244, 0.35); background: var(--bg-card);';
+    card.style.cssText = 'margin-bottom: 1.25rem; border: 2px solid rgba(66, 133, 244, 0.35); background: var(--bg-card);';
     card.innerHTML = `
       <div class="card-header" style="flex-wrap: wrap; gap: 0.75rem;">
         <div class="card-title" style="display: flex; align-items: center; gap: 0.65rem;">
@@ -863,48 +863,15 @@
   };
 
   // Google Cloud OAuth 2.0 Official Account Chooser (accounts.google.com)
-  window.triggerGoogleCloudLogin = async function () {
+  // Google Cloud OAuth 2.0 Official Account Chooser (accounts.google.com)
+  window.triggerGoogleCloudLogin = function () {
     if (gatewayConfig && gatewayConfig.oauthClientId) {
       localStorage.setItem('moallem_google_client_id', gatewayConfig.oauthClientId);
     }
-    if (typeof window.launchGoogleRealPopup === 'function') {
-      window.launchGoogleRealPopup();
-      return;
-    }
-    if (typeof window.openGoogleAccountModal === 'function' && !gatewayConfig.oauthClientId) {
-      window.openGoogleAccountModal();
-      return;
-    }
-
-    const email = prompt('بوابة التوثيق السريع عبر Google Cloud OAuth 2.0:\nأدخل بريدك الإلكتروني في Google (Gmail) للدخول الفوري:', '');
-    if (!email || !email.includes('@')) return;
-
-    const namePart = email.split('@')[0];
-    try {
-      const resp = await fetch('/api/gcloud/oauth_verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim(),
-          name: 'الأستاذ ' + namePart,
-          sub: 'gcloud_' + Date.now()
-        })
-      });
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.success && data.account) {
-          localStorage.setItem('masar_active_teacher_session', JSON.stringify(data.account));
-          localStorage.setItem('moallem_logged_in_user', JSON.stringify(data.account));
-          notify(data.message || 'تم تسجيل الدخول عبر بوابة Google Cloud بنجاح!', 'success');
-          const portal = document.getElementById('fullscreenAuthPortal');
-          if (portal) portal.style.display = 'none';
-          return;
-        }
-      }
-    } catch (e) {}
-
     if (typeof window.openGoogleAccountModal === 'function') {
       window.openGoogleAccountModal();
+    } else if (typeof window.launchGoogleRealPopup === 'function') {
+      window.launchGoogleRealPopup();
     }
   };
 

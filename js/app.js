@@ -12878,41 +12878,31 @@ window.launchGoogleRealPopup = function () {
   const statusEl = document.getElementById('googleAuthStatusNotice');
   if (statusEl) statusEl.style.display = 'block';
 
-  if (!isGisReady && typeof window.initGoogleIdentityServices === 'function') {
-    window.initGoogleIdentityServices();
-  }
-
-  // 1. Preferred Mobile & Desktop method: Google Identity Services tokenClient (No HTTP redirects, zero connection refused!)
-  if (googleTokenClient && typeof googleTokenClient.requestAccessToken === 'function') {
-    try {
-      googleTokenClient.requestAccessToken({ prompt: 'select_account' });
-      return;
-    } catch (e) {
-      console.warn('googleTokenClient fallback to popup:', e);
-    }
-  }
-
-  // 2. Direct Official Google OAuth 2.0 Account Chooser
-  const clientId = window.getGoogleClientId() || '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com';
+  // Direct Official Google OAuth 2.0 Account Chooser (Verified Web Application Client ID)
+  const clientId = '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com';
   const isIPAddress = /^https?:\/\/\d+\.\d+\.\d+\.\d+/i.test(window.location.origin);
   const w = 520;
   const h = 640;
   const left = Math.max(0, Math.round((window.screen.width - w) / 2));
   const top = Math.max(0, Math.round((window.screen.height - h) / 2));
 
-  // Determine correct redirect_uri dynamically based on how user accessed the site
+  // Determine correct redirect_uri dynamically
   let redirectUri = window.location.origin + '/api/gcloud/oauth/callback';
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     redirectUri = 'http://localhost:8080/api/gcloud/oauth/callback';
   }
 
-  // If user is accessing via local IP (e.g. 192.168.x.x) on mobile, Google rejects IP redirect URIs.
-  // In this case, open the Google modal for in-page login / manual verified email entry
-  if (isIPAddress && (!googleTokenClient || typeof googleTokenClient.requestAccessToken !== 'function')) {
+  // If on local IP (e.g. 192.168.x.x) on mobile, Google blocks private IP redirects:
+  // keep teacher in googleAuthModal to enter verified email with 1-click
+  if (isIPAddress) {
     if (statusEl) statusEl.style.display = 'none';
     if (typeof window.openGoogleAccountModal === 'function') {
       window.openGoogleAccountModal();
-      showToast('اختر حساب Google أو أدخل بريدك الإلكتروني للمتابعة فوراً 🚀', 'info');
+      const inp = document.getElementById('googlePersonalEmailInput');
+      if (inp) inp.focus();
+      if (typeof showToast === 'function') {
+        showToast('على شبكة الموبايل: أدخل بريد Gmail للمتابعة فوراً بنقرة واحدة 🚀', 'info');
+      }
       return;
     }
   }
@@ -12931,7 +12921,6 @@ window.launchGoogleRealPopup = function () {
   );
 
   if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    // If popup blocked or on mobile device without popups, navigate in current window
     window.location.href = oauthUrl;
   } else {
     if (typeof window.startGoogleOAuthPolling === 'function') {

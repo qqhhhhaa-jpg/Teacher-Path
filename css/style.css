@@ -36900,7 +36900,4 @@ button[data-pdf-export]:disabled {
   display: none !important;
 }
 
-#googleSavedAccountsBox,
-#googleSavedAccountsList {
-  display: none !important;
-}
+/* Google Saved Accounts allowed */
