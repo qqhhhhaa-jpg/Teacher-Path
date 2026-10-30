@@ -12524,7 +12524,7 @@ window.handleVerifiedGoogleAccount = async function (googleProfile) {
     adminAcc.email = email;
     if (picture) adminAcc.avatar = picture;
     saveAuthAccounts(accounts);
-    loginUser(adminAcc);
+    await window.performGoogleLoginSuccess(adminAcc);
     if (typeof showToast === 'function') {
       showToast(`مرحباً بعودتك يا مديرنا العام (${adminAcc.name}) تم تسجيل الدخول وربط حسابك بـ Google بنجاح 👑✔`, 'success');
     }
@@ -12622,12 +12622,79 @@ window.handleVerifiedGoogleAccount = async function (googleProfile) {
 };
 
 window.renderGoogleSavedAccountsList = function () {
-  // تم إلغاء ميزة عرض الحسابات والدخول الفوري بنقرة واحدة لحماية خصوصية الأسئلة والدرجات من المتطفلين
+  const container = document.getElementById('googleSavedAccountsList');
   const box = document.getElementById('googleSavedAccountsBox');
-  if (box) {
-    box.style.display = 'none';
-    box.remove();
+  if (!container || !box) return;
+
+  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
+
+  // Filter accounts that have an email or are teacher / admin accounts
+  let eligibleAccounts = accounts.filter(a => {
+    if (!a) return false;
+    const hasEmail = Boolean(a.email && a.email.trim());
+    const isGoogle = a.isGoogleUser || (a.email && a.email.toLowerCase().includes('@gmail'));
+    const isNamed = Boolean(a.name || a.username);
+    return isNamed && (hasEmail || isGoogle || a.isAdmin || a.role === 'admin');
+  });
+
+  // Include last remembered Google email if present
+  const lastGoogleEmail = localStorage.getItem('moallem_last_google_email');
+  if (lastGoogleEmail && !eligibleAccounts.some(a => a.email && a.email.toLowerCase() === lastGoogleEmail.toLowerCase())) {
+    eligibleAccounts.push({
+      id: 'usr_last_google',
+      name: 'الأستاذ (حساب Google المعتمد)',
+      email: lastGoogleEmail,
+      username: lastGoogleEmail.split('@')[0],
+      isGoogleUser: true
+    });
   }
+
+  // Deduplicate by email or username
+  const seen = new Set();
+  eligibleAccounts = eligibleAccounts.filter(acc => {
+    const key = (acc.email || acc.username || acc.id || '').toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (eligibleAccounts.length === 0) {
+    box.style.display = 'none';
+    container.innerHTML = '';
+    return;
+  }
+
+  box.style.display = 'block';
+  container.innerHTML = eligibleAccounts.map(acc => {
+    const displayName = acc.name || acc.username || 'أستاذ';
+    const displayEmail = acc.email || (acc.username ? `${acc.username}@moallem.iq` : 'معلم معتمد');
+    const initials = displayName.trim().slice(0, 2);
+    const safeName = displayName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safeEmail = displayEmail.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safePic = (acc.avatar || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const isVip = Boolean(acc.isVip || acc.isSubscribed || acc.isAdmin || localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
+
+    return `
+      <div class="google-saved-acc-card" onclick="window.showGoogleYesNoConfirmDialog('${safeName}', '${safeEmail}', '${safePic}')"
+        style="background: #ffffff; border: 1.5px solid rgba(66, 133, 244, 0.28); border-radius: 12px; padding: 0.65rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
+        <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35); overflow: hidden;">
+            ${acc.avatar ? `<img src="${acc.avatar}" alt="${safeName}" style="width: 100%; height: 100%; object-fit: cover;">` : initials}
+          </div>
+          <div style="min-width: 0; text-align: right;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <strong style="font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${displayName}</strong>
+              ${isVip ? '<span style="font-size: 0.72rem; color: #f59e0b;" title="اشتراك مفعل">👑</span>' : ''}
+            </div>
+            <span style="font-size: 0.74rem; color: #64748b; direction: ltr; display: block; unicode-bidi: embed;">${displayEmail}</span>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-primary" style="font-size: 0.78rem; font-weight: 800; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0; pointer-events: none; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> دخول
+        </button>
+      </div>
+    `;
+  }).join('');
 };
 
 window.validateOfficialGoogleEmail = function (emailStr) {

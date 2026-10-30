@@ -36619,7 +36619,7 @@ button[data-pdf-export]:disabled {
   display: block !important;
   width: 100% !important;
   height: 48px !important;
-  padding: 0 48px 0 44px !important; /* In RTL: right: 48px for right-icon, left: 44px for eye-toggle */
+  padding: 0 58px 0 50px !important; /* In RTL: right: 58px for right-icon with plenty of spacing, left: 50px for eye-toggle */
   box-sizing: border-box !important;
   border-radius: 12px !important;
   border: 1.5px solid var(--border-color, #cbd5e1) !important;
@@ -36628,9 +36628,32 @@ button[data-pdf-export]:disabled {
   font-size: 0.92rem !important;
   font-weight: 600 !important;
   font-family: 'Cairo', 'Alexandria', sans-serif !important;
+  text-align: right !important;
+  direction: rtl !important;
   outline: none !important;
   transition: all 0.22s ease !important;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+.google-saved-acc-card {
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.google-saved-acc-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.16) !important;
+  background: rgba(239, 246, 255, 0.95) !important;
+}
+
+[data-theme="dark"] .google-saved-acc-card {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .google-saved-acc-card:hover {
+  background: #0f172a !important;
+  border-color: #3b82f6 !important;
 }
 
 [data-theme="light"] .portal-lux-input {
