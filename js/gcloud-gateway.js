@@ -863,15 +863,14 @@
   };
 
   // Google Cloud OAuth 2.0 Official Account Chooser (accounts.google.com)
-  // Google Cloud OAuth 2.0 Official Account Chooser (accounts.google.com)
   window.triggerGoogleCloudLogin = function () {
     if (gatewayConfig && gatewayConfig.oauthClientId) {
       localStorage.setItem('moallem_google_client_id', gatewayConfig.oauthClientId);
     }
-    if (typeof window.openGoogleAccountModal === 'function') {
-      window.openGoogleAccountModal();
-    } else if (typeof window.launchGoogleRealPopup === 'function') {
+    if (typeof window.launchGoogleRealPopup === 'function') {
       window.launchGoogleRealPopup();
+    } else if (typeof window.openGoogleAccountModal === 'function') {
+      window.openGoogleAccountModal();
     }
   };
 

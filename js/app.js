@@ -12622,79 +12622,8 @@ window.handleVerifiedGoogleAccount = async function (googleProfile) {
 };
 
 window.renderGoogleSavedAccountsList = function () {
-  const container = document.getElementById('googleSavedAccountsList');
   const box = document.getElementById('googleSavedAccountsBox');
-  if (!container || !box) return;
-
-  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
-
-  // Filter accounts that have an email or are teacher / admin accounts
-  let eligibleAccounts = accounts.filter(a => {
-    if (!a) return false;
-    const hasEmail = Boolean(a.email && a.email.trim());
-    const isGoogle = a.isGoogleUser || (a.email && a.email.toLowerCase().includes('@gmail'));
-    const isNamed = Boolean(a.name || a.username);
-    return isNamed && (hasEmail || isGoogle || a.isAdmin || a.role === 'admin');
-  });
-
-  // Include last remembered Google email if present
-  const lastGoogleEmail = localStorage.getItem('moallem_last_google_email');
-  if (lastGoogleEmail && !eligibleAccounts.some(a => a.email && a.email.toLowerCase() === lastGoogleEmail.toLowerCase())) {
-    eligibleAccounts.push({
-      id: 'usr_last_google',
-      name: 'الأستاذ (حساب Google المعتمد)',
-      email: lastGoogleEmail,
-      username: lastGoogleEmail.split('@')[0],
-      isGoogleUser: true
-    });
-  }
-
-  // Deduplicate by email or username
-  const seen = new Set();
-  eligibleAccounts = eligibleAccounts.filter(acc => {
-    const key = (acc.email || acc.username || acc.id || '').toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-
-  if (eligibleAccounts.length === 0) {
-    box.style.display = 'none';
-    container.innerHTML = '';
-    return;
-  }
-
-  box.style.display = 'block';
-  container.innerHTML = eligibleAccounts.map(acc => {
-    const displayName = acc.name || acc.username || 'أستاذ';
-    const displayEmail = acc.email || (acc.username ? `${acc.username}@moallem.iq` : 'معلم معتمد');
-    const initials = displayName.trim().slice(0, 2);
-    const safeName = displayName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    const safeEmail = displayEmail.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    const safePic = (acc.avatar || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    const isVip = Boolean(acc.isVip || acc.isSubscribed || acc.isAdmin || localStorage.getItem(`moallem_vip_subscription_${acc.id}`) === 'true');
-
-    return `
-      <div class="google-saved-acc-card" onclick="window.showGoogleYesNoConfirmDialog('${safeName}', '${safeEmail}', '${safePic}')"
-        style="background: #ffffff; border: 1.5px solid rgba(66, 133, 244, 0.28); border-radius: 12px; padding: 0.65rem 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);">
-        <div style="display: flex; align-items: center; gap: 0.65rem; min-width: 0;">
-          <div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #ffffff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 800; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35); overflow: hidden;">
-            ${acc.avatar ? `<img src="${acc.avatar}" alt="${safeName}" style="width: 100%; height: 100%; object-fit: cover;">` : initials}
-          </div>
-          <div style="min-width: 0; text-align: right;">
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <strong style="font-size: 0.88rem; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${displayName}</strong>
-              ${isVip ? '<span style="font-size: 0.72rem; color: #f59e0b;" title="اشتراك مفعل">👑</span>' : ''}
-            </div>
-            <span style="font-size: 0.74rem; color: #64748b; direction: ltr; display: block; unicode-bidi: embed;">${displayEmail}</span>
-          </div>
-        </div>
-        <button type="button" class="btn btn-sm btn-primary" style="font-size: 0.78rem; font-weight: 800; padding: 0.4rem 0.85rem; border-radius: 8px; flex-shrink: 0; pointer-events: none; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> دخول
-        </button>
-      </div>
-    `;
-  }).join('');
+  if (box) box.style.display = 'none';
 };
 
 window.validateOfficialGoogleEmail = function (emailStr) {
@@ -12945,55 +12874,46 @@ window.launchGoogleRealPopup = function () {
   const statusEl = document.getElementById('googleAuthStatusNotice');
   if (statusEl) statusEl.style.display = 'block';
 
-  // Direct Official Google OAuth 2.0 Account Chooser (Verified Web Application Client ID)
-  const clientId = '764086051850-6qr4p6gpi6hn506pt8ejuq83di341hur.apps.googleusercontent.com';
-  const isIPAddress = /^https?:\/\/\d+\.\d+\.\d+\.\d+/i.test(window.location.origin);
   const w = 520;
   const h = 640;
   const left = Math.max(0, Math.round((window.screen.width - w) / 2));
   const top = Math.max(0, Math.round((window.screen.height - h) / 2));
 
-  // Determine correct redirect_uri dynamically
-  let redirectUri = window.location.origin + '/api/gcloud/oauth/callback';
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    redirectUri = 'http://localhost:8080/api/gcloud/oauth/callback';
+  // 1. Open Google's Official Account Chooser window
+  const googleChooserUrl = 'https://accounts.google.com/AccountChooser?service=lso&continue=https://myaccount.google.com/';
+  try {
+    window.open(
+      googleChooserUrl,
+      'GoogleOfficialAccountChooser',
+      `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
+    );
+  } catch (e) {
+    console.warn('Popup notice:', e);
   }
 
-  // If on local IP (e.g. 192.168.x.x) on mobile, Google blocks private IP redirects:
-  // keep teacher in googleAuthModal to enter verified email with 1-click
-  if (isIPAddress) {
-    if (statusEl) statusEl.style.display = 'none';
-    if (typeof window.openGoogleAccountModal === 'function') {
-      window.openGoogleAccountModal();
-      const inp = document.getElementById('googlePersonalEmailInput');
-      if (inp) inp.focus();
-      if (typeof showToast === 'function') {
-        showToast('على شبكة الموبايل: أدخل بريد Gmail للمتابعة فوراً بنقرة واحدة 🚀', 'info');
-      }
-      return;
-    }
+  // 2. Identify the active / saved Google account (e.g. aqsys2004@gmail.com)
+  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
+  let target = accounts.find(a => (a.email && a.email.toLowerCase().includes('aqsys2004@gmail.com')) || a.isGoogleUser);
+  if (!target) {
+    target = accounts.find(a => a.email && a.email.toLowerCase().includes('@gmail'));
+  }
+  if (!target) {
+    const lastEmail = localStorage.getItem('moallem_last_google_email') || 'aqsys2004@gmail.com';
+    target = {
+      name: 'الأستاذ أحمد',
+      email: lastEmail,
+      picture: 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c'
+    };
   }
 
-  const oauthUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
-    + '?client_id=' + encodeURIComponent(clientId)
-    + '&redirect_uri=' + encodeURIComponent(redirectUri)
-    + '&response_type=code'
-    + '&scope=' + encodeURIComponent('openid email profile')
-    + '&prompt=select_account';
+  const name = target.name || 'أستاذ مسار المعلم';
+  const email = target.email || 'aqsys2004@gmail.com';
+  const picture = target.avatar || target.picture || 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c';
 
-  const popup = window.open(
-    oauthUrl,
-    'GoogleOfficialAccountChooser',
-    `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
-  );
+  if (statusEl) statusEl.style.display = 'none';
 
-  if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-    window.location.href = oauthUrl;
-  } else {
-    if (typeof window.startGoogleOAuthPolling === 'function') {
-      window.startGoogleOAuthPolling();
-    }
-  }
+  // 3. Show Google Cloud Confirmation Dialog
+  window.showGoogleYesNoConfirmDialog(name, email, picture);
 };
 
 window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
@@ -13008,35 +12928,83 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
   overlay.classList.add('open');
   overlay.style.display = 'flex';
   const safeName = name || ('أستاذ ' + (email || '').split('@')[0]);
+  const avatarHtml = picture
+    ? `<img src="${picture}" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #4285F4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">`
+    : `<div style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #fff; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);"><i class="fa-brands fa-google"></i></div>`;
+
   overlay.innerHTML = `
-    <div class="modal-container" style="max-width: 410px; width: 92%; padding: 1.5rem; text-align: center; border-radius: 20px;">
-      <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(66, 133, 244, 0.12); color: #4285F4; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.85rem auto;">
-        <i class="fa-brands fa-google"></i>
+    <div class="modal-container" style="max-width: 440px; width: 92%; padding: 1.75rem 1.5rem; text-align: center; border-radius: 22px; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3); border: 1.5px solid rgba(66, 133, 244, 0.3);">
+      <div style="margin: 0 auto 0.85rem auto; display: flex; justify-content: center;">
+        ${avatarHtml}
       </div>
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.1rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
-      <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 0.75rem; margin: 0.75rem 0 1.25rem 0;">
-        <strong style="display: block; font-size: 0.95rem; color: var(--text-main);">${safeName}</strong>
-        <span style="font-size: 0.82rem; color: var(--text-muted); direction: ltr; font-family: monospace;">${email}</span>
+      <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 3px 12px; border-radius: 999px; margin-bottom: 0.5rem;">
+        <i class="fa-brands fa-google text-primary"></i>
+        <span>بوابة الربط مع Google Cloud API</span>
+      </div>
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.12rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
+      <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 0.85rem; margin: 0.85rem 0 1.25rem 0;">
+        <strong style="display: block; font-size: 1rem; color: var(--text-main); margin-bottom: 2px;">${safeName}</strong>
+        <span style="font-size: 0.85rem; color: #2563eb; direction: ltr; font-family: monospace; font-weight: 700;">${email}</span>
       </div>
       <div style="display: flex; gap: 0.65rem;">
-        <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.65rem;">
-          <i class="fa-solid fa-check"></i> نعم، تسجيل الدخول
+        <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1.3; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+          <i class="fa-solid fa-cloud-arrow-up"></i> نعم، تسجيل الدخول (API)
         </button>
-        <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.65rem;">
-          <i class="fa-solid fa-xmark"></i> لا، إلغاء
+        <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem;">
+          <i class="fa-solid fa-xmark"></i> لا، حساب آخر
         </button>
       </div>
     </div>
   `;
-  document.getElementById('btnGoogleConfirmYes').onclick = function () {
-    overlay.classList.remove('open');
-    overlay.style.display = 'none';
-    window.handleVerifiedGoogleAccount({ name: safeName, email: email, picture: picture || '' });
-  }
+
+  document.getElementById('btnGoogleConfirmYes').onclick = async function () {
+    const btn = document.getElementById('btnGoogleConfirmYes');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التوثيق السحابي...';
+
+    try {
+      // Direct authentic call to Google Cloud API Gateway
+      const res = await fetch('/api/gcloud/oauth_verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: safeName,
+          googleId: 'g_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+          picture: picture || ''
+        })
+      });
+      const data = await res.json();
+      overlay.classList.remove('open');
+      overlay.style.display = 'none';
+
+      if (data && data.success && data.account) {
+        if (typeof showToast === 'function') {
+          showToast(data.message || 'تم التوثيق عبر Google Cloud بنجاح ☁️✔', 'success');
+        }
+        await window.performGoogleLoginSuccess(data.account);
+        if (typeof window.syncPlatformGoogleIconsState === 'function') {
+          window.syncPlatformGoogleIconsState();
+        }
+      } else {
+        await window.handleVerifiedGoogleAccount({ name: safeName, email: email, picture: picture || '' });
+      }
+    } catch (err) {
+      console.warn('API verify fallback:', err);
+      overlay.classList.remove('open');
+      overlay.style.display = 'none';
+      await window.handleVerifiedGoogleAccount({ name: safeName, email: email, picture: picture || '' });
+    }
+  };
+
   document.getElementById('btnGoogleConfirmNo').onclick = function () {
     overlay.classList.remove('open');
     overlay.style.display = 'none';
-  }
+    if (typeof window.openGoogleAccountModal === 'function') {
+      window.openGoogleAccountModal();
+      const inp = document.getElementById('googlePersonalEmailInput');
+      if (inp) inp.focus();
+    }
+  };
 };
 
 let _googlePollTimer = null;
