@@ -1,0 +1,183 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Glow -->
+    <radialGradient id="seatGlow" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#0d9488" stop-opacity="0.25" />
+      <stop offset="55%" stop-color="#0f766e" stop-opacity="0.08" />
+      <stop offset="100%" stop-color="#042f2e" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- A4 Paper Gradient -->
+    <linearGradient id="a4PaperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f0fdfa" />
+    </linearGradient>
+
+    <!-- Header Gradient (Teal to Navy) -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d9488" />
+      <stop offset="60%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#115e59" />
+    </linearGradient>
+
+    <!-- Card Badge Gradient (Cyan / Blue) -->
+    <linearGradient id="cardBadgeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+
+    <!-- Gold Accent Ribbon -->
+    <linearGradient id="goldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#eab308" />
+      <stop offset="100%" stop-color="#ca8a04" />
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="deskShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#0f766e" flood-opacity="0.3" />
+    </filter>
+    <filter id="cardFloatShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000000" flood-opacity="0.28" />
+    </filter>
+    <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Ambient Backdrop Glow -->
+  <rect width="512" height="512" rx="40" fill="url(#seatGlow)" />
+
+  <!-- Abstract Examination Hall Grid Lines -->
+  <g stroke="#14b8a6" stroke-opacity="0.12" stroke-width="1.5" stroke-dasharray="6,6">
+    <line x1="64" y1="90" x2="448" y2="90" />
+    <line x1="64" y1="180" x2="448" y2="180" />
+    <line x1="64" y1="270" x2="448" y2="270" />
+    <line x1="64" y1="360" x2="448" y2="360" />
+    <line x1="128" y1="50" x2="128" y2="450" />
+    <line x1="256" y1="50" x2="256" y2="450" />
+    <line x1="384" y1="50" x2="384" y2="450" />
+  </g>
+
+  <!-- Main Perspective: Examination Hall & A4 Portrait Blueprint Sheet -->
+  <g transform="translate(66, 40)" filter="url(#deskShadow)">
+    <!-- Base A4 Portrait Paper (380x430) -->
+    <rect x="0" y="0" width="380" height="432" rx="16" fill="url(#a4PaperGrad)" stroke="#14b8a6" stroke-width="2" />
+
+    <!-- A4 Paper Decorative Top Header Band -->
+    <path d="M 0 16 C 0 7.16 7.16 0 16 0 L 364 0 C 372.84 0 380 7.16 380 16 L 380 50 L 0 50 Z" fill="url(#headerGrad)" />
+    
+    <!-- Header Title Simulation -->
+    <circle cx="35" cy="25" r="14" fill="#ffffff" fill-opacity="0.25" />
+    <path d="M30 25 L35 20 L40 25 L38 25 L38 30 L32 30 L32 25 Z" fill="#ffffff" />
+    <rect x="60" y="16" width="140" height="9" rx="4.5" fill="#ffffff" />
+    <rect x="60" y="29" width="90" height="6" rx="3" fill="#ffffff" fill-opacity="0.6" />
+    <rect x="290" y="18" width="65" height="15" rx="7.5" fill="url(#goldRibbon)" filter="url(#badgeShadow)" />
+    <circle cx="302" cy="25.5" r="4" fill="#ffffff" />
+    <rect x="312" y="23" width="32" height="5" rx="2" fill="#78350f" />
+
+    <!-- Cut / Grid Lines across the A4 sheet -->
+    <line x1="190" y1="65" x2="190" y2="415" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="7,5" stroke-opacity="0.45" />
+    <line x1="15" y1="150" x2="365" y2="150" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="7,5" stroke-opacity="0.45" />
+    <line x1="15" y1="240" x2="365" y2="240" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="7,5" stroke-opacity="0.45" />
+    <line x1="15" y1="330" x2="365" y2="330" stroke="#0d9488" stroke-width="1.8" stroke-dasharray="7,5" stroke-opacity="0.45" />
+
+    <!-- Mini Seating Cards on the Sheet -->
+    <!-- Card 1 (Top Left) -->
+    <g transform="translate(18, 62)">
+      <rect width="160" height="78" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <rect x="6" y="6" width="148" height="18" rx="4" fill="#f0fdfa" />
+      <rect x="12" y="11" width="70" height="8" rx="3" fill="#0d9488" />
+      <rect x="100" y="10" width="46" height="10" rx="4" fill="#0284c7" />
+      <!-- Student Name Line -->
+      <rect x="12" y="32" width="105" height="11" rx="3" fill="#0f172a" />
+      <!-- Roll Number Line -->
+      <rect x="12" y="48" width="60" height="8" rx="2" fill="#64748b" />
+      <rect x="85" y="48" width="45" height="8" rx="2" fill="#eab308" />
+      <!-- Barcode simulation -->
+      <g transform="translate(12, 62)" fill="#0f172a" opacity="0.6">
+        <rect x="0" y="0" width="3" height="8" /><rect x="5" y="0" width="1" height="8" />
+        <rect x="8" y="0" width="4" height="8" /><rect x="14" y="0" width="2" height="8" />
+        <rect x="18" y="0" width="3" height="8" /><rect x="23" y="0" width="1" height="8" />
+        <rect x="26" y="0" width="4" height="8" /><rect x="33" y="0" width="2" height="8" />
+      </g>
+    </g>
+
+    <!-- Card 2 (Top Right - Highlighted/Active Desk Card with 3D Pop Effect) -->
+    <g transform="translate(202, 62)">
+      <rect width="160" height="78" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <rect x="6" y="6" width="148" height="18" rx="4" fill="#f0fdfa" />
+      <rect x="12" y="11" width="75" height="8" rx="3" fill="#0d9488" />
+      <rect x="100" y="10" width="46" height="10" rx="4" fill="#0284c7" />
+      <rect x="12" y="32" width="95" height="11" rx="3" fill="#0f172a" />
+      <rect x="12" y="48" width="55" height="8" rx="2" fill="#64748b" />
+      <rect x="85" y="48" width="45" height="8" rx="2" fill="#eab308" />
+      <g transform="translate(12, 62)" fill="#0f172a" opacity="0.6">
+        <rect x="0" y="0" width="2" height="8" /><rect x="4" y="0" width="3" height="8" />
+        <rect x="9" y="0" width="1" height="8" /><rect x="12" y="0" width="4" height="8" />
+      </g>
+    </g>
+
+    <!-- Card 3 & 4 (Middle Row) -->
+    <g transform="translate(18, 158)">
+      <rect width="160" height="74" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <rect x="6" y="6" width="148" height="16" rx="4" fill="#f8fafc" />
+      <rect x="12" y="10" width="65" height="7" rx="3" fill="#0d9488" opacity="0.7" />
+      <rect x="12" y="28" width="85" height="9" rx="3" fill="#334155" />
+      <rect x="12" y="42" width="50" height="7" rx="2" fill="#94a3b8" />
+    </g>
+    <g transform="translate(202, 158)">
+      <rect width="160" height="74" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2" />
+      <rect x="6" y="6" width="148" height="16" rx="4" fill="#f8fafc" />
+      <rect x="12" y="10" width="65" height="7" rx="3" fill="#0d9488" opacity="0.7" />
+      <rect x="12" y="28" width="85" height="9" rx="3" fill="#334155" />
+      <rect x="12" y="42" width="50" height="7" rx="2" fill="#94a3b8" />
+    </g>
+  </g>
+
+  <!-- Big Hero Floating Seating Card (Pop-out 3D Wow Factor) -->
+  <g transform="translate(130, 240)" filter="url(#cardFloatShadow)">
+    <!-- Main Card Body -->
+    <rect width="260" height="180" rx="16" fill="#ffffff" stroke="#0d9488" stroke-width="3" />
+    
+    <!-- Card Header Strip -->
+    <path d="M 0 16 C 0 7.16 7.16 0 16 0 L 244 0 C 252.84 0 260 7.16 260 16 L 260 46 L 0 46 Z" fill="url(#headerGrad)" />
+    
+    <!-- School Emblem & Name -->
+    <circle cx="28" cy="23" r="14" fill="#ffffff" />
+    <path d="M22 23 L28 17 L34 23 L32 23 L32 29 L24 29 L24 23 Z" fill="#0d9488" />
+    <text x="50" y="28" font-family="'Cairo', sans-serif" font-weight="900" font-size="13" fill="#ffffff">ثانوية المتميزين للبنين</text>
+    
+    <!-- Hall Badge -->
+    <rect x="195" y="11" width="54" height="24" rx="12" fill="url(#goldRibbon)" filter="url(#badgeShadow)" />
+    <text x="222" y="27" font-family="'Cairo', sans-serif" font-weight="900" font-size="10.5" fill="#78350f" text-anchor="middle">قاعة (1)</text>
+
+    <!-- Student Name (Large Bold Focus) -->
+    <text x="238" y="76" font-family="'Cairo', sans-serif" font-weight="900" font-size="11" fill="#64748b" text-anchor="end">اسم الطالب:</text>
+    <text x="238" y="103" font-family="'Cairo', sans-serif" font-weight="900" font-size="17" fill="#0f172a" text-anchor="end">أحمد علي عبد الحسين</text>
+
+    <!-- Divider Line -->
+    <line x1="20" y1="116" x2="240" y2="116" stroke="#e2e8f0" stroke-width="1.5" />
+
+    <!-- Examination Roll Number Box (Golden / Navy Highlight) -->
+    <g transform="translate(18, 126)">
+      <rect width="130" height="38" rx="8" fill="#f0fdfa" stroke="#0d9488" stroke-width="1.5" />
+      <text x="120" y="16" font-family="'Cairo', sans-serif" font-weight="800" font-size="8.5" fill="#0f766e" text-anchor="end">الرقم الامتحاني:</text>
+      <text x="65" y="33" font-family="'Cairo', monospace" font-weight="900" font-size="16" fill="#0d9488" text-anchor="middle" letter-spacing="2">1024</text>
+    </g>
+
+    <!-- Desk Seat Number Pill -->
+    <g transform="translate(158, 126)">
+      <rect width="84" height="38" rx="8" fill="#0f172a" />
+      <text x="42" y="16" font-family="'Cairo', sans-serif" font-weight="800" font-size="8.5" fill="#94a3b8" text-anchor="middle">رقم المقعد</text>
+      <text x="42" y="33" font-family="'Cairo', sans-serif" font-weight="900" font-size="15" fill="#fde047" text-anchor="middle">12</text>
+    </g>
+  </g>
+
+  <!-- Scissor & Cutting Guide Icon Floating on the right edge -->
+  <g transform="translate(425, 175)" filter="url(#badgeShadow)">
+    <circle cx="20" cy="20" r="22" fill="#0f766e" stroke="#ffffff" stroke-width="2" />
+    <!-- Scissor SVG -->
+    <path d="M12 14 C10 14 9 16 9 18 C9 20 10 22 12 22 C13.5 22 15 21 16 19.5 L24 27 L26 25 L18 17 C19 16 19.5 14.5 19.5 13 C19.5 11 18 9.5 16 9.5 C14 9.5 12.5 11 12.5 13 C12.5 13.5 12.7 14 13 14.5 L12 14 Z M13 17 C12.5 17 12 16.5 12 16 C12 15.5 12.5 15 13 15 C13.5 15 14 15.5 14 16 C14 16.5 13.5 17 13 17 Z M26 15 L24 13 L17.5 19.5 L19 21 L26 15 Z" fill="#ffffff" />
+  </g>
+</svg>

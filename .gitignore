@@ -1,0 +1,43 @@
+# الاعتماديات المحلية وحزم Node
+node_modules/
+package-lock.json.bak
+
+# ملفات الاختبار والتطوير المحلي المؤقتة
+scratch/
+*.log
+server_bot.log
+
+# بيانات المستخدمين السحابية المحلية والتزامنات المؤقتة
+data/cloud_sync_*.json
+data/session_*.json
+
+# كاش بايثون والملفات التنفيذية المؤقتة
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# ملفات النظام المؤقتة
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+*.swp
+*.zip
+
+# بيانات الحسابات وقاعدة البيانات (لا تُرفع إلى GitHub)
+data/accounts.json
+data/masar_system.db
+data/*.db
+data/*.db-journal
+
+# ملفات تنفيذية وبيانات لا تُرفع إلى GitHub
+tools/cloudflared.exe
+*.exe
+data/activation_codes.json
+data/public_server_url.txt
+
+masar_system.db
+server/data/
+data/server_meta.json

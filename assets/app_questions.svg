@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="q_bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ede9fe"/>
+      <stop offset="100%" stop-color="#ddd6fe"/>
+    </linearGradient>
+    <linearGradient id="q_paper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="q_pen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="q_accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="q_shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#8b5cf6" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Rounded Base Blob -->
+  <rect x="15" y="15" width="130" height="130" rx="36" fill="url(#q_bg)"/>
+  <!-- Paper Sheet with 3D Fold -->
+  <g filter="url(#q_shadow)">
+    <rect x="38" y="32" width="68" height="92" rx="12" fill="url(#q_paper)" stroke="#e2e8f0" stroke-width="2"/>
+    <!-- Lines on paper -->
+    <rect x="48" y="46" width="34" height="6" rx="3" fill="url(#q_accent)"/>
+    <rect x="48" y="60" width="48" height="4" rx="2" fill="#cbd5e1"/>
+    <rect x="48" y="72" width="42" height="4" rx="2" fill="#cbd5e1"/>
+    <rect x="48" y="84" width="48" height="4" rx="2" fill="#cbd5e1"/>
+    <rect x="48" y="96" width="30" height="4" rx="2" fill="#cbd5e1"/>
+  </g>
+  <!-- Floating 3D Pen -->
+  <g transform="rotate(-35 105 85)" filter="url(#q_shadow)">
+    <rect x="96" y="45" width="16" height="65" rx="6" fill="url(#q_pen)"/>
+    <polygon points="96,110 112,110 104,126" fill="#f59e0b"/>
+    <polygon points="102,122 106,122 104,128" fill="#1e293b"/>
+    <!-- Pen clip -->
+    <rect x="101" y="52" width="6" height="24" rx="2" fill="#ddd6fe"/>
+  </g>
+  <!-- Sparkles -->
+  <path d="M125 32 L128 39 L135 42 L128 45 L125 52 L122 45 L115 42 L122 39 Z" fill="#f59e0b"/>
+</svg>
