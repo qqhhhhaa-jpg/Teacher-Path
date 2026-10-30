@@ -2341,16 +2341,28 @@ body::before {
 }
 
 .form-control {
-  background: var(--bg-input);
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  color: #ffffff;
+  background: var(--bg-input, #ffffff);
+  border: 1.5px solid var(--border-color, #cbd5e1);
+  color: var(--text-main, #0f172a);
   padding: 0.65rem 0.95rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-md, 10px);
   font-size: 0.94rem;
   font-weight: 600;
   transition: var(--transition);
   outline: none;
   width: 100%;
+}
+
+[data-theme="light"] .form-control {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+[data-theme="dark"] .form-control {
+  background: #151d2f !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #f8fafc !important;
 }
 
 .form-control:focus {
@@ -36462,57 +36474,230 @@ button[data-pdf-export]:disabled {
   background: #ffffff !important;
 }
 
-[data-theme="dark"] .portal-input-container {
+/* ==========================================================================
+   Moallem Pro — Modernized Dedicated Portal & Workstation Input Precision Rules
+   ========================================================================== */
+
+/* Modern 2x2 Impact Pillars on Welcome Showcase */
+.welcome-pillars-row {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.75rem !important;
+  margin: 1.15rem 0 1.35rem 0 !important;
+}
+
+.welcome-pillar-chip {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  padding: 0.75rem 0.95rem !important;
+  background: var(--bg-card, #ffffff) !important;
+  border: 1.5px solid var(--border-color, #e2e8f0) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  transition: all 0.22s ease !important;
+}
+
+[data-theme="dark"] .welcome-pillar-chip {
   background: #1e293b !important;
   border-color: #334155 !important;
 }
 
-[data-theme="dark"] .portal-input-container:focus-within {
-  background: #0f172a !important;
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+.welcome-pillar-chip:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.1) !important;
+  border-color: #93c5fd !important;
+}
+
+.welcome-pillar-icon {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 11px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.05rem !important;
+  flex-shrink: 0 !important;
+}
+
+.welcome-pillar-text {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  text-align: right !important;
+}
+
+.welcome-pillar-text strong {
+  font-size: 0.84rem !important;
+  font-weight: 800 !important;
+  color: var(--text-main, #0f172a) !important;
+  white-space: nowrap !important;
+}
+
+[data-theme="dark"] .welcome-pillar-text strong {
+  color: #f1f5f9 !important;
+}
+
+.welcome-pillar-text small {
+  font-size: 0.72rem !important;
+  color: var(--text-muted, #64748b) !important;
+  white-space: nowrap !important;
+}
+
+/* Forgot Password Button Link */
+.btn-forgot-password-lux {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  color: #d97706 !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  transition: all 0.2s ease !important;
+  text-decoration: none !important;
+  outline: none !important;
+  font-family: inherit !important;
+}
+
+.btn-forgot-password-lux:hover {
+  color: #b45309 !important;
+  text-decoration: underline !important;
+  transform: translateY(-1px) !important;
+}
+
+[data-theme="dark"] .btn-forgot-password-lux {
+  color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .btn-forgot-password-lux:hover {
+  color: #fde68a !important;
+}
+
+/* Precision RTL Input Fields Container */
+.portal-input-container {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .portal-input-icon-box {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
   width: 28px !important;
   height: 28px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  color: var(--text-muted, #64748b) !important;
-  font-size: 0.9rem !important;
+  border-radius: 8px !important;
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #2563eb !important;
+  font-size: 0.95rem !important;
+  pointer-events: none !important;
+  z-index: 5 !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-theme="dark"] .portal-input-icon-box {
+  background: rgba(59, 130, 246, 0.18) !important;
+  color: #60a5fa !important;
 }
 
 .portal-lux-input {
-  flex: 1 !important;
-  border: none !important;
-  background: transparent !important;
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 48px !important;
+  padding: 0 48px 0 44px !important; /* In RTL: right: 48px for right-icon, left: 44px for eye-toggle */
+  box-sizing: border-box !important;
+  border-radius: 12px !important;
+  border: 1.5px solid var(--border-color, #cbd5e1) !important;
+  background: var(--bg-surface, #f8fafc) !important;
   color: var(--text-main, #0f172a) !important;
-  padding: 0 0.5rem !important;
-  height: 100% !important;
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  font-family: 'Cairo', 'Alexandria', sans-serif !important;
   outline: none !important;
+  transition: all 0.22s ease !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="light"] .portal-lux-input {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 [data-theme="dark"] .portal-lux-input {
+  background: #1e293b !important;
+  border-color: #334155 !important;
   color: #f1f5f9 !important;
 }
 
-.portal-toggle-password-btn {
-  background: transparent !important;
-  border: none !important;
-  color: var(--text-muted, #64748b) !important;
-  cursor: pointer !important;
-  padding: 4px 6px !important;
+.portal-lux-input:focus {
+  border-color: #2563eb !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16) !important;
+}
+
+[data-theme="dark"] .portal-lux-input:focus {
+  background: #0f172a !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
+}
+
+.portal-lux-input::placeholder {
+  color: #94a3b8 !important;
   font-size: 0.88rem !important;
+  font-weight: 500 !important;
+}
+
+.portal-eye-toggle-btn {
+  position: absolute !important;
+  left: 10px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 30px !important;
+  height: 30px !important;
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-muted, #64748b) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 0.95rem !important;
+  z-index: 5 !important;
+  border-radius: 7px !important;
+  transition: all 0.18s ease !important;
+}
+
+.portal-eye-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #2563eb !important;
+}
+
+[data-theme="dark"] .portal-eye-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #60a5fa !important;
 }
 
 .portal-form-aux-row {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  margin: 0.45rem 0 0.65rem 0 !important;
+  margin: 0.55rem 0 0.75rem 0 !important;
 }
 
 .portal-custom-checkbox {
@@ -36521,14 +36706,15 @@ button[data-pdf-export]:disabled {
   gap: 6px !important;
   cursor: pointer !important;
   font-size: 0.78rem !important;
+  font-weight: 600 !important;
   color: var(--text-muted, #64748b) !important;
 }
 
 .portal-btn-primary {
   width: 100% !important;
-  height: 45px !important;
-  border-radius: 10px !important;
-  font-size: 0.92rem !important;
+  height: 48px !important;
+  border-radius: 12px !important;
+  font-size: 0.94rem !important;
   font-weight: 800 !important;
   background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
   color: #ffffff !important;
@@ -36548,7 +36734,7 @@ button[data-pdf-export]:disabled {
 }
 
 .auth-divider-line {
-  margin: 0.65rem 0 0.55rem 0 !important;
+  margin: 0.75rem 0 0.65rem 0 !important;
   display: flex !important;
   align-items: center !important;
   text-align: center !important;
@@ -36563,7 +36749,7 @@ button[data-pdf-export]:disabled {
 
 .auth-divider-line span {
   padding: 0 0.65rem !important;
-  font-size: 0.73rem !important;
+  font-size: 0.74rem !important;
   color: var(--text-muted, #64748b) !important;
   font-weight: 600 !important;
 }
@@ -36571,21 +36757,22 @@ button[data-pdf-export]:disabled {
 .portal-extra-actions-grid {
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  gap: 0.6rem !important;
+  gap: 0.65rem !important;
 }
 
 .btn-portal-google-action,
 .btn-register-account-prominent {
-  height: 48px !important;
-  padding: 0.35rem 0.65rem !important;
-  border-radius: 10px !important;
+  height: 50px !important;
+  padding: 0.4rem 0.65rem !important;
+  border-radius: 12px !important;
   border: 1.5px solid var(--border-color, #cbd5e1) !important;
   background: var(--bg-surface, #f8fafc) !important;
   display: flex !important;
   align-items: center !important;
-  gap: 0.5rem !important;
+  gap: 0.55rem !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
+  min-width: 0 !important;
 }
 
 [data-theme="dark"] .btn-portal-google-action,
@@ -36612,27 +36799,49 @@ button[data-pdf-export]:disabled {
 .register-btn-icon-wrap {
   width: 32px !important;
   height: 32px !important;
-  border-radius: 8px !important;
+  min-width: 32px !important;
+  border-radius: 9px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
 }
 
+.register-btn-text {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+  text-align: right !important;
+  overflow: hidden !important;
+}
+
 .register-btn-text strong {
-  font-size: 0.8rem !important;
+  font-size: 0.78rem !important;
   font-weight: 800 !important;
-  line-height: 1.2 !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: var(--text-main, #0f172a) !important;
+}
+
+[data-theme="dark"] .register-btn-text strong {
+  color: #f1f5f9 !important;
 }
 
 .register-btn-text small {
-  font-size: 0.68rem !important;
+  font-size: 0.67rem !important;
   line-height: 1.2 !important;
+  color: var(--text-muted, #64748b) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 /* Card Footer */
 .portal-card-footer {
-  padding: 0.55rem 0.95rem !important;
+  padding: 0.65rem 0.95rem !important;
   background: rgba(248, 250, 252, 0.85) !important;
   border-top: 1px solid var(--border-color, #e2e8f0) !important;
 }
@@ -36654,12 +36863,12 @@ button[data-pdf-export]:disabled {
   display: flex !important;
   align-items: center !important;
   gap: 4px !important;
-  font-size: 0.72rem !important;
+  font-size: 0.73rem !important;
   color: var(--text-muted, #64748b) !important;
   font-weight: 600 !important;
 }
 
-/* Mobile responsive adjustments */
+/* Responsive Overrides */
 @media (max-width: 900px) {
   .portal-showcase-container {
     grid-template-columns: 1fr !important;
@@ -36667,7 +36876,7 @@ button[data-pdf-export]:disabled {
   }
   .portal-auth-section {
     max-width: 100% !important;
-    order: -1 !important; /* Login card appears FIRST on mobile for instant access */
+    order: -1 !important;
   }
 }
 
@@ -36681,9 +36890,12 @@ button[data-pdf-export]:disabled {
   .portal-extra-actions-grid {
     grid-template-columns: 1fr !important;
   }
+  .welcome-pillars-row {
+    grid-template-columns: 1fr !important;
+  }
 }
 
-/* Hide obsolete gcloud-topbar-pill & saved 1-click accounts box permanently */
+/* Guarantee isolation */
 .gcloud-topbar-pill, #topbarGCloudBtn {
   display: none !important;
 }

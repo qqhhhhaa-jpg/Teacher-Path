@@ -63,6 +63,24 @@ def health():
         'timestamp': datetime.now().isoformat()
     }), 200
 
+@app.route('/api/network-info', methods=['GET'])
+def api_network_info():
+    import socket
+    local_ip = '127.0.0.1'
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        local_ip = s.getsockname()[0]
+        s.close()
+    except Exception:
+        pass
+    return jsonify({
+        'local_ip': local_ip,
+        'port': 8080,
+        'mobile_url': f'http://{local_ip}:8080',
+        'local_url': 'http://localhost:8080'
+    }), 200
+
 # Statistics API
 @app.route('/api/stats', methods=['GET'])
 def api_stats():

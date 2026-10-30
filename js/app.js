@@ -16877,3 +16877,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
+
+// Mobile Connect Modal Utilities
+window.showMobileConnectModal = function() {
+  fetch('/api/network-info').then(function(r) { return r.json(); }).then(function(data) {
+    if (data && data.mobile_url) {
+      var inp = document.getElementById('mobileConnectUrlInput');
+      if (inp) inp.value = data.mobile_url;
+    }
+  }).catch(function() {});
+  var m = document.getElementById('mobileConnectModal');
+  if (m) m.classList.add('open');
+};
+
+window.closeMobileConnectModal = function() {
+  var m = document.getElementById('mobileConnectModal');
+  if (m) m.classList.remove('open');
+};
+
+window.copyMobileConnectUrl = function() {
+  var inp = document.getElementById('mobileConnectUrlInput');
+  if (inp) {
+    var val = inp.value;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(val).then(function() {
+        if (typeof window.showToast === 'function') {
+          window.showToast('تم نسخ الرابط بنجاح! الصقه في متصفح الموبايل 📱', 'success');
+        } else {
+          alert('تم نسخ الرابط: ' + val);
+        }
+      });
+    } else {
+      inp.select();
+      document.execCommand('copy');
+      if (typeof window.showToast === 'function') {
+        window.showToast('تم نسخ الرابط بنجاح! الصقه في متصفح الموبايل 📱', 'success');
+      } else {
+        alert('تم نسخ الرابط: ' + val);
+      }
+    }
+  }
+};

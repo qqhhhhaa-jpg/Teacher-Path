@@ -22,6 +22,18 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_FILE = os.path.join(BASE_DIR, 'app.py')
 LOG_FILE = os.path.join(BASE_DIR, 'data', 'server_watchdog.log')
 PORT = 8080
+WATCHDOG_LOCK_PORT = 8091
+
+# Ensure singleton watchdog
+_watchdog_socket = None
+def acquire_watchdog_lock():
+    global _watchdog_socket
+    try:
+        _watchdog_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        _watchdog_socket.bind(('127.0.0.1', WATCHDOG_LOCK_PORT))
+        return True
+    except Exception:
+        return False
 
 os.makedirs(os.path.join(BASE_DIR, 'data'), exist_ok=True)
 
@@ -72,6 +84,10 @@ def save_server_meta():
         pass
 
 def main():
+    if not acquire_watchdog_lock():
+        print("Another watchdog instance is already running. Exiting.")
+        sys.exit(0)
+
     log("=== بدء تشغيل حارس السيرفر الدائم (Watchdog 24/7) ===")
     save_server_meta()
     
