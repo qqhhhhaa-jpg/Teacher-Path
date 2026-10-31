@@ -42225,3 +42225,109 @@ button[data-pdf-export],
   border-color: rgba(56, 189, 248, 0.6) !important;
   box-shadow: 0 20px 45px rgba(2, 132, 199, 0.18), 0 0 25px rgba(56, 189, 248, 0.15) !important;
 }
+
+
+/* ==========================================================================
+   تطبيق الخلفية السينمائية المبهرة على واجهة تسجيل الدخول
+   Dazzling Cinematic Universe for Login Portal Interface
+   ========================================================================== */
+.fullscreen-auth-portal {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
+  background: radial-gradient(circle at 50% 25%, #0f172a 0%, #080d1a 100%) !important;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+[data-theme="light"] .fullscreen-auth-portal {
+  background: radial-gradient(circle at 50% 25%, #f8fafc 0%, #edf2f7 100%) !important;
+}
+
+.portal-cinematic-backdrop {
+  position: absolute !important;
+  z-index: 1 !important;
+  opacity: 0.95 !important;
+}
+
+.portal-topbar {
+  position: relative !important;
+  z-index: 10 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+[data-theme="dark"] .portal-topbar {
+  background: rgba(15, 23, 42, 0.75) !important;
+  border-bottom: 1.5px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+[data-theme="light"] .portal-topbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom: 1.5px solid rgba(2, 132, 199, 0.2) !important;
+}
+
+.portal-showcase-container {
+  position: relative !important;
+  z-index: 5 !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 28px !important;
+  transition: all 0.35s ease !important;
+}
+
+[data-theme="dark"] .portal-showcase-container {
+  background: rgba(15, 23, 42, 0.65) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.25) !important;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(2, 132, 199, 0.2) !important;
+}
+
+[data-theme="light"] .portal-showcase-container {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1.5px solid rgba(203, 213, 225, 0.85) !important;
+  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.08), 0 0 40px rgba(2, 132, 199, 0.12) !important;
+}
+
+.portal-auth-card {
+  position: relative !important;
+  z-index: 6 !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-radius: 24px !important;
+  transition: all 0.35s ease !important;
+}
+
+[data-theme="dark"] .portal-auth-card {
+  background: rgba(15, 23, 42, 0.84) !important;
+  border: 1.5px solid rgba(56, 189, 248, 0.4) !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.65), 0 0 45px rgba(2, 132, 199, 0.25) !important;
+}
+
+[data-theme="light"] .portal-auth-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border: 1.5px solid rgba(2, 132, 199, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(2, 132, 199, 0.14), 0 0 35px rgba(56, 189, 248, 0.18) !important;
+}
+
+/* Glowing Aura on Login Inputs */
+.portal-input-wrap input:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.35) !important;
+}
+
+/* Radiant Submit Button */
+#portalSubmitLoginBtn {
+  background: linear-gradient(135deg, #0284c7, #0d9488) !important;
+  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45) !important;
+  transition: all 0.25s ease !important;
+}
+
+#portalSubmitLoginBtn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 26px rgba(2, 132, 199, 0.6), 0 0 20px rgba(56, 189, 248, 0.35) !important;
+}
