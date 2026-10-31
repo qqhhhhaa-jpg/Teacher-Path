@@ -37937,7 +37937,9 @@ textarea:focus {
 .exam-cards-grid.grid-count-4 {
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, minmax(130mm, 1fr));
-  gap: 5.5mm 6mm;
+  gap: 5mm 5mm;
+  flex: 1;
+  height: 100%;
 }
 
 /* 6 cards per A4: 2 columns x 3 rows */
@@ -38591,19 +38593,23 @@ textarea:focus {
    تصميم رسمي مطابق 100% للنموذج العراقي المعتمد
    ========================================================================== */
 .exam-card-item.ministerial-card {
-  border: 1px dashed #cbd5e1;
-  padding: 4px;
+  border: 1px dashed #94a3b8;
+  padding: 3mm;
   background: #ffffff;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   box-sizing: border-box;
   overflow: hidden;
   font-family: 'Cairo', 'Tajawal', sans-serif;
   color: #08295e;
   position: relative;
-  aspect-ratio: 1.42 / 1;
+  aspect-ratio: auto;
   width: 100%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  height: 100%;
+  min-height: 128mm;
+  max-height: 138mm;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 /* Blue Theme (Default Ministerial Ink) */

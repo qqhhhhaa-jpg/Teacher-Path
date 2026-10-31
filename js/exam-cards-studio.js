@@ -362,7 +362,7 @@
     const perPage = Number(cardsData.cardsPerPage || 4);
     const pagesCount = Math.ceil(students.length / perPage);
     const isMinisterial = (cardsData.cardTemplate !== 'modernBadge');
-    const isLandscapePaper = isMinisterial && (perPage === 4);
+    const isLandscapePaper = false; // Always standard A4 Portrait: 4 cards = 4x A6 cards (2x2)
     const paperClass = isLandscapePaper ? 'exam-card-a4-paper paper-landscape' : 'exam-card-a4-paper';
     let html = '';
 

@@ -398,7 +398,32 @@
     print-color-adjust: exact !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    aspect-ratio: 1.42 / 1 !important;
+    aspect-ratio: auto !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 128mm !important;
+    max-height: 138mm !important;
+  }
+
+  .exam-cards-grid.grid-count-4 {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: repeat(2, minmax(130mm, 1fr)) !important;
+    gap: 4mm 4mm !important;
+    width: 100% !important;
+  }
+
+  .exam-card-a4-paper {
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 297mm !important;
+    height: auto !important;
+    padding: 5mm 5mm !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    page-break-after: always !important;
+    break-after: page !important;
   }
   .exam-card-item.ministerial-card.theme-blue {
     color: #08295e !important;
