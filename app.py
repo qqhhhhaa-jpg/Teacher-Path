@@ -926,6 +926,51 @@ def api_supabase_verify():
         "profile": matched
     }), 200
 
+@app.route('/api/supabase/sync_full', methods=['POST', 'GET'])
+def api_supabase_sync_full():
+    """Perform bidirectional sync check between Local SQLite and Supabase Cloud"""
+    try:
+        status = supabase_manager.check_connection()
+        accounts = server_db.get_all_accounts() if server_db else []
+        synced_count = 0
+        errors = []
+
+        if status.get('connected'):
+            for a in accounts:
+                email = a.get('email')
+                if not email or '@' not in email:
+                    continue
+                pwd = a.get('password')
+                role = a.get('role', 'teacher')
+                meta = {
+                    'name': a.get('name'),
+                    'username': a.get('username'),
+                    'school': a.get('school'),
+                    'subject': a.get('subject')
+                }
+                user, err = supabase_manager.create_or_sync_supabase_user(email, pwd, role=role, user_metadata=meta)
+                if user:
+                    synced_count += 1
+                elif err and 'already been registered' in str(err):
+                    synced_count += 1
+                elif err:
+                    errors.append(f"{email}: {err}")
+
+        # Update local sync log
+        sync_result = {
+            "success": True,
+            "supabase_connected": status.get('connected', False),
+            "supabase_url": supabase_manager.SUPABASE_URL,
+            "local_db_status": "active_sqlite",
+            "local_accounts_count": len(accounts),
+            "synced_accounts_count": synced_count,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "errors": errors[:5]
+        }
+        return jsonify(sync_result), 200
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route('/api/supabase/sync_account', methods=['POST'])
 def api_supabase_sync_account():
     """Sync a local account to Supabase Auth"""

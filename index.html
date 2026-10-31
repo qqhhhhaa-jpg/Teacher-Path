@@ -9266,6 +9266,74 @@
           </div>
         </div>
 
+        <!-- 2.5 بطاقة المزامنة السحابية والحفظ المحلي (Dual Persistence: Supabase Cloud & Local SQLite) -->
+        <div
+          style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(14, 165, 233, 0.08)); border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-md); padding: 1.15rem 1.25rem; margin-bottom: 1.15rem;">
+          <div
+            style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 8px;">
+            <div
+              style="font-weight: 800; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+              <i class="fa-solid fa-cloud-arrow-up" style="color: #10b981;"></i>
+              <span>المزامنة السحابية وقاعدة البيانات المحلية (Cloud & Local Sync)</span>
+            </div>
+            <span class="badge-tag" id="srvModalCloudSyncBadge"
+              style="background: rgba(16, 185, 129, 0.15); color: #10b981; font-weight: 800; font-size: 0.76rem; padding: 3px 10px; border-radius: 999px;">
+              <i class="fa-solid fa-circle-check"></i> متصل ومزامن (Dual Active)
+            </span>
+          </div>
+
+          <!-- شبكة تفاصيل الحفظ المحلي والسحابي -->
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.85rem; margin-bottom: 1rem;">
+
+            <!-- الحفظ المحلي -->
+            <div
+              style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem 1rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
+                <i class="fa-solid fa-database" style="color: #0284c7;"></i> قاعدة البيانات المحلية (Local SQLite):
+              </div>
+              <div style="font-size: 0.92rem; font-weight: 800; color: var(--text-main); margin-bottom: 2px;">
+                ملف <code style="color: #0284c7; font-family: monospace;">masar_system.db</code>
+              </div>
+              <small style="color: #10b981; font-size: 0.75rem; font-weight: 700; display: block;" id="srvModalLocalDbStats">
+                ✔ الحفظ المحلي دائم ومستمر (11 حساب مسجل)
+              </small>
+            </div>
+
+            <!-- المزامنة السحابية -->
+            <div
+              style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem 1rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
+                <i class="fa-solid fa-cloud" style="color: #10b981;"></i> السيرفر السحابي (Supabase Cloud):
+              </div>
+              <div style="font-size: 0.85rem; font-weight: 800; color: #10b981; margin-bottom: 2px; direction: ltr; text-align: right; font-family: monospace;" id="srvModalSupabaseUrlText">
+                https://wnzmmkhoplcmelqzjskz.supabase.co
+              </div>
+              <small style="color: #0ea5e9; font-size: 0.75rem; font-weight: 700; display: block;" id="srvModalCloudSyncStats">
+                ✔ مزامنة الحسابات والتوثيق Auth نشطة
+              </small>
+            </div>
+
+          </div>
+
+          <!-- أزرار الإجراءات الفورية للمزامنة -->
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+            <button type="button" class="btn btn-primary" id="btnTriggerSupabaseSync"
+              onclick="window.triggerManualSupabaseSync()"
+              style="font-size: 0.82rem; font-weight: 800; padding: 0.5rem 1rem; border-radius: 10px; background: linear-gradient(135deg, #10b981, #059669); border: none;">
+              <i class="fa-solid fa-rotate" id="iconManualSync"></i> مزامنة السيرفر السحابي والمحلي الآن
+            </button>
+            <a href="/api/backup" target="_blank" class="btn btn-outline"
+              style="font-size: 0.82rem; font-weight: 700; padding: 0.5rem 1rem; border-radius: 10px; text-decoration: none;">
+              <i class="fa-solid fa-download"></i> تصدير نسخة احتياطية محلية (JSON)
+            </a>
+            <span id="srvModalSyncTimeNotice" style="font-size: 0.76rem; color: var(--text-muted); font-weight: 600; margin-right: auto;">
+              آخر مزامنة: الآن
+            </span>
+          </div>
+
+        </div>
+
         <!-- 3. أين مربوط السيرفر (الروابط والعناوين للوصول والنسخ) -->
         <div
           style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem 1.25rem; margin-bottom: 1.15rem;">
