@@ -41,3 +41,6 @@ data/public_server_url.txt
 masar_system.db
 server/data/
 data/server_meta.json
+
+supabase_secrets.json
+.env

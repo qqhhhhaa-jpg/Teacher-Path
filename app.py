@@ -8,6 +8,7 @@ import os
 import re
 import json
 from datetime import datetime
+import supabase_manager
 from flask import Flask, send_from_directory, jsonify, request, send_file
 
 import sys
@@ -872,6 +873,77 @@ def api_pricing():
         except Exception:
             pass
     return jsonify({"success": True, "pricing": DEFAULT_PRICING}), 200
+
+
+# ==============================================================================
+# Supabase Integration & Protected Routes API
+# ==============================================================================
+
+@app.route('/api/supabase/config', methods=['GET'])
+def api_supabase_config():
+    """Return safe public configuration for client (URL & Publishable key)"""
+    return jsonify({
+        "success": True,
+        "config": supabase_manager.get_public_config()
+    }), 200
+
+@app.route('/api/supabase/status', methods=['GET'])
+def api_supabase_status():
+    """Check connectivity to Supabase project"""
+    status = supabase_manager.check_connection()
+    return jsonify({
+        "success": True,
+        "status": status
+    }), 200
+
+@app.route('/api/supabase/verify', methods=['POST'])
+def api_supabase_verify():
+    """Verify Supabase JWT token and return authenticated user session"""
+    auth_header = request.headers.get('Authorization', '')
+    token = None
+    if auth_header.startswith('Bearer '):
+        token = auth_header.split(' ', 1)[1].strip()
+    
+    if not token:
+        payload = request.get_json(force=True, silent=True) or {}
+        token = payload.get('token')
+
+    if not token:
+        return jsonify({"success": False, "message": "رمز التوثيق (JWT Token) مطلوب"}), 401
+
+    user = supabase_manager.verify_jwt_token(token)
+    if not user:
+        return jsonify({"success": False, "message": "جلسة غير صالحة أو منتهية الصلاحية"}), 401
+
+    email = user.get('email', '')
+    # Check if local profile exists
+    accounts = server_db.get_all_accounts() if server_db else []
+    matched = next((a for a in accounts if (a.get('email') or '').lower() == email.lower()), None)
+
+    return jsonify({
+        "success": True,
+        "user": user,
+        "profile": matched
+    }), 200
+
+@app.route('/api/supabase/sync_account', methods=['POST'])
+def api_supabase_sync_account():
+    """Sync a local account to Supabase Auth"""
+    payload = request.get_json(force=True, silent=True) or {}
+    email = payload.get('email')
+    password = payload.get('password')
+    role = payload.get('role', 'teacher')
+    metadata = payload.get('metadata', {})
+
+    if not email:
+        return jsonify({"success": False, "message": "البريد الإلكتروني مطلوب"}), 400
+
+    user, err = supabase_manager.create_or_sync_supabase_user(email, password, role=role, user_metadata=metadata)
+    if user:
+        return jsonify({"success": True, "user": user}), 200
+    else:
+        return jsonify({"success": False, "message": err or "فشل المزامنة"}), 400
+
 
 @app.route('/<path:path>')
 def serve_file(path):
