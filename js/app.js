@@ -12891,32 +12891,19 @@ let pendingGoogleAccount = {
 };
 
 // Launch Manual Email Registration / Login Modal
-window.launchGoogleRealPopup = function () {
+window.launchGoogleRealPopup = async function () {
   const statusEl = document.getElementById('googleAuthStatusNotice');
-  if (statusEl) statusEl.style.display = 'block';
+  if (statusEl) statusEl.style.display = 'none';
 
-  const w = 520;
-  const h = 640;
-  const left = Math.max(0, Math.round((window.screen.width - w) / 2));
-  const top = Math.max(0, Math.round((window.screen.height - h) / 2));
+  // Completely eliminate and remove the confirmation popup overlay
+  const overlay = document.getElementById('googleYesNoQuickOverlay');
+  if (overlay) overlay.remove();
 
-  // 1. Open Google's Official Account Chooser window
-  const googleChooserUrl = 'https://accounts.google.com/AccountChooser?service=lso&continue=https://myaccount.google.com/';
-  try {
-    window.open(
-      googleChooserUrl,
-      'GoogleOfficialAccountChooser',
-      `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
-    );
-  } catch (e) {
-    console.warn('Popup notice:', e);
-  }
-
-  // 2. Identify the active / saved Google account (e.g. aqsys2004@gmail.com)
+  // 1. Identify active teacher account (strictly non-admin)
   const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
-  // حساب المدير العام خاص ولا يظهر في نافذة التأكيد
   const isPrivateAdmin = (a) => !!(a && (a.isAdmin || a.role === 'admin' || a.username === 'admin' || a.id === 'usr_admin'));
   const publicAccounts = accounts.filter(a => !isPrivateAdmin(a));
+
   let target = publicAccounts.find(a => (a.email && a.email.toLowerCase().includes('aqsys2004@gmail.com')) || a.isGoogleUser);
   if (!target) {
     target = publicAccounts.find(a => a.email && a.email.toLowerCase().includes('@gmail'));
@@ -12925,73 +12912,10 @@ window.launchGoogleRealPopup = function () {
     let lastEmail = localStorage.getItem('moallem_last_google_email') || 'aqsys2004@gmail.com';
     if (accounts.some(a => isPrivateAdmin(a) && (a.email || '').toLowerCase() === lastEmail.toLowerCase())) lastEmail = 'aqsys2004@gmail.com';
     target = {
+      id: 'g_' + lastEmail.replace(/[^a-zA-Z0-9]/g, '_'),
       name: 'الأستاذ أحمد',
+      username: lastEmail.split('@')[0],
       email: lastEmail,
-      picture: 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c'
-    };
-  }
-
-  const name = target.name || 'أستاذ مسار المعلم';
-  const email = target.email || 'aqsys2004@gmail.com';
-  const picture = target.avatar || target.picture || 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c';
-
-  if (statusEl) statusEl.style.display = 'none';
-
-  // 3. Show Google Cloud Confirmation Dialog
-  window.showGoogleYesNoConfirmDialog(name, email, picture);
-};
-
-window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
-  let overlay = document.getElementById('googleYesNoQuickOverlay');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'googleYesNoQuickOverlay';
-    overlay.className = 'modal-overlay open';
-    overlay.style.zIndex = '100000099';
-    document.body.appendChild(overlay);
-  }
-  overlay.classList.add('open');
-  overlay.style.display = 'flex';
-  const safeName = name || ('أستاذ ' + (email || '').split('@')[0]);
-  const avatarHtml = picture
-    ? `<img src="${picture}" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='assets/masar_moallem_logo.png';this.style.objectFit='contain';this.style.background='#fff';" style="width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2.5px solid #4285F4; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);">`
-    : `<div style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #fff; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);"><i class="fa-brands fa-google"></i></div>`;
-
-  overlay.innerHTML = `
-    <div class="modal-container" style="max-width: 430px; width: 92%; padding: 1.75rem 1.5rem; text-align: center; border-radius: 22px; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(66, 133, 244, 0.35);">
-      <div style="margin: 0 auto 0.85rem auto; display: flex; justify-content: center;">
-        ${avatarHtml}
-      </div>
-      <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 4px 14px; border-radius: 999px; margin-bottom: 0.6rem;">
-        <i class="fa-brands fa-google text-primary"></i>
-        <span>تسجيل الدخول عبر Google</span>
-      </div>
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.18rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
-      <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 0.85rem; margin: 0.85rem 0 1.25rem 0;">
-        <strong style="display: block; font-size: 1.05rem; color: var(--text-main); margin-bottom: 3px;">${safeName}</strong>
-        <span style="font-size: 0.88rem; color: #2563eb; direction: ltr; font-family: monospace; font-weight: 700;">${email}</span>
-      </div>
-      <div style="display: flex; gap: 0.65rem;">
-        <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1.35; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.92rem; background: linear-gradient(135deg, #2563eb, #1d4ed8); gap: 6px;">
-          <i class="fa-solid fa-arrow-left"></i> متابعة
-        </button>
-        <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem; gap: 6px;">
-          <i class="fa-solid fa-xmark"></i> لا، حساب آخر
-        </button>
-      </div>
-    </div>
-  `;
-
-  document.getElementById('btnGoogleConfirmYes').onclick = async function () {
-    const btn = document.getElementById('btnGoogleConfirmYes');
-    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري فتح المنصة...';
-
-    // Account payload for immediate unlock
-    const googleAcc = {
-      id: 'g_' + (email || 'user').replace(/[^a-zA-Z0-9]/g, '_'),
-      name: safeName,
-      username: (email || '').split('@')[0] || 'teacher',
-      email: email,
       role: 'teacher',
       status: 'active',
       isSubscribed: true,
@@ -13000,48 +12924,40 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
       googleLinked: true,
       authProvider: 'google_cloud_oauth',
       loginProvider: 'google',
-      avatar: picture || 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c'
+      avatar: 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c'
     };
+  }
 
-    // Close overlay immediately
-    overlay.classList.remove('open');
-    overlay.style.display = 'none';
+  // 2. Direct Instant Login in 1 Click! No confirmation dialog ever!
+  await window.performGoogleLoginSuccess(target);
 
-    // Open platform directly & unlock workstation
-    await window.performGoogleLoginSuccess(googleAcc);
+  // 3. Notify backend in background asynchronously
+  try {
+    fetch('/api/gcloud/oauth_verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: target.email,
+        name: target.name || 'أستاذ مسار المعلم',
+        googleId: target.id || ('g_' + target.email.replace(/[^a-zA-Z0-9]/g, '_')),
+        picture: target.avatar || target.picture || ''
+      })
+    }).then(r => r.json()).then(data => {
+      if (data && data.success && data.account) {
+        setCurrentUser(data.account);
+      }
+    }).catch(() => {});
+  } catch (_) {}
 
-    // Sync in background with backend
-    try {
-      fetch('/api/gcloud/oauth_verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email,
-          name: safeName,
-          googleId: googleAcc.id,
-          picture: picture || ''
-        })
-      }).then(r => r.json()).then(data => {
-        if (data && data.success && data.account) {
-          setCurrentUser(data.account);
-        }
-      }).catch(() => {});
-    } catch (_) {}
+  if (typeof window.syncPlatformGoogleIconsState === 'function') {
+    window.syncPlatformGoogleIconsState();
+  }
+};
 
-    if (typeof window.syncPlatformGoogleIconsState === 'function') {
-      window.syncPlatformGoogleIconsState();
-    }
-  };
-
-  document.getElementById('btnGoogleConfirmNo').onclick = function () {
-    overlay.classList.remove('open');
-    overlay.style.display = 'none';
-    if (typeof window.openGoogleAccountModal === 'function') {
-      window.openGoogleAccountModal();
-      const inp = document.getElementById('googlePersonalEmailInput');
-      if (inp) inp.focus();
-    }
-  };
+// Disabled permanently as requested: dialog never appears
+window.showGoogleYesNoConfirmDialog = function () {
+  const overlay = document.getElementById('googleYesNoQuickOverlay');
+  if (overlay) overlay.remove();
 };
 
 let _googlePollTimer = null;
