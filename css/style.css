@@ -41881,3 +41881,132 @@ button[data-pdf-export],
 #btnReportViewPdfDoc {
   display: none !important;
 }
+
+
+/* ==========================================================================
+   دمج الحركات السينمائية التعليمية: الشفق التعليمي + الرموز العلمية العائمة
+   Cinematic Educational Aurora & Floating Academic Symbols (Merge of 1 & 2)
+   ========================================================================== */
+.cinematic-academic-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none !important;
+  user-select: none !important;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* 1. Aurora Fluid Orbs (الخيار 2: الشفق التعليمي والأفق المضيء) */
+.aurora-fluid-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(55px);
+  -webkit-filter: blur(55px);
+  opacity: 0.38;
+  will-change: transform, opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+[data-theme="dark"] .aurora-fluid-orb {
+  opacity: 0.58;
+  filter: blur(65px);
+}
+
+.aurora-fluid-orb.orb-cyan {
+  width: 340px;
+  height: 220px;
+  top: -40px;
+  left: 8%;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.45) 0%, rgba(56, 189, 248, 0.15) 60%, transparent 80%);
+  animation: auroraCyanBreath 18s ease-in-out infinite alternate;
+}
+
+.aurora-fluid-orb.orb-emerald {
+  width: 300px;
+  height: 210px;
+  bottom: -35px;
+  right: 12%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(52, 211, 153, 0.12) 60%, transparent 80%);
+  animation: auroraEmeraldBreath 22s ease-in-out infinite alternate-reverse;
+}
+
+.aurora-fluid-orb.orb-indigo {
+  width: 280px;
+  height: 190px;
+  top: 20%;
+  left: 52%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(168, 85, 247, 0.1) 60%, transparent 80%);
+  animation: auroraIndigoBreath 20s ease-in-out infinite alternate;
+}
+
+@keyframes auroraCyanBreath {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.32; }
+  50% { transform: translate3d(35px, 20px, 0) scale(1.18); opacity: 0.52; }
+  100% { transform: translate3d(-25px, 15px, 0) scale(0.92); opacity: 0.36; }
+}
+
+@keyframes auroraEmeraldBreath {
+  0% { transform: translate3d(0, 0, 0) scale(0.95); opacity: 0.28; }
+  50% { transform: translate3d(-30px, -20px, 0) scale(1.15); opacity: 0.48; }
+  100% { transform: translate3d(20px, -10px, 0) scale(1.05); opacity: 0.35; }
+}
+
+@keyframes auroraIndigoBreath {
+  0% { transform: translate3d(0, 0, 0) scale(1.05); opacity: 0.28; }
+  50% { transform: translate3d(25px, -15px, 0) scale(0.88); opacity: 0.44; }
+  100% { transform: translate3d(-20px, 25px, 0) scale(1.12); opacity: 0.32; }
+}
+
+/* 2. Floating Academic & Educational Symbols (الخيار 1: الجزيئات والرموز العلمية العائمة) */
+.floating-academic-symbol {
+  position: absolute;
+  color: #0284c7;
+  font-size: 1.45rem;
+  opacity: 0.20;
+  filter: drop-shadow(0 2px 8px rgba(2, 132, 199, 0.25));
+  will-change: transform, opacity;
+  animation: floatAcademicDrift 16s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Amiri', 'Cairo', serif;
+  font-weight: 900;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+[data-theme="dark"] .floating-academic-symbol {
+  color: #38bdf8;
+  opacity: 0.30;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.45));
+}
+
+.floating-academic-symbol.sym-book { font-size: 1.6rem; color: #0284c7; }
+.floating-academic-symbol.sym-atom { font-size: 1.5rem; color: #10b981; }
+.floating-academic-symbol.sym-pi { font-size: 1.8rem; color: #8b5cf6; font-style: italic; }
+.floating-academic-symbol.sym-compass { font-size: 1.4rem; color: #06b6d4; }
+.floating-academic-symbol.sym-grad { font-size: 1.65rem; color: #f59e0b; }
+.floating-academic-symbol.sym-sqrt { font-size: 1.6rem; color: #10b981; font-weight: 800; }
+.floating-academic-symbol.sym-pen { font-size: 1.4rem; color: #3b82f6; }
+.floating-academic-symbol.sym-sigma { font-size: 1.7rem; color: #ec4899; }
+
+@keyframes floatAcademicDrift {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(12px, -18px, 0) rotate(5deg);
+  }
+  50% {
+    transform: translate3d(-8px, -32px, 0) rotate(-4deg);
+  }
+  75% {
+    transform: translate3d(-15px, -14px, 0) rotate(3deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
