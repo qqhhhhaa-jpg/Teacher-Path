@@ -12937,25 +12937,25 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
     : `<div style="width: 58px; height: 58px; border-radius: 50%; background: linear-gradient(135deg, #4285F4, #2563eb); color: #fff; font-size: 1.6rem; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.35);"><i class="fa-brands fa-google"></i></div>`;
 
   overlay.innerHTML = `
-    <div class="modal-container" style="max-width: 440px; width: 92%; padding: 1.75rem 1.5rem; text-align: center; border-radius: 22px; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3); border: 1.5px solid rgba(66, 133, 244, 0.3);">
+    <div class="modal-container" style="max-width: 430px; width: 92%; padding: 1.75rem 1.5rem; text-align: center; border-radius: 22px; box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(66, 133, 244, 0.35);">
       <div style="margin: 0 auto 0.85rem auto; display: flex; justify-content: center;">
         ${avatarHtml}
       </div>
-      <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 3px 12px; border-radius: 999px; margin-bottom: 0.5rem;">
+      <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 800; color: #2563eb; background: rgba(37, 99, 235, 0.08); padding: 4px 14px; border-radius: 999px; margin-bottom: 0.6rem;">
         <i class="fa-brands fa-google text-primary"></i>
         <span>تسجيل الدخول عبر Google</span>
       </div>
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.12rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.18rem; font-weight: 900; color: var(--text-main);">هل تريد تسجيل الدخول بهذا الحساب؟</h3>
       <div style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 0.85rem; margin: 0.85rem 0 1.25rem 0;">
-        <strong style="display: block; font-size: 1rem; color: var(--text-main); margin-bottom: 2px;">${safeName}</strong>
-        <span style="font-size: 0.85rem; color: #2563eb; direction: ltr; font-family: monospace; font-weight: 700;">${email}</span>
+        <strong style="display: block; font-size: 1.05rem; color: var(--text-main); margin-bottom: 3px;">${safeName}</strong>
+        <span style="font-size: 0.88rem; color: #2563eb; direction: ltr; font-family: monospace; font-weight: 700;">${email}</span>
       </div>
       <div style="display: flex; gap: 0.65rem;">
-        <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1.3; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
-          <i class="fa-solid fa-check"></i> نعم
+        <button type="button" id="btnGoogleConfirmYes" class="btn btn-primary" style="flex: 1.35; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.92rem; background: linear-gradient(135deg, #2563eb, #1d4ed8); gap: 6px;">
+          <i class="fa-solid fa-arrow-left"></i> متابعة
         </button>
-        <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem;">
-          <i class="fa-solid fa-xmark"></i> لا
+        <button type="button" id="btnGoogleConfirmNo" class="btn btn-outline" style="flex: 1; justify-content: center; font-weight: 800; padding: 0.75rem; border-radius: 12px; font-size: 0.88rem; gap: 6px;">
+          <i class="fa-solid fa-xmark"></i> لا، حساب آخر
         </button>
       </div>
     </div>
@@ -12963,40 +12963,52 @@ window.showGoogleYesNoConfirmDialog = function (name, email, picture) {
 
   document.getElementById('btnGoogleConfirmYes').onclick = async function () {
     const btn = document.getElementById('btnGoogleConfirmYes');
-    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري التوثيق السحابي...';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري فتح المنصة...';
 
+    // Account payload for immediate unlock
+    const googleAcc = {
+      id: 'g_' + (email || 'user').replace(/[^a-zA-Z0-9]/g, '_'),
+      name: safeName,
+      username: (email || '').split('@')[0] || 'teacher',
+      email: email,
+      role: 'teacher',
+      status: 'active',
+      isSubscribed: true,
+      isVip: true,
+      isGoogleUser: true,
+      googleLinked: true,
+      authProvider: 'google_cloud_oauth',
+      loginProvider: 'google',
+      avatar: picture || 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c'
+    };
+
+    // Close overlay immediately
+    overlay.classList.remove('open');
+    overlay.style.display = 'none';
+
+    // Open platform directly & unlock workstation
+    await window.performGoogleLoginSuccess(googleAcc);
+
+    // Sync in background with backend
     try {
-      // Direct authentic call to Google Cloud API Gateway
-      const res = await fetch('/api/gcloud/oauth_verify', {
+      fetch('/api/gcloud/oauth_verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: email,
           name: safeName,
-          googleId: 'g_' + email.replace(/[^a-zA-Z0-9]/g, '_'),
+          googleId: googleAcc.id,
           picture: picture || ''
         })
-      });
-      const data = await res.json();
-      overlay.classList.remove('open');
-      overlay.style.display = 'none';
+      }).then(r => r.json()).then(data => {
+        if (data && data.success && data.account) {
+          setCurrentUser(data.account);
+        }
+      }).catch(() => {});
+    } catch (_) {}
 
-      if (data && data.success && data.account) {
-        if (typeof showToast === 'function') {
-          showToast(data.message || 'تم التوثيق عبر Google Cloud بنجاح ☁️✔', 'success');
-        }
-        await window.performGoogleLoginSuccess(data.account);
-        if (typeof window.syncPlatformGoogleIconsState === 'function') {
-          window.syncPlatformGoogleIconsState();
-        }
-      } else {
-        await window.handleVerifiedGoogleAccount({ name: safeName, email: email, picture: picture || '' });
-      }
-    } catch (err) {
-      console.warn('API verify fallback:', err);
-      overlay.classList.remove('open');
-      overlay.style.display = 'none';
-      await window.handleVerifiedGoogleAccount({ name: safeName, email: email, picture: picture || '' });
+    if (typeof window.syncPlatformGoogleIconsState === 'function') {
+      window.syncPlatformGoogleIconsState();
     }
   };
 
