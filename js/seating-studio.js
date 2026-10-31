@@ -1332,6 +1332,332 @@
   };
   window.seatingClearAllOpenData = window.seatingClearAllData;
 
+  /* ==========================================================================
+     Excel & CSV Import Suite for Seating Studio (استيراد الطلاب والقاعات من إكسل)
+     ========================================================================== */
+  let _pendingSeatingImportStudents = [];
+
+  window.seatingOpenExcelImportModal = function() {
+    _pendingSeatingImportStudents = [];
+    const modal = document.getElementById('seatExcelImportModal');
+    const input = document.getElementById('seatingExcelFileInput');
+    const fileLabel = document.getElementById('seatingSelectedFileName');
+    const previewZone = document.getElementById('seatingImportPreviewZone');
+    const previewTbody = document.getElementById('seatingImportPreviewTbody');
+    const confirmBtn = document.getElementById('seatingConfirmImportBtn');
+
+    if (input) input.value = '';
+    if (fileLabel) { fileLabel.textContent = ''; fileLabel.style.display = 'none'; }
+    if (previewZone) previewZone.style.display = 'none';
+    if (previewTbody) previewTbody.innerHTML = '';
+    if (confirmBtn) confirmBtn.disabled = true;
+
+    if (modal) modal.classList.add('open');
+  };
+
+  window.seatingCloseExcelImportModal = function() {
+    window.seatingCloseModal('seatExcelImportModal');
+  };
+
+  window.seatingOnDragOver = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('seatingExcelDropzone');
+    if (dropzone) {
+      dropzone.style.borderColor = '#0d9488';
+      dropzone.style.background = 'rgba(13, 148, 136, 0.1)';
+    }
+  };
+
+  window.seatingOnDragLeave = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropzone = document.getElementById('seatingExcelDropzone');
+    if (dropzone) {
+      dropzone.style.borderColor = 'rgba(13, 148, 136, 0.4)';
+      dropzone.style.background = 'rgba(13, 148, 136, 0.03)';
+    }
+  };
+
+  window.seatingOnDropExcel = function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    window.seatingOnDragLeave(e);
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      window.seatingParseExcelFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  window.seatingOnExcelFileSelected = function(input) {
+    if (input && input.files && input.files.length > 0) {
+      window.seatingParseExcelFile(input.files[0]);
+    }
+  };
+
+  window.seatingParseExcelFile = function(file) {
+    if (!file) return;
+    const fileLabel = document.getElementById('seatingSelectedFileName');
+    if (fileLabel) {
+      fileLabel.textContent = `📄 الملف المحدد: ${file.name} (${Math.round(file.size / 1024)} كيلوبايت)`;
+      fileLabel.style.display = 'inline-block';
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        let rows = [];
+        const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+        if (typeof XLSX !== 'undefined') {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[firstSheetName];
+          rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+        } else if (ext === '.csv') {
+          const decoder = new TextDecoder('utf-8');
+          const text = decoder.decode(e.target.result);
+          rows = text.split(/\r?\n/).filter(l => l.trim().length > 0).map(l => l.split(/[,\t;]/));
+        } else {
+          throw new Error('مكتبة قراءة ملفات Excel غير محملة');
+        }
+
+        extractSeatingStudentsFromRows(rows);
+      } catch (err) {
+        console.error('Error reading Excel for seating:', err);
+        if (typeof window.showToast === 'function') {
+          window.showToast(`تعذر قراءة ملف الإكسل: ${err.message || 'تأكد من سلامة الملف'}`, 'error');
+        }
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  function extractSeatingStudentsFromRows(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('ملف الإكسل فارغ ولا يحتوي على بيانات!', 'warning');
+      }
+      return;
+    }
+
+    let headerRowIdx = -1;
+    let nameCol = -1;
+    let rollCol = -1;
+    let classCol = -1;
+    let hallCol = -1;
+    let seatCol = -1;
+
+    for (let r = 0; r < Math.min(15, rows.length); r++) {
+      const row = rows[r];
+      if (!Array.isArray(row)) continue;
+
+      for (let c = 0; c < row.length; c++) {
+        const val = String(row[c] || '').trim().toLowerCase();
+        if (
+          (val.includes('اسم') || val.includes('طالب') || val.includes('تلميذ') || val.includes('name') || val.includes('student')) &&
+          !val.includes('مدرسة') && !val.includes('معلم') && !val.includes('مدرس')
+        ) {
+          nameCol = c;
+          headerRowIdx = r;
+        } else if (val.includes('امتحاني') || val.includes('رقم') || val.includes('تسلسل') || val.includes('roll') || val.includes('id')) {
+          if (rollCol === -1) rollCol = c;
+        } else if (val.includes('صف') || val.includes('شعبة') || val.includes('مرحلة') || val.includes('class') || val.includes('grade')) {
+          classCol = c;
+        } else if (val.includes('قاعة') || val.includes('room') || val.includes('hall')) {
+          hallCol = c;
+        } else if (val.includes('مقعد') || val.includes('جلوس') || val.includes('seat')) {
+          seatCol = c;
+        }
+      }
+      if (nameCol !== -1) break;
+    }
+
+    if (nameCol === -1) {
+      // Fallback: search for first column with Arabic text
+      for (let r = 0; r < Math.min(10, rows.length); r++) {
+        const row = rows[r];
+        if (!Array.isArray(row)) continue;
+        for (let c = 0; c < row.length; c++) {
+          const val = String(row[c] || '').trim();
+          if (val.length >= 3 && /[؀-ۿ]/.test(val) && !/^\d+$/.test(val)) {
+            nameCol = c;
+            headerRowIdx = r > 0 ? r - 1 : 0;
+            break;
+          }
+        }
+        if (nameCol !== -1) break;
+      }
+    }
+
+    if (nameCol === -1) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('لم نتمكن من العثور على عمود أسماء الطلاب في الملف! تأكد من وجود عمود باسم (اسم الطالب).', 'warning');
+      }
+      return;
+    }
+
+    const startRow = (headerRowIdx !== -1) ? headerRowIdx + 1 : 0;
+    const extracted = [];
+
+    for (let r = startRow; r < rows.length; r++) {
+      const row = rows[r];
+      if (!Array.isArray(row) || row.length === 0) continue;
+
+      const rawName = String(row[nameCol] || '').trim();
+      if (!rawName || rawName.length < 2) continue;
+      // Filter out total or summary rows
+      if (rawName.includes('مجموع') || rawName.includes('المجموع') || rawName.includes('العدد') || rawName.includes('الإجمالي')) continue;
+
+      const rawRoll = (rollCol !== -1) ? String(row[rollCol] || '').trim() : '';
+      const rawClass = (classCol !== -1) ? String(row[classCol] || '').trim() : '';
+      const rawHall = (hallCol !== -1) ? String(row[hallCol] || '').trim() : '';
+      const rawSeat = (seatCol !== -1) ? parseInt(row[seatCol], 10) : NaN;
+
+      extracted.push({
+        name: rawName,
+        rollNo: rawRoll,
+        className: rawClass,
+        hallName: rawHall,
+        seatNo: isNaN(rawSeat) ? null : rawSeat
+      });
+    }
+
+    if (extracted.length === 0) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('لم يتم العثور على أي صفوف طلاب صالحة للاستيراد في الملف!', 'warning');
+      }
+      return;
+    }
+
+    _pendingSeatingImportStudents = extracted;
+
+    // Show preview
+    const previewZone = document.getElementById('seatingImportPreviewZone');
+    const previewTbody = document.getElementById('seatingImportPreviewTbody');
+    const countBadge = document.getElementById('seatingImportCountBadge');
+    const confirmBtn = document.getElementById('seatingConfirmImportBtn');
+
+    if (countBadge) countBadge.textContent = `${extracted.length} طالباً جاهز للاستيراد`;
+    if (previewTbody) {
+      previewTbody.innerHTML = extracted.slice(0, 8).map((st, i) => `
+        <tr>
+          <td style="padding: 6px 10px; font-weight: 700;">${i + 1}</td>
+          <td style="padding: 6px 10px; font-weight: 800; color: #0d9488;">${esc(st.name)}</td>
+          <td style="padding: 6px 10px;">${esc(st.rollNo || '—')}</td>
+          <td style="padding: 6px 10px;">${esc(st.className || '—')}</td>
+          <td style="padding: 6px 10px;">${esc(st.hallName || 'تلقائي')}</td>
+        </tr>
+      `).join('');
+      if (extracted.length > 8) {
+        previewTbody.innerHTML += `
+          <tr>
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 6px;">
+              ... بالإضافة إلى (${extracted.length - 8}) طالباً إضافياً
+            </td>
+          </tr>
+        `;
+      }
+    }
+    if (previewZone) previewZone.style.display = 'block';
+    if (confirmBtn) confirmBtn.disabled = false;
+
+    if (typeof window.showToast === 'function') {
+      window.showToast(`تم اكتشاف (${extracted.length}) طالباً بنجاح من ملف الإكسل! جاهز للتأكيد 📊`, 'success');
+    }
+  }
+
+  window.seatingConfirmExcelImport = function() {
+    if (!_pendingSeatingImportStudents || _pendingSeatingImportStudents.length === 0) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('لا توجد بيانات طلاب معتمدة للاستيراد!', 'warning');
+      }
+      return;
+    }
+
+    if (!seatingData) loadSeatingData();
+
+    const modeRadio = document.querySelector('input[name="seatingExcelImportMode"]:checked');
+    const isReplace = modeRadio ? (modeRadio.value === 'replace') : false;
+
+    if (isReplace) {
+      seatingData.students = [];
+    }
+
+    const defaultHallId = (seatingData.halls && seatingData.halls[0]) ? seatingData.halls[0].id : 'hall_1';
+    let addedCount = 0;
+
+    _pendingSeatingImportStudents.forEach((st, idx) => {
+      let targetHallId = defaultHallId;
+      if (st.hallName) {
+        const foundHall = seatingData.halls.find(h => h.name.trim().toLowerCase() === st.hallName.trim().toLowerCase());
+        if (foundHall) {
+          targetHallId = foundHall.id;
+        } else {
+          // Auto create hall if named
+          const newHallId = 'hall_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+          seatingData.halls.push({
+            id: newHallId,
+            name: st.hallName.trim(),
+            capacity: 30,
+            rows: 6,
+            cols: 5
+          });
+          targetHallId = newHallId;
+        }
+      }
+
+      const existingHallStudents = seatingData.students.filter(s => s.hallId === targetHallId);
+      const computedSeatNo = st.seatNo || (existingHallStudents.length + 1);
+
+      seatingData.students.push({
+        id: 'st_imp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+        name: st.name.trim(),
+        rollNo: st.rollNo || String(202600 + seatingData.students.length + 1),
+        className: st.className || '',
+        hallId: targetHallId,
+        seatNo: computedSeatNo
+      });
+      addedCount++;
+    });
+
+    saveSeatingData(false);
+    updateStatsCounters();
+    renderSeatingStudio();
+    window.seatingCloseModal('seatExcelImportModal');
+
+    if (typeof window.showToast === 'function') {
+      window.showToast(`🎉 تم استيراد (${addedCount}) طالباً بنجاح وتوزيعهم على خريطة الجلوس! ✨`, 'success');
+    }
+  };
+
+  window.seatingDownloadExcelTemplate = function() {
+    if (typeof XLSX === 'undefined') {
+      if (typeof window.showToast === 'function') window.showToast('مكتبة الإكسل غير جاهزة لتحميل النموذج', 'error');
+      return;
+    }
+
+    const headers = ['اسم الطالب', 'الرقم الامتحاني', 'الصف / المرحلة', 'القاعة الامتحانية', 'رقم المقعد'];
+    const sampleRows = [
+      headers,
+      ['أحمد علي حسن', '202601', 'الرابع العلمي', 'القاعة الأولى', 1],
+      ['زينب محمد كريم', '202602', 'الرابع العلمي', 'القاعة الأولى', 2],
+      ['حيدر صادق جعفر', '202603', 'الرابع العلمي', 'القاعة الأولى', 3],
+      ['فاطمة حسين علي', '202604', 'الرابع العلمي', 'القاعة الثانية', 1],
+      ['كرار وسام باسم', '202605', 'الرابع العلمي', 'القاعة الثانية', 2]
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(sampleRows);
+    ws['!cols'] = [{ wch: 25 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 14 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'قالب خريطة الجلوس');
+    XLSX.writeFile(wb, 'قالب_استيراد_طلاب_خريطة_الجلوس.xlsx');
+
+    if (typeof window.showToast === 'function') {
+      window.showToast('تم تحميل قالب الإكسل التجريبي بنجاح! 📥', 'success');
+    }
+  };
+
   // Startup hook
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadSeatingData);

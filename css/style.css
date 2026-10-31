@@ -35784,6 +35784,188 @@ textarea:focus {
   color: #5eead4 !important;
 }
 
+
+/* ==========================================================================
+   Seating Studio Luxury Hero Toolbar Strip (الأزرار داخل الشريط الأخضر بترتيب فخم)
+   ========================================================================== */
+.seating-hero-toolbar-strip {
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1.15rem;
+  background: rgba(2, 44, 43, 0.55);
+  border: 1px solid rgba(94, 234, 212, 0.3);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  position: relative;
+  z-index: 2;
+}
+
+.seating-view-segmented-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.seating-toolbar-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #a7f3d0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.seating-view-pills {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.55);
+  padding: 4px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  gap: 4px;
+}
+
+.seating-view-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.seating-view-pill-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.seating-view-pill-btn.active {
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(20, 184, 166, 0.45);
+}
+
+.seating-actions-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.seating-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0.46rem 1rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+/* 1. Print Button */
+.btn-hero-print {
+  background: #ffffff;
+  color: #0f766e;
+  border-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.btn-hero-print:hover {
+  background: #f0fdfa;
+  color: #115e59;
+  transform: translateY(-1.5px);
+  box-shadow: 0 5px 14px rgba(255, 255, 255, 0.35);
+}
+
+/* 2. PDF Button */
+.btn-hero-pdf {
+  background: rgba(239, 68, 68, 0.22);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.45);
+}
+.btn-hero-pdf:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* 3. Excel Import Button (بدل التصدير) */
+.btn-hero-excel-import {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border-color: rgba(16, 185, 129, 0.6);
+  box-shadow: 0 3px 10px rgba(16, 185, 129, 0.35);
+}
+.btn-hero-excel-import:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.5);
+}
+
+/* 4. Import from Grades */
+.btn-hero-grades {
+  background: rgba(2, 132, 199, 0.25);
+  color: #7dd3fc;
+  border-color: rgba(2, 132, 199, 0.45);
+}
+.btn-hero-grades:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+/* 5. Clear Seats Button */
+.btn-hero-clear {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.btn-hero-clear:hover {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ffffff;
+  border-color: #ef4444;
+  transform: translateY(-1.5px);
+}
+
+/* Responsive adjustment for Hero Toolbar */
+@media (max-width: 991px) {
+  .seating-hero-toolbar-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .seating-view-segmented-wrap {
+    justify-content: center;
+  }
+  .seating-actions-pill-group {
+    justify-content: center;
+  }
+}
+
 /* 4. Subnav Bar & Halls Filters */
 .seating-subnav-bar {
   background: var(--bg-card, #ffffff);
