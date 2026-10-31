@@ -1251,64 +1251,17 @@
       forPrint: true
     });
 
-    let printFrame = document.getElementById('sbDedicatedPrintIframe');
-    if (printFrame) printFrame.remove();
-    printFrame = document.createElement('iframe');
-    printFrame.id = 'sbDedicatedPrintIframe';
-    printFrame.style.cssText = 'position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; z-index: -9999;';
-    document.body.appendChild(printFrame);
-
-    const printDoc = printFrame.contentWindow.document;
-    printDoc.open();
-    printDoc.write(`
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8">
-        <title>كشف المتابعة اليومية وحسن السلوك الرسمي A4</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
-        <style>
-          @page {
-            size: A4 landscape;
-            margin: 6mm 8mm 6mm 8mm;
-          }
-          * { box-sizing: border-box; }
-          body {
-            font-family: 'Cairo', 'Tajawal', sans-serif;
-            margin: 0; padding: 0;
-            background: #ffffff;
-            color: #0f172a;
-            direction: rtl;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          table { page-break-inside: auto; }
-          tr { page-break-inside: avoid; page-break-after: auto; }
-          thead { display: table-header-group; }
-          tfoot { display: table-footer-group; }
-        </style>
-      </head>
-      <body>
-        ${sheetHtml}
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.focus();
-              window.print();
-            }, 300);
-          };
-        </script>
-      </body>
-      </html>
-    `);
-    printDoc.close();
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow('كشف المتابعة اليومية وحسن السلوك الرسمي A4 (بعرض الصفحة الأفقي)', sheetHtml, {
+        pageSize: 'A4',
+        orientation: 'landscape',
+        margin: '6mm 8mm'
+      });
+    } else {
+      window.print();
+    }
   };
 
-  /**
-   * Direct PDF Exporter for Official Behavior Report
-   */
   window.sbExecuteReportPdf = async function () {
     const sheetHtml = buildOfficialBehaviorReportHTML({
       theme: _sbCurrentReportTheme,

@@ -807,69 +807,43 @@
   };
 
   // Printing A4 Portrait (100% Crisp Output with All Desk Cards, Zero Blank Paper)
-  window.seatingPrintCards = function() {
-    window.seatingSetView('cards');
+  window.seatingPrintCards = function(type) {
+    if (type) window.seatingSetView(type);
     const wrapper = document.getElementById('seatingCanvasWrapper');
-    document.body.classList.add('printing-seating');
-    if (wrapper) {
-      wrapper.classList.add('seating-print-all-mode');
-      wrapper.querySelectorAll('.seating-a4-paper').forEach(p => {
-        p.style.opacity = '1';
-        p.style.display = 'flex';
+    if (!wrapper) return;
+
+    let contentHtml = '';
+    const papers = wrapper.querySelectorAll('.seating-a4-paper');
+    if (papers.length > 0) {
+      papers.forEach(p => {
+        const clone = p.cloneNode(true);
+        clone.style.display = 'flex';
+        clone.style.opacity = '1';
+        clone.classList.remove('seating-page-hidden-screen');
+        clone.classList.add('seating-page-active');
+        contentHtml += clone.outerHTML;
       });
+    } else {
+      contentHtml = wrapper.innerHTML;
     }
 
-    let isCleaned = false;
-    const cleanup = () => {
-      if (isCleaned) return;
-      isCleaned = true;
-      document.body.classList.remove('printing-seating');
-      if (wrapper) {
-        wrapper.classList.remove('seating-print-all-mode');
-        // Restore active pagination display
-        const perPage = Number(seatingData?.cardsPerPage || 10);
-        const activePage = window.activeSeatingPage || 1;
-        const papers = wrapper.querySelectorAll('.seating-a4-paper');
-        papers.forEach((p, idx) => {
-          if (idx + 1 === activePage) {
-            p.classList.remove('seating-page-hidden-screen');
-            p.classList.add('seating-page-active');
-            p.style.display = 'flex';
-          } else {
-            p.classList.add('seating-page-hidden-screen');
-            p.classList.remove('seating-page-active');
-            p.style.display = '';
-          }
-        });
-      }
-      window.removeEventListener('afterprint', cleanup);
-    };
+    const title = (window.seatingViewMode === 'hall')
+      ? 'مخطط القاعة الامتحانية وتوزيع المقاعد A4'
+      : (window.seatingViewMode === 'list'
+        ? 'كشف أسماء الطلاب ومقاعد الجلوس الرسمية A4'
+        : 'بطاقات جلوس الطلاب على المقاعد A4');
 
-    window.addEventListener('afterprint', cleanup);
-
-    setTimeout(() => {
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow(title, contentHtml, {
+        pageSize: 'A4',
+        orientation: 'portrait',
+        margin: '8mm 8mm'
+      });
+    } else {
       window.print();
-      setTimeout(cleanup, 1500);
-    }, 280);
+    }
   };
 
-  // Keyboard shortcut Ctrl+P / browser print integration
-  window.addEventListener('beforeprint', () => {
-    const tabSeating = document.getElementById('tab-seating');
-    if (tabSeating && tabSeating.style.display !== 'none') {
-      document.body.classList.add('printing-seating');
-      const wrapper = document.getElementById('seatingCanvasWrapper');
-      if (wrapper) wrapper.classList.add('seating-print-all-mode');
-    }
-  });
-
-  window.addEventListener('afterprint', () => {
-    document.body.classList.remove('printing-seating');
-    const wrapper = document.getElementById('seatingCanvasWrapper');
-    if (wrapper) wrapper.classList.remove('seating-print-all-mode');
-  });
-
-  // PDF Export
   window.seatingExportPdf = async function() {
     window.seatingSetView('cards');
     const wrapper = document.getElementById('seatingCanvasWrapper');

@@ -974,12 +974,33 @@
   // Quick Print A4
   window.examCardPrint = function() {
     window.examCardSetView('cards');
-    if (typeof showToast === 'function') {
-      showToast('جاري تحضير بطاقات الامتحان للطباعة A4... 🖨️', 'info');
+    const container = document.getElementById('examCardCanvasWrapper');
+    if (!container) return;
+
+    let contentHtml = '';
+    const papers = container.querySelectorAll('.exam-card-a4-paper');
+    if (papers.length > 0) {
+      papers.forEach(p => {
+        const clone = p.cloneNode(true);
+        clone.style.display = 'flex';
+        clone.style.opacity = '1';
+        clone.classList.remove('exam-card-page-hidden-screen');
+        clone.classList.add('exam-card-page-active');
+        contentHtml += clone.outerHTML;
+      });
+    } else {
+      contentHtml = container.innerHTML;
     }
-    setTimeout(() => {
+
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow('البطاقات الامتحانية الرسمية للطلبة مقاس A6 (4 بطاقات في كل ورقة A4)', contentHtml, {
+        pageSize: 'A4',
+        orientation: 'portrait',
+        margin: '6mm 6mm'
+      });
+    } else {
       window.print();
-    }, 250);
+    }
   };
 
   // PDF Export

@@ -2160,87 +2160,22 @@
       modalTitle.innerHTML = `اكتمل التجهيز بنجاح! جاري فتح الطباعة... 🖨️✨`;
     }
 
-    // 3. Mount into dedicated print iframe
-    const printDocHtml = `
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8">
-        <title>${escapeHtml(batch.title || 'شهادات_الطلاب')}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Alexandria:wght@300;400;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;600;700;800;900&family=Reem+Kufi:wght@500;600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="css/style.css">
-        <style>
-          ${getCertificatesPrintCss(isLandscape)}
-        </style>
-      </head>
-      <body>
-        <div class="all-certificates-print-container">
-          ${pagesHtmlList.join('\n')}
-        </div>
-      </body>
-      </html>
-    `;
-
-    // Remove any previous print frame
-    let oldFrame = document.getElementById('certDedicatedPrintIframe');
-    if (oldFrame) oldFrame.remove();
-
-    const iframe = document.createElement('iframe');
-    iframe.id = 'certDedicatedPrintIframe';
-    const frameW = isLandscape ? '1123px' : '794px';
-    const frameH = isLandscape ? '794px' : '1123px';
-    iframe.style.cssText = `position: fixed; left: 0; top: 0; width: ${frameW}; height: ${frameH}; z-index: -99999; opacity: 0.01; pointer-events: none; border: 0; overflow: hidden;`;
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(printDocHtml);
-    doc.close();
-
-    // 4. Preload fonts & images
-    try {
-      if (doc.fonts) await doc.fonts.ready;
-    } catch (_) {}
-
-    try {
-      const imgs = Array.from(doc.images || []);
-      if (imgs.length > 0) {
-        await Promise.all(imgs.map(img => {
-          if (img.complete) return Promise.resolve();
-          return new Promise(res => { img.onload = res; img.onerror = res; });
-        }));
-      }
-    } catch (_) {}
-
-    // 5. Brief layout settling
-    await new Promise(r => setTimeout(r, 120));
-
-    // Remove overlay right as print triggers
+    // Remove progress overlay
     if (overlay && overlay.parentNode) {
       overlay.remove();
     }
 
-    try {
-      if (typeof window.setDynamicPrintPage === 'function') {
-        window.setDynamicPrintPage(isLandscape ? 'landscape' : 'portrait', '0', 'A4');
-      }
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-    } catch (err) {
-      console.warn('iframe.print failed, fallback to window.print', err);
-      if (typeof window.setDynamicPrintPage === 'function') {
-        window.setDynamicPrintPage(isLandscape ? 'landscape' : 'portrait', '0', 'A4');
-      }
+    // Open in dedicated print preview window that stays open
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow(escapeHtml(batch.title || 'شهادات التقدير والتفوق للطلبة A4'), pagesHtml, {
+        pageSize: 'A4',
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        margin: '0',
+        extraStyles: getCertificatesPrintCss(isLandscape)
+      });
+    } else {
       window.print();
     }
-
-    // Delayed cleanup of frame
-    setTimeout(function() {
-      if (iframe && iframe.parentNode) iframe.remove();
-    }, 120000);
   }
 
   // 18. CSS Stylesheet for High Definition Multi-page Certificates (Rock-Solid No-Loop Print)

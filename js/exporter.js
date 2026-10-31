@@ -182,23 +182,16 @@ const ExamExporter = {
       </div>
     `;
 
-    document.body.classList.add('dual-print-active');
-
-    const cleanup = () => {
-      document.body.classList.remove('dual-print-active');
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow('ورقة الامتحان الوزاري المعتمد A4 (نسخة الطالب + نسخة اللجنة الامتحانية)', dualPrint.innerHTML, {
+        pageSize: 'A4',
+        orientation: 'portrait'
+      });
       if (dualPrint) dualPrint.innerHTML = '';
-      if (typeof window.removeEventListener === 'function') {
-        window.removeEventListener('afterprint', cleanup);
-      }
-    };
-
-    if (typeof window.addEventListener === 'function') {
-      window.addEventListener('afterprint', cleanup);
+    } else {
+      document.body.classList.add('dual-print-active');
+      setTimeout(() => { window.print(); }, 80);
     }
-
-    setTimeout(() => {
-      window.print();
-    }, 80);
   },
 
   /**
