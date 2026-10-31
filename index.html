@@ -323,9 +323,15 @@
             <i class="fa-solid fa-arrow-right-from-bracket" style="color: #ef4444;"></i>
           </button>
 
-          <!-- Teacher Profile Badge (إعدادات الحساب والملف الشخصي في أقصى اليسار) -->
+          <!-- Side Drawer Toggle Button (زر القائمة الجانبية والإعدادات) -->
+          <button type="button" class="topbar-icon-btn btn-side-drawer-toggle" id="topbarSideDrawerBtn"
+            onclick="window.toggleSideDrawer(event)" title="شريط الإعدادات والخدمات الجانبي" aria-label="القائمة الجانبية">
+            <i class="fa-solid fa-bars-staggered"></i>
+          </button>
+
+          <!-- Teacher Profile Badge (المعلومات الشخصية للأستاذ في أقصى اليسار) -->
           <div class="topbar-user-badge" onclick="window.openTeacherProfileModal()" role="button" tabindex="0"
-            title="إعدادات الحساب والمدرس والبيانات الشخصية" style="padding-right: 14px; padding-left: 14px;">
+            title="المعلومات الشخصية للأستاذ وإعدادات الحساب" style="padding-right: 14px; padding-left: 14px;">
             <div class="topbar-user-info">
               <span class="topbar-user-name" id="topbarTeacherName">أستاذ المادة</span>
               <span class="topbar-user-role" id="topbarTeacherRole">مدرس معتمد</span>
@@ -364,7 +370,7 @@
 
         <!-- Active User Profile Card inside Drawer -->
         <div class="drawer-teacher-card" onclick="window.openTeacherProfileModal(); window.closeSideDrawer();"
-          role="button" tabindex="0" title="تعديل بيانات الحساب والملف الشخصي">
+          role="button" tabindex="0" title="المعلومات الشخصية للأستاذ والملف الأكاديمي">
           <div class="drawer-teacher-avatar">
             <i class="fa-solid fa-user-tie"></i>
           </div>
@@ -384,17 +390,17 @@
 
           <div class="drawer-buttons-list">
 
-            <!-- 1. إعدادات الحساب -->
+            <!-- 1. المعلومات الشخصية للأستاذ -->
             <button type="button" class="drawer-item-btn" id="drawerAccountSettingsBtn"
               onclick="window.openTeacherProfileModal(); window.closeSideDrawer();"
-              title="إعدادات الحساب والبيانات الشخصية والمدرسة">
+              title="المعلومات الشخصية للأستاذ وإعدادات الحساب">
               <div class="drawer-item-main" style="display: flex; align-items: center; gap: 0.75rem;">
                 <div class="drawer-item-icon-box icon-account">
-                  <i class="fa-solid fa-user-gear"></i>
+                  <i class="fa-solid fa-user-pen"></i>
                 </div>
                 <div class="drawer-item-text">
-                  <strong>إعدادات الحساب</strong>
-                  <small>بيانات الأستاذ، المدرسة، المادة، والتوقيع</small>
+                  <strong>المعلومات الشخصية للأستاذ</strong>
+                  <small>الاسم الكامل، الهاتف، المدرسة، المادة، والتوقيع</small>
                 </div>
               </div>
               <i class="fa-solid fa-arrow-left drawer-arrow"></i>
@@ -575,6 +581,22 @@
                       البيئة الذكية المتكاملة الأولى لتمكين الأستاذ والمعلم في العراق — إعداد وتنسيق بنك الأسئلة
                       الوزارية، طباعة نماذج A4 الرسمية، ورصد درجات وسلوك الطلاب بكل سهولة واحترافية.
                     </p>
+
+                    <!-- Hero Quick Action: Teacher Personal Information & Subscriptions -->
+                    <div class="hero-actions-group" style="display: flex; align-items: center; gap: 10px; margin-top: 1rem; flex-wrap: wrap;">
+                      <button type="button" class="btn-hero-profile-action" onclick="window.openTeacherProfileModal()"
+                        title="تعديل وتحديث المعلومات الشخصية والبيانات المعتمدة للأستاذ"
+                        style="display: inline-flex; align-items: center; gap: 8px; background: rgba(56, 189, 248, 0.18); backdrop-filter: blur(8px); border: 1.5px solid rgba(56, 189, 248, 0.45); color: #ffffff; padding: 7px 18px; border-radius: 999px; font-weight: 800; font-size: 0.86rem; cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);">
+                        <i class="fa-solid fa-user-pen" style="color: #38bdf8;"></i>
+                        <span>المعلومات الشخصية للأستاذ</span>
+                      </button>
+                      <button type="button" class="btn-hero-subs-action" onclick="window.openSubscriptionModal()"
+                        title="عرض باقات واشتراكات المنصة VIP"
+                        style="display: inline-flex; align-items: center; gap: 8px; background: rgba(168, 85, 247, 0.18); backdrop-filter: blur(8px); border: 1.5px solid rgba(168, 85, 247, 0.4); color: #ffffff; padding: 7px 18px; border-radius: 999px; font-weight: 800; font-size: 0.86rem; cursor: pointer; transition: all 0.25s ease;">
+                        <i class="fa-solid fa-gem" style="color: #c084fc;"></i>
+                        <span>باقات الاشتراك 💎</span>
+                      </button>
+                    </div>
 
 
                   </div>
@@ -5828,19 +5850,19 @@
   </script>
   <!-- Teacher Login / Profile Modal -->
   <div class="modal-overlay" id="profileModal"
-    onclick="if(event.target === this) window.validateAndCloseProfileModal();">
+    onclick="if(event.target === this) window.closeTeacherProfileModal();">
     <div class="modal-container" style="max-width: 550px;">
       <div class="modal-header">
         <div class="card-title" style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
-          <i class="fa-solid fa-user-gear" style="color: #38bdf8; font-size: 1.25rem;"></i>
-          <span>إعدادات الحساب وبيانات المدرس</span>
+          <i class="fa-solid fa-user-pen" style="color: #38bdf8; font-size: 1.25rem;"></i>
+          <span>المعلومات الشخصية للأستاذ وإعدادات الحساب</span>
           <span
             style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35); font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 999px;">
             <i class="fa-solid fa-circle-exclamation"></i> أساسي إجباري
           </span>
         </div>
         <button class="btn btn-outline btn-icon-only" id="closeProfileModalBtn"
-          onclick="window.validateAndCloseProfileModal();" style="border: none;" title="حفظ وإغلاق">
+          onclick="window.closeTeacherProfileModal();" style="border: none;" title="حفظ وإغلاق">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
@@ -10134,7 +10156,7 @@
     <!-- Supabase Official SDK & Client Integration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js?v=2026.10.31"></script>
-  <script src="js/app.js?v=2026.10.31.clean_stable_v18"></script>
+  <script src="js/app.js?v=2026.10.31.clean_stable_v19"></script>
   <script src="js/gcloud-gateway.js?v=2026.10.31.clean_stable_v12"></script>
 
 

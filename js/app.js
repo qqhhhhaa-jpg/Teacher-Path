@@ -2055,8 +2055,15 @@ window.validateTeacherProfileFields = function (showVisualFeedback = false) {
 };
 
 function saveTeacherProfile(isClosingOrManual = false, explicitData = null) {
-  const current = getCurrentUser() || {};
-  if (!current.id && !current.username) return;
+  let current = getCurrentUser() || {};
+  if (!current.id && !current.username) {
+    current = {
+      id: 'usr_' + Date.now(),
+      username: 'teacher',
+      name: 'الأستاذ',
+      role: 'teacher'
+    };
+  }
 
   if (explicitData && typeof explicitData === 'object') {
     Object.assign(current, explicitData);
@@ -2149,6 +2156,60 @@ function saveTeacherProfile(isClosingOrManual = false, explicitData = null) {
   }
 }
 window.saveTeacherProfile = saveTeacherProfile;
+
+// Teacher Profile Modal Controller (المعلومات الشخصية للأستاذ)
+window.openTeacherProfileModal = function () {
+  try {
+    if (typeof window.closeSideDrawer === 'function') {
+      window.closeSideDrawer();
+    }
+    if (typeof loadTeacherProfile === 'function') {
+      loadTeacherProfile();
+    }
+    const current = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (current && typeof syncProfileModalInputs === 'function') {
+      syncProfileModalInputs(current);
+    } else if (typeof teacherProfile !== 'undefined' && teacherProfile && typeof syncProfileModalInputs === 'function') {
+      syncProfileModalInputs(teacherProfile);
+    }
+    if (typeof window.renderSessionsLog === 'function') {
+      try {
+        window.renderSessionsLog();
+      } catch (e) {
+        console.warn('renderSessionsLog error:', e);
+      }
+    }
+    const pModal = document.getElementById('profileModal');
+    if (pModal) {
+      pModal.classList.add('open');
+      setTimeout(() => {
+        const pName = document.getElementById('profName');
+        if (pName) pName.focus();
+      }, 100);
+    } else {
+      console.warn('profileModal element not found');
+    }
+  } catch (err) {
+    console.error('Error opening teacher profile modal:', err);
+  }
+};
+window.openProfileModal = window.openTeacherProfileModal;
+window.openTeacherProfile = window.openTeacherProfileModal;
+window.openTeacherInfoModal = window.openTeacherProfileModal;
+window.openTeacherInfo = window.openTeacherProfileModal;
+
+window.closeTeacherProfileModal = function (force = true) {
+  try {
+    const pModal = document.getElementById('profileModal');
+    if (pModal) {
+      pModal.classList.remove('open');
+    }
+  } catch (err) {
+    console.error('Error closing teacher profile modal:', err);
+  }
+};
+window.closeProfileModal = window.closeTeacherProfileModal;
+
 
 window.validateAndCloseProfileModal = function () {
   const check = window.validateTeacherProfileFields(true);
