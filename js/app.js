@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderAll();
   if (isUserLoggedIn()) {
     checkDraftRestore();
-    checkMandatoryTeacherProfileOnStartup();
+    if (typeof checkMandatoryTeacherProfileOnStartup === 'function') checkMandatoryTeacherProfileOnStartup();
   }
   initSingleDeviceWatchdog();
 
@@ -346,6 +346,27 @@ document.addEventListener('DOMContentLoaded', () => {
 /**
  * Initializes and syncs theme from state or local storage (Default: Light / Pure White)
  */
+
+/**
+ * Safely checks teacher profile on startup and applies defaults to header
+ */
+function checkMandatoryTeacherProfileOnStartup() {
+  try {
+    if (typeof isUserLoggedIn === 'function' && !isUserLoggedIn()) return;
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    if (user && (user.isAdmin || user.role === 'admin' || user.username === 'admin')) return;
+
+    if (typeof syncHeaderInputs === 'function') {
+      syncHeaderInputs();
+    }
+    if (typeof applyProfileToExamHeader === 'function') {
+      applyProfileToExamHeader();
+    }
+  } catch (err) {
+    console.warn('Teacher profile startup check notice:', err);
+  }
+}
+
 function initTheme() {
   const savedTheme = localStorage.getItem('moallem_theme') || 'light';
   appState.settings.theme = savedTheme;
