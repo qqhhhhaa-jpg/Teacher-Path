@@ -5,176 +5,39 @@
 // ==========================================================================
 window.openPrintWindow = function (title, bodyContent, options) {
   options = options || {};
-  const orientation = options.orientation || 'portrait';
-  const pageSize = options.pageSize || 'A4';
-  const margin = options.margin || (orientation === 'landscape' ? '6mm 8mm' : '8mm 10mm');
-  const extraStyles = options.extraStyles || '';
-  const autoPrint = options.autoPrint !== false;
+  var docTitle = title || 'طباعة مستند رسمي - مسار المعلم';
 
-  const printWin = window.open('', '_blank');
-  if (!printWin) {
-    if (typeof showToast === 'function') {
-      showToast('يرجى السماح بالنوافذ المنبثقة (Popups) للمتصفح لفتح نافذة الطباعة والمعاينة الجديدة!', 'warning');
-    }
-    return null;
+  try {
+    var payload = {
+      title: docTitle,
+      content: bodyContent || '',
+      options: options,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('masar_print_payload', JSON.stringify(payload));
+    sessionStorage.setItem('masar_print_payload', JSON.stringify(payload));
+  } catch (err) {
+    console.warn('Storage payload error:', err);
   }
 
-  const docTitle = title || 'طباعة مستند رسمي - مسار المعلم';
+  // Open /print.html as an actual distinct browser tab/page
+  // Native <a> click avoids popup blockers completely
+  try {
+    var link = document.createElement('a');
+    link.href = 'print.html';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function () {
+      if (link && link.parentNode) link.remove();
+    }, 800);
+  } catch (e) {
+    window.open('print.html', '_blank');
+  }
 
-  const fullHtml = `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${docTitle}</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/print.css">
-  <style>
-    @page {
-      size: ${pageSize} ${orientation};
-      margin: ${margin};
-    }
-    *, *::before, *::after {
-      box-sizing: border-box;
-      -webkit-print-color-adjust: exact !important;
-      print-color-adjust: exact !important;
-      color-adjust: exact !important;
-    }
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: #f1f5f9;
-      color: #0f172a;
-      font-family: 'Cairo', 'Tajawal', sans-serif;
-      direction: rtl;
-    }
-    @media screen {
-      .print-window-bar {
-        position: sticky;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: #0f172a;
-        color: #ffffff;
-        padding: 10px 20px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-        z-index: 999999;
-        font-family: 'Cairo', sans-serif;
-      }
-      .print-window-bar-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 800;
-        font-size: 0.95rem;
-      }
-      .print-window-bar-actions {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .print-btn-action {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: #0284c7;
-        color: #ffffff;
-        border: none;
-        padding: 7px 18px;
-        border-radius: 8px;
-        font-weight: 800;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
-      }
-      .print-btn-action:hover {
-        background: #0369a1;
-      }
-      .print-btn-close {
-        background: #334155;
-        color: #f1f5f9;
-        box-shadow: none;
-      }
-      .print-btn-close:hover {
-        background: #475569;
-      }
-      .print-window-body-wrap {
-        padding: 24px 16px 60px 16px;
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        overflow-x: auto;
-      }
-      .print-window-body-wrap > * {
-        background: #ffffff;
-        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-      }
-    }
-    @media print {
-      .print-window-bar {
-        display: none !important;
-      }
-      html, body {
-        background: #ffffff !important;
-      }
-      .print-window-body-wrap {
-        padding: 0 !important;
-        margin: 0 !important;
-        display: block !important;
-        width: 100% !important;
-      }
-      .print-window-body-wrap > * {
-        box-shadow: none !important;
-      }
-    }
-    ${extraStyles}
-  </style>
-</head>
-<body>
-  <div class="print-window-bar">
-    <div class="print-window-bar-title">
-      <i class="fa-solid fa-print" style="color: #38bdf8;"></i>
-      <span>${docTitle}</span>
-      <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; margin-right: 8px;">تبقى النافذة مفتوحة للمعاينة والطباعة</span>
-    </div>
-    <div class="print-window-bar-actions">
-      <button type="button" class="print-btn-action" onclick="window.print()">
-        <i class="fa-solid fa-print"></i> بدء الطباعة الآن
-      </button>
-      <button type="button" class="print-btn-action print-btn-close" onclick="window.close()">
-        <i class="fa-solid fa-xmark"></i> إغلاق النافذة
-      </button>
-    </div>
-  </div>
-
-  <div class="print-window-body-wrap">
-    ${bodyContent}
-  </div>
-
-  <script>
-    // Keep window open permanently until the user closes it!
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        ${autoPrint ? 'window.print();' : ''}
-      }, 400);
-    });
-  </script>
-</body>
-</html>`;
-
-  printWin.document.open();
-  printWin.document.write(fullHtml);
-  printWin.document.close();
-  return printWin;
+  return true;
 };
 
 window.checkMandatoryTeacherProfileOnStartup = function () {
