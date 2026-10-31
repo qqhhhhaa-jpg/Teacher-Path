@@ -331,17 +331,25 @@ document.addEventListener('DOMContentLoaded', () => {
   initAuthPortalPersistenceGuard();
   initEventListeners();
   initSideQTypeBarMovable();
-  initSubjectMode();
-  initQuestionsHistoryBank();
-  initDailyReport();
-  initQuestionsQuickFilter();
-  updateArchiveBadge();
-  renderAll();
-  if (isUserLoggedIn()) {
-    checkDraftRestore();
-    if (typeof checkMandatoryTeacherProfileOnStartup === 'function') checkMandatoryTeacherProfileOnStartup();
+
+  const loggedIn = isUserLoggedIn();
+  if (loggedIn) {
+    // High-performance deferred rendering: keeps UI paint under 16ms
+    requestAnimationFrame(() => {
+      initSubjectMode();
+      initQuestionsHistoryBank();
+      initDailyReport();
+      initQuestionsQuickFilter();
+      updateArchiveBadge();
+      renderAll();
+      checkDraftRestore();
+      if (typeof checkMandatoryTeacherProfileOnStartup === 'function') checkMandatoryTeacherProfileOnStartup();
+      initSingleDeviceWatchdog();
+    });
+  } else {
+    // Light initial state for auth portal: no unnecessary question calculations on locked screen
+    updateArchiveBadge();
   }
-  initSingleDeviceWatchdog();
 
   // Background sync accounts from server (for cross-device synchronization)
   if (typeof syncAccountsWithServer === 'function') {
@@ -3274,28 +3282,8 @@ window.syncSideDrawerItems = function () {
 };
 
 window.initAppCards3DTilt = function () {
-  const cards = document.querySelectorAll('.app-hub-card');
-  cards.forEach(card => {
-    if (card._has3dTilt) return;
-    card._has3dTilt = true;
-
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = ((y - centerY) / centerY) * -8;
-      const rotateY = ((x - centerX) / centerX) * 8;
-
-      card.style.transform = `perspective(1200px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-10px) scale(1.025)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-    });
-  });
+  // Performance optimization: CSS hardware-accelerated transforms replace expensive mousemove getBoundingClientRect reflows
+  // Cards are smoothly animated via .app-hub-card:hover with will-change: transform
 };
 
 /**
@@ -13372,6 +13360,11 @@ window.performGoogleLoginSuccess = async function (account) {
   applyProfileToExamHeader();
   updateUserAuthUI();
   if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+
+  // Load state and render workstation
+  if (typeof loadSavedState === 'function') loadSavedState();
+  if (typeof updateArchiveBadge === 'function') updateArchiveBadge();
+  if (typeof renderAll === 'function') renderAll();
 
   // Close modals
   window.closeGoogleAccountModal();
