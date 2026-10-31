@@ -8642,11 +8642,26 @@
           </div>
         </div>
 
+                <!-- User Active Subscription Status Banner (يوضح للمستخدم باقته الحالية المفعلة) -->
+        <div class="user-active-plan-status-alert" id="userActivePlanStatusBanner" style="display: none;">
+          <div class="active-plan-alert-icon">
+            <i class="fa-solid fa-crown text-warning"></i>
+          </div>
+          <div class="active-plan-alert-content">
+            <strong id="userActivePlanTitleText">باقتك الحالية المفعلة: الباقة السنوية الأكاديمية VIP 👑</strong>
+            <small id="userActivePlanExpiryText">حسابك مفعل ونشط بكامل الصلاحيات لجميع الاستوديوهات والميزات</small>
+          </div>
+          <div class="active-plan-live-badge">
+            <span class="live-dot-pulse"></span>
+            <span>اشتراك نشط ✔</span>
+          </div>
+        </div>
+
         <!-- 3-Tier Pricing Plans Deck -->
         <div class="vip-plans-deck">
 
           <!-- Plan 1: باقة شهر واحد (25 ألف) -->
-          <div class="vip-plan-card">
+          <div class="vip-plan-card" id="plan1Card" data-plan-key="1_month">
             <div class="plan-floating-badge badge-starter">
               <i class="fa-solid fa-calendar-days"></i> مرونة شهرية
             </div>
@@ -8694,7 +8709,7 @@
           </div>
 
           <!-- Plan 2: باقة الـ 6 أشهر (75 ألف بدل 150) - الأكثر طلباً 🔥 -->
-          <div class="vip-plan-card plan-popular">
+          <div class="vip-plan-card plan-popular" id="plan2Card" data-plan-key="6_months">
             <div class="plan-floating-badge badge-popular-glow">
               <i class="fa-solid fa-fire-flame-curved"></i> الأكثر طلباً — اختيار 78% من المعلمين 🔥
             </div>
@@ -8749,7 +8764,7 @@
           </div>
 
           <!-- Plan 3: الباقة السنوية الأكاديمية (200 ألف بدل 300) - وفر 100 ألف 👑 -->
-          <div class="vip-plan-card plan-vip">
+          <div class="vip-plan-card plan-vip" id="plan3Card" data-plan-key="1_year">
             <div class="plan-floating-badge badge-vip-gold">
               <i class="fa-solid fa-crown"></i> أفضل قيمة — وفر 100,000 د.ع (4 أشهر مجاناً 🎁) 👑
             </div>
@@ -10085,7 +10100,7 @@
     <!-- Supabase Official SDK & Client Integration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js?v=2026.10.31"></script>
-  <script src="js/app.js?v=2026.10.31.clean_stable_v14"></script>
+  <script src="js/app.js?v=2026.10.31.clean_stable_v16"></script>
   <script src="js/gcloud-gateway.js?v=2026.10.31.clean_stable_v12"></script>
 
 

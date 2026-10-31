@@ -14575,6 +14575,78 @@ window.renderSubscriptionPricingUI = function () {
   if (p3Cta) {
     const span = p3Cta.querySelector('span');
     if (span) span.textContent = 'اشتراك';
+    p3Cta.classList.remove('btn-plan-current-active');
+  }
+  if (p1Cta) p1Cta.classList.remove('btn-plan-current-active');
+  if (p2Cta) p2Cta.classList.remove('btn-plan-current-active');
+
+  // 5. Active Plan Detection & Prominent Highlighting for Logged-In User
+  const card1 = document.getElementById('plan1Card');
+  const card2 = document.getElementById('plan2Card');
+  const card3 = document.getElementById('plan3Card');
+  [card1, card2, card3].forEach(c => {
+    if (!c) return;
+    c.classList.remove('is-user-current-plan');
+    const oldRibbon = c.querySelector('.plan-current-user-ribbon');
+    if (oldRibbon) oldRibbon.remove();
+  });
+
+  const activeBanner = document.getElementById('userActivePlanStatusBanner');
+  const activeTitle = document.getElementById('userActivePlanTitleText');
+  const activeExp = document.getElementById('userActivePlanExpiryText');
+
+  const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  const isVip = user && (user.isSubscribed || user.isVip || user.role === 'teacher_vip' || localStorage.getItem(`moallem_vip_subscription_${user.id}`) === 'true');
+
+  if (isVip && user) {
+    const dur = String(user.subscriptionDuration || user.subscriptionType || '').toLowerCase();
+    const planName = String(user.subscriptionPlanName || '').toLowerCase();
+
+    let activeKey = '1_year'; // default for VIP
+    let activePlanTitle = 'الباقة السنوية الأكاديمية VIP 👑';
+    let targetCard = card3;
+    let targetCta = p3Cta;
+
+    if (dur.includes('6_month') || dur.includes('6') || planName.includes('6 أشهر') || planName.includes('نصف سنة')) {
+      activeKey = '6_months';
+      activePlanTitle = 'باقة الـ 6 أشهر (نصف سنة دراسية) 🔥';
+      targetCard = card2;
+      targetCta = p2Cta;
+    } else if (dur === '1_month' || (dur.includes('month') && !dur.includes('6')) || planName.includes('شهر واحد')) {
+      activeKey = '1_month';
+      activePlanTitle = 'باقة الشهر الواحد 🗓️';
+      targetCard = card1;
+      targetCta = p1Cta;
+    }
+
+    // Highlight target card
+    if (targetCard) {
+      targetCard.classList.add('is-user-current-plan');
+      const ribbon = document.createElement('div');
+      ribbon.className = 'plan-current-user-ribbon';
+      ribbon.innerHTML = '<i class="fa-solid fa-crown text-warning"></i> <span>باقتك الحالية المفعلة ✔</span>';
+      targetCard.appendChild(ribbon);
+    }
+
+    if (targetCta) {
+      targetCta.classList.add('btn-plan-current-active');
+      const span = targetCta.querySelector('span');
+      if (span) span.textContent = 'باقتك الحالية المفعلة ✔';
+    }
+
+    // Show top active status banner
+    if (activeBanner) {
+      activeBanner.style.display = 'flex';
+      if (activeTitle) {
+        activeTitle.innerHTML = `باقتك الحالية المفعلة: <strong>${activePlanTitle}</strong> (حساب أستاذ ${user.name || user.username})`;
+      }
+      if (activeExp) {
+        const expDate = user.subscriptionExpiryFormatted || (user.subscriptionExpiresAt ? String(user.subscriptionExpiresAt).split('T')[0] : 'سارية ومفعلة');
+        activeExp.innerHTML = `<i class="fa-solid fa-calendar-check"></i> صالحة وتعمل بكامل الصلاحيات حتى: <strong>${expDate}</strong> • مزامنة سحابية 24/7`;
+      }
+    }
+  } else {
+    if (activeBanner) activeBanner.style.display = 'none';
   }
 };
 
