@@ -1099,14 +1099,14 @@
           <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}; margin-bottom: 14px;">
             <thead>
               <tr style="background: ${thBg}; border-top: 1.5px solid ${primaryColor}; border-bottom: 1.5px solid ${primaryColor};">
-                <th style="width: 32px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">ت</th>
-                <th style="border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">اسم الطالب الثلاثي والرباعي</th>
-                <th style="width: 90px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">حالة الحضور</th>
-                <th style="width: 85px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">المشاركة</th>
-                <th style="width: 85px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الواجب البيتي</th>
-                <th style="width: 95px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">السلوك والمواظبة</th>
-                <th style="width: 48px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الدرجة</th>
-                <th style="width: 220px; border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">ملاحظات المعلم / الإجراء التربوي</th>
+                <th style="width: 36px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">ت</th>
+                <th style="width: 210px; border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">اسم الطالب الثلاثي والرباعي</th>
+                <th style="width: 105px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">حالة الحضور</th>
+                <th style="width: 100px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">المشاركة</th>
+                <th style="width: 100px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الواجب البيتي</th>
+                <th style="width: 115px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">السلوك والمواظبة</th>
+                <th style="width: 55px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الدرجة</th>
+                <th style="border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">ملاحظات المعلم / الإجراء التربوي والمتابعة</th>
               </tr>
             </thead>
             <tbody>
@@ -1271,8 +1271,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
         <style>
           @page {
-            size: A4 portrait;
-            margin: 8mm 7mm 8mm 7mm;
+            size: A4 landscape;
+            margin: 6mm 8mm 6mm 8mm;
           }
           * { box-sizing: border-box; }
           body {
@@ -1330,7 +1330,7 @@
       document.body.appendChild(exportDiv);
     }
 
-    exportDiv.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 794px; background: #ffffff; padding: 12px; z-index: -9999;';
+    exportDiv.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 1122px; background: #ffffff; padding: 16px; z-index: -9999;';
     exportDiv.innerHTML = sheetHtml;
 
     try {
@@ -1340,7 +1340,7 @@
           filename: filename,
           pageSize: 'a4',
           format: 'a4',
-          orientation: 'portrait',
+          orientation: 'landscape',
           margin: '6mm',
           fit: true
         });
