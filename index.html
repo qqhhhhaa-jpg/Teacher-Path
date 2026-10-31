@@ -26,8 +26,6 @@
 
   <!-- KaTeX CSS for Iraqi Ministerial Math Typography -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <!-- Official Google Identity Services (accounts.google.com OAuth 2.0 & Account Chooser) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 
   <!-- Cache-Control to prevent stale client caching -->
@@ -5673,31 +5671,6 @@
             </div>
 
             <div class="portal-card-body">
-              <!-- Primary 1-Click Fast Google Sign-In -->
-              <div class="portal-fast-auth-wrapper" style="margin-bottom: 0.85rem;">
-                <button type="button" class="btn-portal-google-action" id="portalGoogleOAuthBtn"
-                  onclick="window.triggerGoogleCloudLogin()" title="تسجيل الدخول السريع بحساب Google">
-                  <div class="google-action-icon-wrap">
-                    <svg viewBox="0 0 24 24">
-                      <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z"/>
-                      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z"/>
-                      <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z"/>
-                      <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 21.4 7.4 24 12 24z"/>
-                    </svg>
-                  </div>
-                  <div class="register-btn-text">
-                    <strong>الدخول السريع بحساب Google</strong>
-                    <small>نقرة واحدة للدخول الفوري ومزامنة أعمالك ✨</small>
-                  </div>
-                  <i class="fa-solid fa-arrow-left" style="color: #4285F4; font-size: 0.95rem; margin-right: auto;"></i>
-                </button>
-              </div>
-
-              <!-- Refined Divider line -->
-              <div class="auth-divider-line" style="margin: 0.75rem 0 0.85rem 0;">
-                <span>أو تسجيل الدخول بالاسم وكلمة المرور</span>
-              </div>
-
               <!-- Login Form -->
               <form id="loginForm">
 
@@ -5811,113 +5784,7 @@
           </div>
         </section>
 
-        <!-- Showcase Column: Platform Endorsements & Capabilities -->
-        <section class="portal-welcome-showcase" aria-label="نبذة عن منصة مسار المعلم ومميزاتها">
-          <!-- Top Trust Row -->
-          <div class="welcome-top-row">
-            <div class="welcome-top-badge">
-              <span class="badge-pulsing-dot"></span>
-              <i class="fa-solid fa-certificate text-warning"></i>
-              <span>المنظومة التعليمية الرقمية المعتمدة في العراق 🇮🇶</span>
-            </div>
-            <div class="welcome-trust-rating">
-              <span class="stars-gold">
-                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-              </span>
-              <span class="rating-val">4.9/5</span>
-              <span class="rating-count">(+12,000 معلم ومدرس معتمد)</span>
-            </div>
-          </div>
-
-          <!-- Hero Greeting Headline -->
-          <div class="welcome-hero-header">
-            <h1 class="welcome-hero-title">
-              استوديو <span class="gradient-text">مسار المعلم</span> الذكي PRO 2026
-            </h1>
-            <p class="welcome-hero-subtitle">
-              المنظومة التقنية الأولى في العراق المصممة لأساتذة المدارس والمعاهد — بيئة عمل رقمية تمنحك سرعة فائقة في إعداد الأسئلة وطباعة الامتحانات ورصد درجات وسلوك الطلبة برصانة إشرافية كاملة.
-            </p>
-          </div>
-
-          <!-- 4 Core Capabilities Grid -->
-          <div class="welcome-features-grid">
-            <div class="welcome-feature-card feat-app-card feat-app-blue">
-              <div class="feat-app-header">
-                <div class="feat-app-tag-wrap" style="color: #2563eb; background: rgba(37, 99, 235, 0.1);">
-                  <i class="fa-solid fa-bolt"></i>
-                  <span>إعداد امتحانات في دقيقتين</span>
-                </div>
-              </div>
-              <h4 class="feat-app-name">بنك الأسئلة الذكي والمناهج</h4>
-              <p class="feat-app-desc">آلاف الأسئلة المصنفة حسب الفصول، مع دعم كامل للمعادلات والرموز الرياضية والكسور.</p>
-            </div>
-
-            <div class="welcome-feature-card feat-app-card feat-app-emerald">
-              <div class="feat-app-header">
-                <div class="feat-app-tag-wrap" style="color: #10b981; background: rgba(16, 185, 129, 0.1);">
-                  <i class="fa-solid fa-chart-column"></i>
-                  <span>رصد الدرجات وسلوك الطلبة</span>
-                </div>
-              </div>
-              <h4 class="feat-app-name">سجلات الطلاب المدرسية</h4>
-              <p class="feat-app-desc">متابعة تراكمية دقيقة للدرجات وحالات السلوك مع استخراج فوري لكشوفات الإشراف المعتمدة.</p>
-            </div>
-
-            <div class="welcome-feature-card feat-app-card feat-app-purple">
-              <div class="feat-app-header">
-                <div class="feat-app-tag-wrap" style="color: #7c3aed; background: rgba(124, 58, 237, 0.1);">
-                  <i class="fa-solid fa-print"></i>
-                  <span>طباعة وفرز A4 مزدوج</span>
-                </div>
-              </div>
-              <h4 class="feat-app-name">تصدير ليزري فوري</h4>
-              <p class="feat-app-desc">ورقة أسئلة الطالب ونموذج الإجابة مع الباركود والترويسة الوزارية جاهزة للطباعة فوراً.</p>
-            </div>
-
-            <div class="welcome-feature-card feat-app-card feat-app-amber">
-              <div class="feat-app-header">
-                <div class="feat-app-tag-wrap" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
-                  <i class="fa-solid fa-cloud-arrow-up"></i>
-                  <span>حماية ومزامنة سحابية</span>
-                </div>
-              </div>
-              <h4 class="feat-app-name">حفظ دائم وأمان 256-bit</h4>
-              <p class="feat-app-desc">مزامنة سحابية مستمرة تحفظ بنك أسئلتك وسجلاتك وتتيح الوصول إليها من أي جهاز.</p>
-            </div>
-          </div>
-
-          <!-- Bottom Metric Highlights -->
-          <div class="welcome-pillars-row" style="margin-top: 1rem;">
-            <div class="welcome-pillar-chip">
-              <div class="welcome-pillar-icon" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6;">
-                <i class="fa-solid fa-database"></i>
-              </div>
-              <div class="welcome-pillar-text">
-                <strong>+50,000 سؤال</strong>
-                <small>بنك وزاري ومدرسي</small>
-              </div>
-            </div>
-            <div class="welcome-pillar-chip">
-              <div class="welcome-pillar-icon" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
-                <i class="fa-solid fa-school"></i>
-              </div>
-              <div class="welcome-pillar-text">
-                <strong>18 مديرية</strong>
-                <small>تغطية كافة المحافظات</small>
-              </div>
-            </div>
-            <div class="welcome-pillar-chip">
-              <div class="welcome-pillar-icon" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
-                <i class="fa-solid fa-shield-check"></i>
-              </div>
-              <div class="welcome-pillar-text">
-                <strong>100% رصانة</strong>
-                <small>معايير وزارة التربية</small>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+        </div>
     </main>
   </div>
 
@@ -8480,37 +8347,6 @@
         <!-- STEP 1: Direct Email Input (الخطوة الأولى: إدخال البريد الإلكتروني يدوياً) -->
         <div id="googleAuthStep1">
           <div id="googleStep1SelectionView">
-
-            <!-- Google Cloud Official API Integration Box -->
-            <div style="background: linear-gradient(135deg, rgba(66, 133, 244, 0.08), rgba(52, 168, 83, 0.06)); border: 1.5px solid rgba(66, 133, 244, 0.35); border-radius: var(--radius-md); padding: 1.15rem; margin-bottom: 1rem; text-align: center;">
-              <div style="font-size: 0.9rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 7px;">
-                <i class="fa-brands fa-google" style="color: #4285F4; font-size: 1.15rem;"></i>
-                <span>تسجيل الدخول الرسمي عبر Google</span>
-              </div>
-
-              <button type="button" onclick="window.launchGoogleRealPopup()" class="btn-google-cloud-oauth"
-                style="justify-content: center; background: #ffffff; color: #0f172a; border: 1.5px solid #cbd5e1; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08); margin-bottom: 0.65rem; width: 100%; height: 50px; border-radius: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s ease;">
-                <span class="google-g-logo" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-                  <svg viewBox="0 0 24 24" width="22" height="22">
-                    <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.4 1 3.5 3.6 1.6 7.4l3.7 2.8C6.2 7.2 8.9 5 12 5z" />
-                    <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.6l3.7 2.9c2.2-2 3.7-5 3.7-8.7z" />
-                    <path fill="#FBBC05" d="M5.3 14.8c-.2-.8-.4-1.6-.4-2.5s.2-1.7.4-2.5L1.6 7C.6 9 0 11.2 0 13.5s.6 4.5 1.6 6.5l3.7-2.9z" />
-                    <path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3.1 0-5.8-2.1-6.7-5l-3.7 2.8C3.5 21.4 7.4 24 12 24z" />
-                  </svg>
-                </span>
-                <strong style="font-size: 0.95rem; color: #0f172a;">اختيار وتأكيد حسابك عبر Google</strong>
-                <i class="fa-solid fa-up-right-from-square" style="color: #4285F4; font-size: 0.9rem;"></i>
-              </button>
-
-              <!-- Official Google Identity Services Rendered Button -->
-              <div id="googleOfficialGsiButton" style="display: flex; justify-content: center; margin-top: 0.35rem;"></div>
-
-              <!-- Status Notice while waiting for Google Popup -->
-              <div id="googleAuthStatusNotice"
-                style="display: none; margin-top: 0.6rem; padding: 0.5rem; border-radius: 8px; background: rgba(66, 133, 244, 0.12); color: #2563eb; font-size: 0.78rem; font-weight: 700;">
-                <i class="fa-solid fa-spinner fa-spin"></i> جاري الاتصال بـ Google...
-              </div>
-            </div>
 
             <!-- Direct Email Sign-in Box -->
             <div

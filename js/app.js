@@ -12386,63 +12386,8 @@ let googleTokenClient = null;
 let isGisReady = false;
 
 window.initGoogleIdentityServices = function () {
-  if (typeof google === 'undefined' || !google.accounts) {
-    return;
-  }
-
-  try {
-    // 1. Initialize Google Identity Services ID Token Client
-    const clientId = window.getGoogleClientId();
-    if (!clientId || !window.location.protocol.startsWith('http')) {
-      isGisReady = false;
-      googleTokenClient = null;
-      return;
-    }
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: window.handleGoogleCredentialResponse,
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-
-    // Render Official Google Sign-In Button inside Modal target
-    const btnTarget = document.getElementById('googleOfficialGsiButton');
-    if (btnTarget) {
-      btnTarget.innerHTML = '';
-      google.accounts.id.renderButton(btnTarget, {
-        theme: 'filled_blue',
-        size: 'large',
-        shape: 'pill',
-        text: 'signin_with',
-        logo_alignment: 'left',
-        width: 300
-      });
-    }
-
-    // 2. Initialize OAuth2 Token Client for Interactive Account Chooser Popup
-    if (google.accounts.oauth2) {
-      googleTokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: 'email profile openid',
-        callback: async (tokenResponse) => {
-          const statusEl = document.getElementById('googleAuthStatusNotice');
-          if (statusEl) statusEl.style.display = 'none';
-
-          if (tokenResponse && tokenResponse.access_token) {
-            window.fetchGoogleUserProfile(tokenResponse.access_token);
-          } else if (tokenResponse && tokenResponse.error) {
-            if (tokenResponse.error !== 'popup_closed_by_user') {
-              showToast('حدث خطأ أثناء المصادقة عبر Google: ' + tokenResponse.error, 'error');
-            }
-          }
-        }
-      });
-    }
-
-    isGisReady = true;
-  } catch (err) {
-    console.warn('GIS initialization notice:', err);
-  }
+  // Google authentication completely disabled per configuration
+  return;
 };
 
 // Auto-init GIS on window load (safe stub)

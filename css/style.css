@@ -40507,3 +40507,108 @@ button[data-pdf-export]:disabled {
     display: none !important;
   }
 }
+
+/* ===== Login Portal Centered Flagship Design (Without Google & Features Showcase) ===== */
+.portal-main-wrapper {
+  min-height: calc(100vh - 65px) !important;
+  padding: 2.5rem 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.portal-showcase-container {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 470px !important;
+  width: 100% !important;
+  margin: auto !important;
+  gap: 0 !important;
+}
+
+.portal-welcome-showcase {
+  display: none !important;
+}
+
+.portal-auth-section {
+  width: 100% !important;
+  max-width: 470px !important;
+  margin: 0 auto !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.portal-auth-card {
+  width: 100% !important;
+  max-width: 470px !important;
+  margin: 0 auto !important;
+  border-radius: 24px !important;
+  background: var(--bg-card-solid, #ffffff) !important;
+  border: 1.5px solid var(--border-color, #e2e8f0) !important;
+  box-shadow: 0 25px 60px -12px rgba(15, 23, 42, 0.12), 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+  overflow: hidden !important;
+}
+
+[data-theme="dark"] .portal-auth-card {
+  background: #111827 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+.portal-card-header { padding: 1.5rem 1.6rem 0.85rem !important; }
+.portal-card-body { padding: 1rem 1.6rem 1.5rem !important; }
+.portal-card-title { font-size: 1.35rem !important; font-weight: 800 !important; margin: 0.4rem 0 0.3rem !important; }
+.portal-card-desc { font-size: 0.85rem !important; margin-bottom: 0.75rem !important; line-height: 1.5 !important; }
+.portal-form-group { margin-bottom: 0.85rem !important; }
+.portal-lux-input { height: 46px !important; border-radius: 12px !important; }
+
+/* Hide all Google OAuth buttons completely */
+.btn-portal-google-action,
+.btn-google-cloud-oauth,
+#portalGoogleOAuthBtn,
+#googleOfficialGsiButton,
+.portal-fast-auth-wrapper {
+  display: none !important;
+}
+
+@media (max-width: 480px) {
+  .portal-main-wrapper { padding: 1rem 0.5rem !important; }
+  .portal-showcase-container, .portal-auth-section, .portal-auth-card { max-width: 100% !important; }
+  .portal-card-header { padding: 1.25rem 1rem 0.65rem !important; }
+  .portal-card-body { padding: 0.85rem 1rem 1.25rem !important; }
+}
+
+/* Full-width unclipped Register button */
+.btn-register-account-prominent {
+  width: 100% !important;
+  height: 54px !important;
+  padding: 0.55rem 1.15rem !important;
+  border-radius: 14px !important;
+}
+.register-btn-text strong {
+  font-size: 0.9rem !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+.register-btn-text small {
+  font-size: 0.75rem !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.portal-extra-actions-grid {
+  display: block !important;
+  width: 100% !important;
+}
+
+.btn-register-account-prominent {
+  width: 100% !important;
+  height: 52px !important;
+  padding: 0.55rem 1.15rem !important;
+  border-radius: 14px !important;
+  box-sizing: border-box !important;
+}
