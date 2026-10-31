@@ -42010,3 +42010,218 @@ button[data-pdf-export],
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
 }
+
+
+/* ==========================================================================
+   خلفية الموقع بالكامل: الشفق التعليمي السينمائي + المجرة الأكاديمية العائمة
+   Global Full-Platform Cinematic Academic Universe Background
+   ========================================================================== */
+.global-cinematic-universe {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none !important;
+  user-select: none !important;
+  overflow: hidden;
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+/* 1. Giant Multi-color Aurora Nebula Blobs across the entire page */
+.nebula-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(85px);
+  -webkit-filter: blur(85px);
+  will-change: transform, opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+}
+
+/* Light theme nebula opacity */
+.nebula-blob.blob-azure {
+  width: 580px;
+  height: 480px;
+  top: -100px;
+  right: -80px;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.22) 0%, rgba(56, 189, 248, 0.08) 60%, transparent 80%);
+  animation: cosmicDriftOne 24s ease-in-out infinite alternate;
+}
+
+.nebula-blob.blob-emerald {
+  width: 520px;
+  height: 440px;
+  bottom: -100px;
+  left: -80px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(52, 211, 153, 0.06) 60%, transparent 80%);
+  animation: cosmicDriftTwo 28s ease-in-out infinite alternate-reverse;
+}
+
+.nebula-blob.blob-purple {
+  width: 500px;
+  height: 420px;
+  top: 40%;
+  left: 20%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(168, 85, 247, 0.05) 60%, transparent 80%);
+  animation: cosmicDriftThree 22s ease-in-out infinite alternate;
+}
+
+.nebula-blob.blob-amber {
+  width: 460px;
+  height: 380px;
+  bottom: 25%;
+  right: 25%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(251, 191, 36, 0.04) 60%, transparent 80%);
+  animation: cosmicDriftFour 26s ease-in-out infinite alternate-reverse;
+}
+
+/* Dark theme enhanced vibrant nebula */
+[data-theme="dark"] .nebula-blob {
+  filter: blur(100px);
+  -webkit-filter: blur(100px);
+}
+
+[data-theme="dark"] .nebula-blob.blob-azure {
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.32) 0%, rgba(56, 189, 248, 0.12) 60%, transparent 80%);
+}
+
+[data-theme="dark"] .nebula-blob.blob-emerald {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.28) 0%, rgba(52, 211, 153, 0.10) 60%, transparent 80%);
+}
+
+[data-theme="dark"] .nebula-blob.blob-purple {
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.28) 0%, rgba(168, 85, 247, 0.10) 60%, transparent 80%);
+}
+
+[data-theme="dark"] .nebula-blob.blob-amber {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(251, 191, 36, 0.08) 60%, transparent 80%);
+}
+
+@keyframes cosmicDriftOne {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-60px, 50px, 0) scale(1.18); }
+  100% { transform: translate3d(40px, -30px, 0) scale(0.95); }
+}
+
+@keyframes cosmicDriftTwo {
+  0% { transform: translate3d(0, 0, 0) scale(0.92); }
+  50% { transform: translate3d(50px, -60px, 0) scale(1.15); }
+  100% { transform: translate3d(-30px, 30px, 0) scale(1.05); }
+}
+
+@keyframes cosmicDriftThree {
+  0% { transform: translate3d(0, 0, 0) scale(1.08); }
+  50% { transform: translate3d(40px, 45px, 0) scale(0.92); }
+  100% { transform: translate3d(-50px, -35px, 0) scale(1.14); }
+}
+
+@keyframes cosmicDriftFour {
+  0% { transform: translate3d(0, 0, 0) scale(0.96); }
+  50% { transform: translate3d(-45px, -40px, 0) scale(1.12); }
+  100% { transform: translate3d(35px, 50px, 0) scale(0.98); }
+}
+
+/* 2. Floating Educational Constellation Symbols across entire viewport */
+.academic-constellation-field {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cosmic-symbol-item {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Amiri', 'Cairo', serif;
+  font-weight: 900;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+  animation: cosmicSymbolFloat 18s ease-in-out infinite;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+/* Light Theme Symbol Colors */
+.cosmic-symbol-item {
+  color: #0284c7;
+  opacity: 0.16;
+  filter: drop-shadow(0 2px 8px rgba(2, 132, 199, 0.2));
+}
+
+/* Dark Theme Symbol Colors */
+[data-theme="dark"] .cosmic-symbol-item {
+  color: #38bdf8;
+  opacity: 0.25;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.4));
+}
+
+/* Individual Color Theming */
+.cosmic-symbol-item.theme-emerald { color: #10b981; }
+[data-theme="dark"] .cosmic-symbol-item.theme-emerald { color: #34d399; filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.4)); }
+
+.cosmic-symbol-item.theme-purple { color: #8b5cf6; }
+[data-theme="dark"] .cosmic-symbol-item.theme-purple { color: #a78bfa; filter: drop-shadow(0 0 12px rgba(167, 139, 250, 0.4)); }
+
+.cosmic-symbol-item.theme-amber { color: #f59e0b; }
+[data-theme="dark"] .cosmic-symbol-item.theme-amber { color: #fbbf24; filter: drop-shadow(0 0 12px rgba(251, 191, 36, 0.4)); }
+
+.cosmic-symbol-item.theme-cyan { color: #06b6d4; }
+[data-theme="dark"] .cosmic-symbol-item.theme-cyan { color: #22d3ee; filter: drop-shadow(0 0 12px rgba(34, 211, 238, 0.4)); }
+
+.cosmic-symbol-item.theme-rose { color: #f43f5e; }
+[data-theme="dark"] .cosmic-symbol-item.theme-rose { color: #fb7185; filter: drop-shadow(0 0 12px rgba(251, 113, 133, 0.4)); }
+
+@keyframes cosmicSymbolFloat {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(14px, -24px, 0) rotate(6deg);
+  }
+  50% {
+    transform: translate3d(-12px, -45px, 0) rotate(-5deg);
+  }
+  75% {
+    transform: translate3d(-20px, -20px, 0) rotate(4deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+/* 3. Glassmorphism Elevation on Cards to Let the Universe Glow Through */
+.app-card,
+.custom-hero-banner,
+.seating-dashboard-hero,
+.exam-cards-hero,
+.schedule-hero-banner,
+.sg-dashboard-hero,
+.sb-stats-hero {
+  position: relative !important;
+  z-index: 2 !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+}
+
+[data-theme="light"] .app-card {
+  background: rgba(255, 255, 255, 0.88) !important;
+  border: 1.5px solid rgba(226, 232, 240, 0.85) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05), inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="dark"] .app-card {
+  background: rgba(15, 23, 42, 0.82) !important;
+  border: 1.5px solid rgba(51, 65, 85, 0.8) !important;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Interactive Card Glow Hover */
+.app-card:hover {
+  transform: translateY(-5px) scale(1.012) !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
+  box-shadow: 0 20px 45px rgba(2, 132, 199, 0.18), 0 0 25px rgba(56, 189, 248, 0.15) !important;
+}

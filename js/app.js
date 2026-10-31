@@ -17448,3 +17448,36 @@ window.copyMobileConnectUrl = function() {
   document.addEventListener('click', function() { setTimeout(hideButtons, 150); });
   window.addEventListener('load', hideButtons);
 })();
+
+
+// ==========================================================================
+// التفاعل السينمائي ثلاثي الأبعاد مع مؤشر الماوس لمجرة الموقع الأكاديمية
+// ==========================================================================
+(function initCosmicParallax() {
+  if (typeof window === 'undefined') return;
+  var ticking = false;
+  var mouseX = 0, mouseY = 0;
+
+  window.addEventListener('mousemove', function (e) {
+    var w = window.innerWidth || 1200;
+    var h = window.innerHeight || 800;
+    mouseX = (e.clientX / w) - 0.5; // -0.5 to +0.5
+    mouseY = (e.clientY / h) - 0.5;
+
+    if (!ticking) {
+      window.requestAnimationFrame(function () {
+        var field = document.getElementById('academicConstellationField');
+        if (field) {
+          field.style.transform = 'translate3d(' + (mouseX * 16) + 'px, ' + (mouseY * 16) + 'px, 0)';
+        }
+        var blobs = document.querySelectorAll('.nebula-blob');
+        for (var i = 0; i < blobs.length; i++) {
+          var factor = (i % 2 === 0 ? 1 : -1) * (18 + i * 5);
+          blobs[i].style.transform = 'translate3d(' + (mouseX * factor) + 'px, ' + (mouseY * factor) + 'px, 0)';
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+})();
