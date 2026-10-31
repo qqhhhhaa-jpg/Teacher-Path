@@ -5640,23 +5640,13 @@
 
     <!-- Central Interactive Portal Workspace (عرض ترحيبي شامل + بطاقة تسجيل الدخول) -->
     <main class="portal-main-wrapper">
-      <div class="portal-showcase-container">
+      <div class="portal-showcase-container portal-split-rectangle">
 
-        <!-- Right Column: Interactive Auth Card (واجهة تسجيل الدخول المحدثة والمبسطة) -->
+        <!-- Right Side: Inputs, Forms & Login Actions (على اليمين: الحقول وأزرار الدخول) -->
         <section class="portal-auth-section" aria-label="بوابة تسجيل الدخول وتوثيق الحساب">
           <div class="portal-auth-card">
 
-            <!-- Card Header with Masar Al-Moallem Interactive Welcoming Emblem -->
             <div class="portal-card-header">
-              <!-- Welcoming Logo Hero -->
-              <div class="masar-interactive-hero" id="masarInteractiveHero">
-                <div class="masar-aura-ambient"></div>
-                <div class="masar-halo-ring"></div>
-                <div class="masar-logo-core-badge" id="masarLogoCoreBadge">
-                  <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="masar-main-logo-img" id="masarLoginLogoImg" width="72" height="72" style="width: 72px; height: 72px; object-fit: contain;">
-                </div>
-              </div>
-
               <div class="portal-badge-label">
                 <i class="fa-solid fa-crown text-warning"></i>
                 <span>بوابة الدخول المعتمدة — مسار المعلم PRO 2026</span>
@@ -5760,7 +5750,6 @@
                 </button>
               </div>
 
-              
             </div>
 
             <!-- Portal Card Footer -->
@@ -5771,11 +5760,7 @@
                   <span>مطابق لضوابط وزارة التربية العراقية 🇮🇶</span>
                 </div>
                 <div class="portal-feature-item">
-                  <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i>
-                  <span>طباعة وتصدير PDF ليزري A4 فوري</span>
-                </div>
-                <div class="portal-feature-item">
-                  <i class="fa-solid fa-cloud-arrow-up" style="color: #10b981;"></i>
+                  <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i>
                   <span>أرشيف ومزامنة سحابية دائمة 24/7</span>
                 </div>
               </div>
@@ -5784,7 +5769,29 @@
           </div>
         </section>
 
-        </div>
+        <!-- Left Side: Logo & Brand ONLY (على اليسار: الشعار مع اسم المنصة وحده) -->
+        <aside class="portal-brand-showcase-side" aria-label="شعار واسم منصة مسار المعلم">
+          <div class="brand-side-glow-aura"></div>
+          <div class="brand-side-inner-wrap">
+            <div class="brand-side-hero-logo">
+              <div class="brand-side-logo-halo"></div>
+              <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-side-emblem-img" width="135" height="135">
+            </div>
+            <div class="brand-side-identity">
+              <h1 class="brand-side-main-title">
+                مسار المعلم
+                <span class="brand-side-pro-tag">PRO 2026</span>
+              </h1>
+              <p class="brand-side-tagline-text">المنظومة التعليمية الرقمية المعتمدة في العراق 🇮🇶</p>
+              <div class="brand-side-ministerial-badge">
+                <i class="fa-solid fa-shield-halved text-warning"></i>
+                <span>البيئة الرسمية لإعداد الاختبارات المدرسية</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
     </main>
   </div>
 
