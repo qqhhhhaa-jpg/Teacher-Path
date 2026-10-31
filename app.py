@@ -145,11 +145,26 @@ def api_auth_login():
 
     accounts = server_db.get_all_accounts() if server_db else []
     matched = None
+    clean_id_phone = re.sub(r'\D', '', identifier) if len(re.sub(r'\D', '', identifier)) >= 7 else None
+
     for acc in accounts:
         aid = (acc.get('id') or '').lower()
         auser = (acc.get('username') or '').lower()
         aemail = (acc.get('email') or '').lower()
-        if identifier in (aid, auser, aemail):
+        aname = (acc.get('name') or '').lower()
+        aphone = (acc.get('phone') or '').strip().lower()
+        acontact = (acc.get('contact') or '').strip().lower()
+
+        phone_match = False
+        if clean_id_phone:
+            clean_p = re.sub(r'\D', '', aphone)
+            clean_c = re.sub(r'\D', '', acontact)
+            if clean_p and (clean_id_phone == clean_p or clean_id_phone.endswith(clean_p) or clean_p.endswith(clean_id_phone)):
+                phone_match = True
+            elif clean_c and (clean_id_phone == clean_c or clean_id_phone.endswith(clean_c) or clean_c.endswith(clean_id_phone)):
+                phone_match = True
+
+        if identifier in (aid, auser, aemail, aname, aphone, acontact) or phone_match:
             matched = acc
             break
 

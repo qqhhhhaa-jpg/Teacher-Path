@@ -4570,40 +4570,40 @@ function initEventListeners() {
       } catch (err) {}
 
       let accounts = getAuthAccounts();
-      let userExists = accounts.find(a =>
-        (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) ||
-        (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
-        (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
-      );
+      const cleanEnteredPhone = emailOrUser.replace(/\D/g, '');
+      const isPhoneLikeQuery = cleanEnteredPhone.length >= 7;
+
+      const checkAccountMatch = (a) => {
+        if (!a) return false;
+        const low = emailOrUser.toLowerCase();
+        if (a.email && a.email.toLowerCase() === low) return true;
+        if (a.username && a.username.toLowerCase() === low) return true;
+        if (a.name && a.name.toLowerCase() === low) return true;
+        if (isPhoneLikeQuery) {
+          const aPhone = (a.phone || a.contact || '').replace(/\D/g, '');
+          if (aPhone && (aPhone === cleanEnteredPhone || aPhone.endsWith(cleanEnteredPhone) || cleanEnteredPhone.endsWith(aPhone))) {
+            return true;
+          }
+        }
+        return false;
+      };
+
+      let userExists = accounts.find(checkAccountMatch);
 
       if (!found) {
         found = accounts.find(a =>
-          (
-            (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) ||
-            (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
-            (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
-          ) &&
+          checkAccountMatch(a) &&
           (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
         );
       }
 
       // CROSS-DEVICE LOGIN SYNC (Laptop -> Phone):
-      // If user account is not found in this phone's local storage,
-      // IMMEDIATELY query the server accounts endpoint to fetch accounts created on laptop!
       if (!found) {
         if (typeof syncAccountsWithServer === 'function') {
           accounts = await syncAccountsWithServer();
-          userExists = accounts.find(a =>
-            (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) ||
-            (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
-            (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
-          );
+          userExists = accounts.find(checkAccountMatch);
           found = accounts.find(a =>
-            (
-              (a.email && a.email.toLowerCase() === emailOrUser.toLowerCase()) ||
-              (a.name && a.name.toLowerCase() === emailOrUser.toLowerCase()) ||
-              (a.username && a.username.toLowerCase() === emailOrUser.toLowerCase())
-            ) &&
+            checkAccountMatch(a) &&
             (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
           );
         }
@@ -12743,7 +12743,193 @@ window.confirmExistingAccountWithPassword = async function () {
   }
 };
 
-window.openGoogleAccountModal = function () {
+
+window.openTeacherRegistrationModal = function () {
+  const modal = document.getElementById('googleAuthModal');
+  if (modal) {
+    modal.classList.add('open');
+    modal.style.display = 'flex';
+    const form = document.getElementById('singleStepTeacherRegisterForm');
+    if (form) form.reset();
+    setTimeout(() => {
+      const nameInput = document.getElementById('regTeacherFullName');
+      if (nameInput) nameInput.focus();
+    }, 120);
+  }
+};
+
+window.closeTeacherRegistrationModal = function () {
+  const modal = document.getElementById('googleAuthModal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.style.display = 'none';
+  }
+};
+
+window.openGoogleAccountModal = window.openTeacherRegistrationModal;
+window.closeGoogleAccountModal = window.closeTeacherRegistrationModal;
+
+window.submitSingleStepTeacherRegistration = async function () {
+  const nameInput = document.getElementById('regTeacherFullName');
+  const userInput = document.getElementById('regTeacherUsername');
+  const passInput = document.getElementById('regTeacherPassword');
+  const phoneInput = document.getElementById('regTeacherPhone');
+  const emailInput = document.getElementById('regTeacherEmail');
+  const subInput = document.getElementById('regTeacherSubject');
+  const schoolInput = document.getElementById('regTeacherSchool');
+  const govInput = document.getElementById('regTeacherGov');
+  const rightsInput = document.getElementById('regTeacherRights');
+
+  const name = (nameInput && nameInput.value.trim()) || '';
+  const username = (userInput && userInput.value.trim()) || '';
+  const password = (passInput && passInput.value) || '';
+  const phone = (phoneInput && phoneInput.value.trim()) || '';
+  const email = (emailInput && emailInput.value.trim()) || '';
+  const subject = (subInput && subInput.value.trim()) || '';
+  const school = (schoolInput && schoolInput.value.trim()) || '';
+  const governorate = (govInput && govInput.value.trim()) || '';
+  const rights = (rightsInput && rightsInput.value.trim()) || '';
+
+  // Clear previous error styles
+  [nameInput, userInput, passInput, phoneInput, emailInput, subInput, schoolInput, govInput, rightsInput].forEach(el => {
+    if (el) { el.style.borderColor = ''; el.style.boxShadow = ''; }
+  });
+
+  // Validation
+  if (!name) {
+    showToast('⚠️ حقل مطلوب: يرجى كتابة الاسم الكامل للأستاذ / المعلم!', 'warning');
+    if (nameInput) { nameInput.focus(); nameInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!username) {
+    showToast('⚠️ حقل مطلوب: يرجى كتابة اسم المستخدم (اليوزر)!', 'warning');
+    if (userInput) { userInput.focus(); userInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (username.toLowerCase() === 'admin' || username.toLowerCase() === 'usr_admin') {
+    showToast('اسم المستخدم (admin) محجوز للإدارة فقط!', 'danger');
+    if (userInput) { userInput.focus(); userInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!password || password.length < 4) {
+    showToast('⚠️ كلمة المرور يجب أن لا تقل عن 4 رموز!', 'warning');
+    if (passInput) { passInput.focus(); passInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+
+  // Phone Validation: MUST BE PROVIDED AND UNIQUE!
+  const cleanPhone = phone.replace(/\D/g, '');
+  if (!phone || cleanPhone.length < 7) {
+    showToast('⚠️ يرجى كتابة رقم هاتف موبايل صحيح (مثال: 0770xxxxxxx)!', 'warning');
+    if (phoneInput) { phoneInput.focus(); phoneInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+
+  const accounts = getAuthAccounts();
+  const lowerUser = username.toLowerCase();
+
+  // Check unique username
+  const isUsernameTaken = accounts.some(a => a.username && a.username.toLowerCase() === lowerUser);
+  if (isUsernameTaken) {
+    showToast('⚠️ اسم المستخدم هذا مسجل مسبقاً! يرجى اختيار يوزر آخر.', 'warning');
+    if (userInput) { userInput.focus(); userInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+
+  // Check UNIQUE phone number across all accounts
+  const isPhoneTaken = accounts.some(a => {
+    const ap = (a.phone || a.contact || '').replace(/\D/g, '');
+    return ap && (ap === cleanPhone || ap.endsWith(cleanPhone) || cleanPhone.endsWith(ap));
+  });
+  if (isPhoneTaken) {
+    showToast('⚠️ رقم الهاتف هذا مسجل مسبقاً في حساب آخر! يرجى استخدام رقمك الشخصي الخاص.', 'warning');
+    if (phoneInput) { phoneInput.focus(); phoneInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+
+  if (!subject) {
+    showToast('⚠️ يرجى تحديد المادة الدراسية التخصصية!', 'warning');
+    if (subInput) { subInput.focus(); subInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!school) {
+    showToast('⚠️ يرجى كتابة اسم المدرسة أو المعهد!', 'warning');
+    if (schoolInput) { schoolInput.focus(); schoolInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!governorate) {
+    showToast('⚠️ يرجى كتابة المحافظة أو المديرية!', 'warning');
+    if (govInput) { govInput.focus(); govInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+  if (!rights) {
+    showToast('⚠️ يرجى كتابة حقوق الطبع والترويسة المخصصة لك!', 'warning');
+    if (rightsInput) { rightsInput.focus(); rightsInput.style.borderColor = '#ef4444'; }
+    return;
+  }
+
+  // Create clean account object
+  const now = new Date();
+  const trialDurationMs = 7 * 24 * 60 * 60 * 1000;
+  const trialExpiry = new Date(now.getTime() + trialDurationMs);
+  const dateFormatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
+  const newAccount = {
+    id: 'usr_teacher_' + Date.now(),
+    name: name,
+    username: username,
+    password: password,
+    phone: phone,
+    contact: phone,
+    email: email || '',
+    subject: subject,
+    school: school,
+    governorate: governorate,
+    rights: rights,
+    role: 'teacher',
+    status: 'active',
+    isSubscribed: true,
+    isVip: true,
+    isTrial: true,
+    trialDurationHours: 168,
+    trialStartedAt: now.toISOString(),
+    subscriptionType: 'free_trial_7d',
+    subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+    subscriptionStartDate: now.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
+    registeredAt: now.toISOString(),
+    registeredDateFormatted: dateFormatted
+  };
+
+  accounts.push(newAccount);
+  saveAuthAccounts(accounts);
+
+  // Sync to Backend Server immediately
+  try {
+    fetch(getBackendApiUrl('/api/accounts'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ account: newAccount })
+    }).catch(() => {});
+  } catch (_) {}
+
+  // Save isolated profile for this account
+  try {
+    localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, trialExpiry.toISOString());
+    localStorage.setItem(`moallem_teacher_profile_${newAccount.id}`, JSON.stringify(newAccount));
+  } catch (_) {}
+
+  window.closeTeacherRegistrationModal();
+
+  // Perform Instant Login
+  await window.performGoogleLoginSuccess(newAccount);
+  showToast(`أهلاً وسهلاً بك يا أستاذ ${name} 🚀 تم إنشاء حسابك وتفعيل مساحة العمل بنجاح!`, 'success');
+};
+
+// Deprecated legacy Google opener:
+window.legacyOpenGoogleAccountModal = function () {
   const modal = document.getElementById('googleAuthModal');
   if (modal) {
     modal.classList.add('open');

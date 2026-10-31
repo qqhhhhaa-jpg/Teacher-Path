@@ -309,16 +309,7 @@
             <span class="topbar-pro-chip">PRO</span>
           </button>
 
-          <!-- Google Cloud Gateway & Gemini AI Icon Button (خاص بالمدير العام 👑 فقط - أيقونة دائرية أنيقة) -->
-          <button type="button" class="topbar-icon-btn btn-google-status-indicator admin-only-hidden"
-            id="topbarGoogleAuthIconBtn" onclick="window.openGCloudGatewayModal('config')"
-            title="بوابة Google Cloud API & Gemini AI (خاص بالمدير العام 👑)"
-            style="position: relative;">
-            <i class="fa-brands fa-google" id="topbarGoogleLogoIcon"
-              style="color: #ef4444; font-size: 1.15rem; transition: all 0.25s ease;"></i>
-            <span id="topbarGoogleStatusDot"
-              style="position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 6px #ef4444; border: 1.5px solid var(--bg-card, #0f172a); transition: all 0.25s ease;"></span>
-          </button>
+          <!-- Google button removed as requested -->
 
           <!-- Dark/Light Theme Toggle (بعد زر الاشتراك) -->
           <button type="button" class="topbar-icon-btn btn-theme" onclick="window.toggleTheme()"
@@ -506,22 +497,7 @@
               <i class="fa-solid fa-arrow-left drawer-arrow"></i>
             </button>
 
-            <!-- حساب Google السحابي -->
-            <button type="button" class="drawer-item-btn" id="drawerGoogleSyncBtn"
-              style="pointer-events: none; cursor: default;" tabindex="-1">
-
-              <div class="drawer-item-main" style="display: flex; align-items: center; gap: 0.75rem;">
-                <div class="drawer-item-icon-box" id="drawerGoogleIconBox"
-                  style="background: rgba(239, 68, 68, 0.14); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.35);">
-                  <i class="fa-brands fa-google" id="drawerGoogleLogoIcon" style="color: #ef4444;"></i>
-                </div>
-                <div class="drawer-item-text">
-                  <strong id="drawerGoogleTitleText" style="color: #ef4444;">غير مسجل عن طريق Google</strong>
-                  <small id="drawerGoogleSubText">اضغط لتسجيل الدخول وربط حساب Google الرسمي</small>
-                </div>
-              </div>
-              <i class="fa-solid fa-arrow-left drawer-arrow"></i>
-            </button>
+            
 
             <!-- 6. تسجيل الخروج من الحساب -->
             <button type="button" class="drawer-item-btn drawer-item-logout" id="drawerLogoutBtn"
@@ -5608,18 +5584,12 @@
         <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="portal-topbar-seal" width="44" height="44"
           style="object-fit: contain; width: 44px; height: 44px; filter: drop-shadow(0 2px 8px rgba(37, 99, 235, 0.3));">
         <div class="portal-topbar-title">
-          <span>مسار المعلم <span class="portal-brand-pro-pill">PRO 2026</span></span>
+          <span>مسار المعلم</span>
           <small>المنظومة التعليمية الرقمية المعتمدة في العراق 🇮🇶</small>
         </div>
       </div>
 
-      <div class="portal-topbar-center">
-        <div class="portal-live-status-chip">
-          <span class="live-dot-pulse"></span>
-          <i class="fa-solid fa-cloud-arrow-up text-success"></i>
-          <span>الخادم نشط ومتزامن محلياً وسحابياً 🟢</span>
-        </div>
-      </div>
+      <div class="portal-topbar-center"></div>
 
       <div class="portal-topbar-actions">
         <button type="button" class="btn btn-outline btn-icon-only" onclick="toggleTheme()"
@@ -5649,14 +5619,14 @@
             <div class="portal-card-header">
               <div class="portal-badge-label">
                 <i class="fa-solid fa-crown text-warning"></i>
-                <span>بوابة الدخول المعتمدة — مسار المعلم PRO 2026</span>
+                <span>بوابة الدخول المعتمدة — مسار المعلم</span>
               </div>
               <h2 class="portal-card-title" id="authPortalHeading">تسجيل الدخول للمنصة</h2>
               <p class="portal-card-desc">أهلاً بك يا أستاذنا العزيز! سجّل دخولك للوصول الفوري إلى بنك الأسئلة والاستوديوهات الرقمية.</p>
 
               <div class="portal-privacy-notice">
                 <div class="privacy-shield-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <span><strong>بيئة عمل معزولة ومحمية:</strong> بيانات اختباراتك وسجلات طلابك مشفرة ومحفوظة بأعلى درجات الخصوصية والأمان.</span>
+                <span><strong>بيئة عمل معزولة ومحمية:</strong> بيانات اختباراتك وسجلات طلابك محفوظة ومحمية بأعلى درجات الخصوصية والأمان.</span>
               </div>
             </div>
 
@@ -5664,33 +5634,27 @@
               <!-- Login Form -->
               <form id="loginForm">
 
-                <!-- Username / Email Field -->
+                <!-- Username / Phone / Email Field -->
                 <div class="portal-form-group">
                   <label class="portal-form-label" for="loginEmail">
                     <i class="fa-solid fa-circle-user text-primary"></i>
-                    <span>اسم المستخدم أو البريد الإلكتروني</span>
+                    <span>اسم المستخدم أو رقم الموبايل أو البريد</span>
                   </label>
                   <div class="portal-input-container">
                     <div class="portal-input-icon-box">
                       <i class="fa-solid fa-id-badge"></i>
                     </div>
                     <input type="text" class="portal-lux-input" id="loginEmail"
-                      placeholder="اسم المستخدم أو البريد الإلكتروني" required autocomplete="username">
+                      placeholder="اسم المستخدم أو رقم الموبايل أو البريد" required autocomplete="username">
                   </div>
                 </div>
 
                 <!-- Password Field -->
                 <div class="portal-form-group">
-                  <div class="portal-label-row">
-                    <label class="portal-form-label" for="loginPassword">
-                      <i class="fa-solid fa-shield-halved text-accent"></i>
-                      <span>كلمة المرور</span>
-                    </label>
-                    <button type="button" class="btn-forgot-password-lux" onclick="window.openForgotPasswordVerificationModal()" title="التحقق واستعادة كلمة المرور">
-                      <i class="fa-solid fa-key" style="color: #f59e0b;"></i>
-                      <span>نسيت كلمة السر؟ (استعادة فورية)</span>
-                    </button>
-                  </div>
+                  <label class="portal-form-label" for="loginPassword">
+                    <i class="fa-solid fa-shield-halved text-accent"></i>
+                    <span>كلمة المرور</span>
+                  </label>
                   <div class="portal-input-container">
                     <div class="portal-input-icon-box">
                       <i class="fa-solid fa-lock"></i>
@@ -5700,6 +5664,14 @@
                     <button type="button" class="portal-eye-toggle-btn"
                       onclick="togglePasswordVisibility('loginPassword', this)" title="إظهار / إخفاء كلمة المرور">
                       <i class="fa-solid fa-eye"></i>
+                    </button>
+                  </div>
+
+                  <!-- Forgot password positioned UNDER the input field -->
+                  <div class="portal-forgot-below-row" style="display: flex; justify-content: flex-end; margin-top: 6px;">
+                    <button type="button" class="btn-forgot-password-lux" onclick="window.openForgotPasswordVerificationModal()" title="التحقق واستعادة كلمة المرور">
+                      <i class="fa-solid fa-key" style="color: #f59e0b;"></i>
+                      <span>نسيت كلمة السر؟ (استعادة فورية)</span>
                     </button>
                   </div>
 
@@ -5720,7 +5692,7 @@
                     <span class="checkbox-label-text">تذكر تسجيل دخولي على هذا الجهاز</span>
                   </label>
                   <span class="portal-secure-badge">
-                    <i class="fa-solid fa-lock"></i> تشفير وحماية SSL 256-bit
+                    <i class="fa-solid fa-shield-halved"></i> حماية وخصوصية عالية 256-bit
                   </span>
                 </div>
 
@@ -5738,7 +5710,7 @@
               <!-- Extra Actions Grid: New Teacher Registration -->
               <div class="portal-extra-actions-grid" style="margin-top: 0.85rem;">
                 <button type="button" class="btn-register-account-prominent" id="portalOpenRegisterBtn"
-                  onclick="window.openGoogleAccountModal()" title="إنشاء وتسجيل حساب معلم جديد في المنصة">
+                  onclick="window.openTeacherRegistrationModal()" title="إنشاء وتسجيل حساب معلم جديد في المنصة">
                   <div class="register-btn-icon-wrap" style="width: 38px; height: 38px; border-radius: 11px;">
                     <i class="fa-solid fa-user-plus"></i>
                   </div>
@@ -5771,21 +5743,50 @@
 
         <!-- Left Side: Logo & Brand ONLY (على اليسار: الشعار مع اسم المنصة وحده) -->
         <aside class="portal-brand-showcase-side" aria-label="شعار واسم منصة مسار المعلم">
+          <!-- Background Ambient Elements & Geometry -->
           <div class="brand-side-glow-aura"></div>
+          <div class="brand-side-deco-ring ring-outer"></div>
+          <div class="brand-side-deco-ring ring-inner"></div>
+
           <div class="brand-side-inner-wrap">
-            <div class="brand-side-hero-logo">
+            <!-- Elevated Emblem Shield / Glass Pedestal -->
+            <div class="brand-side-shield-pedestal">
               <div class="brand-side-logo-halo"></div>
-              <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-side-emblem-img" width="135" height="135">
+              <div class="brand-side-shield-glass">
+                <img src="assets/masar_moallem_logo.png" alt="شعار مسار المعلم" class="brand-side-emblem-img" width="130" height="130">
+              </div>
             </div>
+
+            <!-- Brand Identity & Typography -->
             <div class="brand-side-identity">
+              <div class="brand-side-crown-tag">
+                <i class="fa-solid fa-crown"></i>
+                <span>المنظومة التعليمية الرقمية المعتمدة</span>
+              </div>
               <h1 class="brand-side-main-title">
                 مسار المعلم
-                <span class="brand-side-pro-tag">PRO 2026</span>
               </h1>
-              <p class="brand-side-tagline-text">المنظومة التعليمية الرقمية المعتمدة في العراق 🇮🇶</p>
+              <p class="brand-side-tagline-text">البيئة المعتمدة لإعداد وطباعة الامتحانات المدرسية والوزارية في العراق 🇮🇶</p>
+              
               <div class="brand-side-ministerial-badge">
-                <i class="fa-solid fa-shield-halved text-warning"></i>
-                <span>البيئة الرسمية لإعداد الاختبارات المدرسية</span>
+                <i class="fa-solid fa-certificate text-warning"></i>
+                <span>مطابق لضوابط وزارة التربية العراقية</span>
+              </div>
+
+              <!-- Sleek Feature Highlight Chips -->
+              <div class="brand-side-feature-chips">
+                <span class="brand-feature-chip">
+                  <i class="fa-solid fa-brain" style="color: #60a5fa;"></i>
+                  <span>بنك وزاري شامل</span>
+                </span>
+                <span class="brand-feature-chip">
+                  <i class="fa-solid fa-bolt" style="color: #fbbf24;"></i>
+                  <span>إعداد وطباعة فورية</span>
+                </span>
+                <span class="brand-feature-chip">
+                  <i class="fa-solid fa-shield-check" style="color: #34d399;"></i>
+                  <span>أمان ورصانة 100%</span>
+                </span>
               </div>
             </div>
           </div>
@@ -8316,265 +8317,139 @@
     </div>
   </div>
 
-  <!-- Teacher Email Registration & Login Modal -->
+  <!-- Teacher Registration Modal (Single 1-Step Easy Signup) -->
   <div class="modal-overlay" id="googleAuthModal">
-    <div class="modal-container" style="max-width: 530px;">
-      <div class="modal-header" style="border-bottom: none; padding-bottom: 0.35rem;">
-        <div style="display: flex; align-items: center; gap: 0.65rem;">
-          <div
-            style="width: 34px; height: 34px; border-radius: 50%; background: rgba(37, 99, 235, 0.15); display: flex; align-items: center; justify-content: center; color: var(--primary);">
-            <i class="fa-solid fa-envelope" style="font-size: 1.1rem;"></i>
+    <div class="modal-container" style="max-width: 580px; width: 94%; max-height: 90vh; display: flex; flex-direction: column;">
+      
+      <!-- Modal Header -->
+      <div class="modal-header" style="padding: 1.15rem 1.4rem 0.9rem 1.4rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 38px; height: 38px; border-radius: 12px; background: rgba(37, 99, 235, 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+            <i class="fa-solid fa-user-plus"></i>
           </div>
-          <span style="font-weight: 800; font-size: 1.05rem; color: var(--text-main);">تسجيل الدخول بالبريد
-            الإلكتروني</span>
+          <div>
+            <h3 style="margin: 0; font-size: 1.1rem; font-weight: 900; color: var(--text-main);">إنشاء حساب معلم جديد</h3>
+            <p style="margin: 2px 0 0 0; font-size: 0.76rem; color: var(--text-muted);">خطوة واحدة فقط: أدخل بياناتك ورقم هاتفك للانضمام الفوري للمنصة</p>
+          </div>
         </div>
-        <button type="button" class="btn-drawer-close" onclick="window.closeGoogleAccountModal()">✖</button>
+        <button type="button" class="btn-drawer-close" onclick="window.closeTeacherRegistrationModal()">✖</button>
       </div>
 
-      <!-- Stepper Progress Header (مؤشر الخطوتين) -->
-      <div class="auth-stepper-header"
-        style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 1.25rem 0.85rem 1.25rem; border-bottom: 1px solid var(--border-color);">
-        <div class="stepper-step active" id="stepIndicator1"
-          style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--primary);">
-          <span class="step-num-badge" id="step1Badge"
-            style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">1</span>
-          <span>الخطوة 1: البريد الإلكتروني</span>
-        </div>
-        <div style="flex: 1; height: 2px; background: var(--border-color); max-width: 45px;"></div>
-        <div class="stepper-step" id="stepIndicator2"
-          style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">
-          <span class="step-num-badge" id="step2Badge"
-            style="width: 24px; height: 24px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-muted); display: flex; align-items: center; justify-content: center; font-size: 0.74rem;">2</span>
-          <span>الخطوة 2: معلومات المدرس</span>
-        </div>
-      </div>
-
-      <div class="modal-body" style="padding-top: 0.85rem;">
-
-        <!-- STEP 1: Direct Email Input (الخطوة الأولى: إدخال البريد الإلكتروني يدوياً) -->
-        <div id="googleAuthStep1">
-          <div id="googleStep1SelectionView">
-
-            <!-- Direct Email Sign-in Box -->
-            <div
-              style="background: var(--bg-surface); border: 1.5px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1rem; text-align: right;">
-              <div style="margin-bottom: 1rem;">
-                <label
-                  style="font-size: 0.88rem; font-weight: 800; color: var(--text-main); display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.45rem;">
-                  <span style="display: flex; align-items: center; gap: 6px;">
-                    <i class="fa-solid fa-envelope text-primary"></i>
-                    <span>البريد الإلكتروني للأستاذ:</span>
-                  </span>
-                  <span id="googleEmailStatusBadge" class="badge-tag"
-                    style="font-size: 0.72rem; background: rgba(37, 99, 235, 0.1); color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.25);">إدخال
-                    يدوي</span>
-                </label>
-
-                <div style="position: relative;">
-                  <input type="email" id="googlePersonalEmailInput" class="form-control" dir="ltr"
-                    placeholder="name@example.com"
-                    style="padding-left: 2.6rem; font-size: 1rem; font-weight: 600; border-radius: 10px; height: 48px;"
-                    oninput="window.handlePersonalGoogleEmailInput(this.value)">
-                  <span
-                    style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--primary); font-size: 1.25rem; pointer-events: none;">
-                    <i class="fa-solid fa-at"></i>
-                  </span>
-                </div>
-                <div id="googleEmailNoticeText"
-                  style="font-size: 0.76rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-                  أدخل بريدك الإلكتروني يدوياً لفتح حسابك أو تسجيل حساب جديد ومتابعة الإعدادات.
-                </div>
-              </div>
-
-              <!-- Password Challenge Box (يظهر فقط إذا كان الحساب مسجلاً مسبقاً) -->
-              <div id="googleExistingAccountPasswordBox"
-                style="display: none; background: rgba(15, 23, 42, 0.75); border: 1.5px solid #f59e0b; border-radius: 10px; padding: 0.95rem; margin-bottom: 0.85rem; text-align: right;">
-                <div
-                  style="font-size: 0.82rem; font-weight: 800; color: #fbbf24; margin-bottom: 0.55rem; display: flex; align-items: center; gap: 6px;">
-                  <i class="fa-solid fa-lock"></i>
-                  <span id="googleExistingAccountPromptTitle">الحساب مسجل مسبقاً! يرجى إدخال كلمة المرور لتأكيد
-                    الهوية:</span>
-                </div>
-                <div style="position: relative; margin-bottom: 0.65rem;">
-                  <input type="password" id="googleExistingPassInput" class="form-control"
-                    placeholder="أدخل كلمة مرور حسابك لتأكيد الدخول" style="height: 42px; padding-right: 2.2rem;">
-                  <i class="fa-solid fa-key"
-                    style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.85rem;"></i>
-                </div>
-                <div id="googleExistingPassError"
-                  style="display: none; color: #ef4444; font-size: 0.76rem; font-weight: 700; margin-bottom: 0.55rem;">
-                  <i class="fa-solid fa-triangle-exclamation"></i> كلمة المرور غير صحيحة! يرجى إعادة المحاولة.
-                </div>
-                <button type="button" class="btn btn-warning" onclick="window.confirmExistingAccountWithPassword()"
-                  style="width: 100%; height: 42px; font-weight: 800; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                  <i class="fa-solid fa-shield-halved"></i> تأكيد الهوية وفتح المنصة
-                </button>
-              </div>
-
-              <!-- Submit Button -->
-              <button type="button" class="btn btn-primary" id="btnConfirmPersonalGoogle"
-                onclick="window.submitPersonalGoogleEmail()"
-                style="width: 100%; height: 48px; font-size: 1rem; font-weight: 800; border-radius: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #2563eb; border-color: #2563eb; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
-                <i class="fa-solid fa-arrow-left"></i>
-                <span>متابعة تسجيل الحساب بالبريد 🚀</span>
-              </button>
-            </div>
-
-
-          </div>
-        </div>
-
-        <!-- STEP 2: Teacher Personal Info & Credentials (الخطوة الثانية: معلومات المدرس واليوزر وكلمة المرور والحقوق) -->
-        <div id="googleAuthStep2" style="display: none;">
-          <!-- Account Linked Ribbon -->
-          <div
-            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 0.65rem 0.85rem; margin-bottom: 0.85rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <i class="fa-solid fa-circle-check text-success" style="font-size: 1.2rem;"></i>
-              <div>
-                <strong style="font-size: 0.82rem; color: #10b981; display: block;">تم تأكيد البريد الإلكتروني
-                  ✔</strong>
-                <small id="step2LinkedEmail" style="font-size: 0.72rem; color: var(--text-muted);"
-                  dir="ltr">teacher@example.com</small>
-              </div>
-            </div>
-            <button type="button" class="btn btn-outline" style="padding: 0.2rem 0.55rem; font-size: 0.72rem;"
-              onclick="window.backToGoogleStep1()">
-              تغيير البريد
-            </button>
-          </div>
-
-          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">
-            الخطوة الثانية: عيّن اسم المستخدم وكلمة المرور واكتب معلوماتك وحقوقك لتثبيتها في حسابك والترويسة <strong
-              style="color: #ef4444;">(جميع الحقول أدناه إجبارية)</strong>:
-          </p>
-
-          <div style="display: flex; flex-direction: column; gap: 0.7rem;">
-            <!-- Teacher Full Name -->
-            <div class="form-group">
-              <label class="form-label"
-                style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fa-solid fa-user text-primary"></i> الاسم الكامل للأستاذ / المعلم (كتابة يدوية) <span
-                    style="color: #ef4444; font-weight: bold;">*</span></span>
+      <!-- Modal Body (Single Step Scrollable) -->
+      <div class="modal-body" style="padding: 1.25rem 1.4rem; overflow-y: auto; flex: 1;">
+        <form id="singleStepTeacherRegisterForm" onsubmit="event.preventDefault(); window.submitSingleStepTeacherRegistration();">
+          
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            
+            <!-- 1. Full Name -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fa-solid fa-user text-primary"></i> الاسم الكامل للأستاذ / المعلم <span style="color: #ef4444;">*</span></span>
                 <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
               </label>
-              <input type="text" class="form-control" id="step2TeacherName" placeholder="مثال: أستاذ حسين علي الشمري"
-                required>
+              <input type="text" class="form-control" id="regTeacherFullName" placeholder="مثال: أستاذ علي حسين العبيدي" required style="height: 44px; border-radius: 10px;">
             </div>
 
-            <!-- Username & Password Row for Quick Credentials Login -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
-              <div class="form-group">
-                <label class="form-label"
-                  style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                  <span><i class="fa-solid fa-id-badge text-info"></i> اسم المستخدم (اليوزر) <span
-                      style="color: #ef4444; font-weight: bold;">*</span></span>
+            <!-- 2. Username & Password (2 Columns) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-id-badge text-info"></i> اسم المستخدم (اليوزر) <span style="color: #ef4444;">*</span></span>
                   <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
                 </label>
-                <input type="text" class="form-control" id="step2TeacherUsername" placeholder="مثال: hussein_ali"
-                  dir="ltr" required>
-                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">للدخول
-                  السريع لاحقاً باليوزر</small>
+                <input type="text" class="form-control" id="regTeacherUsername" placeholder="مثال: ali_hussein" dir="ltr" required style="height: 44px; border-radius: 10px;">
+                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">يُستخدم للدخول</small>
               </div>
 
-              <div class="form-group">
-                <label class="form-label"
-                  style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                  <span><i class="fa-solid fa-key text-warning"></i> كلمة المرور (الباسورد) <span
-                      style="color: #ef4444; font-weight: bold;">*</span></span>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-key text-warning"></i> كلمة المرور <span style="color: #ef4444;">*</span></span>
                   <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
                 </label>
                 <div style="position: relative;">
-                  <input type="password" class="form-control" id="step2TeacherPassword" placeholder="اكتب كلمة مرورك"
-                    required style="padding-right: 2rem;">
-                  <button type="button" onclick="togglePasswordVisibility('step2TeacherPassword', this)"
-                    style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;"
-                    title="إظهار/إخفاء">
+                  <input type="password" class="form-control" id="regTeacherPassword" placeholder="اكتب كلمة مرورك" required style="height: 44px; border-radius: 10px; padding-right: 2.2rem;">
+                  <button type="button" onclick="togglePasswordVisibility('regTeacherPassword', this)" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" title="إظهار/إخفاء">
                     <i class="fa-solid fa-eye"></i>
                   </button>
                 </div>
-                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">لفتح
-                  الحساب من أي جهاز</small>
+                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">لا تقل عن 4 رموز</small>
               </div>
             </div>
 
-            <!-- Subject (Full Manual Input - NOT select) -->
-            <div class="form-group">
-              <label class="form-label"
-                style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fa-solid fa-book-open text-warning"></i> المادة الدراسية التخصصية (كتابة يدوية) <span
-                    style="color: #ef4444; font-weight: bold;">*</span></span>
-                <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
-              </label>
-              <input type="text" class="form-control" id="step2TeacherSubject"
-                placeholder="اكتب مادتك (مثال: الرياضيات / الكيمياء / فيزياء السادس العلمي / اللغة العربية)" required>
+            <!-- 3. Phone Number (UNIQUE) & Email (2 Columns) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-phone text-success"></i> رقم هاتف الموبايل <span style="color: #ef4444;">*</span></span>
+                  <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(يُستخدم مرة واحدة)</span>
+                </label>
+                <input type="tel" class="form-control" id="regTeacherPhone" placeholder="0770xxxxxxx أو 0780xxxxxxx" dir="ltr" required style="height: 44px; border-radius: 10px;">
+                <small style="font-size: 0.68rem; color: #10b981; display: block; margin-top: 2px; font-weight: 700;">✔ يمكنك تسجيل الدخول به أيضاً</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-envelope text-primary"></i> البريد الإلكتروني</span>
+                  <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">(اختياري)</span>
+                </label>
+                <input type="email" class="form-control" id="regTeacherEmail" placeholder="name@example.com" dir="ltr" style="height: 44px; border-radius: 10px;">
+                <small style="font-size: 0.68rem; color: var(--text-muted); display: block; margin-top: 2px;">للمزامنة السحابية</small>
+              </div>
             </div>
 
-            <!-- School & Governorate (Full Manual Input) -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem;">
-              <div class="form-group">
-                <label class="form-label"
-                  style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                  <span><i class="fa-solid fa-school text-info"></i> المدرسة أو المعهد (كتابة يدوية) <span
-                      style="color: #ef4444; font-weight: bold;">*</span></span>
+            <!-- 4. Specialization Subject -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fa-solid fa-book-open text-warning"></i> المادة الدراسية التخصصية <span style="color: #ef4444;">*</span></span>
+                <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
+              </label>
+              <input type="text" class="form-control" id="regTeacherSubject" placeholder="مثال: الرياضيات / الكيمياء / فيزياء السادس العلمي / اللغة العربية" required style="height: 44px; border-radius: 10px;">
+            </div>
+
+            <!-- 5. School & Governorate (2 Columns) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-school text-info"></i> المدرسة أو المعهد <span style="color: #ef4444;">*</span></span>
                   <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
                 </label>
-                <input type="text" class="form-control" id="step2TeacherSchool"
-                  placeholder="مثال: ثانوية المتميزين للبنين" required>
+                <input type="text" class="form-control" id="regTeacherSchool" placeholder="مثال: ثانوية المتميزين للبنين" required style="height: 44px; border-radius: 10px;">
               </div>
 
-              <div class="form-group">
-                <label class="form-label"
-                  style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                  <span><i class="fa-solid fa-location-dot text-danger"></i> المحافظة / المديرية (كتابة يدوية) <span
-                      style="color: #ef4444; font-weight: bold;">*</span></span>
+              <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                  <span><i class="fa-solid fa-location-dot text-danger"></i> المحافظة / المديرية <span style="color: #ef4444;">*</span></span>
                   <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
                 </label>
-                <input type="text" class="form-control" id="step2TeacherGov" placeholder="مثال: بغداد - الكرخ الثانية"
-                  required>
+                <input type="text" class="form-control" id="regTeacherGov" placeholder="مثال: بغداد - الكرخ الثانية" required style="height: 44px; border-radius: 10px;">
               </div>
             </div>
 
-            <!-- Custom Rights & Copyright (Full Manual Input) -->
-            <div class="form-group">
-              <label class="form-label"
-                style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fa-solid fa-copyright text-success"></i> حقوق الطبع والترويسة المخصصة <span
-                    style="color: #ef4444; font-weight: bold;">*</span></span>
+            <!-- 6. Custom Rights & Exam Header -->
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" style="font-size: 0.82rem; font-weight: 800; margin-bottom: 0.3rem; display: flex; justify-content: space-between; align-items: center;">
+                <span><i class="fa-solid fa-copyright text-success"></i> حقوق الطبع والترويسة المخصصة <span style="color: #ef4444;">*</span></span>
                 <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
               </label>
-              <input type="text" class="form-control" id="step2TeacherRights"
-                placeholder="مثال: إعداد وتنظيم الأستاذ حسين علي - جميع الحقوق محفوظة" required>
-              <small style="font-size: 0.69rem; color: var(--text-muted); display: block; margin-top: 2px;">ستُطبع هذه
-                الحقوق تلقائياً في ترويسة وأسفل كل نموذج اختبار تنشئه.</small>
+              <input type="text" class="form-control" id="regTeacherRights" placeholder="مثال: إعداد وتنظيم الأستاذ علي حسين - جميع الحقوق محفوظة" required style="height: 44px; border-radius: 10px;">
+              <small style="font-size: 0.69rem; color: var(--text-muted); display: block; margin-top: 2px;">ستُطبع هذه الحقوق تلقائياً في ترويسة وأسفل كل نموذج اختبار تنشئه.</small>
             </div>
 
-            <!-- Contact Phone / Telegram -->
-            <div class="form-group">
-              <label class="form-label"
-                style="font-size: 0.8rem; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center;">
-                <span><i class="fa-solid fa-phone text-primary"></i> رقم الهاتف أو وسيلة التواصل <span
-                    style="color: #ef4444; font-weight: bold;">*</span></span>
-                <span style="font-size: 0.72rem; color: #ef4444; font-weight: 700;">(إجباري)</span>
-              </label>
-              <input type="text" class="form-control" id="step2TeacherContact"
-                placeholder="مثال: 0770xxxxxxx أو معرف التليغرام" dir="ltr" required>
-            </div>
-
-            <!-- Navigation Buttons for Step 2 -->
-            <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
-              <button type="button" class="btn btn-outline" style="flex: 1;" onclick="window.backToGoogleStep1()">
-                <i class="fa-solid fa-arrow-right"></i> رجوع
-              </button>
-              <button type="button" class="btn btn-primary" style="flex: 2; font-weight: 800;"
-                onclick="window.completeGoogleLoginWithProfile()">
-                <i class="fa-solid fa-circle-check"></i> تأكيد البيانات وحفظ حسابي 🚀
-              </button>
-            </div>
           </div>
-        </div>
 
+          <!-- Submit Action -->
+          <div style="margin-top: 1.25rem;">
+            <button type="submit" class="btn btn-primary" id="btnSubmitSingleStepTeacher" style="width: 100%; height: 48px; font-size: 1rem; font-weight: 800; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, #2563eb, #1d4ed8); border: none; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>إنشاء الحساب وتفعيل الدخول الفوري 🚀</span>
+            </button>
+          </div>
+
+        </form>
       </div>
+
+    </div>
+  </div>
     </div>
   </div>
 
@@ -10197,8 +10072,8 @@
     <!-- Supabase Official SDK & Client Integration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js?v=2026.10.31"></script>
-  <script src="js/app.js?v=2026.10.31.clean_stable_v10"></script>
-  <script src="js/gcloud-gateway.js?v=2026.10.31.clean_stable_v10"></script>
+  <script src="js/app.js?v=2026.10.31.clean_stable_v12"></script>
+  <script src="js/gcloud-gateway.js?v=2026.10.31.clean_stable_v12"></script>
 
 
   <!-- Teacher's Path PDF Export Engine Initialization -->
