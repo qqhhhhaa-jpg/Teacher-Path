@@ -2730,7 +2730,7 @@
               <i class="fa-solid fa-folder-open"></i>
               <span>فتح السجل</span>
             </button>
-            <button type="button" class="sg-archive-btn" style="background: rgba(225,29,72,0.12); color: #e11d48; border-color: rgba(225,29,72,0.3); font-weight: 800;" onclick="window.sgExportRosterPdfFromArchive('${r.id}')" title="تنزيل كشف درجات هذا الصف بصيغة PDF مباشرة">
+            <button type="button" class="sg-archive-btn" style="display: none !important; background: rgba(225,29,72,0.12); color: #e11d48; border-color: rgba(225,29,72,0.3); font-weight: 800;" onclick="window.sgExportRosterPdfFromArchive('${r.id}')" title="تنزيل كشف درجات هذا الصف بصيغة PDF مباشرة">
               <i class="fa-solid fa-file-pdf"></i>
               <span>تنزيل PDF</span>
             </button>

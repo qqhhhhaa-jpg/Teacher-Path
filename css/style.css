@@ -41851,3 +41851,33 @@ button[data-pdf-export]:disabled {
     width: 100% !important;
   }
 }
+
+
+/* ==========================================================================
+   إلغاء وإخفاء كافة أزرار تصدير الـ PDF من المنصة بالكامل بناءً على طلب المستخدم
+   Hide all PDF export/download buttons across all platform tabs and modals
+   ========================================================================== */
+.btn-card-action.cqa-pdf,
+.btn-exam-action.btn-exam-pdf,
+.btn-pdf-quick,
+.btn-hero-pdf,
+.seating-hero-btn.btn-hero-pdf,
+.cert-tool-btn[onclick*="Pdf"],
+.sg-btn-hero[onclick*="Pdf"],
+button[onclick*="exportCurrentExamToPdf"],
+button[onclick*="seatingExportPdf"],
+button[onclick*="examCardExportPdf"],
+button[onclick*="sbExportOfficialPdf"],
+button[onclick*="sbExecuteReportPdf"],
+button[onclick*="sbExportSessionFromArchivePdf"],
+button[onclick*="sgExportLedgerPdf"],
+button[onclick*="sgExportRosterPdfFromArchive"],
+button[onclick*="schedExportPdf"],
+button[onclick*="executeCertificatesBatchPdf"],
+button[onclick*="exportFullPlatformDailyReportPdf"],
+button[onclick*="exportActivationCardsPDF"],
+button[data-pdf-export],
+#downloadReport,
+#btnReportViewPdfDoc {
+  display: none !important;
+}

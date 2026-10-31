@@ -1719,7 +1719,7 @@
             <button type="button" class="btn btn-sm btn-primary" onclick="window.sbSelectSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="background: linear-gradient(135deg, #0284c7, #0369a1); font-weight: 800; padding: 0.35rem 0.75rem;">
               <i class="fa-solid fa-folder-open"></i> فتح الكشف
             </button>
-            <button type="button" class="btn btn-sm btn-danger" onclick="window.sbExportSessionFromArchivePdf('${rec.date}', '${rec.rosterId}')" style="background: linear-gradient(135deg, #e11d48, #be123c); font-weight: 800; padding: 0.35rem 0.75rem; border: none;" title="تنزيل كشف هذا اليوم بصيغة PDF مباشرة">
+            <button type="button" class="btn btn-sm btn-danger" onclick="window.sbExportSessionFromArchivePdf('${rec.date}', '${rec.rosterId}')" style="display: none !important; background: linear-gradient(135deg, #e11d48, #be123c); font-weight: 800; padding: 0.35rem 0.75rem; border: none;" title="تنزيل كشف هذا اليوم بصيغة PDF مباشرة">
               <i class="fa-solid fa-file-pdf"></i> تنزيل PDF
             </button>
             <button type="button" class="btn btn-sm btn-outline" onclick="window.sbPrintSessionFromArchive('${rec.date}', '${rec.rosterId}')" style="border-color: #7c3aed; color: #7c3aed; font-weight: 700; padding: 0.35rem 0.75rem;" title="طباعة كشف هذا اليوم A4">

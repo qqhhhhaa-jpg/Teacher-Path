@@ -17351,3 +17351,31 @@ window.copyMobileConnectUrl = function() {
     }
   }
 };
+
+// Universal safeguard: Hide any PDF export buttons platform-wide as requested by user
+(function autoHidePdfExportButtons() {
+  function hideButtons() {
+    try {
+      var allBtns = document.querySelectorAll('button, a.btn, .btn-card-action');
+      for (var i = 0; i < allBtns.length; i++) {
+        var el = allBtns[i];
+        var txt = (el.innerText || el.textContent || '').trim();
+        var title = (el.getAttribute('title') || '').trim();
+        var onclickStr = (el.getAttribute('onclick') || '').toLowerCase();
+        var isPdf = txt.includes('PDF') || txt.includes('pdf') || title.includes('PDF') || onclickStr.includes('pdf');
+        var isExport = txt.includes('تصدير') || txt.includes('تنزيل') || txt.includes('تحميل') || title.includes('تصدير') || title.includes('تنزيل') || onclickStr.includes('export');
+        if (isPdf && isExport) {
+          el.style.setProperty('display', 'none', 'important');
+        }
+      }
+    } catch (e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideButtons);
+  } else {
+    hideButtons();
+  }
+  // Run on tab changes and modal opens
+  document.addEventListener('click', function() { setTimeout(hideButtons, 150); });
+  window.addEventListener('load', hideButtons);
+})();
