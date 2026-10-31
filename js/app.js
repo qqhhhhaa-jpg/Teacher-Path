@@ -5697,10 +5697,12 @@ function renderBuilderList() {
 
   if (appState.questions.length === 0) {
     container.innerHTML = `
-      <div style="text-align: center; padding: 2.2rem 1rem; color: var(--text-muted); background: rgba(15, 23, 42, 0.4); border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
-        <i class="fa-regular fa-file-circle-plus" style="font-size: 2.4rem; margin-bottom: 0.6rem; color: #38bdf8;"></i>
-        <p style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">ورقة الاختبار فارغة حالياً</p>
-        <p style="font-size: 0.8rem; margin-top: 4px; color: var(--text-muted);">انقر على أي من أزرار المواد أعلاه (عربي / انكليزي / رياضيات / كيمياء / فيزياء / إسلامية) ثم اختر نوع السؤال للبدء فوراً.</p>
+      <div class="builder-empty-state-card">
+        <div class="empty-state-sparkle-icon">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <h4 class="empty-state-title">ورقة الاختبار فارغة وجاهزة للإعداد</h4>
+        <p class="empty-state-desc">انقر على المادة ونوع السؤال من الشريط العلوي للبدء في كتابة وتنسيق أول سؤال فوراً بكل احترافية.</p>
       </div>
     `;
     return;
@@ -9416,11 +9418,17 @@ function showToast(message, type = 'info') {
   const container = document.getElementById('toastContainer');
   if (!container) return;
 
-  const icons = {
-    success: 'fa-circle-check',
-    error: 'fa-triangle-exclamation',
-    info: 'fa-circle-info'
+  // Keep single active toast to prevent cluttering the canvas
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
   }
+
+  const icons = {
+    success: 'fa-circle-check text-success',
+    error: 'fa-triangle-exclamation text-danger',
+    info: 'fa-circle-info text-primary',
+    warning: 'fa-triangle-exclamation text-warning'
+  };
 
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
@@ -9434,8 +9442,8 @@ function showToast(message, type = 'info') {
 
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 300);
-  }, 3500);
+    setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+  }, 3200);
 }
 
 /**
@@ -14727,7 +14735,7 @@ function updateTrialWarningBanner() {
     if (floatingTimer) floatingTimer.innerText = floatCountdownText;
     if (badgeTitle) badgeTitle.innerText = '🎁 الفترة التجريبية المجانية (7 أيام)';
     if (descEl) {
-      descEl.innerHTML = `<strong>الفترة التجريبية:</strong> متبقي <strong>${formattedTime}</strong> بكامل الصلاحيات والطباعة مجاناً (7 أيام) 🎁`;
+      descEl.innerHTML = `تمتع بكامل صلاحيات إعداد وطباعة الاختبارات الوزارية وسجلات الطلاب`;
     }
     if (actionBtnText) actionBtnText.innerText = 'ترقية الحساب والاشتراك الآن 👑';
   } else {
