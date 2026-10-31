@@ -12744,6 +12744,57 @@ window.confirmExistingAccountWithPassword = async function () {
 };
 
 
+
+window.calculatePasswordStrength = function (val) {
+  if (!val || typeof val !== 'string') return { score: 0, text: 'أدخل كلمة المرور', color: '#94a3b8', advice: 'يفضل 6 رموز وأرقام' };
+  const len = val.length;
+  if (len < 4) {
+    return { score: 1, text: 'ضعيفة جداً ⚠️', color: '#ef4444', advice: 'قصيرة جداً، لا تقل عن 4 رموز' };
+  }
+
+  let score = 0;
+  if (len >= 6) score += 1;
+  if (len >= 8) score += 1;
+  if (/[0-9]/.test(val) && (/[a-zA-Z]/.test(val) || /[\u0600-\u06FF]/.test(val))) score += 1;
+  if (/[!@#$%^&*(),.?":{}|<>_\-+=~]/.test(val) || (/[A-Z]/.test(val) && /[a-z]/.test(val))) score += 1;
+
+  if (score <= 1) {
+    return { score: 1, text: 'ضعيفة ⚠️', color: '#ef4444', advice: 'أضف أرقاماً وأحرفاً إضافية' };
+  } else if (score === 2) {
+    return { score: 2, text: 'متوسطة المقبولية ⚡', color: '#f59e0b', advice: 'جيدة، وزد طولها لحماية أعلى' };
+  } else if (score === 3) {
+    return { score: 3, text: 'قوية وجيدة 🛡️', color: '#3b82f6', advice: 'ممتاز، كلمة مرور آمنة ومحمية' };
+  } else {
+    return { score: 4, text: 'ممتازة وقوية جداً 🔒✨', color: '#10b981', advice: 'أعلى درجات الأمان لحسابك' };
+  }
+};
+
+window.updateRegPasswordStrength = function (val) {
+  const result = window.calculatePasswordStrength(val);
+  const b1 = document.getElementById('strengthBar1');
+  const b2 = document.getElementById('strengthBar2');
+  const b3 = document.getElementById('strengthBar3');
+  const b4 = document.getElementById('strengthBar4');
+  const textLabel = document.getElementById('strengthTextLabel');
+  const adviceLabel = document.getElementById('strengthAdviceLabel');
+
+  const transparent = 'transparent';
+  const c = result.color;
+
+  if (b1) b1.style.background = result.score >= 1 ? c : transparent;
+  if (b2) b2.style.background = result.score >= 2 ? c : transparent;
+  if (b3) b3.style.background = result.score >= 3 ? c : transparent;
+  if (b4) b4.style.background = result.score >= 4 ? c : transparent;
+
+  if (textLabel) {
+    textLabel.innerText = 'مستوى الأمان: ' + result.text;
+    textLabel.style.color = result.score > 0 ? c : 'var(--text-muted)';
+  }
+  if (adviceLabel) {
+    adviceLabel.innerText = result.advice;
+  }
+};
+
 window.openTeacherRegistrationModal = function () {
   const modal = document.getElementById('googleAuthModal');
   if (modal) {
