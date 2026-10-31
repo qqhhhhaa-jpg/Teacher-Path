@@ -8820,34 +8820,68 @@
 
         </div>
 
-        <!-- VIP Activation Code Redemption Card (تفعيل الحساب بكود الاشتراك) -->
-        <div class="vip-code-redeem-card">
-          <div class="vip-code-redeem-header">
-            <div class="vip-code-icon-box">
-              <i class="fa-solid fa-ticket-simple"></i>
-            </div>
-            <div>
-              <div class="vip-code-title">
-                <span>هل تمتلك كود تفعيل أو بطاقة اشتراك VIP؟ 🎟️</span>
-                <span class="vip-code-tag">تفعيل فوري ⚡</span>
+        <!-- Realistic Physical VIP Activation Smart Card (شكل بطاقة اشتراك ذكية شبه حقيقية باللون الأبيض وتفاصيل وتوهج أزرق) -->
+        <div class="realistic-vip-smart-card" id="realisticVipCard">
+          <!-- Ambient Blue Aura Glow Behind Card -->
+          <div class="card-blue-aura-glow"></div>
+          
+          <div class="smart-card-inner">
+            <!-- Card Top Row: EMV Chip + Contactless + Official Brand -->
+            <div class="smart-card-top-row">
+              <div class="smart-card-chip-wrap">
+                <div class="emv-gold-chip" title="شريحة الأمان الذكية VIP">
+                  <span class="chip-circuit-line line-1"></span>
+                  <span class="chip-circuit-line line-2"></span>
+                  <span class="chip-circuit-core"></span>
+                </div>
+                <div class="nfc-contactless-box" title="دعم التفعيل الفوري الذكي">
+                  <i class="fa-solid fa-wifi smart-card-nfc-icon"></i>
+                </div>
               </div>
-              <div class="vip-code-desc">أدخل رمز الكود المكون من بطاقة التفعيل لترقية حسابك فورياً دون الحاجة لأي
-                انتظار!</div>
+
+              <div class="smart-card-brand-wrap">
+                <div class="smart-card-badge-tag">
+                  <i class="fa-solid fa-crown text-warning"></i>
+                  <span>بطاقة اشتراك VIP المعتمدة</span>
+                </div>
+                <span class="smart-card-platform-name">مسار المعلم • SMART PASS</span>
+              </div>
             </div>
-          </div>
-          <div class="vip-code-redeem-form">
-            <div class="vip-code-input-wrap">
-              <i class="fa-solid fa-key vip-code-input-icon"></i>
-              <input type="text" id="vipCodeRedeemInput" class="vip-code-input"
-                placeholder="أدخل كود التفعيل هنا (مثال: VIP-YEAR-XXXX-XXXX)..." autocomplete="off" spellcheck="false"
-                dir="ltr"
-                onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.handleRedeemActivationCode(); }">
+
+            <!-- Card Middle: Authentic Activation Code Strip -->
+            <div class="smart-card-body-zone">
+              <div class="smart-card-code-header">
+                <span class="code-strip-label"><i class="fa-solid fa-shield-halved"></i> رمز التفعيل السري (SECRET ACTIVATION CODE):</span>
+                <span class="code-strip-hint">أدخل رمز بطاقتك لترقية الحساب فوراً دون انتظار</span>
+              </div>
+
+              <div class="smart-card-input-row">
+                <div class="smart-card-code-slot">
+                  <i class="fa-solid fa-key smart-code-key-icon"></i>
+                  <input type="text" id="vipCodeRedeemInput" class="smart-card-code-input"
+                    placeholder="VIP-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false"
+                    dir="ltr"
+                    onkeydown="if(event.key==='Enter'){ event.preventDefault(); window.handleRedeemActivationCode(); }">
+                </div>
+                <button type="button" id="btnSubmitRedeemCode" class="smart-card-submit-btn"
+                  onclick="window.handleRedeemActivationCode()" title="تفعيل بطاقة الاشتراك الآن">
+                  <i class="fa-solid fa-bolt-lightning"></i>
+                  <span>تفعيل البطاقة الآن ⚡</span>
+                </button>
+              </div>
             </div>
-            <button type="button" id="btnSubmitRedeemCode" class="btn-vip-code-submit"
-              onclick="window.handleRedeemActivationCode()" title="تفعيل الكود فوراً">
-              <i class="fa-solid fa-bolt-lightning"></i>
-              <span>تفعيل الاشتراك الآن</span>
-            </button>
+
+            <!-- Card Bottom: Security Hologram & Serial Meta -->
+            <div class="smart-card-footer-row">
+              <div class="smart-card-security-meta">
+                <i class="fa-solid fa-certificate text-primary"></i>
+                <span>معتمدة رسمياً ومحمية بنظام التحقق السريع 100%</span>
+              </div>
+              <div class="smart-card-embossed-brand">
+                <i class="fa-solid fa-gem text-primary"></i>
+                <span>ACADEMIC VIP PASS 2026</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -10100,7 +10134,7 @@
     <!-- Supabase Official SDK & Client Integration -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase-client.js?v=2026.10.31"></script>
-  <script src="js/app.js?v=2026.10.31.clean_stable_v16"></script>
+  <script src="js/app.js?v=2026.10.31.clean_stable_v18"></script>
   <script src="js/gcloud-gateway.js?v=2026.10.31.clean_stable_v12"></script>
 
 
