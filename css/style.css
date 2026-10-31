@@ -37238,35 +37238,82 @@ textarea:focus {
     width: 100% !important;
   }
 
-  body.printing-seating .seating-canvas-wrapper {
-    background: transparent !important;
-    border: none !important;
+  body.printing-seating #appWorkstation,
+  body.printing-seating .main-container,
+  body.printing-seating .builder-pane,
+  body.printing-seating .builder-body-scrollable,
+  body.printing-seating #tab-seating,
+  body.printing-seating .seating-studio-container,
+  body.printing-seating .seating-workstation-grid,
+  body.printing-seating .seating-canvas-column,
+  body.printing-seating .seating-canvas-wrapper,
+  body.printing-seating #seatingCanvasWrapper,
+  body:has(#tab-seating:not([style*="display: none"])) #appWorkstation,
+  body:has(#tab-seating:not([style*="display: none"])) .main-container,
+  body:has(#tab-seating:not([style*="display: none"])) .builder-pane,
+  body:has(#tab-seating:not([style*="display: none"])) .builder-body-scrollable,
+  body:has(#tab-seating:not([style*="display: none"])) #tab-seating,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-studio-container,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-workstation-grid,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-canvas-column,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-canvas-wrapper,
+  body:has(#tab-seating:not([style*="display: none"])) #seatingCanvasWrapper {
+    display: block !important;
+    visibility: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
-    display: block !important;
     box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
   }
 
-  /* Paper setup on physical page */
-  body.printing-seating .seating-pagination-bar {
+  body.printing-seating .seating-settings-column,
+  body.printing-seating .seating-subnav-bar,
+  body.printing-seating .seating-canvas-toolbar,
+  body.printing-seating .seating-pagination-bar,
+  body.printing-seating .section-return-bar,
+  body.printing-seating .floor-plan-actions-bar,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-settings-column,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-subnav-bar,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-canvas-toolbar,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-pagination-bar,
+  body:has(#tab-seating:not([style*="display: none"])) .section-return-bar,
+  body:has(#tab-seating:not([style*="display: none"])) .floor-plan-actions-bar {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
   }
 
   body.printing-seating .seating-a4-paper,
-  body.printing-seating .seating-a4-paper.seating-page-hidden-screen {
+  body.printing-seating .seating-a4-paper.seating-page-hidden-screen,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-a4-paper,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-a4-paper.seating-page-hidden-screen {
     display: flex !important;
-  }
-
-  body.printing-seating .seating-a4-paper {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 282mm !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    width: 210mm !important;
+    max-width: 210mm !important;
+    min-height: 290mm !important;
     height: auto !important;
-    margin: 0 !important;
-    padding: 5mm 5mm !important;
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 6mm 6mm !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
@@ -37275,7 +37322,18 @@ textarea:focus {
     print-color-adjust: exact !important;
   }
 
-  body.printing-seating .seating-desk-card {
+  body.printing-seating .seating-desks-grid,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-desks-grid {
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body.printing-seating .seating-desk-card,
+  body:has(#tab-seating:not([style*="display: none"])) .seating-desk-card {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     -webkit-print-color-adjust: exact !important;
