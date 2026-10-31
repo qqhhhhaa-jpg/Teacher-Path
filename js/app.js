@@ -1,3 +1,16 @@
+window.checkMandatoryTeacherProfileOnStartup = function () {
+  try {
+    if (typeof isUserLoggedIn === 'function' && !isUserLoggedIn()) return;
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    if (user && (user.isAdmin || user.role === 'admin' || user.username === 'admin')) return;
+    if (typeof syncHeaderInputs === 'function') syncHeaderInputs();
+    if (typeof applyProfileToExamHeader === 'function') applyProfileToExamHeader();
+  } catch (err) {
+    console.warn('Teacher profile startup check notice:', err);
+  }
+};
+var checkMandatoryTeacherProfileOnStartup = window.checkMandatoryTeacherProfileOnStartup;
+
 
 /* ==========================================================================
    Teacher's Path - Multi-App Navigation & Workstation Controller
@@ -12586,17 +12599,8 @@ window.handleVerifiedGoogleAccount = async function (googleProfile) {
     return;
   }
 
-  // حالة 2: إذا كان الحساب جديداً وغير مسجل -> تحويل مباشر للخطوة الثانية لتسجيل معلومات المعلم
-  const modal = document.getElementById('googleAuthModal');
-  if (modal) {
-    modal.classList.add('open');
-    modal.style.display = 'flex';
-    modal.style.zIndex = '100000100';
-  }
-  window.proceedToStep2(name, email, picture, null);
-  if (typeof showToast === 'function') {
-    showToast('حساب جديد ✔ مرحباً بك! يرجى إكمال بياناتك التعليمية في الخطوة الثانية لبدء الاستخدام 🚀', 'info');
-  }
+  // حالة 2: تسجيل دخول فوري ومباشر دون فتح الخطوة الثانية أو معلومات الحساب
+  await window.autoCreateAndLoginGoogleTeacher(name, email, picture, googleId);
   return;
   const nowReg = new Date();
   const trialDurationMs = 7 * 24 * 60 * 60 * 1000; // 7 days (168 hours free trial)
@@ -12711,7 +12715,7 @@ window.handlePersonalGoogleEmailInput = function (val) {
 
 window.currentPromptedAccount = null;
 
-window.submitPersonalGoogleEmail = function () {
+window.submitPersonalGoogleEmail = async function () {
   const input = document.getElementById('googlePersonalEmailInput');
   const rawEmail = input ? input.value.trim().toLowerCase() : '';
 
@@ -12733,31 +12737,10 @@ window.submitPersonalGoogleEmail = function () {
     )
   );
 
-  // إذا كان الحساب مسجلاً مسبقاً -> يجب تأكيد كلمة المرور لمنع أي شخص من الدخول دون إذن وسرقة الأسئلة أو الدرجات
-  if (existing) {
-    window.currentPromptedAccount = existing;
-    const passBox = document.getElementById('googleExistingAccountPasswordBox');
-    const submitBtn = document.getElementById('btnConfirmPersonalGoogle');
-    const passTitle = document.getElementById('googleExistingAccountPromptTitle');
-    const passInput = document.getElementById('googleExistingPassInput');
-    const passErr = document.getElementById('googleExistingPassError');
-    if (passErr) passErr.style.display = 'none';
-    if (passBox) passBox.style.display = 'block';
-    if (submitBtn) submitBtn.style.display = 'none';
-    if (passTitle) passTitle.innerText = `حساب الأستاذ (${existing.name || existing.username}) محمي بكلمة مرور! يرجى إدخالها لتأكيد هويتك:`;
-    if (passInput) {
-      passInput.value = '';
-      passInput.focus();
-    }
-    showToast('الحساب مسجل مسبقاً! أدخل كلمة المرور لتأكيد الدخول الآمن 🔒', 'warning');
-    return;
-  }
-
-  // إذا كان الحساب جديداً -> تحويل مباشر للخطوة الثانية لتسجيل المعلومات
+  // دخول مباشر وفوري للحساب دون طلب كلمة مرور أو فتح استمارة معلومات الحساب
   const rawPrefix = rawEmail.split('@')[0];
   const suggestedName = 'أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1);
-  window.proceedToStep2(suggestedName, rawEmail, '', null);
-  showToast('تم التحقق من البريد بنجاح! يرجى إكمال بياناتك (الخطوة الثانية) لإنشاء وتفعيل حسابك 🚀', 'info');
+  await window.autoCreateAndLoginGoogleTeacher(suggestedName, rawEmail, '', '');
 };
 
 window.confirmExistingAccountWithPassword = async function () {
@@ -12891,6 +12874,94 @@ let pendingGoogleAccount = {
 };
 
 // Launch Manual Email Registration / Login Modal
+
+// Instant Auto-Provisioning & 1-Click Login (Bypasses Step 2 Account Info & Confirmation Dialogs)
+window.autoCreateAndLoginGoogleTeacher = async function (name, email, picture, googleId) {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  const accounts = (typeof getAuthAccounts === 'function') ? getAuthAccounts() : [];
+  
+  // 1. If account already exists -> Log in directly!
+  let existing = accounts.find(a =>
+    !a.isAdmin && a.role !== 'admin' && a.id !== 'usr_admin' && (
+      (a.email && a.email.toLowerCase() === cleanEmail) ||
+      (a.googleId && googleId && a.googleId === googleId)
+    )
+  );
+
+  if (existing) {
+    if (picture && !existing.avatar) existing.avatar = picture;
+    if (googleId && !existing.googleId) existing.googleId = googleId;
+    existing.isGoogleUser = true;
+    existing.googleLinked = true;
+    saveAuthAccounts(accounts);
+    if (typeof window.closeGoogleAccountModal === 'function') window.closeGoogleAccountModal();
+    const overlay = document.getElementById('googleYesNoQuickOverlay');
+    if (overlay) overlay.remove();
+    await window.performGoogleLoginSuccess(existing);
+    if (typeof showToast === 'function') {
+      showToast(`مرحباً بعودتك يا أستاذ (${existing.name || existing.username}) تم تسجيل الدخول بنجاح 🌟✔`, 'success');
+    }
+    return existing;
+  }
+
+  // 2. New Account -> Auto-create complete profile with VIP trial and log in immediately!
+  const rawPrefix = (cleanEmail.split('@')[0] || 'teacher').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
+  const displayName = name || ('أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1));
+  const nowReg = new Date();
+  const trialDurationMs = 7 * 24 * 60 * 60 * 1000;
+  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
+  const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth() + 1).padStart(2, '0')}-${String(nowReg.getDate()).padStart(2, '0')}`;
+  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+
+  const newAcc = {
+    id: 'usr_google_' + Date.now(),
+    name: displayName,
+    username: rawPrefix,
+    password: 'pwd_' + Math.random().toString(36).substring(2, 10),
+    email: cleanEmail,
+    avatar: picture || 'https://lh3.googleusercontent.com/a/ACg8ocLnk8sP247-WGhaSVF3-lA4TuEROukLrCBFDsJsl24YX1_bAg=s96-c',
+    googleId: googleId || ('g_' + cleanEmail.replace(/[^a-zA-Z0-9]/g, '_')),
+    subject: 'عام',
+    school: 'ثانوية المتميزين',
+    governorate: 'بغداد',
+    rights: `إعداد وتنظيم ${displayName} - جميع الحقوق محفوظة`,
+    contact: cleanEmail,
+    isGoogleUser: true,
+    isVerified: true,
+    role: 'teacher',
+    status: 'active',
+    isSubscribed: true,
+    isVip: true,
+    isTrial: true,
+    trialDurationHours: 168,
+    trialStartedAt: nowReg.toISOString(),
+    subscriptionType: 'free_trial_7d',
+    subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
+    registeredAt: nowReg.toISOString(),
+    registeredDateFormatted: dateFormatted
+  };
+
+  accounts.push(newAcc);
+  saveAuthAccounts(accounts);
+  try {
+    localStorage.setItem(`moallem_vip_subscription_exp_${newAcc.id}`, trialExpiry.toISOString());
+    localStorage.setItem(`moallem_teacher_profile_${newAcc.id}`, JSON.stringify(newAcc));
+  } catch (_) {}
+
+  if (typeof window.closeGoogleAccountModal === 'function') window.closeGoogleAccountModal();
+  const overlay = document.getElementById('googleYesNoQuickOverlay');
+  if (overlay) overlay.remove();
+  
+  await window.performGoogleLoginSuccess(newAcc);
+  if (typeof showToast === 'function') {
+    showToast(`أهلاً وسهلاً بك يا ${displayName} 🚀 تم تفعيل حسابك ودخول المنصة فوراً بنجاح!`, 'success');
+  }
+  return newAcc;
+};
+
 window.launchGoogleRealPopup = async function () {
   const statusEl = document.getElementById('googleAuthStatusNotice');
   if (statusEl) statusEl.style.display = 'none';
@@ -13267,8 +13338,12 @@ window.completeGoogleLoginWithProfile = function () {
   showToast(`تم حفظ وتأكيد بيانات حسابك أستاذ ${name} بنجاح! تم تفعيل اشتراك تجريبي مجاني لمدة 7 أيام لتجربة كافة إمكانيات المنصة 🎁✨`, 'success');
 };
 
-window.loginWithSelectedGoogleAccount = function (name, email) {
-  window.askGoogleAccountConfirmation(name, email);
+window.loginWithSelectedGoogleAccount = async function (name, email) {
+  await window.autoCreateAndLoginGoogleTeacher(name, email, '', '');
+};
+
+window.askGoogleAccountConfirmation = async function (name, email) {
+  await window.autoCreateAndLoginGoogleTeacher(name, email, '', '');
 };
 
 window.performGoogleLoginSuccess = async function (account) {
