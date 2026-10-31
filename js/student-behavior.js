@@ -834,223 +834,60 @@
   /**
    * Official A4 Printable Report (كشف رسمي معتمد للإشراف المدرسي)
    */
-  window.sbPrintOfficialReport = function () {
-    const key = getRecordKey(activeDate, activeRosterId);
-    const record = behaviorRecords[key];
-    const roster = getActiveRoster();
-    if (!record || !record.students.length) {
-      alert('لا توجد بيانات للطباعة.');
-      return;
-    }
+    /**
+   * ==============================================================================
+   * Official Ministerial Behavior Report Engine (محرك كشف المتابعة والسلوك الوزاري المعتمد)
+   * تصميم رسمي فاخر لجمهورية العراق ووزارة التربية خالٍ من الإيموجي المشوهة
+   * متوافق 100% مع الطابعات ومطابق للمواصفات الإشرافية المعتمدة
+   * ==============================================================================
+   */
 
-    const meta = roster.meta || {};
-    const school = meta.school || 'ثانوية المتميزين للبنين';
-    const teacher = meta.teacher || 'أستاذ المادة';
-    const subject = record.subject || meta.subject || 'الرياضيات';
-    const grade = meta.grade || 'الثالث المتوسط';
-    const section = meta.section || 'أ';
-    const dayName = ARABIC_DAYS[new Date(activeDate).getDay()] || 'اليوم';
+  let _sbCurrentReportTheme = 'color'; // 'color' or 'bw'
+  let _sbCurrentReportDensity = 'normal'; // 'normal' or 'compact'
+  let _sbCurrentReportTargetDate = null;
+  let _sbCurrentReportTargetRosterId = null;
 
-    // Stats
-    let present = 0, absent = 0, excused = 0, late = 0;
-    record.students.forEach(st => {
-      if (st.attendance === 'present') present++;
-      else if (st.attendance === 'absent') absent++;
-      else if (st.attendance === 'excused') excused++;
-      else if (st.attendance === 'late') late++;
-    });
-
-    let rowsHtml = '';
-    record.students.forEach((st, idx) => {
-      const attMap = {
-        present: '<span style="color: #059669; font-weight: 800;">حاضر ✔</span>',
-        absent: '<span style="color: #dc2626; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px;">غائب ✖</span>',
-        excused: '<span style="color: #d97706; font-weight: 800;">مجاز 📋</span>',
-        late: '<span style="color: #ea580c; font-weight: 800;">متأخر ⏱</span>'
-      };
-      const partMap = { excellent: '🌟 متميز', active: '👍 متفاعل', average: '➖ متوسط', none: '❌ لم يشارك' };
-      const hwMap = { done: '📘 منجز', partial: '📙 جزئي', not_done: '📕 غير منجز' };
-      const conductMap = { excellent: '🌟 مثالي', good: '🟢 منضبط', needs_attention: '⚠️ تنبيه', warning: '⛔ مخالف' };
-
-      rowsHtml += `
-        <tr>
-          <td style="text-align: center; font-weight: 800;">${idx + 1}</td>
-          <td style="text-align: right; font-weight: 800; padding: 6px 8px;">${st.name}</td>
-          <td style="text-align: center;">${attMap[st.attendance] || ''}</td>
-          <td style="text-align: center;">${partMap[st.participation] || ''}</td>
-          <td style="text-align: center;">${hwMap[st.homework] || ''}</td>
-          <td style="text-align: center;">${conductMap[st.conduct] || ''}</td>
-          <td style="text-align: center; font-weight: 900; font-size: 1rem;">${st.score !== undefined ? st.score : 10}</td>
-          <td style="text-align: right; font-size: 0.8rem; color: #475569;">${st.notes || '—'}</td>
-        </tr>
-      `;
-    });
-
-    let printDoc = null;
-    let isIframeFallback = false;
-    let printWin = null;
-    try {
-      printWin = window.open('', '_blank');
-    } catch (_) {}
-
-    if (printWin && printWin.document) {
-      printDoc = printWin.document;
-    } else {
-      isIframeFallback = true;
-      let printFrame = document.getElementById('sbDedicatedPrintIframe');
-      if (printFrame) printFrame.remove();
-      printFrame = document.createElement('iframe');
-      printFrame.id = 'sbDedicatedPrintIframe';
-      printFrame.style.cssText = 'position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; z-index: -9999;';
-      document.body.appendChild(printFrame);
-      printDoc = printFrame.contentWindow.document;
-    }
-
-    printDoc.open();
-    printDoc.write(`
-      <!DOCTYPE html>
-      <html dir="rtl" lang="ar">
-      <head>
-        <meta charset="UTF-8">
-        <title>كشف المتابعة اليومية وحسن السلوك — ${school}</title>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-        <style>
-          @page { size: A4 portrait; margin: 12mm; }
-          body { font-family: 'Cairo', sans-serif; margin: 0; padding: 0; color: #000; direction: rtl; background: #fff; }
-          .header-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
-          .header-table td { vertical-align: middle; }
-          .title-box { text-align: center; }
-          .title-main { font-size: 1.25rem; font-weight: 900; margin: 2px 0; }
-          .title-sub { font-size: 0.88rem; font-weight: 700; color: #333; }
-          .meta-strip { display: flex; justify-content: space-between; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700; }
-          .stats-strip { display: flex; gap: 15px; margin-bottom: 10px; font-size: 0.82rem; }
-          .stat-pill { border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa; }
-          table.data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; margin-bottom: 15px; }
-          table.data-table th, table.data-table td { border: 1px solid #334155; padding: 5px 6px; }
-          table.data-table th { background: #f1f5f9; font-weight: 900; }
-          .signatures { display: flex; justify-content: space-between; margin-top: 20px; padding: 0 20px; font-weight: 800; font-size: 0.88rem; }
-          .sig-box { text-align: center; width: 180px; }
-        </style>
-      </head>
-      <body>
-        <table class="header-table">
-          <tr>
-            <td style="width: 28%; font-size: 0.82rem; font-weight: 700; line-height: 1.6;">
-              جمهورية العراق<br>
-              وزارة التربية<br>
-              المديرية العامة للتربية<br>
-              <strong>${school}</strong>
-            </td>
-            <td class="title-box" style="width: 44%;">
-              <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية" style="width: 52px; height: 52px; object-fit: contain; margin-bottom: 2px;">
-              <div class="title-main">سجل المتابعة والتقييم اليومي وحسن السلوك</div>
-              <div class="title-sub">كشف رسمي معتمد للإشراف التربوي والإدارة المدرسية</div>
-            </td>
-            <td style="width: 28%; text-align: left; font-size: 0.82rem; font-weight: 700; line-height: 1.6;">
-              اليوم: <strong>${dayName}</strong><br>
-              التاريخ: <strong>${activeDate}</strong><br>
-              الصف: <strong>${grade} (${section})</strong><br>
-              المادة: <strong>${subject}</strong>
-            </td>
-          </tr>
-        </table>
-
-        <div class="meta-strip">
-          <div>الحصة: <strong>${record.period || 'الأولى'}</strong></div>
-          <div>عنوان الدرس / الموضوع: <strong>${record.topic || 'سير الدرس اليومي'}</strong></div>
-          <div>مدرس المادة: <strong>${teacher}</strong></div>
-        </div>
-
-        <div class="stats-strip">
-          <div class="stat-pill">العدد الكلي: <strong>${record.students.length}</strong></div>
-          <div class="stat-pill" style="border-color: #10b981; color: #059669;">الحاضرون: <strong>${present}</strong></div>
-          <div class="stat-pill" style="border-color: #ef4444; color: #dc2626;">الغائبون: <strong>${absent}</strong></div>
-          <div class="stat-pill" style="border-color: #f59e0b; color: #d97706;">المجازون: <strong>${excused}</strong></div>
-          <div class="stat-pill">نسبة الحضور: <strong>${record.students.length > 0 ? Math.round(((present + late) / record.students.length) * 100) : 0}%</strong></div>
-        </div>
-
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width: 32px;">ت</th>
-              <th>اسم الطالب الثلاثي والرباعي</th>
-              <th style="width: 80px;">الحضور</th>
-              <th style="width: 85px;">المشاركة</th>
-              <th style="width: 85px;">الواجب البيتي</th>
-              <th style="width: 85px;">السلوك والمواظبة</th>
-              <th style="width: 55px;">الدرجة</th>
-              <th>ملاحظات المعلم / أسباب الغياب</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-        </table>
-
-        <div class="signatures">
-          <div class="sig-box">
-            <div>مدرس / معلم المادة</div>
-            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">${teacher}</div>
-          </div>
-          <div class="sig-box">
-            <div>المشرف التربوي الزائر</div>
-            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">التوقيع والختم</div>
-          </div>
-          <div class="sig-box">
-            <div>مدير المدرسة</div>
-            <div style="margin-top: 35px; border-bottom: 1px dotted #000;">الختم والتوقيع الرسمي</div>
-          </div>
-        </div>
-
-        <script>
-          window.onload = function() { window.print(); };
-        </script>
-      </body>
-      </html>
-    `);
-    printDoc.close();
-    if (isIframeFallback) {
-      setTimeout(() => {
-        try {
-          const frame = document.getElementById('sbDedicatedPrintIframe');
-          if (frame && frame.contentWindow) {
-            frame.contentWindow.focus();
-            frame.contentWindow.print();
-          }
-        } catch (_) {
-          window.print();
-        }
-      }, 500);
-    } else {
-      try {
-        printWin.focus();
-      } catch (_) {}
-    }
-  };
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
 
   /**
-   * Direct PDF Exporter for Student Behavior & Conduct Sheet (تنزيل ملف PDF حقيقي ومباشر دون نوافذ طباعة)
+   * Builds the complete, high-definition HTML for the official behavior report
    */
-  window.sbExportOfficialPdf = async function (targetDate, targetRosterId) {
-    const theDate = targetDate || activeDate;
-    const theRosterId = targetRosterId || activeRosterId;
+  function buildOfficialBehaviorReportHTML(options = {}) {
+    const theme = options.theme || _sbCurrentReportTheme || 'color';
+    const density = options.density || _sbCurrentReportDensity || 'normal';
+    const theDate = options.targetDate || _sbCurrentReportTargetDate || activeDate;
+    const theRosterId = options.targetRosterId || _sbCurrentReportTargetRosterId || activeRosterId;
+    const forPrint = !!options.forPrint;
+
     const key = getRecordKey(theDate, theRosterId);
     const record = behaviorRecords[key];
     const roster = (rosters && rosters.find(r => r.id === theRosterId)) || getActiveRoster();
-    if (!record || !record.students || !record.students.length) {
-      if (typeof window.showToast === 'function') {
-        window.showToast('لا توجد بيانات طلاب في جلسة المتابعة لتنزيل PDF!', 'warning');
-      } else {
-        alert('لا توجد بيانات طلاب لتنزيل PDF.');
-      }
-      return;
-    }
+    const students = (record && record.students) ? record.students : ((roster && roster.students) ? roster.students : []);
+
+    // Retrieve active teacher profile and metadata
+    let curTeacher = {};
+    try {
+      if (typeof getCurrentUser === 'function') curTeacher = getCurrentUser() || {};
+      if (!curTeacher.name && typeof teacherProfile !== 'undefined' && teacherProfile) curTeacher = teacherProfile;
+    } catch (_) {}
 
     const meta = (roster && roster.meta) || {};
-    const school = meta.school || (roster && roster.schoolName) || 'ثانوية المتميزين للبنين';
-    const teacher = meta.teacher || (roster && roster.teacherName) || 'أستاذ المادة';
-    const subject = record.subject || meta.subject || 'الرياضيات';
-    const grade = meta.grade || (roster && roster.name) || 'الثالث المتوسط';
+    const school = curTeacher.school || meta.school || (roster && roster.schoolName) || 'ثانوية المتميزين للبنين';
+    const governorate = curTeacher.governorate || meta.governorate || 'بغداد - الكرخ الأولى';
+    const teacher = curTeacher.name || meta.teacher || (roster && roster.teacherName) || 'أستاذ المادة';
+    const subject = (record && record.subject) || meta.subject || (roster && roster.subject) || 'الرياضيات';
+    const grade = (record && record.className) || meta.grade || (roster && roster.name) || 'الثالث المتوسط';
+    const period = (record && record.period) || 'الأولى';
+    const topic = (record && record.topic) || 'سير الدرس والمتابعة اليومية';
+
     let dayName = 'اليوم';
     try {
       dayName = ARABIC_DAYS[new Date(theDate).getDay()] || 'اليوم';
@@ -1058,132 +895,443 @@
       dayName = 'اليوم';
     }
 
+    // Attendance & Evaluation Calculations
     let present = 0, absent = 0, excused = 0, late = 0;
-    record.students.forEach(st => {
+    let totalScore = 0;
+    students.forEach(st => {
       if (st.attendance === 'present') present++;
       else if (st.attendance === 'absent') absent++;
       else if (st.attendance === 'excused') excused++;
       else if (st.attendance === 'late') late++;
+      totalScore += (st.score !== undefined && st.score !== null) ? Number(st.score) : 10;
     });
 
+    const totalStudents = students.length;
+    const attendanceRate = totalStudents > 0 ? Math.round(((present + late) / totalStudents) * 100) : 0;
+    const avgScore = totalStudents > 0 ? (totalScore / totalStudents).toFixed(1) : '10.0';
+
+    // Theme Variables
+    const isBw = (theme === 'bw');
+    const isCompact = (density === 'compact');
+
+    const primaryColor = isBw ? '#0f172a' : '#1e3a8a';
+    const accentColor = isBw ? '#334155' : '#0284c7';
+    const goldColor = isBw ? '#0f172a' : '#b45309';
+    const borderColor = isBw ? '#000000' : '#cbd5e1';
+    const thBg = isBw ? '#f1f5f9' : '#f8fafc';
+
+    const cellPadding = isCompact ? '4px 5px' : '6px 7px';
+    const fontSize = isCompact ? '0.74rem' : '0.82rem';
+    const nameFontSize = isCompact ? '0.80rem' : '0.88rem';
+
+    // Build Table Rows
     let rowsHtml = '';
-    record.students.forEach((st, idx) => {
-      const attMap = {
-        present: '<span style="color: #059669; font-weight: 800;">حاضر ✔</span>',
-        absent: '<span style="color: #dc2626; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px;">غائب ✖</span>',
-        excused: '<span style="color: #d97706; font-weight: 800;">مجاز 📋</span>',
-        late: '<span style="color: #ea580c; font-weight: 800;">متأخر ⏱</span>'
-      };
-      const partMap = { excellent: '🌟 متميز', active: '👍 متفاعل', average: '➖ متوسط', none: '❌ لم يشارك' };
-      const hwMap = { done: '📘 منجز', partial: '📙 جزئي', not_done: '📕 غير منجز' };
-      const conductMap = { excellent: '🌟 مثالي', good: '🟢 منضبط', needs_attention: '⚠️ تنبيه', warning: '⛔ مخالف' };
+    students.forEach((st, idx) => {
+      // 1. Attendance Badge (بدون إيموجي)
+      let attBadge = '';
+      if (st.attendance === 'present') {
+        attBadge = isBw
+          ? '<span style="font-weight: 800; border: 1px solid #000; padding: 2px 6px; border-radius: 4px;">حاضر</span>'
+          : '<span style="background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-block;">حاضر</span>';
+      } else if (st.attendance === 'absent') {
+        attBadge = isBw
+          ? '<span style="font-weight: 900; background: #e2e8f0; border: 1.5px solid #000; padding: 2px 6px; border-radius: 4px;">غائب</span>'
+          : '<span style="background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; font-weight: 900; padding: 2px 7px; border-radius: 6px; display: inline-block;">غائب</span>';
+      } else if (st.attendance === 'excused') {
+        attBadge = isBw
+          ? '<span style="font-weight: 800; border: 1px dashed #000; padding: 2px 6px; border-radius: 4px;">مجاز</span>'
+          : '<span style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-block;">مجاز بعذر</span>';
+      } else if (st.attendance === 'late') {
+        attBadge = isBw
+          ? '<span style="font-weight: 800; border: 1px dotted #000; padding: 2px 6px; border-radius: 4px;">متأخر</span>'
+          : '<span style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; font-weight: 800; padding: 2px 7px; border-radius: 6px; display: inline-block;">متأخر</span>';
+      } else {
+        attBadge = '—';
+      }
+
+      // 2. Participation Badge
+      let partBadge = '';
+      if (st.participation === 'excellent') {
+        partBadge = isBw ? '<strong>متميز</strong>' : '<span style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 800; padding: 2px 6px; border-radius: 5px;">متميز</span>';
+      } else if (st.participation === 'active') {
+        partBadge = isBw ? 'متفاعل' : '<span style="background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; font-weight: 700; padding: 2px 6px; border-radius: 5px;">متفاعل</span>';
+      } else if (st.participation === 'average') {
+        partBadge = isBw ? 'متوسط' : '<span style="background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; font-weight: 600; padding: 2px 6px; border-radius: 5px;">متوسط</span>';
+      } else if (st.participation === 'none') {
+        partBadge = isBw ? '<span style="text-decoration: underline;">لم يشارك</span>' : '<span style="background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; font-weight: 700; padding: 2px 6px; border-radius: 5px;">لم يشارك</span>';
+      } else {
+        partBadge = isBw ? 'اعتيادي' : '<span style="color: #64748b;">اعتيادي</span>';
+      }
+
+      // 3. Homework Badge
+      let hwBadge = '';
+      if (st.homework === 'done') {
+        hwBadge = isBw ? '<strong>كامل</strong>' : '<span style="background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; font-weight: 800; padding: 2px 6px; border-radius: 5px;">كامل</span>';
+      } else if (st.homework === 'partial') {
+        hwBadge = isBw ? 'جزئي' : '<span style="background: #fffbeb; color: #92400e; border: 1px solid #fde68a; font-weight: 700; padding: 2px 6px; border-radius: 5px;">جزئي</span>';
+      } else if (st.homework === 'not_done') {
+        hwBadge = isBw ? '<strong>غير منجز</strong>' : '<span style="background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; font-weight: 800; padding: 2px 6px; border-radius: 5px;">غير منجز</span>';
+      } else {
+        hwBadge = '—';
+      }
+
+      // 4. Conduct Badge
+      let conductBadge = '';
+      if (st.conduct === 'excellent') {
+        conductBadge = isBw ? '<strong>قدوة حسنة</strong>' : '<span style="background: #fdf4ff; color: #7e22ce; border: 1px solid #f0abfc; font-weight: 800; padding: 2px 6px; border-radius: 5px;">قدوة حسنة</span>';
+      } else if (st.conduct === 'good') {
+        conductBadge = isBw ? 'منضبط' : '<span style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; font-weight: 700; padding: 2px 6px; border-radius: 5px;">منضبط</span>';
+      } else if (st.conduct === 'needs_attention') {
+        conductBadge = isBw ? 'تنبيه' : '<span style="background: #fffbeb; color: #854d0e; border: 1px solid #fde68a; font-weight: 700; padding: 2px 6px; border-radius: 5px;">تنبيه</span>';
+      } else if (st.conduct === 'warning') {
+        conductBadge = isBw ? '<strong>مخالفة</strong>' : '<span style="background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; font-weight: 800; padding: 2px 6px; border-radius: 5px;">مخالفة</span>';
+      } else {
+        conductBadge = 'منضبط';
+      }
+
+      // Score
+      const scoreVal = (st.score !== undefined && st.score !== null) ? st.score : 10;
+      let scoreBox = '';
+      if (isBw) {
+        scoreBox = `<strong>${scoreVal}</strong>`;
+      } else {
+        const scColor = scoreVal >= 9 ? '#047857' : (scoreVal >= 7 ? '#1d4ed8' : (scoreVal >= 5 ? '#b45309' : '#b91c1c'));
+        scoreBox = `<span style="font-weight: 900; font-size: 0.95rem; color: ${scColor};">${scoreVal}</span>`;
+      }
+
+      const rowBg = idx % 2 === 1 ? '#f8fafc' : '#ffffff';
 
       rowsHtml += `
-        <tr style="border-bottom: 1px solid #cbd5e1; background: ${idx % 2 === 1 ? '#f8fafc' : '#ffffff'};">
-          <td style="text-align: center; font-weight: 800; padding: 4px; border: 1px solid #cbd5e1;">${idx + 1}</td>
-          <td style="text-align: right; font-weight: 800; padding: 4px 8px; border: 1px solid #cbd5e1;">${escapeHtml(st.name || '')}</td>
-          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${attMap[st.attendance] || ''}</td>
-          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${partMap[st.participation] || ''}</td>
-          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${hwMap[st.homework] || ''}</td>
-          <td style="text-align: center; padding: 4px; border: 1px solid #cbd5e1;">${conductMap[st.conduct] || ''}</td>
-          <td style="text-align: center; font-weight: 900; font-size: 0.95rem; padding: 4px; border: 1px solid #cbd5e1;">${st.score !== undefined ? st.score : 10}</td>
-          <td style="text-align: right; font-size: 0.8rem; color: #475569; padding: 4px 8px; border: 1px solid #cbd5e1;">${escapeHtml(st.notes || '—')}</td>
+        <tr style="background: ${rowBg}; page-break-inside: avoid;">
+          <td style="text-align: center; font-weight: 800; padding: ${cellPadding}; border: 1px solid ${borderColor}; color: #334155;">${idx + 1}</td>
+          <td style="text-align: right; font-weight: 800; padding: ${cellPadding}; border: 1px solid ${borderColor}; font-size: ${nameFontSize}; color: #0f172a; white-space: nowrap;">${escapeHtml(st.name)}</td>
+          <td style="text-align: center; padding: ${cellPadding}; border: 1px solid ${borderColor};">${attBadge}</td>
+          <td style="text-align: center; padding: ${cellPadding}; border: 1px solid ${borderColor};">${partBadge}</td>
+          <td style="text-align: center; padding: ${cellPadding}; border: 1px solid ${borderColor};">${hwBadge}</td>
+          <td style="text-align: center; padding: ${cellPadding}; border: 1px solid ${borderColor};">${conductBadge}</td>
+          <td style="text-align: center; padding: ${cellPadding}; border: 1px solid ${borderColor};">${scoreBox}</td>
+          <td style="text-align: right; padding: ${cellPadding}; border: 1px solid ${borderColor}; font-size: 0.74rem; color: #475569;">${escapeHtml(st.notes) || '<span style="color:#cbd5e1;">—</span>'}</td>
         </tr>
       `;
     });
 
-    let exportDiv = document.getElementById('sbPdfExportContainer');
+    const sealUrl = (typeof window !== 'undefined' && window.location && window.location.origin)
+      ? `${window.location.origin}/assets/iraq_moe_seal.png`
+      : 'assets/iraq_moe_seal.png';
+
+    return `
+      <div class="official-behavior-sheet-root ${isBw ? 'theme-bw' : 'theme-color'} ${isCompact ? 'density-compact' : 'density-normal'}"
+        style="width: 100%; box-sizing: border-box; font-family: 'Cairo', 'Tajawal', sans-serif; direction: rtl; color: #0f172a; line-height: 1.4;">
+        
+        <!-- Outer Official Double-Rule Security Frame -->
+        <div style="border: 2px solid ${primaryColor}; outline: 1px solid ${goldColor}; outline-offset: 2.5px; padding: 12px 14px; border-radius: 4px; background: #ffffff;">
+
+          <!-- Official 3-Column Header Table -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; border-bottom: 2px solid ${primaryColor}; padding-bottom: 8px;">
+            <tr>
+              <!-- Right Side: Official Ministry Hierarchy -->
+              <td style="width: 30%; vertical-align: top; text-align: right; font-size: 0.82rem; font-weight: 700; line-height: 1.6; color: #1e293b;">
+                <div style="font-size: 0.92rem; font-weight: 900; color: ${primaryColor};">جمهورية العراق</div>
+                <div>وزارة التربية العراقية</div>
+                <div>المديرية العامة لتربية ${escapeHtml(governorate)}</div>
+                <div style="font-weight: 900; color: #0f172a; margin-top: 2px;">مدرسة: ${escapeHtml(school)}</div>
+                <div style="font-size: 0.74rem; color: #64748b;">العام الدراسي: 2025 - 2026 م</div>
+              </td>
+
+              <!-- Center: Official Emblem & Main Title -->
+              <td style="width: 40%; vertical-align: middle; text-align: center;">
+                <img src="${sealUrl}" alt="شعار وزارة التربية"
+                  style="width: 58px; height: 58px; object-fit: contain; margin-bottom: 3px; display: inline-block;"
+                  onerror="this.style.display='none'">
+                <div style="font-size: 1.22rem; font-weight: 900; color: ${primaryColor}; margin: 2px 0 1px 0; letter-spacing: -0.3px;">
+                  كشف المتابعة والتقييم اليومي وحسن السلوك
+                </div>
+                <div style="font-size: 0.76rem; font-weight: 800; color: ${goldColor}; margin-bottom: 2px;">
+                  سجل رسمي معتمد للإشراف التربوي والإدارة المدرسية
+                </div>
+                <div style="display: inline-block; font-size: 0.70rem; font-weight: 700; background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; padding: 1px 8px; color: #475569;">
+                  رقم الوثيقة: SB-${theDate.replace(/-/g, '')}-${(theRosterId || '01').slice(-4)}
+                </div>
+              </td>
+
+              <!-- Left Side: Session & Class Meta Details -->
+              <td style="width: 30%; vertical-align: top; text-align: left; font-size: 0.82rem; font-weight: 700; line-height: 1.6; color: #1e293b;">
+                <div>اليوم: <strong>${escapeHtml(dayName)}</strong></div>
+                <div>التاريخ: <strong style="font-family: Arial; direction: ltr; display: inline-block;">${escapeHtml(theDate)}</strong></div>
+                <div style="color: ${primaryColor};">الصف والشعبة: <strong>${escapeHtml(grade)}</strong></div>
+                <div>المادة الدراسية: <strong>${escapeHtml(subject)}</strong></div>
+                <div style="font-size: 0.76rem; color: #475569;">الحصة: <strong>${escapeHtml(period)}</strong> • الدرس: <strong>${escapeHtml(topic)}</strong></div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Executive Summary KPI Strip (شريط الإحصائيات الرسمي) -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px; background: #f8fafc; border: 1.5px solid ${borderColor}; border-radius: 6px; overflow: hidden;">
+            <tr>
+              <td style="padding: 6px 10px; text-align: center; border-left: 1px solid ${borderColor};">
+                <span style="font-size: 0.72rem; color: #64748b; display: block; font-weight: 700;">العدد الكلي</span>
+                <strong style="font-size: 1.05rem; color: #0f172a;">${totalStudents} طالب</strong>
+              </td>
+              <td style="padding: 6px 10px; text-align: center; border-left: 1px solid ${borderColor}; background: ${isBw ? 'transparent' : 'rgba(16, 185, 129, 0.08)'};">
+                <span style="font-size: 0.72rem; color: ${isBw ? '#000' : '#047857'}; display: block; font-weight: 700;">الحاضرون فعلياً</span>
+                <strong style="font-size: 1.05rem; color: ${isBw ? '#000' : '#059669'};">${present}</strong>
+              </td>
+              <td style="padding: 6px 10px; text-align: center; border-left: 1px solid ${borderColor}; background: ${isBw ? 'transparent' : 'rgba(245, 158, 11, 0.08)'};">
+                <span style="font-size: 0.72rem; color: ${isBw ? '#000' : '#b45309'}; display: block; font-weight: 700;">المجازون والمتأخرون</span>
+                <strong style="font-size: 1.05rem; color: ${isBw ? '#000' : '#d97706'};">${excused + late}</strong>
+              </td>
+              <td style="padding: 6px 10px; text-align: center; border-left: 1px solid ${borderColor}; background: ${isBw ? 'transparent' : 'rgba(239, 68, 68, 0.08)'};">
+                <span style="font-size: 0.72rem; color: ${isBw ? '#000' : '#b91c1c'}; display: block; font-weight: 700;">الغياب بدون عذر</span>
+                <strong style="font-size: 1.05rem; color: ${isBw ? '#000' : '#dc2626'};">${absent}</strong>
+              </td>
+              <td style="padding: 6px 10px; text-align: center; border-left: 1px solid ${borderColor};">
+                <span style="font-size: 0.72rem; color: #64748b; display: block; font-weight: 700;">نسبة الحضور</span>
+                <strong style="font-size: 1.05rem; color: ${primaryColor};">${attendanceRate}%</strong>
+              </td>
+              <td style="padding: 6px 10px; text-align: center;">
+                <span style="font-size: 0.72rem; color: #64748b; display: block; font-weight: 700;">معدل نشاط اليوم</span>
+                <strong style="font-size: 1.05rem; color: ${goldColor};">${avgScore} / 10</strong>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Master Data Table -->
+          <table style="width: 100%; border-collapse: collapse; font-size: ${fontSize}; margin-bottom: 14px;">
+            <thead>
+              <tr style="background: ${thBg}; border-top: 1.5px solid ${primaryColor}; border-bottom: 1.5px solid ${primaryColor};">
+                <th style="width: 32px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">ت</th>
+                <th style="border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">اسم الطالب الثلاثي والرباعي</th>
+                <th style="width: 90px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">حالة الحضور</th>
+                <th style="width: 85px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">المشاركة</th>
+                <th style="width: 85px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الواجب البيتي</th>
+                <th style="width: 95px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">السلوك والمواظبة</th>
+                <th style="width: 48px; border: 1px solid ${borderColor}; padding: 6px 4px; text-align: center; font-weight: 900; color: #0f172a;">الدرجة</th>
+                <th style="width: 220px; border: 1px solid ${borderColor}; padding: 6px 8px; text-align: right; font-weight: 900; color: #0f172a;">ملاحظات المعلم / الإجراء التربوي</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml || '<tr><td colspan="8" style="text-align: center; padding: 25px; color: #64748b;">لا توجد بيانات طلاب مسجلة في كشف هذا اليوم</td></tr>'}
+            </tbody>
+          </table>
+
+          <!-- Inspection Notes & Recommendations Box -->
+          <div style="border: 1px dashed ${borderColor}; border-radius: 5px; padding: 6px 12px; margin-bottom: 12px; font-size: 0.76rem; background: #fafafa;">
+            <strong style="color: ${primaryColor};">ملاحظات المشرف التربوي الزائر / توجيهات الإدارة المدرسية:</strong>
+            <span style="color: #64748b; margin-right: 6px;">..................................................................................................................................................................................................................................</span>
+          </div>
+
+          <!-- Official Tripartite Signatures Block -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px; padding: 0 15px; font-weight: 800; font-size: 0.82rem; page-break-inside: avoid;">
+            <!-- Teacher Signature -->
+            <div style="text-align: center; width: 200px;">
+              <div style="color: ${primaryColor}; font-weight: 900;">مدرس / معلم المادة</div>
+              <div style="margin-top: 8px; font-weight: 700; color: #334155;">الأستاذ: ${escapeHtml(teacher)}</div>
+              <div style="margin-top: 25px; border-bottom: 1.5px dotted #64748b; width: 85%; margin-right: auto; margin-left: auto;"></div>
+              <div style="font-size: 0.70rem; color: #94a3b8; margin-top: 3px;">التوقيع: .....................</div>
+            </div>
+
+            <!-- Educational Supervisor -->
+            <div style="text-align: center; width: 200px;">
+              <div style="color: ${primaryColor}; font-weight: 900;">المشرف التربوي التخصصي</div>
+              <div style="margin-top: 8px; font-weight: 700; color: #334155;">الاسم: ..............................</div>
+              <div style="margin-top: 25px; border-bottom: 1.5px dotted #64748b; width: 85%; margin-right: auto; margin-left: auto;"></div>
+              <div style="font-size: 0.70rem; color: #94a3b8; margin-top: 3px;">التوقيع والملاحظات</div>
+            </div>
+
+            <!-- School Principal & Official Seal -->
+            <div style="text-align: center; width: 220px;">
+              <div style="color: ${primaryColor}; font-weight: 900;">مدير المدرسة (الختم الرسمي)</div>
+              <div style="margin-top: 8px; font-weight: 700; color: #334155;">مصادقة إدارة المدرسة المعتمدة</div>
+              <div style="margin-top: 25px; border-bottom: 1.5px dotted #64748b; width: 85%; margin-right: auto; margin-left: auto;"></div>
+              <div style="font-size: 0.70rem; color: #94a3b8; margin-top: 3px;">الختم والتوقيع الرسمي</div>
+            </div>
+          </div>
+
+          <!-- Official Document Footer -->
+          <div style="margin-top: 14px; padding-top: 6px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 0.68rem; color: #64748b;">
+            <span>منظومة مسار المعلم الأكاديمية الذكية 2026 • كشف متابعة رسمي معتمد للإشراف التربوي</span>
+            <span style="direction: ltr; font-family: monospace;">|||| |||||| |||| |||||||| |||||</span>
+            <span>تاريخ الطباعة: ${new Date().toLocaleDateString('ar-EG')}</span>
+          </div>
+
+        </div>
+      </div>
+    `;
+  }
+
+  /**
+   * Opens the interactive on-screen report preview modal
+   */
+  window.sbOpenReportPreviewModal = function (theme = 'color', density = 'normal', targetDate = null, targetRosterId = null) {
+    _sbCurrentReportTheme = theme;
+    _sbCurrentReportDensity = density;
+    _sbCurrentReportTargetDate = targetDate || activeDate;
+    _sbCurrentReportTargetRosterId = targetRosterId || activeRosterId;
+
+    const modal = document.getElementById('sbReportPreviewModal');
+    const container = document.getElementById('sbA4SheetContainer');
+    if (!modal || !container) {
+      // Fallback directly to print if modal element not found
+      window.sbExecuteReportPrint();
+      return;
+    }
+
+    // Update active button indicators
+    const btnColor = document.getElementById('sbThemeBtnColor');
+    const btnBw = document.getElementById('sbThemeBtnBw');
+    if (btnColor && btnBw) {
+      if (theme === 'color') {
+        btnColor.style.background = '#e0f2fe';
+        btnColor.style.color = '#0284c7';
+        btnBw.style.background = 'transparent';
+        btnBw.style.color = '#475569';
+      } else {
+        btnBw.style.background = '#e2e8f0';
+        btnBw.style.color = '#0f172a';
+        btnColor.style.background = 'transparent';
+        btnColor.style.color = '#475569';
+      }
+    }
+
+    const btnNormal = document.getElementById('sbDensityBtnNormal');
+    const btnCompact = document.getElementById('sbDensityBtnCompact');
+    if (btnNormal && btnCompact) {
+      if (density === 'normal') {
+        btnNormal.style.background = '#e0f2fe';
+        btnNormal.style.color = '#0284c7';
+        btnCompact.style.background = 'transparent';
+        btnCompact.style.color = '#475569';
+      } else {
+        btnCompact.style.background = '#e2e8f0';
+        btnCompact.style.color = '#0f172a';
+        btnNormal.style.background = 'transparent';
+        btnNormal.style.color = '#475569';
+      }
+    }
+
+    container.innerHTML = buildOfficialBehaviorReportHTML({
+      theme: _sbCurrentReportTheme,
+      density: _sbCurrentReportDensity,
+      targetDate: _sbCurrentReportTargetDate,
+      targetRosterId: _sbCurrentReportTargetRosterId,
+      forPrint: false
+    });
+
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+  };
+
+  window.sbCloseReportPreviewModal = function () {
+    const modal = document.getElementById('sbReportPreviewModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.remove('open');
+    }
+  };
+
+  window.sbToggleReportTheme = function (theme) {
+    _sbCurrentReportTheme = theme;
+    window.sbOpenReportPreviewModal(_sbCurrentReportTheme, _sbCurrentReportDensity, _sbCurrentReportTargetDate, _sbCurrentReportTargetRosterId);
+  };
+
+  window.sbToggleReportDensity = function (density) {
+    _sbCurrentReportDensity = density;
+    window.sbOpenReportPreviewModal(_sbCurrentReportTheme, _sbCurrentReportDensity, _sbCurrentReportTargetDate, _sbCurrentReportTargetRosterId);
+  };
+
+  /**
+   * Executes high-fidelity printing directly
+   */
+  window.sbExecuteReportPrint = function () {
+    const sheetHtml = buildOfficialBehaviorReportHTML({
+      theme: _sbCurrentReportTheme,
+      density: _sbCurrentReportDensity,
+      targetDate: _sbCurrentReportTargetDate,
+      targetRosterId: _sbCurrentReportTargetRosterId,
+      forPrint: true
+    });
+
+    let printFrame = document.getElementById('sbDedicatedPrintIframe');
+    if (printFrame) printFrame.remove();
+    printFrame = document.createElement('iframe');
+    printFrame.id = 'sbDedicatedPrintIframe';
+    printFrame.style.cssText = 'position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; z-index: -9999;';
+    document.body.appendChild(printFrame);
+
+    const printDoc = printFrame.contentWindow.document;
+    printDoc.open();
+    printDoc.write(`
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ar">
+      <head>
+        <meta charset="UTF-8">
+        <title>كشف المتابعة اليومية وحسن السلوك الرسمي A4</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap" rel="stylesheet">
+        <style>
+          @page {
+            size: A4 portrait;
+            margin: 8mm 7mm 8mm 7mm;
+          }
+          * { box-sizing: border-box; }
+          body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            margin: 0; padding: 0;
+            background: #ffffff;
+            color: #0f172a;
+            direction: rtl;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          table { page-break-inside: auto; }
+          tr { page-break-inside: avoid; page-break-after: auto; }
+          thead { display: table-header-group; }
+          tfoot { display: table-footer-group; }
+        </style>
+      </head>
+      <body>
+        ${sheetHtml}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.focus();
+              window.print();
+            }, 300);
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    printDoc.close();
+  };
+
+  /**
+   * Direct PDF Exporter for Official Behavior Report
+   */
+  window.sbExecuteReportPdf = async function () {
+    const sheetHtml = buildOfficialBehaviorReportHTML({
+      theme: _sbCurrentReportTheme,
+      density: _sbCurrentReportDensity,
+      targetDate: _sbCurrentReportTargetDate,
+      targetRosterId: _sbCurrentReportTargetRosterId,
+      forPrint: true
+    });
+
+    const theDate = _sbCurrentReportTargetDate || activeDate;
+    const roster = getActiveRoster();
+    const className = (roster && roster.name) ? roster.name.replace(/[^a-zA-Z0-9ء-ي]/g, '_') : 'الصف';
+    const filename = `كشف-متابعة-وسلوك-${className}-${theDate}.pdf`;
+
+    let exportDiv = document.getElementById('sbPdfDirectExportContainer');
     if (!exportDiv) {
       exportDiv = document.createElement('div');
-      exportDiv.id = 'sbPdfExportContainer';
+      exportDiv.id = 'sbPdfDirectExportContainer';
       document.body.appendChild(exportDiv);
     }
 
-    const cleanClassName = (record.className || (roster && roster.name) || 'الصف').replace(/[\/\\?%*:|"<>]/g, '-').trim();
-    const cleanSub = subject.replace(/[\/\\?%*:|"<>]/g, '-').trim();
-    const filename = `كشف-متابعة-وسلوك-${cleanClassName}-${cleanSub}-${theDate}.pdf`;
-
-    exportDiv.style.display = 'block';
-    exportDiv.style.position = 'relative';
-    exportDiv.innerHTML = `
-      <div style="direction: rtl; text-align: right; font-family: 'Amiri', 'Cairo', serif; color: #000; padding: 20px 25px; line-height: 1.35; background: #fff; width: 100%; box-sizing: border-box;">
-        
-        <!-- Header -->
-        <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
-          <tr>
-            <td style="width: 28%; font-size: 0.85rem; font-weight: 700; line-height: 1.6; vertical-align: middle;">
-              جمهورية العراق<br>
-              وزارة التربية<br>
-              المديرية العامة للتربية<br>
-              <strong>${escapeHtml(school)}</strong>
-            </td>
-            <td style="width: 44%; text-align: center; vertical-align: middle;">
-              <img src="assets/iraq_moe_seal.png" alt="شعار وزارة التربية" style="width: 54px; height: 54px; object-fit: contain; margin-bottom: 2px; display: inline-block;">
-              <div style="font-size: 1.25rem; font-weight: 900; margin: 2px 0;">سجل المتابعة والتقييم اليومي وحسن السلوك</div>
-              <div style="font-size: 0.88rem; font-weight: 700; color: #333;">كشف رسمي معتمد للإشراف التربوي والإدارة المدرسية</div>
-            </td>
-            <td style="width: 28%; text-align: left; font-size: 0.85rem; font-weight: 700; line-height: 1.6; vertical-align: middle;">
-              اليوم: <strong>${dayName}</strong><br>
-              التاريخ: <strong>${theDate}</strong><br>
-              الصف: <strong>${escapeHtml(cleanClassName)}</strong><br>
-              المادة: <strong>${escapeHtml(subject)}</strong>
-            </td>
-          </tr>
-        </table>
-
-        <!-- Meta Strip -->
-        <div style="display: flex; justify-content: space-between; background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 6px; padding: 6px 12px; margin-bottom: 10px; font-size: 0.85rem; font-weight: 700;">
-          <div>الحصة: <strong>${escapeHtml(record.period || 'الأولى')}</strong></div>
-          <div>عنوان الدرس / الموضوع: <strong>${escapeHtml(record.topic || 'سير الدرس اليومي')}</strong></div>
-          <div>مدرس المادة: <strong>${escapeHtml(teacher)}</strong></div>
-        </div>
-
-        <!-- Stats Strip -->
-        <div style="display: flex; gap: 12px; margin-bottom: 10px; font-size: 0.82rem; flex-wrap: wrap;">
-          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa;">العدد الكلي: <strong>${record.students.length}</strong></div>
-          <div style="border: 1px solid #10b981; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #ecfdf5; color: #059669;">الحاضرون: <strong>${present}</strong></div>
-          <div style="border: 1px solid #ef4444; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fef2f2; color: #dc2626;">الغائبون: <strong>${absent}</strong></div>
-          <div style="border: 1px solid #f59e0b; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fffbeb; color: #d97706;">المجازون: <strong>${excused}</strong></div>
-          <div style="border: 1px solid #cbd5e1; border-radius: 4px; padding: 3px 8px; font-weight: 800; background: #fafafa;">نسبة الحضور: <strong>${record.students.length > 0 ? Math.round(((present + late) / record.students.length) * 100) : 0}%</strong></div>
-        </div>
-
-        <!-- Data Table -->
-        <table style="width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-bottom: 15px;">
-          <thead>
-            <tr style="background: #f1f5f9; font-weight: 900;">
-              <th style="width: 32px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">ت</th>
-              <th style="border: 1px solid #334155; padding: 5px 6px; text-align: right;">اسم الطالب الثلاثي والرباعي</th>
-              <th style="width: 75px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الحضور</th>
-              <th style="width: 80px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">المشاركة</th>
-              <th style="width: 80px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الواجب البيتي</th>
-              <th style="width: 85px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">السلوك والمواظبة</th>
-              <th style="width: 50px; border: 1px solid #334155; padding: 5px 4px; text-align: center;">الدرجة</th>
-              <th style="border: 1px solid #334155; padding: 5px 6px; text-align: right;">ملاحظات المعلم / أسباب الغياب</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rowsHtml}
-          </tbody>
-        </table>
-
-        <!-- Signatures -->
-        <div style="display: flex; justify-content: space-between; margin-top: 25px; padding: 0 15px; font-weight: 800; font-size: 0.85rem;">
-          <div style="text-align: center; width: 170px;">
-            <div>مدرس / معلم المادة</div>
-            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">${escapeHtml(teacher)}</div>
-          </div>
-          <div style="text-align: center; width: 170px;">
-            <div>المشرف التربوي الزائر</div>
-            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">التوقيع والختم</div>
-          </div>
-          <div style="text-align: center; width: 170px;">
-            <div>مدير المدرسة</div>
-            <div style="margin-top: 30px; border-bottom: 1px dotted #000;">الختم والتوقيع الرسمي</div>
-          </div>
-        </div>
-
-      </div>
-    `;
+    exportDiv.style.cssText = 'position: absolute; left: -9999px; top: 0; width: 794px; background: #ffffff; padding: 12px; z-index: -9999;';
+    exportDiv.innerHTML = sheetHtml;
 
     try {
       if (typeof window.exportToPDF === 'function') {
@@ -1193,28 +1341,46 @@
           pageSize: 'a4',
           format: 'a4',
           orientation: 'portrait',
-          margin: '8mm',
+          margin: '6mm',
           fit: true
         });
         if (typeof window.showToast === 'function') {
           window.showToast('تم تنزيل كشف المتابعة وحسن السلوك بصيغة PDF بنجاح ✅', 'success');
         }
       } else {
-        throw new Error('محرك تصدير PDF المباشر غير متوفر');
+        window.sbExecuteReportPrint();
       }
     } catch (err) {
-      console.error('sbExportOfficialPdf error:', err);
-      if (typeof window.showToast === 'function') {
-        window.showToast('تعذر تنزيل ملف PDF: ' + (err.message || 'خطأ غير متوقع'), 'danger');
-      }
+      console.error('sbExecuteReportPdf error:', err);
+      // Fallback to print dialog
+      window.sbExecuteReportPrint();
     } finally {
-      if (exportDiv) exportDiv.style.display = 'none';
+      exportDiv.innerHTML = '';
+      exportDiv.style.display = 'none';
     }
+  };
+
+  /**
+   * Main Public Triggers (ترقية الأزرار الأصلية لتفتح المعاينة الفاخرة)
+   */
+  window.sbPrintOfficialReport = function () {
+    window.sbOpenReportPreviewModal('color', 'normal');
+  };
+
+  window.sbExportOfficialPdf = async function (targetDate, targetRosterId) {
+    if (targetDate) _sbCurrentReportTargetDate = targetDate;
+    if (targetRosterId) _sbCurrentReportTargetRosterId = targetRosterId;
+    await window.sbExecuteReportPdf();
+  };
+
+  window.sbPrintSessionFromArchive = function (date, rosterId) {
+    window.sbOpenReportPreviewModal('color', 'normal', date, rosterId);
   };
 
   window.sbExportSessionFromArchivePdf = async function (date, rosterId) {
     await window.sbExportOfficialPdf(date, rosterId);
   };
+
 
 
   // Auto Init on DOM Ready
