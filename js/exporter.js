@@ -201,24 +201,30 @@ const ExamExporter = {
     this.closePrintModal();
     this.ensurePreviewVisible();
 
-    const state = this.getState();
-    document.body.classList.remove('dual-print-active', 'answer-key-mode');
-    const paper = document.getElementById('examPaperDoc');
-    if (paper) paper.classList.remove('answer-key-mode');
-    const badge = document.getElementById('paperAnswerKeyBadge');
-    if (badge) {
-      badge.style.display = 'none';
-      badge.classList.remove('show-in-print');
+    const state = this.getState() || {};
+    const isLtr = (state.settings && state.settings.direction === 'ltr');
+    const studentHTML = this.generatePaperCopyHTML('student');
+    const badge = isLtr
+      ? 'Official Examination Paper ── [ Student Copy ]'
+      : 'جمهورية العراق ــ وزارة التربية | ورقة الأسئلة الامتحانية ــ [ نسخة الطالب ]';
+
+    const fullContent = `
+      <div class="exam-print-single-copy ${isLtr ? 'paper-ltr' : ''}" ${isLtr ? 'dir="ltr"' : 'dir="rtl"'}>
+        <div class="print-copy-badge student-badge" style="border: 1.5px solid #000; text-align: center; padding: 4px 12px; margin-bottom: 8px; font-weight: 800; font-size: 10pt; background: #fff;">
+          ${badge}
+        </div>
+        ${studentHTML}
+      </div>
+    `;
+
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow('ورقة الامتحان الرسمي A4 (نسخة الطالب)', fullContent, {
+        pageSize: 'A4',
+        orientation: 'portrait'
+      });
+    } else {
+      setTimeout(() => { window.print(); }, 80);
     }
-
-    if (state) state.viewMode = 'student';
-    if (typeof window.renderPaperHeader === 'function') window.renderPaperHeader();
-    if (typeof window.renderPaperQuestions === 'function') window.renderPaperQuestions();
-    if (typeof window.applyPaperSettings === 'function') window.applyPaperSettings();
-
-    setTimeout(() => {
-      window.print();
-    }, 80);
   },
 
   /**
@@ -228,25 +234,30 @@ const ExamExporter = {
     this.closePrintModal();
     this.ensurePreviewVisible();
 
-    const state = this.getState();
-    document.body.classList.remove('dual-print-active');
-    document.body.classList.add('answer-key-mode');
-    const paper = document.getElementById('examPaperDoc');
-    if (paper) paper.classList.add('answer-key-mode');
-    const badge = document.getElementById('paperAnswerKeyBadge');
-    if (badge) {
-      badge.style.display = 'block';
-      badge.classList.add('show-in-print');
+    const state = this.getState() || {};
+    const isLtr = (state.settings && state.settings.direction === 'ltr');
+    const committeeHTML = this.generatePaperCopyHTML('answer_key');
+    const badge = isLtr
+      ? '★ Examination Committee & Evaluation Center Copy (Approved Model Answers & Score Rubric) ★'
+      : '★ نسخة اللجنة الامتحانية ومركز الفحص (الأجوبة النموذجية المعتمدة وسلّم توزيع الدرجات) ★';
+
+    const fullContent = `
+      <div class="exam-print-single-copy answer-key-mode ${isLtr ? 'paper-ltr' : ''}" ${isLtr ? 'dir="ltr"' : 'dir="rtl"'}>
+        <div class="print-copy-badge committee-badge" style="border: 2px solid #b45309; background: #fef3c7; color: #78350f; text-align: center; padding: 5px 12px; margin-bottom: 8px; font-weight: 800; font-size: 10pt;">
+          ${badge}
+        </div>
+        ${committeeHTML}
+      </div>
+    `;
+
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow('ورقة الامتحان الرسمي A4 (نسخة اللجنة الامتحانية والأجوبة النموذجية)', fullContent, {
+        pageSize: 'A4',
+        orientation: 'portrait'
+      });
+    } else {
+      setTimeout(() => { window.print(); }, 80);
     }
-
-    if (state) state.viewMode = 'answer_key';
-    if (typeof window.renderPaperHeader === 'function') window.renderPaperHeader();
-    if (typeof window.renderPaperQuestions === 'function') window.renderPaperQuestions();
-    if (typeof window.applyPaperSettings === 'function') window.applyPaperSettings();
-
-    setTimeout(() => {
-      window.print();
-    }, 80);
   },
 
   /**

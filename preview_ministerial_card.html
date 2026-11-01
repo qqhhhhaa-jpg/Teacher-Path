@@ -415,7 +415,7 @@
         <i class="fa-solid fa-palette"></i>
         <span>أزرق وزاري 🔵</span>
       </button>
-      <button type="button" class="btn btn-primary" onclick="window.print()">
+      <button type="button" class="btn btn-primary" onclick="printCardDoc()">
         <i class="fa-solid fa-print"></i>
         <span>طباعة البطاقة A4 🖨️</span>
       </button>
@@ -603,6 +603,38 @@
       } else {
         document.body.classList.remove('theme-red');
         btn.innerHTML = '<i class="fa-solid fa-palette"></i> <span>أزرق وزاري 🔵</span>';
+      }
+    }
+
+    function openPrintWindow(title, bodyContent, options) {
+      options = options || {};
+      var docTitle = title || 'طباعة مستند رسمي - مسار المعلم';
+      try {
+        var payload = { title: docTitle, content: bodyContent || '', options: options, timestamp: Date.now() };
+        localStorage.setItem('masar_print_payload', JSON.stringify(payload));
+        sessionStorage.setItem('masar_print_payload', JSON.stringify(payload));
+      } catch (err) {}
+      try {
+        var link = document.createElement('a');
+        link.href = 'print.html';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () { if (link && link.parentNode) link.remove(); }, 800);
+      } catch (e) {
+        window.open('print.html', '_blank');
+      }
+      return true;
+    }
+
+    function printCardDoc() {
+      const card = document.getElementById('examCard');
+      if (card) {
+        openPrintWindow('بطاقة الامتحان الوزاري المعتمد A4', card.outerHTML, { pageSize: 'A4', orientation: 'portrait' });
+      } else {
+        window.print();
       }
     }
   </script>

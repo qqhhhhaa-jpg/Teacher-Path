@@ -3,6 +3,29 @@
 // محرك النوافذ المنبثقة المستقلة للطباعة - مسار المعلم (Universal Print Window)
 // يفتح نافذة/تبويب جديد مستقل تماماً يبقى مفتوحاً في المتصفح حتى يغلقه المستخدم
 // ==========================================================================
+// Universal Platform-wide Print Protection:
+// Any direct call to window.print() inside the main platform automatically routes to window.openPrintWindow
+if (typeof window !== 'undefined' && !window._printIntercepted) {
+  window._printIntercepted = true;
+  const _nativeBrowserPrint = window.print ? window.print.bind(window) : function() {};
+  window._nativeBrowserPrint = _nativeBrowserPrint;
+
+  if (!window.location.pathname.endsWith('print.html')) {
+    window.print = function () {
+      if (typeof window.triggerSmartPrint === 'function') {
+        window.triggerSmartPrint();
+      } else {
+        let target = document.getElementById('examPaperDoc') || document.querySelector('.exam-paper-container');
+        if (target && typeof window.openPrintWindow === 'function') {
+          window.openPrintWindow('ورقة الامتحان الرسمي A4', target.outerHTML, { pageSize: 'A4', orientation: 'portrait' });
+        } else {
+          _nativeBrowserPrint();
+        }
+      }
+    };
+  }
+}
+
 window.openPrintWindow = function (title, bodyContent, options) {
   options = options || {};
   var docTitle = title || 'طباعة مستند رسمي - مسار المعلم';
@@ -11662,12 +11685,23 @@ window.printFullPlatformDailyReport = function () {
     </div>
   `;
 
-  document.body.classList.add('printing-academic-report');
-  window.print();
-
-  setTimeout(() => {
-    document.body.classList.remove('printing-academic-report');
-  }, 1000);
+  const fullReportHtml = `
+    <div class="academic-report-print-container" style="padding: 15px; direction: rtl; font-family: 'Cairo', sans-serif;">
+      ${printContainer.innerHTML}
+    </div>
+  `;
+  if (typeof window.openPrintWindow === 'function') {
+    window.openPrintWindow('تقرير النشاط الأكاديمي الشامل A4 - مسار المعلم', fullReportHtml, {
+      pageSize: 'A4',
+      orientation: 'portrait'
+    });
+  } else {
+    document.body.classList.add('printing-academic-report');
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-academic-report');
+    }, 1000);
+  }
 };
 
 window.printAcademicReport = window.printFullPlatformDailyReport;
@@ -12089,12 +12123,23 @@ window.printDailyReport = function () {
     </div>
   `;
 
-  document.body.classList.add('printing-daily-report');
-  window.print();
-
-  setTimeout(() => {
-    document.body.classList.remove('printing-daily-report');
-  }, 1000);
+  const dailyReportHtml = `
+    <div class="daily-report-print-container" style="padding: 15px; direction: rtl; font-family: 'Cairo', sans-serif;">
+      ${printContainer.innerHTML}
+    </div>
+  `;
+  if (typeof window.openPrintWindow === 'function') {
+    window.openPrintWindow('سجل بنك الأسئلة والتقارير اليومية A4 - مسار المعلم', dailyReportHtml, {
+      pageSize: 'A4',
+      orientation: 'portrait'
+    });
+  } else {
+    document.body.classList.add('printing-daily-report');
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-daily-report');
+    }, 1000);
+  }
 };
 
 window.exportDailyReportPdf = async function () {
@@ -16828,15 +16873,33 @@ window.renderPrintableVouchers = function () {
 };
 
 window.executePrintActivationCards = function () {
-  const modal = document.getElementById('printActivationCardsModal');
-  if (modal && modal.parentElement !== document.body) {
-    document.body.appendChild(modal);
+  const container = document.getElementById('printCardsContainer');
+  if (!container) {
+    if (typeof window.showToast === 'function') window.showToast('لا توجد بطاقات معروضة للطباعة!', 'warning');
+    return;
   }
-  document.body.classList.add('printing-activation-cards');
-  window.print();
-  setTimeout(() => {
-    document.body.classList.remove('printing-activation-cards');
-  }, 1600);
+  const sheets = container.querySelectorAll('.voucher-a4-sheet');
+  if (!sheets || sheets.length === 0) {
+    if (typeof window.showToast === 'function') window.showToast('لا توجد بطاقات معروضة للطباعة!', 'warning');
+    return;
+  }
+
+  const sheetsHtml = Array.from(sheets).map(s => s.outerHTML).join('<div style="page-break-after: always; break-after: page;"></div>');
+  const agentName = (document.getElementById('voucherAgentNameInput')?.value || '').trim() || 'الوكلاء';
+  const docTitle = `بطاقات تفعيل كود الاشتراك VIP A4 (${sheets.length} صفحة) - ${agentName}`;
+
+  if (typeof window.openPrintWindow === 'function') {
+    window.openPrintWindow(docTitle, sheetsHtml, {
+      pageSize: 'A4',
+      orientation: 'portrait'
+    });
+  } else {
+    document.body.classList.add('printing-activation-cards');
+    window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-activation-cards');
+    }, 1600);
+  }
 };
 
 window.exportActivationCardsPDF = async function () {

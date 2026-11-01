@@ -1396,67 +1396,30 @@
   window.schedPrintA3 = function() {
     if (!activeSchedule) return;
 
-    const printWin = window.open('', '_blank');
-    if (!printWin) {
-      alert('يرجى السماح بالنوافذ المنبثقة (Popups) لعرض وطباعة جدول A3.');
-      return;
-    }
-
     const isMaster = (activeSchedule.viewLayout !== 'singleClass');
     const currentClass = activeSelectedClass || (activeSchedule.classes && activeSchedule.classes[0]) || 'الصف الدراسي';
     const isA3 = (activeSchedule.pageSize || 'A3') === 'A3';
     const css = getSchedulePrintCss(isA3);
-    const contentHtml = buildScheduleHtml(activeSchedule, true, isMaster ? null : currentClass);
+    const contentHtml = `
+      <div class="print-content-wrapper" style="width: 100%;">
+        ${buildScheduleHtml(activeSchedule, true, isMaster ? null : currentClass)}
+      </div>
+    `;
 
     const docTitle = isMaster 
       ? `المخطط الشامل لجدول الحصص المدرسي الموحد A3 - ${escapeHtml(activeSchedule.schoolName || 'المدرسة')}`
       : `جدول الحصص الأسبوعي A3 - ${escapeHtml(currentClass)}`;
 
-    printWin.document.write(`
-      <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <title>${docTitle}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <style>
-          ${css}
-        </style>
-      </head>
-      <body>
-        <div class="print-actions-toolbar no-print">
-          <div style="font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-calendar-check text-gold"></i>
-            <span>${isMaster ? 'جاهز لطباعة المخطط الشامل لجدول الحصص المدرسي الموحد لكافة الصفوف' : `جاهز لطباعة جدول (${escapeHtml(currentClass)})`} مقاس (${isA3 ? 'A3 عريض 420mm × 297mm' : 'A4 عريض'}) • صفحة واحدة معتمدة</span>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-print-go" onclick="window.print()">
-              <i class="fa-solid fa-print"></i> بدء الطباعة / حفظ كـ PDF
-            </button>
-            <button type="button" class="btn-print-cancel" onclick="window.close()">
-              إغلاق
-            </button>
-          </div>
-        </div>
-
-        <div class="print-content-wrapper">
-          ${contentHtml}
-        </div>
-
-        <script>
-          window.addEventListener('load', function() {
-            setTimeout(function() {
-              window.print();
-            }, 600);
-          });
-        </script>
-      </body>
-      </html>
-    `);
-    printWin.document.close();
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow(docTitle, contentHtml, {
+        pageSize: isA3 ? 'A3' : 'A4',
+        orientation: 'landscape',
+        margin: '6mm 6mm',
+        extraStyles: css
+      });
+    } else {
+      window.print();
+    }
   };
 
   window.schedPrintAllClasses = function() {
@@ -1465,65 +1428,30 @@
       return;
     }
 
-    const printWin = window.open('', '_blank');
-    if (!printWin) {
-      alert('يرجى السماح بالنوافذ المنبثقة (Popups) لعرض وطباعة الجداول.');
-      return;
-    }
-
     const isA3 = (activeSchedule.pageSize || 'A3') === 'A3';
     const css = getSchedulePrintCss(isA3);
-    const pagesHtml = activeSchedule.classes.map(cls => `
-      <div class="print-page-break">
-        ${buildScheduleHtml(activeSchedule, true, cls)}
+    const pagesHtml = `
+      <div class="print-content-wrapper" style="display: block; width: 100%;">
+        ${activeSchedule.classes.map(cls => `
+          <div class="print-page-break" style="page-break-after: always; break-after: page; margin-bottom: 20px;">
+            ${buildScheduleHtml(activeSchedule, true, cls)}
+          </div>
+        `).join('')}
       </div>
-    `).join('');
+    `;
 
-    printWin.document.write(`
-      <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <title>طباعة جداول كافة الصفوف - ${escapeHtml(activeSchedule.title || 'مسار المعلم')}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-        <style>
-          ${css}
-        </style>
-      </head>
-      <body>
-        <div class="print-actions-toolbar no-print">
-          <div style="font-weight: 800; font-size: 1.05rem; display: flex; align-items: center; gap: 10px;">
-            <i class="fa-solid fa-layer-group text-gold"></i>
-            <span>طباعة دفعة واحدة لكافة الصفوف (${activeSchedule.classes.length} صفاً - صفحة لكل صف)</span>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button type="button" class="btn-print-go" onclick="window.print()">
-              <i class="fa-solid fa-print"></i> بدء طباعة كافة الصفوف (${activeSchedule.classes.length} صفحات)
-            </button>
-            <button type="button" class="btn-print-cancel" onclick="window.close()">
-              إغلاق
-            </button>
-          </div>
-        </div>
+    const docTitle = `طباعة جداول كافة الصفوف (${activeSchedule.classes.length} صفاً) - ${escapeHtml(activeSchedule.title || 'مسار المعلم')}`;
 
-        <div class="print-content-wrapper" style="display: block; padding: 70px 10px 30px;">
-          ${pagesHtml}
-        </div>
-
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-            }, 600);
-          };
-        </script>
-      </body>
-      </html>
-    `);
-    printWin.document.close();
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow(docTitle, pagesHtml, {
+        pageSize: isA3 ? 'A3' : 'A4',
+        orientation: 'landscape',
+        margin: '6mm 6mm',
+        extraStyles: css
+      });
+    } else {
+      window.print();
+    }
   };
 
   window.schedExportPdf = async function(options) {

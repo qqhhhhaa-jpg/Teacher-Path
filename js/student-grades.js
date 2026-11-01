@@ -1451,41 +1451,8 @@
       `;
     }
 
-    let printDoc = null;
-    let isIframeFallback = false;
-    let printWin = null;
-    try {
-      printWin = window.open('', '_blank', 'width=1100,height=900,menubar=no,toolbar=no,status=no');
-    } catch (_) {}
 
-    if (printWin && printWin.document) {
-      printDoc = printWin.document;
-    } else {
-      isIframeFallback = true;
-      let printFrame = document.getElementById('sgDedicatedPrintIframe');
-      if (printFrame) printFrame.remove();
-      printFrame = document.createElement('iframe');
-      printFrame.id = 'sgDedicatedPrintIframe';
-      printFrame.style.cssText = 'position: fixed; left: 0; top: 0; width: 0; height: 0; border: 0; opacity: 0; pointer-events: none; z-index: -9999;';
-      document.body.appendChild(printFrame);
-      printDoc = printFrame.contentWindow.document;
-    }
-
-    printDoc.open();
-    printDoc.write(`
-      <!DOCTYPE html>
-      <html lang="ar" dir="rtl">
-      <head>
-        <meta charset="UTF-8">
-        <title>سجل درجات الطلاب الرسمي - ${escapeHtml(activeRoster.subject || '')} - ${escapeHtml(activeRoster.name || '')}</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap">
-        <style>
-          @page {
-            size: A4 ${isLandscape ? 'landscape' : 'portrait'};
-            margin: 7mm 8mm;
-          }
+    const ledgerCss = `
           * {
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
@@ -1685,8 +1652,10 @@
             margin-bottom: 4px;
           }
         </style>
-      </head>
-      <body>
+
+    `;
+
+    const contentHtml = `
         <div class="print-ledger-container">
           
           <!-- Official Formal Header -->
@@ -1774,36 +1743,22 @@
 
         </div>
 
-        <script>
-          window.onload = function() {
-            setTimeout(function() {
-              window.print();
-            }, 300);
-          };
-        </script>
-      </body>
-      </html>
-    `);
-    printDoc.close();
-    if (isIframeFallback) {
-      setTimeout(() => {
-        try {
-          const frame = document.getElementById('sgDedicatedPrintIframe');
-          if (frame && frame.contentWindow) {
-            frame.contentWindow.focus();
-            frame.contentWindow.print();
-          }
-        } catch (_) {
-          window.print();
-        }
-      }, 500);
+
+    `;
+
+    const docTitle = `سجل درجات الطلاب الرسمي - ${escapeHtml(activeRoster.subject || '')} - ${escapeHtml(activeRoster.name || '')}`;
+
+    if (typeof window.openPrintWindow === 'function') {
+      window.openPrintWindow(docTitle, contentHtml, {
+        pageSize: 'A4',
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        margin: '6mm 7mm',
+        extraStyles: ledgerCss
+      });
     } else {
-      try {
-        printWin.focus();
-      } catch (_) {}
+      window.print();
     }
   };
-
   /**
    * Direct PDF Exporter for Student Grades Official Ledger (تنزيل ملف PDF حقيقي ومباشر دون فتح نوافذ أو طباعة)
    */

@@ -739,6 +739,14 @@
       iframe.contentWindow.addEventListener('afterprint', function () { setTimeout(cleanup, 1000); });
       setTimeout(cleanup, 10 * 60 * 1000);
 
+      if (typeof global.openPrintWindow === 'function') {
+        const pagesList = resolvePages(opts.pages);
+        const htmlContent = pagesList.map(p => p.outerHTML).join('<div style="page-break-after: always; break-after: page;"></div>');
+        cleanup();
+        global.openPrintWindow(opts.title || 'ورقة الامتحان الرسمي A4', htmlContent, { pageSize: 'A4', orientation: 'portrait' });
+        return;
+      }
+
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     } catch (err) {
