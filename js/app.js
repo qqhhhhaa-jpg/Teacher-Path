@@ -676,8 +676,11 @@ function getBackendApiUrl(endpoint) {
     const base = savedPublicUrl.trim().replace(/\/+$/, '');
     return `${base}${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
   }
-  if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') {
-    return `http://localhost:8080${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  if (typeof window !== 'undefined' && window.location) {
+    const loc = window.location;
+    if (loc.protocol === 'file:' || ((loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') && loc.port !== '8080')) {
+      return `http://localhost:8080${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+    }
   }
   return endpoint;
 }
@@ -1013,7 +1016,7 @@ function registerActiveDeviceSession(user) {
 
   // 4. Send to server backend (if running via server_bot.py or web server)
   try {
-    fetch('/api/active_session', {
+    fetch(getBackendApiUrl('/api/active_session'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sessionObj)
@@ -1067,7 +1070,16 @@ window.dismissDeviceKickedModal = function () {
   if (emailInp) emailInp.focus();
 };
 
+let _consecutiveWatchdogFailures = 0;
+let _lastWatchdogCheckTime = 0;
+
 function verifySingleDeviceSession() {
+  const now = Date.now();
+  // If backend repeatedly fails/offline, back off to check only every 60s instead of spamming console
+  if (_consecutiveWatchdogFailures >= 2 && (now - _lastWatchdogCheckTime < 60000)) {
+    return;
+  }
+  _lastWatchdogCheckTime = now;
   if (!isUserLoggedIn()) return;
   const user = getCurrentUser();
   if (!user || (!user.id && !user.username && !user.email)) return;
@@ -1094,8 +1106,16 @@ function verifySingleDeviceSession() {
 
   // 2. Check remote server active session (cross-device: PC vs Phone)
   if (navigator.onLine) {
-    fetch(`/api/active_session?userId=${encodeURIComponent(uid)}`)
-      .then(res => res.json())
+    fetch(getBackendApiUrl(`/api/active_session?userId=${encodeURIComponent(uid)}`))
+      .then(res => {
+        if (res.ok) {
+          _consecutiveWatchdogFailures = 0;
+          return res.json();
+        } else {
+          _consecutiveWatchdogFailures++;
+          return null;
+        }
+      })
       .then(data => {
         if (data && data.success && data.active && data.session) {
           const srvSession = data.session;
@@ -1105,7 +1125,9 @@ function verifySingleDeviceSession() {
           }
         }
       })
-      .catch(() => { });
+      .catch(() => {
+        _consecutiveWatchdogFailures++;
+      });
   }
 }
 window.verifySingleDeviceSession = verifySingleDeviceSession;
@@ -12834,7 +12856,7 @@ window.confirmExistingAccountWithPassword = async function () {
   }
 
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(getBackendApiUrl('/api/auth/login'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -13312,7 +13334,7 @@ window.launchGoogleRealPopup = async function () {
 
   // 3. Notify backend in background asynchronously
   try {
-    fetch('/api/gcloud/oauth_verify', {
+    fetch(getBackendApiUrl('/api/gcloud/oauth_verify'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -15402,7 +15424,7 @@ window.triggerManualSupabaseSync = async function () {
   if (btn) btn.disabled = true;
 
   try {
-    const res = await fetch('/api/supabase/sync_full', { method: 'POST' });
+    const res = await fetch(getBackendApiUrl('/api/supabase/sync_full'), { method: 'POST' });
     const data = await res.json();
     if (data && data.success) {
       if (typeof showToast === 'function') {
@@ -15560,7 +15582,7 @@ window.checkServerStatusLive = async function (isManual = false) {
 
   // Auto-check Supabase & Local Database Sync Status
   try {
-    fetch('/api/supabase/status', { cache: 'no-store' })
+    fetch(getBackendApiUrl('/api/supabase/status'), { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
         const badge = document.getElementById('srvModalCloudSyncBadge');
@@ -17382,7 +17404,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Mobile Connect Modal Utilities
 window.showMobileConnectModal = function() {
-  fetch('/api/network-info').then(function(r) { return r.json(); }).then(function(data) {
+  fetch(getBackendApiUrl('/api/network-info')).then(function(r) { return r.json(); }).then(function(data) {
     if (data && data.mobile_url) {
       var inp = document.getElementById('mobileConnectUrlInput');
       if (inp) inp.value = data.mobile_url;

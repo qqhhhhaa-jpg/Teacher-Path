@@ -54,6 +54,7 @@ def dashboard():
     return send_from_directory(BASE_DIR, 'admin_control.html')
 
 @app.route('/health')
+@app.route('/api/health')
 @app.route('/ping')
 def health():
     return jsonify({
@@ -1005,12 +1006,19 @@ def api_supabase_sync_account():
         return jsonify({"success": False, "message": err or "فشل المزامنة"}), 400
 
 
-@app.route('/<path:path>')
+@app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 def serve_file(path):
+    if request.method == 'OPTIONS':
+        res = make_response('', 200)
+        return add_cors_headers(res)
+
     # Security: do not serve sensitive files
     forbidden = ['.git', '.env', 'server_bot.log', '.system_generated', 'scratch']
     if any(path.startswith(f) for f in forbidden):
         return 'Forbidden', 403
+
+    if path.startswith('api/'):
+        return jsonify({"success": False, "message": f"API endpoint not found: /{path}"}), 404
 
     target_file = os.path.join(BASE_DIR, path)
     if os.path.exists(target_file) and os.path.isfile(target_file):

@@ -1744,7 +1744,7 @@
       window.showToast('جاري فتح نافذة الطباعة فوراً... ⚡', 'info', 1400);
     }
     const student = activeBatch.students[activeStudentIndex];
-    printCertificates([student], activeBatch);
+    return printCertificates([student], activeBatch);
   };
 
   window.certPrintSingleIndex = function(index) {
@@ -1753,7 +1753,7 @@
       window.showToast('جاري فتح نافذة الطباعة فوراً... ⚡', 'info', 1400);
     }
     const student = activeBatch.students[index];
-    printCertificates([student], activeBatch);
+    return printCertificates([student], activeBatch);
   };
 
   // Direct PDF Download for Single Certificate
@@ -1802,7 +1802,7 @@
     if (typeof window.showToast === 'function') {
       window.showToast('جاري فتح نافذة طباعة جميع الشهادات فوراً... ⚡', 'info', 1400);
     }
-    printCertificates(activeBatch.students, activeBatch);
+    return printCertificates(activeBatch.students, activeBatch);
   };
 
   window.executeCertificatesBatchPdf = async function(options) {
@@ -2167,7 +2167,8 @@
 
     // Open in dedicated print preview window that stays open
     if (typeof window.openPrintWindow === 'function') {
-      window.openPrintWindow(escapeHtml(batch.title || 'شهادات التقدير والتفوق للطلبة A4'), pagesHtml, {
+      const allCertificatesHtml = pagesHtmlList.join('');
+    window.openPrintWindow(escapeHtml(batch.title || 'شهادات التقدير والتفوق للطلبة A4'), allCertificatesHtml, {
         pageSize: 'A4',
         orientation: isLandscape ? 'landscape' : 'portrait',
         margin: '0',

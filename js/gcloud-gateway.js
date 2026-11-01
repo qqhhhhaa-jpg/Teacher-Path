@@ -7,6 +7,19 @@
 
   const STORAGE_KEY = 'masar_gcloud_gateway_config_v1';
 
+  function getApiUrl(endpoint) {
+    if (typeof window !== 'undefined' && typeof window.getBackendApiUrl === 'function') {
+      return window.getBackendApiUrl(endpoint);
+    }
+    if (typeof window !== 'undefined' && window.location) {
+      const loc = window.location;
+      if (loc.protocol === 'file:' || ((loc.hostname === 'localhost' || loc.hostname === '127.0.0.1') && loc.port !== '8080')) {
+        return 'http://localhost:8080' + (endpoint.startsWith('/') ? '' : '/') + endpoint;
+      }
+    }
+    return endpoint;
+  }
+
   const defaultConfig = {
     projectId: 'huseein1234',
     apiKey: '',
@@ -445,7 +458,7 @@
 
   async function syncConfigFromServer() {
     try {
-      const resp = await fetch('/api/gcloud/config');
+      const resp = await fetch(getApiUrl('/api/gcloud/config'));
       if (resp.ok) {
         const data = await resp.json();
         if (data && data.config) {
@@ -508,7 +521,7 @@
     }
 
     try {
-      const resp = await fetch('/api/gcloud/config', {
+      const resp = await fetch(getApiUrl('/api/gcloud/config'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
@@ -538,7 +551,7 @@
     let geminiMsg = 'لم يتم إدخال مفتاح Gemini API Key بعد';
 
     try {
-      const resp = await fetch('/api/gcloud/test', {
+      const resp = await fetch(getApiUrl('/api/gcloud/test'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey: cfg.apiKey, projectId: cfg.projectId })
@@ -649,7 +662,7 @@
       let replyText = '';
       // Try server gateway first, fallback to direct Google Gemini REST API
       try {
-        const resp = await fetch('/api/gcloud/gemini', {
+        const resp = await fetch(getApiUrl('/api/gcloud/gemini'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -762,7 +775,7 @@
     } catch (e) {}
 
     try {
-      const resp = await fetch('/api/gcloud/sync', {
+      const resp = await fetch(getApiUrl('/api/gcloud/sync'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -806,7 +819,7 @@
 
     let history = [];
     try {
-      const resp = await fetch('/api/gcloud/sync');
+      const resp = await fetch(getApiUrl('/api/gcloud/sync'));
       if (resp.ok) {
         const data = await resp.json();
         history = data.history || [];
