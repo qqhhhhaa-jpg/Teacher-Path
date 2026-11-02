@@ -41902,17 +41902,20 @@ button[data-pdf-export],
 .aurora-fluid-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(55px);
-  -webkit-filter: blur(55px);
+  filter: blur(18px);
+  -webkit-filter: blur(18px);
   opacity: 0.38;
-  will-change: transform, opacity;
+  contain: strict;
+  transform: translateZ(0);
+  will-change: transform;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
 
 [data-theme="dark"] .aurora-fluid-orb {
   opacity: 0.58;
-  filter: blur(65px);
+  filter: blur(22px);
+  -webkit-filter: blur(22px);
 }
 
 .aurora-fluid-orb.orb-cyan {
@@ -42033,21 +42036,25 @@ button[data-pdf-export],
 .nebula-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(85px);
-  -webkit-filter: blur(85px);
-  will-change: transform, opacity;
+  filter: blur(24px);
+  -webkit-filter: blur(24px);
+  contain: strict;
+  transform: translateZ(0);
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
 
-/* Light theme nebula opacity */
+/* Light theme nebula with natural feathered gradient */
 .nebula-blob.blob-azure {
   width: 580px;
   height: 480px;
   top: -100px;
   right: -80px;
-  background: radial-gradient(circle, rgba(2, 132, 199, 0.22) 0%, rgba(56, 189, 248, 0.08) 60%, transparent 80%);
-  animation: cosmicDriftOne 24s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.22) 0%, rgba(56, 189, 248, 0.10) 35%, rgba(2, 132, 199, 0.03) 65%, transparent 80%);
+  animation: cosmicDriftOne 26s ease-in-out infinite alternate;
 }
 
 .nebula-blob.blob-emerald {
@@ -42055,8 +42062,8 @@ button[data-pdf-export],
   height: 440px;
   bottom: -100px;
   left: -80px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(52, 211, 153, 0.06) 60%, transparent 80%);
-  animation: cosmicDriftTwo 28s ease-in-out infinite alternate-reverse;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(52, 211, 153, 0.08) 35%, rgba(16, 185, 129, 0.02) 65%, transparent 80%);
+  animation: cosmicDriftTwo 30s ease-in-out infinite alternate-reverse;
 }
 
 .nebula-blob.blob-purple {
@@ -42064,8 +42071,8 @@ button[data-pdf-export],
   height: 420px;
   top: 40%;
   left: 20%;
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(168, 85, 247, 0.05) 60%, transparent 80%);
-  animation: cosmicDriftThree 22s ease-in-out infinite alternate;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.16) 0%, rgba(168, 85, 247, 0.07) 35%, rgba(124, 58, 237, 0.02) 65%, transparent 80%);
+  animation: cosmicDriftThree 24s ease-in-out infinite alternate;
 }
 
 .nebula-blob.blob-amber {
@@ -42073,14 +42080,14 @@ button[data-pdf-export],
   height: 380px;
   bottom: 25%;
   right: 25%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(251, 191, 36, 0.04) 60%, transparent 80%);
-  animation: cosmicDriftFour 26s ease-in-out infinite alternate-reverse;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.14) 0%, rgba(251, 191, 36, 0.06) 35%, rgba(245, 158, 11, 0.02) 65%, transparent 80%);
+  animation: cosmicDriftFour 28s ease-in-out infinite alternate-reverse;
 }
 
 /* Dark theme enhanced vibrant nebula */
 [data-theme="dark"] .nebula-blob {
-  filter: blur(100px);
-  -webkit-filter: blur(100px);
+  filter: blur(28px);
+  -webkit-filter: blur(28px);
 }
 
 [data-theme="dark"] .nebula-blob.blob-azure {
@@ -42203,8 +42210,9 @@ button[data-pdf-export],
 .sb-stats-hero {
   position: relative !important;
   z-index: 2 !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  contain: paint;
 }
 
 [data-theme="light"] .app-card {
@@ -42258,8 +42266,8 @@ button[data-pdf-export],
 .portal-topbar {
   position: relative !important;
   z-index: 10 !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
 }
 
 [data-theme="dark"] .portal-topbar {
@@ -42275,31 +42283,31 @@ button[data-pdf-export],
 .portal-showcase-container {
   position: relative !important;
   z-index: 5 !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   border-radius: 28px !important;
-  transition: all 0.35s ease !important;
+  transition: all 0.25s ease !important;
 }
 
 [data-theme="dark"] .portal-showcase-container {
-  background: rgba(15, 23, 42, 0.65) !important;
+  background: rgba(15, 23, 42, 0.82) !important;
   border: 1.5px solid rgba(56, 189, 248, 0.25) !important;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 50px rgba(2, 132, 199, 0.2) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 35px rgba(2, 132, 199, 0.15) !important;
 }
 
 [data-theme="light"] .portal-showcase-container {
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   border: 1.5px solid rgba(203, 213, 225, 0.85) !important;
-  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.08), 0 0 40px rgba(2, 132, 199, 0.12) !important;
+  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.06), 0 0 30px rgba(2, 132, 199, 0.08) !important;
 }
 
 .portal-auth-card {
   position: relative !important;
   z-index: 6 !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
   border-radius: 24px !important;
-  transition: all 0.35s ease !important;
+  transition: all 0.25s ease !important;
 }
 
 [data-theme="dark"] .portal-auth-card {

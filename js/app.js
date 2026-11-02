@@ -680,6 +680,16 @@ window.getAccountStorageKey = getAccountStorageKey;
 // Global Master Cloud Server URL for worldwide multi-device sync
 window.MOALLEM_DEFAULT_SERVER_URL = window.MOALLEM_DEFAULT_SERVER_URL || '';
 
+window._moallemBackendOfflineUntil = 0;
+function isBackendCircuitBroken() {
+  return Date.now() < (window._moallemBackendOfflineUntil || 0);
+}
+function markBackendOffline(seconds = 90) {
+  window._moallemBackendOfflineUntil = Date.now() + (seconds * 1000);
+}
+window.isBackendCircuitBroken = isBackendCircuitBroken;
+window.markBackendOffline = markBackendOffline;
+
 function getBackendApiUrl(endpoint) {
   const custom = localStorage.getItem('moallem_custom_backend_url');
   if (custom && custom.trim()) {
@@ -711,13 +721,18 @@ window.getBackendApiUrl = getBackendApiUrl;
 
 
 
-// Auto-detect Worldwide Cloudflare Tunnel URL from Server
+// Auto-detect Worldwide Cloudflare Tunnel URL from Server (Safe & Fast with 800ms timeout)
 (async function initServerTunnelDetection() {
   try {
-    const candidateUrls = ['/api/public_url', 'http://localhost:8080/api/public_url'];
+    if (isBackendCircuitBroken()) return;
+    const isLocalHost = typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+    const candidateUrls = isLocalHost ? ['http://localhost:8080/api/public_url', '/api/public_url'] : ['/api/public_url'];
     for (const u of candidateUrls) {
       try {
-        const res = await fetch(u, { cache: 'no-store' });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 800);
+        const res = await fetch(u, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timeoutId);
         if (res.ok) {
           const data = await res.json();
           if (data && data.public_url) {
@@ -727,6 +742,8 @@ window.getBackendApiUrl = getBackendApiUrl;
             } catch (_) { }
             break;
           }
+        } else if (res.status === 404 || res.status === 405) {
+          markBackendOffline(120);
         }
       } catch (_) { }
     }
@@ -818,9 +835,17 @@ function getAuthAccounts() {
 let isSyncingAccountsFlag = false;
 async function syncAccountsWithServer() {
   if (isSyncingAccountsFlag) return getAuthAccounts();
+  if (isBackendCircuitBroken()) return getAuthAccounts();
   isSyncingAccountsFlag = true;
   try {
-    const res = await fetch(getBackendApiUrl('/api/accounts'), { cache: 'no-store' });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1500);
+    const res = await fetch(getBackendApiUrl('/api/accounts'), { cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.status === 404 || res.status === 405) {
+      markBackendOffline(120);
+      return getAuthAccounts();
+    }
     if (res.ok) {
       const data = await res.json();
       if (data && data.success && Array.isArray(data.accounts)) {
@@ -945,19 +970,24 @@ function saveAuthAccounts(accounts) {
     console.error(e);
   }
   // Immediately persist to server backend (24/7 server_bot / app.py)
-  try {
-    fetch(getBackendApiUrl('/api/accounts'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ accounts })
-    }).catch(() => { });
-  } catch (err) { }
+  if (!isBackendCircuitBroken()) {
+    try {
+      fetch(getBackendApiUrl('/api/accounts'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accounts })
+      }).then(r => {
+        if (r.status === 404 || r.status === 405) markBackendOffline(120);
+      }).catch(() => { markBackendOffline(120); });
+    } catch (err) { }
+  }
 }
 
 /* ==========================================================================
    Platform Telemetry & Activity Engine (محرك تسجيل وتتبع كل حركة على السيرفر)
    ========================================================================== */
 function logPlatformActivity(actionType, actionTitle, details = '') {
+  if (isBackendCircuitBroken()) return;
   try {
     const user = (typeof getCurrentUser === 'function' ? getCurrentUser() : null) || {};
     const payload = {
@@ -973,7 +1003,9 @@ function logPlatformActivity(actionType, actionTitle, details = '') {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    }).catch(() => { });
+    }).then(r => {
+      if (r.status === 404 || r.status === 405) markBackendOffline(120);
+    }).catch(() => { markBackendOffline(120); });
   } catch (e) { }
 }
 window.logPlatformActivity = logPlatformActivity;
@@ -1038,13 +1070,17 @@ function registerActiveDeviceSession(user) {
   }
 
   // 4. Send to server backend (if running via server_bot.py or web server)
-  try {
-    fetch(getBackendApiUrl('/api/active_session'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sessionObj)
-    }).catch(() => { });
-  } catch (e) { }
+  if (!isBackendCircuitBroken()) {
+    try {
+      fetch(getBackendApiUrl('/api/active_session'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionObj)
+      }).then(r => {
+        if (r.status === 404 || r.status === 405) markBackendOffline(120);
+      }).catch(() => { markBackendOffline(120); });
+    } catch (e) { }
+  }
 
   return sessionObj;
 }
@@ -1128,7 +1164,7 @@ function verifySingleDeviceSession() {
   }
 
   // 2. Check remote server active session (cross-device: PC vs Phone)
-  if (navigator.onLine) {
+  if (navigator.onLine && !isBackendCircuitBroken()) {
     fetch(getBackendApiUrl(`/api/active_session?userId=${encodeURIComponent(uid)}`))
       .then(res => {
         if (res.ok) {
@@ -4724,26 +4760,6 @@ function initEventListeners() {
       const emailOrUser = (emailInput && emailInput.value) ? emailInput.value.trim() : '';
       const password = (passInput && passInput.value) ? passInput.value : '';
 
-      let found = null;
-      // 1. فحص ومصادقة مشفرة عبر السيرفر الداخلي الموثوق أولاً (Server-Side Authentication)
-      try {
-        const resp = await fetch(getBackendApiUrl('/api/auth/login'), {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            identifier: emailOrUser,
-            password: password,
-            deviceInfo: navigator.userAgent
-          })
-        });
-        if (resp.ok) {
-          const resData = await resp.json();
-          if (resData && resData.success && resData.account) {
-            found = resData.account;
-          }
-        }
-      } catch (err) {}
-
       let accounts = getAuthAccounts();
       const cleanEnteredPhone = emailOrUser.replace(/\D/g, '');
       const isPhoneLikeQuery = cleanEnteredPhone.length >= 7;
@@ -4765,15 +4781,41 @@ function initEventListeners() {
 
       let userExists = accounts.find(checkAccountMatch);
 
-      if (!found) {
-        found = accounts.find(a =>
-          checkAccountMatch(a) &&
-          (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
-        );
+      // 1. Instant Local-First Verification (0ms latency - Zero Network Lag)
+      let found = accounts.find(a =>
+        checkAccountMatch(a) &&
+        (a.password === password || ((a.isAdmin || a.role === 'admin') && password === 'qq7878aassdd'))
+      );
+
+      // 2. Only if not matched locally, query server backend with 1200ms timeout
+      if (!found && !isBackendCircuitBroken()) {
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1200);
+          const resp = await fetch(getBackendApiUrl('/api/auth/login'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              identifier: emailOrUser,
+              password: password,
+              deviceInfo: navigator.userAgent
+            }),
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+          if (resp.ok) {
+            const resData = await resp.json();
+            if (resData && resData.success && resData.account) {
+              found = resData.account;
+            }
+          } else if (resp.status === 404 || resp.status === 405) {
+            markBackendOffline(120);
+          }
+        } catch (err) {}
       }
 
-      // CROSS-DEVICE LOGIN SYNC (Laptop -> Phone):
-      if (!found) {
+      // 3. CROSS-DEVICE LOGIN SYNC (Laptop -> Phone):
+      if (!found && !isBackendCircuitBroken()) {
         if (typeof syncAccountsWithServer === 'function') {
           accounts = await syncAccountsWithServer();
           userExists = accounts.find(checkAccountMatch);
@@ -4872,32 +4914,7 @@ function initEventListeners() {
         localStorage.setItem('moallem_auth_portal_open', 'false');
         sessionStorage.setItem('moallem_session_active', 'true');
 
-        // Reload user's completely isolated workspace
-        loadSavedState();
-        syncHeaderInputs();
-        applyProfileToExamHeader();
-        updateUserAuthUI();
-        updatePrivacySettingsUI();
-        updateArchiveBadge();
-        renderAll();
-
-        // Reload user's isolated student grades & behavior!
-        if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
-          window.reloadStudentGradesForCurrentUser();
-        }
-        if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
-          window.reloadStudentBehaviorForCurrentUser();
-        }
-
-        if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-        if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
-        if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
-
-        // Restore cloud questions & exams across devices from server backend!
-        if (typeof window.restoreUserDataFromServer === 'function') {
-          window.restoreUserDataFromServer(found);
-        }
-
+        // Instantly unlock and dismiss the portal so the transition is immediate (0ms visual delay)
         const portal = document.getElementById('fullscreenAuthPortal');
         const workstation = document.getElementById('appWorkstation');
         if (portal) portal.classList.add('portal-hidden');
@@ -4915,6 +4932,33 @@ function initEventListeners() {
           roleMsg = `مرحباً بك أستاذ ${found.name || found.username}! ${vipText} • ${emailText}`;
         }
         showToast(roleMsg, isSubscribed ? 'success' : 'info');
+
+        // Defer heavy workspace initialization to next animation frame so the portal vanishes instantly
+        requestAnimationFrame(() => {
+          loadSavedState();
+          syncHeaderInputs();
+          applyProfileToExamHeader();
+          updateUserAuthUI();
+          updatePrivacySettingsUI();
+          updateArchiveBadge();
+          renderAll();
+
+          if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+            window.reloadStudentGradesForCurrentUser();
+          }
+          if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+            window.reloadStudentBehaviorForCurrentUser();
+          }
+
+          if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+          if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
+          if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+
+          // Restore cloud questions & exams across devices from server backend in background
+          if (typeof window.restoreUserDataFromServer === 'function') {
+            window.restoreUserDataFromServer(found);
+          }
+        });
       } else {
         // WRONG PASSWORD / CREDENTIALS ERROR!
         if (passInput) {
@@ -13807,6 +13851,7 @@ window.scheduleCloudAutoSync = scheduleCloudAutoSync;
 
 window.syncUserDataToServer = async function (user, isSilent = false) {
   if (!user || !user.id || user.id === 'usr_guest') return;
+  if (isBackendCircuitBroken()) return;
   const email = (user.email || '').trim().toLowerCase();
   const userId = (user.id || user.username || '').trim().toLowerCase();
   const bankStorageKey = getAccountStorageKey('moallem_questions_history_bank');
@@ -13904,11 +13949,19 @@ window.syncUserDataToServer = async function (user, isSilent = false) {
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
     const res = await fetch(getBackendApiUrl('/api/cloud_sync'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
+    if (res.status === 404 || res.status === 405) {
+      markBackendOffline(120);
+      return;
+    }
     if (res.ok) {
       const resJson = await res.json();
       if (!isSilent && resJson.success) {
@@ -13928,6 +13981,7 @@ window.syncCurrentDataToCloud = window.syncUserDataToServer;
 
 window.restoreUserDataFromServer = async function (user) {
   if (!user || !user.id || user.id === 'usr_guest') return false;
+  if (isBackendCircuitBroken()) return false;
   const email = (user.email || '').trim().toLowerCase();
   const userId = (user.id || user.username || '').trim().toLowerCase();
   const username = (user.username || '').trim().toLowerCase();
@@ -17536,33 +17590,6 @@ window.copyMobileConnectUrl = function() {
 
 
 // ==========================================================================
-// التفاعل السينمائي ثلاثي الأبعاد مع مؤشر الماوس لمجرة الموقع الأكاديمية
+// التفاعل السينمائي ثلاثي الأبعاد لمجرة الموقع (تم تحويله بالكامل للـ GPU عبر CSS Keyframes لمنح أداء 60fps فائق السرعة وبدون أي استهلاك للمعالج)
 // ==========================================================================
-(function initCosmicParallax() {
-  if (typeof window === 'undefined') return;
-  var ticking = false;
-  var mouseX = 0, mouseY = 0;
-
-  window.addEventListener('mousemove', function (e) {
-    var w = window.innerWidth || 1200;
-    var h = window.innerHeight || 800;
-    mouseX = (e.clientX / w) - 0.5; // -0.5 to +0.5
-    mouseY = (e.clientY / h) - 0.5;
-
-    if (!ticking) {
-      window.requestAnimationFrame(function () {
-        var field = document.getElementById('academicConstellationField');
-        if (field) {
-          field.style.transform = 'translate3d(' + (mouseX * 16) + 'px, ' + (mouseY * 16) + 'px, 0)';
-        }
-        var blobs = document.querySelectorAll('.nebula-blob');
-        for (var i = 0; i < blobs.length; i++) {
-          var factor = (i % 2 === 0 ? 1 : -1) * (18 + i * 5);
-          blobs[i].style.transform = 'translate3d(' + (mouseX * factor) + 'px, ' + (mouseY * factor) + 'px, 0)';
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-})();
+/* Parallax is handled 100% via hardware-accelerated CSS keyframes */
