@@ -44,3 +44,5 @@ data/server_meta.json
 
 supabase_secrets.json
 .env
+# Electron desktop distribution
+dist_installer/

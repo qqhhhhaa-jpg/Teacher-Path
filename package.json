@@ -2,11 +2,13 @@
   "name": "masar-almoallem",
   "version": "4.0.0",
   "description": "منصة مسار المعلم الذكية لإعداد وتصميم وتوليد الاختبارات الوزارية والمدرسية العراقية",
-  "main": "index.html",
+  "main": "electron-main.js",
   "scripts": {
     "start": "python -m http.server 3000",
     "pdf-service": "node server_pdf.mjs",
-    "test": "node --check js/app.js && node --check js/smart-generator.js"
+    "test": "node --check js/app.js && node --check js/smart-generator.js",
+    "desktop:start": "electron .",
+    "desktop:build": "electron-builder --win --x64"
   },
   "keywords": [
     "iraq",
@@ -20,6 +22,8 @@
   "author": "الأستاذ حسين",
   "license": "MIT",
   "devDependencies": {
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
     "puppeteer-core": "^25.13.0"
   },
   "dependencies": {
@@ -29,5 +33,46 @@
     "p-queue": "^10.0.0",
     "playwright": "^1.64.1",
     "playwright-core": "^1.64.1"
+  },
+  "build": {
+    "appId": "iq.moallem.platform",
+    "productName": "منصة المعلم",
+    "directories": {
+      "output": "dist_installer"
+    },
+    "files": [
+      "index.html",
+      "print.html",
+      "electron-main.js",
+      "package.json",
+      "css/**/*",
+      "js/**/*",
+      "assets/**/*",
+      "!dist_installer/**/*",
+      "!node_modules/**/*",
+      "!scratch/**/*",
+      "!*.log",
+      "!*.py",
+      "!*.bat",
+      "!*.sh"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "منصة المعلم",
+      "uninstallDisplayName": "إلغاء تثبيت منصة المعلم"
+    }
   }
 }
