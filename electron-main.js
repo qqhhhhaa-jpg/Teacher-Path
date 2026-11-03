@@ -1,9 +1,11 @@
 // ==========================================================================
 // منصة المعلم — مشغل سطح المكتب لنظام التشغيل ويندوز (Windows Desktop Host)
+// مع نظام التحديث التلقائي الصامت المتصل بـ GitHub Releases (Auto-Updater)
 // ==========================================================================
 
 const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const path = require('path');
+const { autoUpdater } = require('electron-updater');
 
 // منع تكرار فتح عدة نوافذ لنفس التطبيق (Single Instance Lock)
 const gotTheLock = app.requestSingleInstanceLock();
@@ -34,7 +36,8 @@ if (!gotTheLock) {
         nodeIntegration: false,
         contextIsolation: true,
         webSecurity: true,
-        spellcheck: false
+        spellcheck: false,
+        preload: path.join(__dirname, 'preload.js')
       }
     });
 
@@ -45,13 +48,17 @@ if (!gotTheLock) {
     mainWindow.once('ready-to-show', () => {
       mainWindow.maximize();
       mainWindow.show();
+
+      // فحص التحديثات التلقائية في الخلفية بهدوء
+      setTimeout(() => {
+        setupAutoUpdater();
+      }, 4000);
     });
 
     // إدارة نوافذ المعاينة والطباعة (print.html)
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
       // إذا كان الرابط خارجياً (مثل رابط يوتيوب أو تيليجرام)، افتحه في متصفح النظام الافتراضي
       if (url.startsWith('http://') || url.startsWith('https://')) {
-        // إذا كان رابط خارجي افتحه في المتصفح الخارجي
         if (!url.includes('localhost') && !url.includes('127.0.0.1')) {
           shell.openExternal(url);
           return { action: 'deny' };
@@ -80,6 +87,63 @@ if (!gotTheLock) {
     });
   }
 
+  // ==========================================================================
+  // إعدادات التحديث التلقائي الصامت عبر GitHub Releases
+  // ==========================================================================
+  function setupAutoUpdater() {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    autoUpdater.on('update-available', (info) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('updater-message', {
+          status: 'available',
+          version: info.version,
+          message: `يتوفر إصدار جديد (${info.version})، جاري التنزيل في الخلفية تلقائياً...`
+        });
+      }
+    });
+
+    autoUpdater.on('download-progress', (progressObj) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('updater-message', {
+          status: 'downloading',
+          percent: Math.round(progressObj.percent)
+        });
+      }
+    });
+
+    autoUpdater.on('update-downloaded', (info) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('updater-message', {
+          status: 'downloaded',
+          version: info.version,
+          message: `تم تنزيل الإصدار الجديد (${info.version}) بنجاح! جاهز للتطبيق الفوري.`
+        });
+      }
+    });
+
+    autoUpdater.on('error', (err) => {
+      // تجاهل أخطاء عدم الاتصال بهدوء لضمان تجربة مستخدم سلسة
+      console.log('[AutoUpdater] Notice:', err ? err.message : err);
+    });
+
+    // افحص إذا كان التطبيق مجمّعاً وليس في بيئة التطوير
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdates().catch(() => {});
+    }
+  }
+
+  ipcMain.on('check-for-updates', () => {
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdates().catch(() => {});
+    }
+  });
+
+  ipcMain.on('restart-and-install-update', () => {
+    autoUpdater.quitAndInstall();
+  });
+
   app.whenReady().then(() => {
     createWindow();
 
@@ -94,4 +158,3 @@ if (!gotTheLock) {
     }
   });
 }
-
