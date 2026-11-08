@@ -516,6 +516,32 @@ def api_gcloud_gemini():
     except Exception as e:
         return jsonify({"success": False, "message": f"تعذر الاتصال بـ Gemini API: {str(e)}"}), 500
 
+# In-memory mailbox for Mobile-to-Laptop QR Paper Scanner Bridge
+_PAPER_SCAN_SESSIONS = {}
+
+@app.route('/api/paper-scan/bridge/<session_id>', methods=['GET', 'POST'])
+def api_paper_scan_bridge(session_id):
+    sid = (session_id or '').strip()[:64]
+    if not sid:
+        return jsonify({"success": False, "message": "معرف الجلسة غير صالح"}), 400
+
+    if request.method == 'POST':
+        payload = request.get_json(force=True, silent=True) or {}
+        _PAPER_SCAN_SESSIONS[sid] = {
+            "status": payload.get("status", "received"),
+            "imageDataUrl": payload.get("imageDataUrl", ""),
+            "rawText": payload.get("rawText", ""),
+            "questions": payload.get("questions", []),
+            "updatedAt": datetime.now().isoformat()
+        }
+        return jsonify({"success": True, "sessionId": sid}), 200
+
+    # GET: Laptop polls or checks session state
+    data = _PAPER_SCAN_SESSIONS.get(sid)
+    if not data:
+        return jsonify({"success": True, "status": "waiting"}), 200
+    return jsonify({"success": True, **data}), 200
+
 @app.route('/api/gcloud/sync', methods=['GET', 'POST'])
 def api_gcloud_sync():
     os.makedirs(DATA_DIR, exist_ok=True)
