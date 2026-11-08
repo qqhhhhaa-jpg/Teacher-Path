@@ -464,25 +464,40 @@ def api_gcloud_gemini():
     api_key = (payload.get('apiKey') or cfg.get('apiKey') or '').strip()
     model = (payload.get('model') or cfg.get('geminiModel') or 'gemini-2.5-flash').strip()
     prompt_text = (payload.get('prompt') or '').strip()
+    image_b64 = (payload.get('imageBase64') or '').strip()
+    mime_type = (payload.get('mimeType') or 'image/jpeg').strip()
 
-    if not prompt_text:
-        return jsonify({"success": False, "message": "يرجى إدخال نص الطلب أو الموضوع لتوليد الأسئلة"}), 400
+    if not prompt_text and not image_b64:
+        return jsonify({"success": False, "message": "يرجى إدخال نص الطلب أو رفع صورة الورقة لتوليد الأسئلة"}), 400
 
     if not api_key:
         return jsonify({"success": False, "message": "يرجى إدخال مفتاح Google Gemini API Key في تبويب إعدادات البوابة أولاً"}), 400
 
+    parts_list = []
+    if prompt_text:
+        parts_list.append({"text": prompt_text})
+    if image_b64:
+        if ',' in image_b64:
+            image_b64 = image_b64.split(',', 1)[1]
+        parts_list.append({
+            "inline_data": {
+                "mime_type": mime_type,
+                "data": image_b64
+            }
+        })
+
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
     body = json.dumps({
-        "contents": [{"parts": [{"text": prompt_text}]}],
+        "contents": [{"parts": parts_list}],
         "generationConfig": {
-            "temperature": float(payload.get("temperature", 0.4)),
+            "temperature": float(payload.get("temperature", 0.3)),
             "maxOutputTokens": int(payload.get("maxOutputTokens", 4096))
         }
     }).encode('utf-8')
 
     try:
         req = urllib.request.Request(url, data=body, headers={'Content-Type': 'application/json'}, method='POST')
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=45) as resp:
             raw = json.loads(resp.read().decode('utf-8'))
             candidates = raw.get('candidates') or []
             reply_text = ''
