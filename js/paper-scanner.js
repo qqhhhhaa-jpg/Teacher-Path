@@ -1292,13 +1292,14 @@
         return;
       }
 
-      // المرحلة 2: محرك الرؤية البصرية الذكي للخط اليدوي العربي (Qari-VL & KATIB-VL & Nanonets-VL Vision AI)
+      // المرحلة 2: محرك الرؤية البصرية الذكي للخط اليدوي العربي (Cloud Handwriting Engine 3 + Qari Vision AI)
       // يقرأ خط اليد البشري الطبيعي مباشرة من الصورة كما تراه عين الأستاذ بدون الحاجة لأي مفتاح!
       showScannerProgress(true, 'جاري قراءة خط اليد البشري بمحرك الرؤية البصرية الذكي (Vision AI)...', 45);
       let rawOcrText = await recognizeWithArabicVisionAI(imageObj.dataUrl);
+      let usedVisionAI = Boolean(rawOcrText && rawOcrText.trim().length >= 4);
 
       // المرحلة 3 (احتياطي): القارئ الضوئي العربي المحلي إذا تعذر الاتصال السحابي
-      if (!rawOcrText || rawOcrText.trim().length < 4) {
+      if (!usedVisionAI) {
         showScannerProgress(true, 'جاري تشغيل القارئ الضوئي العربي المساند...', 60);
         rawOcrText = await recognizeWithTesseractOCR(
           imageObj.enhancedDataUrl || imageObj.dataUrl,
@@ -1309,22 +1310,17 @@
       // المرحلة 4: تنقية النص العربي وتقسيم السطور والأسئلة والفروع
       let cleanedText = cleanArabicOcrText(rawOcrText, subjectMode);
 
-      // المرحلة 5: المصحح اللغوي السحابي التلقائي بالذكاء الاصطناعي لتصحيح وتنسيق الأسئلة
+      // المرحلة 5: عرض وتقسيم الأسئلة مباشرة إذا قرأها محرك الرؤية البصري بدقة، أو تدقيقها إذا جاءت من القارئ المحلي
       if (cleanedText && cleanedText.trim().length > 4) {
-        showScannerProgress(true, 'جاري تدقيق النص العربي وتوزيع الأسئلة والدرجات تلقائياً...', 85);
-        const aiRefined = await refineArabicOcrWithCloudAI(cleanedText, subjectMode);
-        if (aiRefined && aiRefined.rawText && aiRefined.rawText.trim().length > 5) {
-          cleanedText = cleanArabicOcrText(aiRefined.rawText, subjectMode);
-          if (rawTextarea) rawTextarea.value = cleanedText;
-          if (Array.isArray(aiRefined.questions) && aiRefined.questions.length > 0) {
-            currentParsedQuestions = normalizeAiQuestionsArray(aiRefined.questions);
-          } else {
-            currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
+        if (!usedVisionAI) {
+          showScannerProgress(true, 'جاري تدقيق النص العربي وتوزيع الأسئلة والدرجات تلقائياً...', 85);
+          const aiRefined = await refineArabicOcrWithCloudAI(cleanedText, subjectMode);
+          if (aiRefined && aiRefined.rawText && aiRefined.rawText.trim().length > 5) {
+            cleanedText = cleanArabicOcrText(aiRefined.rawText, subjectMode);
           }
-        } else {
-          if (rawTextarea) rawTextarea.value = cleanedText;
-          currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
         }
+        if (rawTextarea) rawTextarea.value = cleanedText;
+        currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
 
         showScannerProgress(true, 'تمت قراءة خط اليد البشري وتقسيم الأسئلة بنجاح!', 100);
         renderScannedQuestionsPreview();
@@ -1391,38 +1387,98 @@
     }
   }
 
+  function compressImageForVisionApi(srcDataUrl, maxDim = 1350, quality = 0.78) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width;
+        let h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w > h) {
+            h = Math.round((h * maxDim) / w);
+            w = maxDim;
+          } else {
+            w = Math.round((w * maxDim) / h);
+            h = maxDim;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(srcDataUrl);
+      img.src = srcDataUrl;
+    });
+  }
+
+  async function callCloudHandwritingEngine3(compressedDataUrl, engineNum = '3') {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 16000);
+    try {
+      const form = new URLSearchParams();
+      form.append('apikey', 'helloworld');
+      form.append('base64Image', compressedDataUrl);
+      form.append('OCREngine', String(engineNum));
+      form.append('scale', 'true');
+      form.append('isTable', 'false');
+
+      const resp = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        body: form,
+        signal: controller.signal
+      });
+      if (!resp.ok) return '';
+      const data = await resp.json();
+      if (data && Array.isArray(data.ParsedResults) && data.ParsedResults[0]) {
+        const raw = data.ParsedResults[0].ParsedText || '';
+        return raw.replace(/\[Note:[\s\S]*?\]\s*/gi, '').trim();
+      }
+      return '';
+    } catch (e) {
+      return '';
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
   async function recognizeWithArabicVisionAI(imageDataUrl) {
     if (!imageDataUrl) return '';
 
+    // ضغط الصورة بذكاء لتكون أقل من 450KB لضمان سرعة فائقة وعدم رفض الصور الكبيرة من كاميرا الموبايل
+    const compressedUrl = await compressImageForVisionApi(imageDataUrl, 1350, 0.78);
+
+    // 1. المحرك الأساسي الأول: Cloud Handwriting Vision Engine 3 (قارئ خط اليد العربي السحابي السريع)
+    showScannerProgress(true, 'جاري قراءة خط اليد البشري عبر محرك الرؤية السحابي (Cloud Handwriting Vision)...', 50);
+    let text = await callCloudHandwritingEngine3(compressedUrl, '3');
+    if (text && text.trim().length > 4) {
+      return text;
+    }
+
+    // 2. المحرك الثاني: Qari OCR 0.2.2.1 (نموذج رؤية بصري متخصص بالخط العربي واليدوي)
     const fileObj = {
       path: null,
-      url: imageDataUrl,
+      url: compressedUrl,
       size: null,
       orig_name: 'handwritten_exam_paper.jpg',
       mime_type: 'image/jpeg',
       is_stream: false,
       meta: { _type: 'gradio.FileData' }
     };
-
-    // 1. المحرك الأول: Qari OCR 0.2.2.1 (نموذج رؤية بصري متخصص بالخط العربي واليدوي)
-    showScannerProgress(true, 'جاري قراءة خط اليد البشري عبر محرك الرؤية البصري (Qari Vision AI)...', 52);
+    showScannerProgress(true, 'جاري فحص تفاصيل الخط اليدوي عبر محرك الرؤية البصري (Qari Vision AI)...', 62);
     const qariHost = 'https://oddadmix-arabic-ocr-models-demos.hf.space';
-    let text = await callGradioVisionSpace(qariHost, 'perform_ocr', [fileObj, 'Qari OCR 0.2.2.1'], 26000);
+    text = await callGradioVisionSpace(qariHost, 'perform_ocr', [fileObj, 'Qari OCR 0.2.2.1'], 12000);
     if (text && text.trim().length > 4) {
       return text;
     }
 
-    // 2. المحرك الثاني: KATIB OCR 0.8B (نموذج رؤية عربي سريع للخطوط اليدوية)
-    showScannerProgress(true, 'جاري فحص تفاصيل الخط اليدوي عبر محرك (KATIB Vision AI)...', 62);
-    text = await callGradioVisionSpace(qariHost, 'perform_ocr', [fileObj, 'KATIB OCR 0.8B 0.1'], 24000);
-    if (text && text.trim().length > 4) {
-      return text;
-    }
-
-    // 3. المحرك الثالث: Nanonets Vision OCR (نموذج Qwen2.5-VL لقراءة الوثائق وخط اليد)
-    showScannerProgress(true, 'جاري قراءة الورقة عبر محرك الرؤية المتقدم (Nanonets VL)...', 70);
-    const nanoHost = 'https://mohamedrashad-nanonets-ocr.hf.space';
-    text = await callGradioVisionSpace(nanoHost, 'ocr_image_gradio', [fileObj, 2048], 26000);
+    // 3. المحرك الثالث: Cloud Vision Engine 2 المساند
+    showScannerProgress(true, 'جاري قراءة الورقة عبر محرك الرؤية المساند...', 72);
+    text = await callCloudHandwritingEngine3(compressedUrl, '2');
     if (text && text.trim().length > 4) {
       return text;
     }
@@ -1437,6 +1493,7 @@
   function cleanArabicOcrText(rawText, subjectMode = 'arabic') {
     if (!rawText) return '';
     let txt = String(rawText)
+      .replace(/\[Note:[\s\S]*?\]\s*/gi, '')
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/p>|<\/div>|<\/li>/gi, '\n')
       .replace(/<[^>]+>/g, ' ')
