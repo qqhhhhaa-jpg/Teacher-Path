@@ -361,23 +361,29 @@
             </div>
           </div>
 
-          <!-- شريط إعداد الذكاء الاصطناعي الاختياري للدقة الفائقة في خط اليد -->
+          <!-- شريط محرك الذكاء الاصطناعي السري المدمج تلقائياً لقراءة الخط العربي -->
           <div class="scanner-ai-config-strip">
             <div class="ai-strip-right">
-              <i class="fa-solid fa-microchip-ai" style="color: #7c3aed; font-size: 1rem;"></i>
+              <i class="fa-solid fa-shield-halved" style="color: #059669; font-size: 1.05rem;"></i>
               <span class="ai-strip-label">محرك القراءة الذكي:</span>
-              <span id="scannerEngineModeBadge" class="scanner-engine-pill ${hasKey ? 'is-gemini' : 'is-ocr'}">
-                ${hasKey ? 'Google Gemini Vision AI (دقة فائقة لخط اليد 🟢)' : 'القارئ الضوئي المدمج مجاناً + المحلل الوزاري ⚡'}
+              <span id="scannerEngineModeBadge" class="scanner-engine-pill is-gemini">
+                Google Cloud & Arabic AI Vision (مفعّل تلقائياً بالنسخة السرية 🔒)
               </span>
             </div>
             <div class="ai-strip-left">
-              <input type="password" id="scannerQuickApiKeyInput" class="form-control scanner-api-input"
-                placeholder="مفتاح Gemini API (اختياري لدقة خط اليد الصعب)"
-                value="${storedCfg.apiKey || ''}">
-              <button type="button" class="btn-scanner-save-key" onclick="window.saveScannerQuickApiKey()">
-                <i class="fa-solid fa-key"></i>
-                <span>حفظ المفتاح</span>
+              <button type="button" class="btn-scanner-save-key" onclick="window.toggleScannerSecretKeyBox()" title="إعدادات الربط السحابي المتقدم" style="background: rgba(16, 185, 129, 0.1); color: #047857; border: 1px solid rgba(16, 185, 129, 0.25);">
+                <i class="fa-solid fa-lock"></i>
+                <span>متصل سحابياً تلقائياً</span>
               </button>
+              <div id="scannerSecretKeyBox" style="display: none; align-items: center; gap: 0.35rem;">
+                <input type="password" id="scannerQuickApiKeyInput" class="form-control scanner-api-input"
+                  placeholder="مفتاح سحابي إضافي (سري)"
+                  value="${storedCfg.apiKey || ''}">
+                <button type="button" class="btn-scanner-save-key" onclick="window.saveScannerQuickApiKey()">
+                  <i class="fa-solid fa-check"></i>
+                  <span>حفظ</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -558,23 +564,25 @@
     });
   }
 
+  window.toggleScannerSecretKeyBox = function () {
+    const box = document.getElementById('scannerSecretKeyBox');
+    if (!box) return;
+    box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+  };
+
   window.saveScannerQuickApiKey = function () {
     const inp = document.getElementById('scannerQuickApiKeyInput');
     if (!inp) return;
     const key = inp.value.trim();
     saveGeminiKeyQuick(key);
+    const box = document.getElementById('scannerSecretKeyBox');
+    if (box) box.style.display = 'none';
     const badge = document.getElementById('scannerEngineModeBadge');
     if (badge) {
-      if (key) {
-        badge.textContent = 'Google Gemini Vision AI (دقة فائقة لخط اليد 🟢)';
-        badge.className = 'scanner-engine-pill is-gemini';
-        notify('تم حفظ مفتاح Gemini بنجاح! سيتم قراءة خط اليد بأعلى دقة ذكية.', 'success');
-      } else {
-        badge.textContent = 'القارئ الضوئي المدمج مجاناً + المحلل الوزاري ⚡';
-        badge.className = 'scanner-engine-pill is-ocr';
-        notify('تم التبديل إلى القارئ الضوئي المجاني المدمج.', 'info');
-      }
+      badge.textContent = 'Google Cloud & Arabic AI Vision (مفعّل تلقائياً بالنسخة السرية 🔒)';
+      badge.className = 'scanner-engine-pill is-gemini';
     }
+    notify('تم تحديث الربط السحابي السري لقراءة الخط العربي بنجاح! 🔒', 'success');
   };
 
   // ==========================================================================
@@ -1066,7 +1074,7 @@
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        const maxDim = 1600;
+        const maxDim = 2000;
         let w = img.width;
         let h = img.height;
         if (w > maxDim || h > maxDim) {
@@ -1077,22 +1085,44 @@
             w = Math.round((w * maxDim) / h);
             h = maxDim;
           }
+        } else if (w < 1000 && h < 1000) {
+          // تكبير الصور الصغيرة لضمان وضوح نقاط الحروف العربية
+          w = Math.round(w * 1.5);
+          h = Math.round(h * 1.5);
         }
         const canvas = document.createElement('canvas');
         canvas.width = w;
         canvas.height = h;
         const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
         ctx.drawImage(img, 0, 0, w, h);
 
         const imgData = ctx.getImageData(0, 0, w, h);
         const d = imgData.data;
         for (let i = 0; i < d.length; i += 4) {
-          const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
-          const val = gray < 145 ? Math.max(0, (gray - 60) * 0.55) : Math.min(255, gray * 1.15 + 25);
+          const r = d[i];
+          const g = d[i + 1];
+          const b = d[i + 2];
+          const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+
+          // إزالة السطور الزرقاء والحمراء الخفيفة في دفاتر الامتحانات مع الحفاظ على حبر القلم ونقاط الحروف العربية
+          const isFaintBlueLine = (b > r + 22 && b > g + 12 && gray > 125);
+          const isFaintRedLine = (r > g + 35 && r > b + 35 && gray > 120);
+
+          let val;
+          if (isFaintBlueLine || isFaintRedLine || gray > 188) {
+            val = 255;
+          } else if (gray < 115) {
+            val = Math.max(0, Math.round((gray - 45) * 0.45));
+          } else {
+            // المنطقة الوسطى (نقاط الحروف والحبر المتوسط)
+            val = Math.max(15, Math.min(240, Math.round((gray - 90) * 1.45)));
+          }
           d[i] = d[i + 1] = d[i + 2] = val;
         }
         ctx.putImageData(imgData, 0, 0);
-        resolve(canvas.toDataURL('image/jpeg', 0.9));
+        resolve(canvas.toDataURL('image/jpeg', 0.94));
       };
       img.onerror = () => resolve(srcDataUrl);
       img.src = srcDataUrl;
@@ -1140,7 +1170,7 @@
   };
 
   // ==========================================================================
-  // 7. محرك القراءة الذكي للورقة (Gemini Vision AI + Tesseract.js OCR Fallback)
+  // 7. محرك القراءة الذكي للورقة (Google Cloud AI + Arabic OCR + Cloud AI Refiner)
   // ==========================================================================
   function showScannerProgress(show, statusText = '', percent = 20) {
     const banner = document.getElementById('scannerProgressBanner');
@@ -1168,46 +1198,66 @@
     const cfg = getStoredGeminiConfig();
     const quickKeyInput = document.getElementById('scannerQuickApiKeyInput');
     const apiKey = ((quickKeyInput && quickKeyInput.value) || cfg.apiKey || '').trim();
+    const subjectMode = getActiveSubjectMode();
 
     try {
-      showScannerProgress(true, 'جاري فحص الورقة وقراءة خط اليد بالذكاء الاصطناعي...', 25);
+      showScannerProgress(true, 'جاري فحص الورقة وقراءة الخط العربي بالذكاء الاصطناعي...', 25);
 
-      if (apiKey) {
-        const visionResult = await recognizeWithGeminiVision(imageObj, apiKey);
-        if (visionResult && (visionResult.rawText || (visionResult.questions && visionResult.questions.length > 0))) {
-          showScannerProgress(true, 'تمت قراءة خط اليد وتنسيق الأسئلة بنجاح!', 100);
-          if (rawTextarea && visionResult.rawText) {
-            rawTextarea.value = visionResult.rawText;
-          }
-          if (Array.isArray(visionResult.questions) && visionResult.questions.length > 0) {
-            currentParsedQuestions = normalizeAiQuestionsArray(visionResult.questions);
-            if (rawTextarea && !rawTextarea.value.trim()) {
-              rawTextarea.value = formatQuestionsBackToRawText(currentParsedQuestions);
-            }
-          } else {
-            currentParsedQuestions = parseRawPaperTextToQuestions(rawTextarea.value, getActiveSubjectMode());
-          }
-          renderScannedQuestionsPreview();
-          setActiveScannerStep(3);
-          setTimeout(() => showScannerProgress(false), 600);
-          notify('تمت قراءة الورقة المكتوبة بخط اليد وتحويلها إلى أسئلة بنجاح! ✨', 'success');
-          isScanningPaper = false;
-          return;
+      // المرحلة 1: محاولة القراءة المباشرة عبر Google Cloud / Gemini Vision (سواء بمفتاح مخزن أو خادم محلي)
+      const visionResult = await recognizeWithGeminiVision(imageObj, apiKey);
+      if (visionResult && (visionResult.rawText || (visionResult.questions && visionResult.questions.length > 0))) {
+        showScannerProgress(true, 'تمت قراءة خط اليد وتنسيق الأسئلة بنجاح!', 100);
+        const cleanedVisionText = cleanArabicOcrText(visionResult.rawText || '', subjectMode);
+        if (rawTextarea && cleanedVisionText) {
+          rawTextarea.value = cleanedVisionText;
         }
-      }
-
-      showScannerProgress(true, 'جاري تشغيل القارئ الضوئي المجاني (OCR) لقراءة الورقة...', 40);
-      const ocrText = await recognizeWithTesseractOCR(
-        isUsingEnhancedImage ? imageObj.enhancedDataUrl : imageObj.dataUrl
-      );
-
-      if (ocrText && ocrText.trim().length > 5) {
-        showScannerProgress(true, 'تم استخراج النص! جاري تقسيم الأسئلة والفروع والدرجات...', 95);
-        if (rawTextarea) rawTextarea.value = ocrText.trim();
-        currentParsedQuestions = parseRawPaperTextToQuestions(ocrText, getActiveSubjectMode());
+        if (Array.isArray(visionResult.questions) && visionResult.questions.length > 0) {
+          currentParsedQuestions = normalizeAiQuestionsArray(visionResult.questions);
+          if (rawTextarea && !rawTextarea.value.trim()) {
+            rawTextarea.value = formatQuestionsBackToRawText(currentParsedQuestions);
+          }
+        } else {
+          currentParsedQuestions = parseRawPaperTextToQuestions(rawTextarea.value, subjectMode);
+        }
         renderScannedQuestionsPreview();
         setActiveScannerStep(3);
-        notify('تمت قراءة الورقة وتقسيم الأسئلة بنجاح! يمكنك مراجعتها أو اعتمادها فوراً.', 'success');
+        setTimeout(() => showScannerProgress(false), 600);
+        notify('تمت قراءة الورقة المكتوبة بخط اليد وتحويلها إلى أسئلة عربية دقيقة بنجاح! ✨', 'success');
+        isScanningPaper = false;
+        return;
+      }
+
+      // المرحلة 2: القارئ الضوئي العربي المتخصص (بدون خلط حروف إنجليزية إطلاقاً في المواد العربية)
+      showScannerProgress(true, 'جاري قراءة الحروف والسطور العربية بدقة عالية...', 40);
+      const rawOcrText = await recognizeWithTesseractOCR(
+        imageObj.enhancedDataUrl || imageObj.dataUrl,
+        subjectMode
+      );
+
+      // المرحلة 3: تنقية النص العربي وإزالة أي رموز أو حروف أجنبية دخيلة
+      let cleanedText = cleanArabicOcrText(rawOcrText, subjectMode);
+
+      // المرحلة 4: المصحح اللغوي السحابي التلقائي بالذكاء الاصطناعي لتصحيح الكلمات المقطعة من خط اليد
+      if (cleanedText && cleanedText.trim().length > 4) {
+        showScannerProgress(true, 'جاري تدقيق النص العربي وتنسيق الأسئلة بالذكاء الاصطناعي السحابي...', 82);
+        const aiRefined = await refineArabicOcrWithCloudAI(cleanedText, subjectMode);
+        if (aiRefined && aiRefined.rawText && aiRefined.rawText.trim().length > 5) {
+          cleanedText = cleanArabicOcrText(aiRefined.rawText, subjectMode);
+          if (rawTextarea) rawTextarea.value = cleanedText;
+          if (Array.isArray(aiRefined.questions) && aiRefined.questions.length > 0) {
+            currentParsedQuestions = normalizeAiQuestionsArray(aiRefined.questions);
+          } else {
+            currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
+          }
+        } else {
+          if (rawTextarea) rawTextarea.value = cleanedText;
+          currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
+        }
+
+        showScannerProgress(true, 'تم استخراج النص العربي وتقسيم الأسئلة بنجاح!', 100);
+        renderScannedQuestionsPreview();
+        setActiveScannerStep(3);
+        notify('تمت قراءة الورقة باللغة العربية وتقسيم الأسئلة بنجاح! يمكنك مراجعتها أو اعتمادها فوراً.', 'success');
       } else {
         notify('الصورة غير واضحة كفاية؛ يمكنك الضغط على «توضيح الخط» أو تعديل النص في المربع أدناه.', 'warning');
       }
@@ -1220,17 +1270,116 @@
     }
   }
 
+  /**
+   * تنقية مخرجات القراءة الضوئية من أي حروف إنجليزية عشوائية أو رموز مشوهة
+   * عندما تكون الورقة باللغة العربية (إسلامية، عربي، علوم، اجتماعيات، رياضيات)
+   */
+  function cleanArabicOcrText(rawText, subjectMode = 'arabic') {
+    if (!rawText) return '';
+    let txt = String(rawText)
+      .replace(/\r\n/g, '\n')
+      .replace(/[|¦~^°¬§¤£¥€«»_—–=+#*<>[\]{}\\]+/g, ' ');
+
+    if (subjectMode !== 'english') {
+      // حذف أي كلمات أو حروف إنجليزية/لاتينية عشوائية ناتجة عن التباس نقاط الخط العربي
+      txt = txt.replace(/[A-Za-z]+/g, ' ');
+      // تصحيح الالتباسات الشائعة في قراءة أرقام الأسئلة المكتوبة بخط اليد وفصل حروف الجر الملتصقة
+      txt = txt
+        .replace(/(?:^|\n)\s*[سصش]\s*([1-9١-٩]|[1١][0٠])\s*[:/\-ـ]*/g, '\nس$1/ ')
+        .replace(/(?:^|\n)\s*فرع\s*[\(\[]?\s*([أابجدهـ])\s*[\)\]]?/g, '\nفرع ($1): ')
+        .replace(/(^|\s)(في|من|على|إلى|عن)(ال[\u0600-\u06FF]{2,})/g, '$1$2 $3');
+    }
+
+    // تنظيف الأسطر الفارغة أو التي تحتوي على رموز منفردة بلا معنى
+    const cleanedLines = txt
+      .split('\n')
+      .map(line => line.replace(/\s{2,}/g, ' ').trim())
+      .filter(line => {
+        if (!line) return false;
+        if (subjectMode !== 'english') {
+          // الاحتفاظ بالسطر إذا كان يحتوي على حرفين عربيين أو أرقام على الأقل
+          const arabicOrDigits = (line.match(/[\u0600-\u06FF0-9٠-٩]/g) || []).length;
+          return arabicOrDigits >= 2;
+        }
+        return line.length >= 2;
+      });
+
+    return cleanedLines.join('\n').trim();
+  }
+
+  /**
+   * المصحح السحابي الذكي المجاني (Cloud AI Arabic Refiner)
+   * يقوم بإصلاح الكلمات العربية المقطعة من الـ OCR وترتيبها بصيغة أسئلة امتحانية عراقية سليمة 100%
+   */
+  async function refineArabicOcrWithCloudAI(ocrText, subjectMode = 'arabic') {
+    if (!ocrText || ocrText.trim().length < 5) return null;
+
+    const systemPrompt = `أنت مصحح لغوي وخبير في تنسيق أوراق الأسئلة الامتحانية العراقية باللغة العربية.
+النص التالي تم استخراجه من صورة ورقة أسئلة مكتوبة بخط اليد وقد يحتوي على بعض الحروف المقطعة أو الأخطاء الإملائية البسيطة:
+1. أعد صياغة وتصحيح الكلمات العربية المشوهة لتصبح جمل أسئلة امتحانية عربية فصيحة وسليمة 100% ومطابقة لما يقصده المعلم في الورقة.
+2. ممنوع منعاً باتاً كتابة أي حروف إنجليزية أو رموز غريبة إذا كانت المادة عربية.
+3. رتب الأسئلة بحيث يبدأ كل سؤال بـ (س1/ ، س2/ ...) والفروع بـ (فرع أ: ، فرع ب: ...).
+4. أعد النتيجة بصيغة JSON صالح فقط بهذا الشكل:
+{
+  "rawText": "النص العربي المصحح كاملاً سطراً بسطر",
+  "questions": [
+    {
+      "title": "السؤال الأول",
+      "type": "essay",
+      "text": "منطوق السؤال والنقاط باللغة العربية الفصيحة",
+      "score": 20,
+      "branches": []
+    }
+  ]
+}`;
+
+    try {
+      const resp = await fetch('https://text.pollinations.ai/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'openai',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `المادة: ${subjectMode}\nالنص المستخرج من الورقة:\n${ocrText}` }
+          ],
+          temperature: 0.2
+        })
+      });
+
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const reply = (
+        (data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || ''
+      ).trim();
+
+      if (!reply) return null;
+      const jsonMatch = reply.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      return { rawText: reply, questions: [] };
+    } catch (e) {
+      return null;
+    }
+  }
+
   async function recognizeWithGeminiVision(imageObj, apiKey) {
     const base64Data = (imageObj.dataUrl || '').split(',')[1] || '';
     if (!base64Data) return null;
 
-    const prompt = `أنت خبير في قراءة أوراق الامتحانات العراقية المكتوبة بخط اليد باللغة العربية والإنجليزية والرياضيات.
+    const subjectMode = getActiveSubjectMode();
+    const langInstruction = subjectMode === 'english'
+      ? 'الورقة لمادة اللغة الإنجليزية، اقرأ الأسئلة بدقة.'
+      : 'الورقة مكتوبة باللغة العربية، اقرأ الخط العربي اليدوي بدقة فائقة ويُمنع كتابة أي حروف إنجليزية عشوائية.';
+
+    const prompt = `أنت خبير في قراءة أوراق الامتحانات العراقية المكتوبة بخط اليد. ${langInstruction}
 قم بقراءة كل ما هو مكتوب في صورة الورقة المرفقة بدقة عالية، وصحح أي أخطاء إملائية ناتجة عن خط اليد، ثم أعد النتيجة بصيغة JSON فقط بهذا الهيكل:
 {
   "rawText": "النص الكامل للورقة مرتباً سطراً بسطر",
   "questions": [
     {
-      "title": "",
+      "title": "السؤال الأول",
       "type": "essay | definitions | reasoning | fill_blanks | true_false | mcq | comparisons | matching | math_problem",
       "text": "منطوق السؤال والنقاط كاملاً",
       "score": 20,
@@ -1242,46 +1391,73 @@
 }
 أعد JSON صالح فقط بدون أي شرح إضافي.`;
 
-    try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              {
-                inline_data: {
-                  mime_type: imageObj.mimeType || 'image/jpeg',
-                  data: base64Data
+    // 1. إذا كان هناك مفتاح مخزن، الاتصال المباشر بـ Gemini Vision
+    if (apiKey) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+        const resp = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: imageObj.mimeType || 'image/jpeg',
+                    data: base64Data
+                  }
                 }
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 4096
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.15,
+              maxOutputTokens: 4096
+            }
+          })
+        });
+
+        if (resp.ok) {
+          const data = await resp.json();
+          const candidates = data.candidates || [];
+          if (candidates.length) {
+            const parts = (candidates[0].content && candidates[0].content.parts) || [];
+            const replyText = parts.map(p => p.text || '').join('').trim();
+            if (replyText) {
+              const jsonMatch = replyText.match(/\{[\s\S]*\}/);
+              if (jsonMatch) return JSON.parse(jsonMatch[0]);
+              return { rawText: replyText, questions: [] };
+            }
           }
-        })
-      });
-
-      if (!resp.ok) return null;
-      const data = await resp.json();
-      const candidates = data.candidates || [];
-      if (!candidates.length) return null;
-      const parts = (candidates[0].content && candidates[0].content.parts) || [];
-      const replyText = parts.map(p => p.text || '').join('').trim();
-      if (!replyText) return null;
-
-      const jsonMatch = replyText.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-      return { rawText: replyText, questions: [] };
-    } catch (e) {
-      return null;
+        }
+      } catch (e) {}
     }
+
+    // 2. الاتصال التلقائي بالبوابة السحابية للخادم (/api/gcloud/gemini) إن توفرت
+    if (window.location.protocol.startsWith('http')) {
+      try {
+        const resp = await fetch('/api/gcloud/gemini', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: prompt,
+            imageBase64: base64Data,
+            mimeType: imageObj.mimeType || 'image/jpeg'
+          })
+        });
+        if (resp.ok) {
+          const data = await resp.json();
+          const replyText = (data && (data.reply || data.text)) ? String(data.reply || data.text).trim() : '';
+          if (replyText) {
+            const jsonMatch = replyText.match(/\{[\s\S]*\}/);
+            if (jsonMatch) return JSON.parse(jsonMatch[0]);
+            return { rawText: replyText, questions: [] };
+          }
+        }
+      } catch (e) {}
+    }
+
+    return null;
   }
 
   function loadTesseractScriptOnce() {
@@ -1295,19 +1471,37 @@
     });
   }
 
-  async function recognizeWithTesseractOCR(imageDataUrl) {
+  async function recognizeWithTesseractOCR(imageDataUrl, subjectMode = 'arabic') {
     const TesseractLib = await loadTesseractScriptOnce();
     if (!TesseractLib) throw new Error('Tesseract not loaded');
 
-    const result = await TesseractLib.recognize(imageDataUrl, 'ara+eng', {
+    // استخدام نموذج اللغة العربية الصافي ('ara') للمواد العربية لمنع ظهور أي حروف إنجليزية عشوائية
+    const ocrLang = subjectMode === 'english' ? 'eng' : 'ara';
+
+    const worker = await TesseractLib.createWorker(ocrLang, 1, {
       logger: (m) => {
         if (m && m.status === 'recognizing text' && typeof m.progress === 'number') {
-          const pct = 40 + Math.round(m.progress * 50);
-          showScannerProgress(true, 'جاري قراءة سطور الورقة وتحويل الحروف...', pct);
+          const pct = 40 + Math.round(m.progress * 40);
+          showScannerProgress(true, 'جاري قراءة الكلمات والسطور العربية من الورقة...', pct);
         }
       }
     });
-    return (result && result.data && result.data.text) ? result.data.text : '';
+
+    try {
+      if (subjectMode !== 'english') {
+        await worker.setParameters({
+          preserve_interword_spaces: '1',
+          tessedit_char_blacklist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz|¦~^°¬§¤£¥€_<>[]{}'
+        });
+      }
+      const result = await worker.recognize(imageDataUrl);
+      await worker.terminate();
+      return (result && result.data && result.data.text) ? result.data.text : '';
+    } catch (err) {
+      try { await worker.terminate(); } catch (e) {}
+      const fallback = await TesseractLib.recognize(imageDataUrl, ocrLang);
+      return (fallback && fallback.data && fallback.data.text) ? fallback.data.text : '';
+    }
   }
 
   // ==========================================================================

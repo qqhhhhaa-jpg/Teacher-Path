@@ -461,7 +461,13 @@ def api_gcloud_test():
 def api_gcloud_gemini():
     cfg = _load_gcloud_config()
     payload = request.get_json(force=True, silent=True) or {}
-    api_key = (payload.get('apiKey') or cfg.get('apiKey') or '').strip()
+    api_key = (
+        payload.get('apiKey')
+        or cfg.get('apiKey')
+        or os.environ.get('GEMINI_API_KEY')
+        or os.environ.get('GOOGLE_API_KEY')
+        or ''
+    ).strip()
     model = (payload.get('model') or cfg.get('geminiModel') or 'gemini-2.5-flash').strip()
     prompt_text = (payload.get('prompt') or '').strip()
     image_b64 = (payload.get('imageBase64') or '').strip()
@@ -508,6 +514,7 @@ def api_gcloud_gemini():
                 "success": True,
                 "model": model,
                 "text": reply_text,
+                "reply": reply_text,
                 "raw": raw
             }), 200
     except urllib.error.HTTPError as he:
