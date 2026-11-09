@@ -422,11 +422,15 @@
                       <i class="fa-solid fa-rotate"></i>
                       <span>إعادة القراءة</span>
                     </button>
+                    <button type="button" class="btn-panel-mini-tool danger" id="btnClearPaperImage" onclick="window.clearUploadedPaperImage()" style="display: none; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);" title="تفريغ ومسح صورة الورقة">
+                      <i class="fa-solid fa-trash-can"></i>
+                      <span>مسح الصورة</span>
+                    </button>
                   </div>
                 </div>
 
                 <!-- عارض صورة الورقة المرفوعة -->
-                <div id="scannerImagePreviewBox" class="scanner-image-preview-box"
+                <div id="scannerImagePreviewBox" class="scanner-image-preview-box" style="position: relative;"
                   ondragover="event.preventDefault(); this.classList.add('drag-over');"
                   ondragleave="this.classList.remove('drag-over');"
                   ondrop="window.handlePaperImageDrop(event)">
@@ -438,6 +442,10 @@
                     <span>صوّر الورقة بالكاميرا، أو اربط الموبايل بـ QR، أو اسحب صورة الورقة وأفلتها هنا</span>
                   </div>
                   <img id="scannerPreviewImgEl" src="" alt="معاينة ورقة الأسئلة" style="display: none;">
+                  <button type="button" id="btnOverlayClearPaperImg" onclick="window.clearUploadedPaperImage()" style="display: none; position: absolute; top: 10px; left: 10px; z-index: 5; background: rgba(220, 38, 38, 0.92); color: #fff; border: none; border-radius: 999px; padding: 0.35rem 0.85rem; font-size: 0.78rem; font-weight: 800; cursor: pointer; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); align-items: center; gap: 0.35rem;" title="حذف وتفريغ الصورة الحالية">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>مسح الصورة</span>
+                  </button>
                 </div>
 
                 <!-- مربع النص المقروء (يمكن للمعلم مراجعته أو الكتابة/الإملاء فيه مباشرة) -->
@@ -447,10 +455,16 @@
                       <i class="fa-solid fa-pen-to-square text-primary"></i>
                       <span>النص المقروء من الورقة (يتحول تلقائياً إلى أسئلة):</span>
                     </label>
-                    <button type="button" class="btn-panel-mini-tool primary" onclick="window.parseTextFromScannerBox()">
-                      <i class="fa-solid fa-bolt"></i>
-                      <span>تحديث تقسيم الأسئلة</span>
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                      <button type="button" class="btn-panel-mini-tool primary" onclick="window.parseTextFromScannerBox()">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>تحديث تقسيم الأسئلة</span>
+                      </button>
+                      <button type="button" class="btn-panel-mini-tool" onclick="window.clearUploadedPaperImage()" style="background: rgba(239, 68, 68, 0.08); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" title="تفريغ النص والصورة بالكامل">
+                        <i class="fa-solid fa-broom"></i>
+                        <span>تفريغ</span>
+                      </button>
+                    </div>
                   </div>
                   <textarea id="scannerExtractedTextarea" class="form-control scanner-raw-textarea" rows="6"
                     placeholder="عند تصوير الورقة أو إرسالها من الموبايل سيظهر نص الأسئلة هنا تلقائياً...&#10;كما يمكنك كتابة أو لصق أو إملاء الأسئلة مباشرة مثل:&#10;س1 / عرف ما يأتي: (20 درجة)&#10;1- الخلية  2- النواة&#10;س2 / علل ما يأتي: (20 درجة)"></textarea>
@@ -464,10 +478,16 @@
                 <div class="scanner-panel-header">
                   <div class="panel-header-title">
                     <span class="panel-num-circle success">2</span>
-                    <strong>الأسئلة الجاهزة للإدراج بالورقة</strong>
+                    <strong>الأسئلة الجاهزة للإدراج (اضغط على أي سؤال لتعديله مباشرة)</strong>
                     <span id="scannerDetectedCountBadge" class="scanner-count-pill">0 أسئلة</span>
                   </div>
-                  <span id="scannerTotalScoreBadge" class="scanner-score-total-pill">مجموع الدرجات: 0</span>
+                  <div style="display: flex; align-items: center; gap: 0.45rem;">
+                    <button type="button" class="btn-panel-mini-tool primary" onclick="window.addBlankScannedQuestion()" title="إضافة سؤال جديد يدوياً للمعاينة">
+                      <i class="fa-solid fa-plus"></i>
+                      <span>سؤال جديد</span>
+                    </button>
+                    <span id="scannerTotalScoreBadge" class="scanner-score-total-pill">مجموع الدرجات: 0</span>
+                  </div>
                 </div>
 
                 <div id="scannerGeneratedQuestionsList" class="scanner-generated-questions-list">
@@ -1149,12 +1169,19 @@
     const imgEl = document.getElementById('scannerPreviewImgEl');
     const enhanceBtn = document.getElementById('btnEnhancePaperContrast');
     const rescanBtn = document.getElementById('btnRescanPaperImage');
+    const clearBtn = document.getElementById('btnClearPaperImage');
+    const overlayClearBtn = document.getElementById('btnOverlayClearPaperImg');
 
     if (currentUploadedImages.length === 0) {
       if (emptyEl) emptyEl.style.display = 'flex';
-      if (imgEl) imgEl.style.display = 'none';
+      if (imgEl) {
+        imgEl.style.display = 'none';
+        imgEl.src = '';
+      }
       if (enhanceBtn) enhanceBtn.style.display = 'none';
       if (rescanBtn) rescanBtn.style.display = 'none';
+      if (clearBtn) clearBtn.style.display = 'none';
+      if (overlayClearBtn) overlayClearBtn.style.display = 'none';
       return;
     }
 
@@ -1171,7 +1198,30 @@
         : '<i class="fa-solid fa-wand-sparkles"></i><span>توضيح الخط</span>';
     }
     if (rescanBtn) rescanBtn.style.display = 'inline-flex';
+    if (clearBtn) clearBtn.style.display = 'inline-flex';
+    if (overlayClearBtn) overlayClearBtn.style.display = 'inline-flex';
   }
+
+  window.clearUploadedPaperImage = function () {
+    currentUploadedImages = [];
+    currentParsedQuestions = [];
+    isUsingEnhancedImage = false;
+    isScanningPaper = false;
+
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    if (rawTextarea) rawTextarea.value = '';
+
+    const camInput = document.getElementById('scannerCameraFileInput');
+    const galInput = document.getElementById('scannerGalleryFileInput');
+    if (camInput) camInput.value = '';
+    if (galInput) galInput.value = '';
+
+    showScannerProgress(false);
+    setActiveScannerStep(1);
+    updateImagePreviewUI();
+    renderScannedQuestionsPreview();
+    notify('تم مسح صورة الورقة وتفريغ المعاينة بالكامل! يمكنك رفع ورقة جديدة الآن.', 'info');
+  };
 
   window.toggleEnhancePaperImage = function () {
     if (currentUploadedImages.length === 0) return;
@@ -2106,31 +2156,60 @@
       ).join('');
 
       const branchesHtml = (Array.isArray(q.branches) && q.branches.length > 0)
-        ? `<div class="scanned-q-branches">
-            ${q.branches.map(b => `
-              <div class="scanned-q-branch-item">
-                <span class="branch-pill">${b.title} • ${b.score} د</span>
-                <div class="branch-text">${escapeHtml(b.text).replace(/\n/g, '<br>')}</div>
+        ? `<div class="scanned-q-branches" style="margin-top: 0.55rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            ${q.branches.map((b, bIdx) => {
+              const bRows = Math.max(2, (b.text || '').split('\n').length);
+              return `
+              <div class="scanned-q-branch-item" style="background: rgba(16, 185, 129, 0.04); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 0.55rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.35rem;">
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <span class="branch-pill" style="padding: 2px 8px; font-size: 0.75rem;">فرع</span>
+                    <input type="text" value="${escapeHtml(b.title || '')}"
+                      oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'title', this.value)"
+                      style="width: 95px; padding: 2px 6px; font-size: 0.78rem; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <input type="number" min="1" max="100" value="${b.score || 10}"
+                      oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'score', this.value)"
+                      style="width: 52px; padding: 2px 4px; font-size: 0.78rem; font-weight: 800; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
+                    <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">درجة</span>
+                    <button type="button" onclick="window.removeScannedBranch(${idx}, ${bIdx})" title="حذف هذا الفرع"
+                      style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+                      <i class="fa-solid fa-xmark" style="font-size: 0.75rem;"></i>
+                    </button>
+                  </div>
+                </div>
+                <textarea class="form-control scanned-q-branch-textarea" rows="${bRows}"
+                  placeholder="اكتب أو عدّل نص الفرع هنا..."
+                  oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
+                  style="width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>
               </div>
-            `).join('')}
+            `;
+            }).join('')}
           </div>`
         : '';
 
       const displayTitle = q.displayTitle || q.title || ('السؤال ' + (ARABIC_ORDINALS[idx] || (idx + 1)));
+      const qRows = Math.max(2, (q.text || '').split('\n').length);
 
       return `
         <div class="scanned-q-card">
           <div class="scanned-q-card-header">
-            <div class="scanned-q-title-wrap">
+            <div class="scanned-q-title-wrap" style="flex: 1; min-width: 140px;">
               <span class="scanned-q-num-badge">س${idx + 1}</span>
-              <strong>${escapeHtml(displayTitle)}</strong>
+              <input type="text" value="${escapeHtml(displayTitle)}"
+                oninput="window.updateScannedQuestionLive(${idx}, 'displayTitle', this.value)"
+                title="اضغط لتعديل عنوان السؤال"
+                style="font-weight: 900; font-size: 0.9rem; color: var(--text-main, #0f172a); background: transparent; border: 1px dashed transparent; border-radius: 6px; padding: 2px 6px; width: 135px; transition: border-color 0.2s;"
+                onfocus="this.style.borderColor='#10b981'; this.style.background='rgba(16,185,129,0.05)';"
+                onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
             </div>
             <div class="scanned-q-controls-wrap">
               <select class="scanned-q-type-select" onchange="window.updateScannedQuestionField(${idx}, 'type', this.value)" title="نوع السؤال">
                 ${typeOptionsHtml}
               </select>
               <div class="scanned-q-score-box" title="درجة السؤال">
-                <input type="number" min="1" max="100" value="${q.score}" onchange="window.updateScannedQuestionField(${idx}, 'score', this.value)">
+                <input type="number" min="1" max="100" value="${q.score}" oninput="window.updateScannedQuestionLive(${idx}, 'score', this.value)">
                 <span>درجة</span>
               </div>
               <button type="button" class="scanned-q-delete-btn" onclick="window.removeScannedQuestion(${idx})" title="حذف هذا السؤال">
@@ -2138,14 +2217,122 @@
               </button>
             </div>
           </div>
-          <div class="scanned-q-card-body">
-            ${q.text ? `<div class="scanned-q-main-text">${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>` : ''}
+          <div class="scanned-q-card-body" style="padding-top: 0.45rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem;">
+              <span style="font-size: 0.74rem; color: #059669; font-weight: 800;">
+                <i class="fa-solid fa-pen-clip"></i> يمكنك التعديل على منطوق ونقاط هذا السؤال مباشرة:
+              </span>
+              <button type="button" onclick="window.addBranchToScannedQuestion(${idx})"
+                style="background: rgba(37, 99, 235, 0.08); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.22); border-radius: 6px; padding: 2px 8px; font-size: 0.73rem; font-weight: 800; cursor: pointer;">
+                <i class="fa-solid fa-code-branch"></i> + إضافة فرع
+              </button>
+            </div>
+            <textarea class="form-control scanned-q-edit-textarea" rows="${qRows}"
+              placeholder="اكتب أو عدّل نص السؤال والنقاط هنا مباشرة..."
+              oninput="window.updateScannedQuestionLive(${idx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
+              style="width: 100%; font-size: 0.9rem; font-weight: 700; line-height: 1.65; padding: 0.55rem 0.7rem; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">${escapeHtml(q.text || '')}</textarea>
             ${branchesHtml}
           </div>
         </div>
       `;
     }).join('');
   }
+
+  function updateTotalScoreBadgeOnly() {
+    const countBadge = document.getElementById('scannerDetectedCountBadge');
+    const scoreBadge = document.getElementById('scannerTotalScoreBadge');
+    const count = currentParsedQuestions.length;
+    const totalScore = currentParsedQuestions.reduce((acc, q) => acc + (Number(q.score) || 0), 0);
+    if (countBadge) countBadge.textContent = `${count} أسئلة`;
+    if (scoreBadge) scoreBadge.textContent = `مجموع الدرجات: ${totalScore}`;
+  }
+
+  window.updateScannedQuestionLive = function (idx, field, value) {
+    const q = currentParsedQuestions[idx];
+    if (!q) return;
+    if (field === 'score') {
+      q.score = Math.max(1, parseInt(value, 10) || 10);
+      updateTotalScoreBadgeOnly();
+    } else if (field === 'displayTitle') {
+      q.displayTitle = value;
+      q.title = value;
+    } else if (field === 'text') {
+      q.text = value;
+      if (q.type === 'comparisons') {
+        const compMatch = value.match(/(?:قارن\s+بين|ما\s+الفرق\s+بين)\s+(.+?)\s+و\s*(.+?)(?:[\.\n\?؟]|$)/);
+        if (compMatch) {
+          q.item1 = compMatch[1].trim();
+          q.item2 = compMatch[2].trim();
+        }
+      }
+    }
+  };
+
+  window.updateScannedBranchLive = function (qIdx, bIdx, field, value) {
+    const q = currentParsedQuestions[qIdx];
+    if (!q || !Array.isArray(q.branches) || !q.branches[bIdx]) return;
+    if (field === 'score') {
+      q.branches[bIdx].score = Math.max(1, parseInt(value, 10) || 5);
+    } else if (field === 'title') {
+      q.branches[bIdx].title = value;
+    } else if (field === 'text') {
+      q.branches[bIdx].text = value;
+    }
+  };
+
+  window.addBranchToScannedQuestion = function (qIdx) {
+    const q = currentParsedQuestions[qIdx];
+    if (!q) return;
+    if (!Array.isArray(q.branches)) q.branches = [];
+    const branchLetters = ['أ', 'ب', 'ج', 'د'];
+    const letter = branchLetters[q.branches.length] || (q.branches.length + 1);
+    q.branches.push({
+      title: `الفرع (${letter})`,
+      text: '',
+      score: 10,
+      modelAnswer: ''
+    });
+    renderScannedQuestionsPreview();
+  };
+
+  window.removeScannedBranch = function (qIdx, bIdx) {
+    const q = currentParsedQuestions[qIdx];
+    if (!q || !Array.isArray(q.branches)) return;
+    q.branches.splice(bIdx, 1);
+    renderScannedQuestionsPreview();
+  };
+
+  window.addBlankScannedQuestion = function () {
+    const idx = currentParsedQuestions.length;
+    const subjectMode = getActiveSubjectMode();
+    const ordinalTitle = subjectMode === 'english'
+      ? `Question ${idx + 1}`
+      : `السؤال ${ARABIC_ORDINALS[idx] || (idx + 1)}`;
+    currentParsedQuestions.push({
+      id: 'scan_manual_' + Date.now() + '_' + idx,
+      type: 'essay',
+      title: '',
+      displayTitle: ordinalTitle,
+      text: '',
+      score: 20,
+      difficulty: 'متوسط',
+      bloom: 'فهم',
+      subject: subjectMode,
+      showAnswerLines: false,
+      linesCount: 3,
+      branches: [],
+      options: [],
+      terms: [],
+      pairs: [],
+      item1: '',
+      item2: '',
+      isTrue: true,
+      correction: '',
+      modelAnswer: ''
+    });
+    setActiveScannerStep(3);
+    renderScannedQuestionsPreview();
+  };
 
   window.updateScannedQuestionField = function (idx, field, value) {
     if (!currentParsedQuestions[idx]) return;
