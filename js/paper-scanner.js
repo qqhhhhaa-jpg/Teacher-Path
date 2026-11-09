@@ -76,7 +76,7 @@
         if (!parsed.apiKey) parsed.apiKey = fallbackKey;
         return parsed;
       }
-    } catch (e) {}
+    } catch (e) { }
     return { apiKey: fallbackKey };
   }
 
@@ -87,7 +87,7 @@
       localStorage.setItem('masar_gcloud_gateway_config_v1', JSON.stringify(cfg));
       const gwInput = document.getElementById('gcApiKeyInput');
       if (gwInput) gwInput.value = cfg.apiKey;
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // ==========================================================================
@@ -127,6 +127,10 @@
           <button type="button" class="btn-scanner-bar-primary" id="btnOpenPaperScannerMain" onclick="window.openHandwrittenPaperScanner(false)">
             <i class="fa-solid fa-camera"></i>
             <span>تصوير أو رفع ورقة مكتوبة</span>
+          </button>
+          <button type="button" class="btn-scanner-bar-voice" id="btnOpenPaperScannerVoice" onclick="window.openHandwrittenPaperScannerInVoiceMode()" title="إملاء الأسئلة بالصوت مع فتح الفروع وترقيم التعاريف والتعاليل تلقائياً" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; border: none; border-radius: 10px; padding: 0.52rem 0.95rem; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <span>إملاء صوتي ذكي 🎙️</span>
           </button>
           <button type="button" class="btn-scanner-bar-qr" id="btnOpenPaperScannerQr" onclick="window.openHandwrittenPaperScanner(true)" title="اربط كاميرا تليفونك بالحاسبة عبر رمز QR لتصوير الورقة وإرسالها فوراً">
             <i class="fa-solid fa-qrcode"></i>
@@ -448,14 +452,43 @@
                   </button>
                 </div>
 
+                <!-- شريط الإملاء الصوتي الذكي المباشر + أزرار التقسيم السريع -->
+                <div id="scannerVoiceLiveBanner" style="display: none; margin: 0 0 0.75rem 0; padding: 0.7rem 0.85rem; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.06)); border: 1.5px solid rgba(16, 185, 129, 0.4);">
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.45rem;">
+                    <div style="display: flex; align-items: center; gap: 0.45rem;">
+                      <span id="scannerVoicePulseDot" style="width: 10px; height: 10px; border-radius: 50%; background: #ef4444; display: inline-block; box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25);"></span>
+                      <strong id="scannerVoiceStatusTitle" style="font-size: 0.84rem; color: #065f46;">🎙️ الإملاء الصوتي الذكي مفعل — تحدث الآن وسيتم تقسيم الفروع وترقيم التعاريف والتعاليل تلقائياً</strong>
+                    </div>
+                    <button type="button" onclick="window.toggleScannerVoiceDictation()" style="background: #dc2626; color: #fff; border: none; border-radius: 8px; padding: 3px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
+                      <i class="fa-solid fa-circle-stop"></i> إيقاف المايكروفون
+                    </button>
+                  </div>
+                  <div id="scannerVoiceInterimText" style="font-size: 0.82rem; font-weight: 700; color: #047857; background: rgba(255,255,255,0.75); border-radius: 8px; padding: 0.35rem 0.6rem; min-height: 28px; margin-bottom: 0.45rem; border: 1px dashed rgba(16, 185, 129, 0.35);">
+                    💡 قل مثلاً: "السؤال الأول عرف ما يأتي الخلية النواة المايتوكوندريا علل ما يأتي تمتاز الخلية النباتية بوجود شكل ثابت لها..."
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.72rem; font-weight: 800; color: #065f46;">إدراج فوري أثناء الإملاء:</span>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_question')" style="font-size: 0.72rem; padding: 2px 8px;">+ سؤال جديد</button>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_branch')" style="font-size: 0.72rem; padding: 2px 8px; background: rgba(16,185,129,0.15); color: #065f46;">+ فتح فرع جديد (أ/ب)</button>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('definitions')" style="font-size: 0.72rem; padding: 2px 8px;">+ عرف ما يأتي</button>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('reasoning')" style="font-size: 0.72rem; padding: 2px 8px;">+ علل ما يأتي</button>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('fill_blanks')" style="font-size: 0.72rem; padding: 2px 8px;">+ املأ الفراغات</button>
+                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('comparisons')" style="font-size: 0.72rem; padding: 2px 8px;">+ قارن بين</button>
+                  </div>
+                </div>
+
                 <!-- مربع النص المقروء (يمكن للمعلم مراجعته أو الكتابة/الإملاء فيه مباشرة) -->
                 <div class="scanner-raw-text-wrap">
-                  <div class="raw-text-label-row">
+                  <div class="raw-text-label-row" style="flex-wrap: wrap; gap: 0.4rem;">
                     <label for="scannerExtractedTextarea">
                       <i class="fa-solid fa-pen-to-square text-primary"></i>
-                      <span>النص المقروء من الورقة (يتحول تلقائياً إلى أسئلة):</span>
+                      <span>النص المقروء من الورقة أو الإملاء الصوتي (يقسّم الفروع ويرقّم تلقائياً):</span>
                     </label>
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+                      <button type="button" class="btn-panel-mini-tool" onclick="window.autoStructureAndNumberRawBox()" style="background: rgba(16, 185, 129, 0.12); color: #059669; border: 1px solid rgba(16, 185, 129, 0.35);" title="ترقيم التعاريف والتعاليل وفتح الفروع تلقائياً">
+                        <i class="fa-solid fa-list-ol"></i>
+                        <span>ترقيم وفتح فروع تلقائي</span>
+                      </button>
                       <button type="button" class="btn-panel-mini-tool primary" onclick="window.parseTextFromScannerBox()">
                         <i class="fa-solid fa-bolt"></i>
                         <span>تحديث تقسيم الأسئلة</span>
@@ -699,7 +732,7 @@
         qrBroadcastChannel.onmessage = (ev) => {
           handleIncomingMobileBridgePayload(ev.data);
         };
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 2. Supabase Realtime Broadcast Channel (يعمل عبر الإنترنت بين الموبايل واللابتوب في أي مكان)
@@ -737,7 +770,7 @@
           } else if (data && data.status === 'received' && (data.imageDataUrl || data.rawText)) {
             handleIncomingMobileBridgePayload(data);
           }
-        } catch (err) {}
+        } catch (err) { }
       }, 2200);
     }
   }
@@ -748,11 +781,11 @@
       qrPollingTimer = null;
     }
     if (qrBroadcastChannel) {
-      try { qrBroadcastChannel.close(); } catch (e) {}
+      try { qrBroadcastChannel.close(); } catch (e) { }
       qrBroadcastChannel = null;
     }
     if (qrSupabaseChannel && window.supabaseClient) {
-      try { window.supabaseClient.removeChannel(qrSupabaseChannel); } catch (e) {}
+      try { window.supabaseClient.removeChannel(qrSupabaseChannel); } catch (e) { }
       qrSupabaseChannel = null;
     }
   }
@@ -940,7 +973,7 @@
         bc.postMessage({ status: 'connected' });
         bc.close();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     try {
       const sbClient = window.supabaseClient || (window.supabaseAuth && window.supabaseAuth.getClient && window.supabaseAuth.getClient());
@@ -952,7 +985,7 @@
           }
         });
       }
-    } catch (e) {}
+    } catch (e) { }
 
     if (window.location.protocol.startsWith('http')) {
       try {
@@ -961,7 +994,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'connected' })
         });
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -973,7 +1006,7 @@
         bc.postMessage(payload);
         bc.close();
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 2. Supabase Realtime Broadcast
     try {
@@ -986,7 +1019,7 @@
           }
         });
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // 3. Backend API
     if (window.location.protocol.startsWith('http')) {
@@ -996,7 +1029,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-      } catch (e) {}
+      } catch (e) { }
     }
   }
 
@@ -1273,16 +1306,13 @@
       if (visionResult && (visionResult.rawText || (visionResult.questions && visionResult.questions.length > 0))) {
         showScannerProgress(true, 'تمت قراءة خط اليد وتنسيق الأسئلة بنجاح!', 100);
         const cleanedVisionText = cleanArabicOcrText(visionResult.rawText || '', subjectMode);
-        if (rawTextarea && cleanedVisionText) {
-          rawTextarea.value = cleanedVisionText;
-        }
-        if (Array.isArray(visionResult.questions) && visionResult.questions.length > 0) {
+        if (cleanedVisionText) {
+          currentParsedQuestions = parseRawPaperTextToQuestions(cleanedVisionText, subjectMode);
+        } else if (Array.isArray(visionResult.questions) && visionResult.questions.length > 0) {
           currentParsedQuestions = normalizeAiQuestionsArray(visionResult.questions);
-          if (rawTextarea && !rawTextarea.value.trim()) {
-            rawTextarea.value = formatQuestionsBackToRawText(currentParsedQuestions);
-          }
-        } else {
-          currentParsedQuestions = parseRawPaperTextToQuestions(rawTextarea.value, subjectMode);
+        }
+        if (rawTextarea && currentParsedQuestions.length > 0) {
+          rawTextarea.value = formatQuestionsBackToRawText(currentParsedQuestions);
         }
         renderScannedQuestionsPreview();
         setActiveScannerStep(3);
@@ -1319,8 +1349,12 @@
             cleanedText = cleanArabicOcrText(aiRefined.rawText, subjectMode);
           }
         }
-        if (rawTextarea) rawTextarea.value = cleanedText;
         currentParsedQuestions = parseRawPaperTextToQuestions(cleanedText, subjectMode);
+        if (rawTextarea) {
+          rawTextarea.value = currentParsedQuestions.length > 0
+            ? formatQuestionsBackToRawText(currentParsedQuestions)
+            : cleanedText;
+        }
 
         showScannerProgress(true, 'تمت قراءة خط اليد البشري وتقسيم الأسئلة بنجاح!', 100);
         renderScannedQuestionsPreview();
@@ -1354,7 +1388,7 @@
           if (Array.isArray(parsed) && typeof parsed[0] === 'string' && parsed[0].trim()) {
             return parsed[0].trim();
           }
-        } catch (e) {}
+        } catch (e) { }
       }
     }
     return '';
@@ -1650,7 +1684,7 @@
             return { rawText: replyText, questions: [] };
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 2. إذا كان هناك مفتاح خاص بـ Gemini، الاتصال المباشر بـ Gemini Vision
@@ -1692,7 +1726,7 @@
             }
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // 2. الاتصال التلقائي بالبوابة السحابية للخادم (/api/gcloud/gemini) إن توفرت
@@ -1716,7 +1750,7 @@
             return { rawText: replyText, questions: [] };
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     return null;
@@ -1760,31 +1794,91 @@
       await worker.terminate();
       return (result && result.data && result.data.text) ? result.data.text : '';
     } catch (err) {
-      try { await worker.terminate(); } catch (e) {}
+      try { await worker.terminate(); } catch (e) { }
       const fallback = await TesseractLib.recognize(imageDataUrl, ocrLang);
       return (fallback && fallback.data && fallback.data.text) ? fallback.data.text : '';
     }
   }
 
   // ==========================================================================
-  // 8. الإملاء الصوتي المباشر + تجربة ورقة مكتوبة بخط اليد بنقرة واحدة
+  // 8. الإملاء الصوتي الذكي المباشر + تجربة ورقة مكتوبة بخط اليد بنقرة واحدة
   // ==========================================================================
+  window.openHandwrittenPaperScannerInVoiceMode = function () {
+    window.openHandwrittenPaperScanner(false);
+    setTimeout(() => {
+      const banner = document.getElementById('scannerVoiceLiveBanner');
+      if (banner) banner.style.display = 'block';
+      if (!isRecordingVoice) {
+        window.toggleScannerVoiceDictation();
+      }
+    }, 180);
+  };
+
+  window.insertVoiceQuickCommand = function (cmdType) {
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    if (!rawTextarea) return;
+
+    const cur = rawTextarea.value.trim();
+    let snippet = '';
+    if (cmdType === 'new_question') {
+      const qCount = (cur.match(/(?:^|\n)\s*س\s*[٠-٩\d]+/g) || []).length + 1;
+      snippet = `\nس${qCount} / (20 درجة)\n`;
+    } else if (cmdType === 'new_branch') {
+      snippet = `\nفرع جديد / `;
+    } else if (cmdType === 'definitions') {
+      snippet = `\nعرف ما يأتي:\n`;
+    } else if (cmdType === 'reasoning') {
+      snippet = `\nعلل ما يأتي:\n`;
+    } else if (cmdType === 'fill_blanks') {
+      snippet = `\nاملأ الفراغات الآتية بما يناسبها:\n`;
+    } else if (cmdType === 'comparisons') {
+      snippet = `\nقارن بين `;
+    }
+
+    rawTextarea.value = (cur ? cur + snippet : snippet.trimStart());
+    window.parseTextFromScannerBox(true);
+    rawTextarea.focus();
+  };
+
+  window.autoStructureAndNumberRawBox = function () {
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    if (!rawTextarea || !rawTextarea.value.trim()) {
+      notify('المربع فارغ؛ اكتب أو صوّر الورقة أو استخدم الإملاء الصوتي أولاً.', 'warning');
+      return;
+    }
+    const questions = parseRawPaperTextToQuestions(rawTextarea.value, getActiveSubjectMode());
+    currentParsedQuestions = questions;
+    rawTextarea.value = formatQuestionsBackToRawText(questions);
+    renderScannedQuestionsPreview();
+    setActiveScannerStep(3);
+    notify('تم تقسيم الفروع وترقيم التعاريف والتعاليل والنقاط تلقائياً! ✨', 'success');
+  };
+
   window.toggleScannerVoiceDictation = function () {
     const voiceBtn = document.getElementById('btnScannerVoiceDictate');
     const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    const voiceBanner = document.getElementById('scannerVoiceLiveBanner');
+    const interimEl = document.getElementById('scannerVoiceInterimText');
     const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
 
+    if (voiceBanner) {
+      voiceBanner.style.display = 'block';
+    }
+
     if (!SpeechRec) {
-      notify('متصفحك الحالي لا يدعم الإملاء الصوتي المباشر؛ يفضل استخدام متصفح Chrome أو Edge.', 'warning');
+      notify('متصفحك الحالي لا يدعم الإملاء الصوتي المباشر؛ يفضل استخدام متصفح Chrome أو Edge، أو استخدام أزرار الإدراج السريع.', 'warning');
       return;
     }
 
     if (isRecordingVoice && speechRecognitionInstance) {
       isRecordingVoice = false;
-      try { speechRecognitionInstance.stop(); } catch (e) {}
+      try { speechRecognitionInstance.stop(); } catch (e) { }
       if (voiceBtn) {
         voiceBtn.classList.remove('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i><span>إملاء صوتي</span>';
+      }
+      if (interimEl) {
+        interimEl.textContent = '⏸️ تم إيقاف الإملاء الصوتي — تم تقسيم الفروع وترقيم النقاط تلقائياً.';
       }
       return;
     }
@@ -1792,7 +1886,7 @@
     speechRecognitionInstance = new SpeechRec();
     speechRecognitionInstance.lang = getActiveSubjectMode() === 'english' ? 'en-US' : 'ar-IQ';
     speechRecognitionInstance.continuous = true;
-    speechRecognitionInstance.interimResults = false;
+    speechRecognitionInstance.interimResults = true;
 
     speechRecognitionInstance.onstart = () => {
       isRecordingVoice = true;
@@ -1800,19 +1894,37 @@
         voiceBtn.classList.add('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-circle-stop"></i><span>إيقاف الإملاء</span>';
       }
-      notify('🎙️ تحدث الآن واقرأ الأسئلة بصوت واضح ليتم كتابتها وتقسيمها تلقائياً...', 'info');
+      if (voiceBanner) voiceBanner.style.display = 'block';
+      if (interimEl) {
+        interimEl.textContent = '🎙️ جاري الاستماع... اقرأ السؤال أو التعاريف أو التعاليل وسيتم ترقيمها وفتح الفروع تلقائياً';
+      }
+      notify('🎙️ تحدث الآن واقرأ الأسئلة بصوت واضح ليتم كتابتها وتقسيم الفروع وترقيم النقاط تلقائياً...', 'info');
     };
 
     speechRecognitionInstance.onresult = (event) => {
-      let transcript = '';
+      let finalChunk = '';
+      let interimChunk = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
+        const piece = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
-          transcript += event.results[i][0].transcript + '\n';
+          finalChunk += piece + '\n';
+        } else {
+          interimChunk += piece;
         }
       }
-      if (transcript && rawTextarea) {
-        rawTextarea.value = (rawTextarea.value ? rawTextarea.value.trim() + '\n' : '') + transcript.trim();
+
+      if (interimEl && interimChunk) {
+        interimEl.textContent = '🗣️ ' + interimChunk;
+      }
+
+      if (finalChunk && rawTextarea) {
+        const combined = (rawTextarea.value ? rawTextarea.value.trim() + '\n' : '') + finalChunk.trim();
+        const structuredText = preprocessPaperAndVoiceText(combined);
+        rawTextarea.value = structuredText;
         window.parseTextFromScannerBox(true);
+        if (interimEl) {
+          interimEl.textContent = '✅ تم التقاط وترقيم العبارة — أكمل القراءة أو قل (فرع جديد / السؤال الثاني)...';
+        }
       }
     };
 
@@ -1970,7 +2082,7 @@
 
   function detectQuestionTypeFromText(textStr) {
     const t = (textStr || '').trim();
-    if (/^(?:عرف|عرّف|ما\s+المقصود|اكتب\s+تعريف|define\b)/i.test(t) || /(?:عرف\s+ما\s+يأتي|عرّف\s+ما\s+يأتي)/i.test(t)) {
+    if (/^(?:عرف|عرّف|ما\s+المقصود|اكتب\s+تعريف|define\b)/i.test(t) || /(?:عرف\s+ما\s+يأتي|عرّف\s+ما\s+يأتي|عرف\s+أربعة|عرف\s+ثلاثة|عرف\s+خمسة)/i.test(t)) {
       return 'definitions';
     }
     if (/(?:علل|علّل|اذكر\s+السبب|فسر\s+علميا|لماذا\s+|give\s+reasons?)/i.test(t)) {
@@ -1997,15 +2109,197 @@
     return 'essay';
   }
 
-  function parseRawPaperTextToQuestions(rawText, subjectMode = 'arabic') {
-    const cleanedRaw = (rawText || '').replace(/\r\n/g, '\n').trim();
-    if (!cleanedRaw) return [];
+  // تحويل النص الصوتي أو المكتوب بخط اليد إلى سطور منظمة (أسئلة + فروع + أوامر فرعية + أرقام)
+  function preprocessPaperAndVoiceText(rawText) {
+    if (!rawText) return '';
+    let text = String(rawText).replace(/\r\n/g, '\n');
 
-    const lines = cleanedRaw.split('\n').map(l => l.trim()).filter(Boolean);
+    // 1. تحويل الدرجات المنطوقة صوتياً إلى صيغة رقمية قياسية
+    text = text
+      .replace(/(?:عشرون|عشرين)\s+درج[ةه]/g, '(20 درجة)')
+      .replace(/(?:خمسة\s+عشر|خمسطعش)\s+درج[ةه]/g, '(15 درجة)')
+      .replace(/(?:عشر\s+درجات|عشرة\s+درجة|عشره\s+درجه)/g, '(10 درجات)')
+      .replace(/(?:خمس\s+درجات|خمسة\s+درجة|خمسه\s+درجه)/g, '(5 درجات)');
+
+    // 2. فصل عناوين الأسئلة المنطوقة أو المدمجة في وسط السطر إلى سطر جديد مستقل
+    const spokenQMap = [
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+الأول|السؤال\s+الاول|سؤال\s+الأول|سؤال\s+الاول|سؤال\s+رقم\s*[1١]|سؤال\s+واحد)(?=\s|[\/:\-]|$)/g, rep: '\nس1 / ' },
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+الثاني|سؤال\s+الثاني|سؤال\s+رقم\s*[2٢]|سؤال\s+اثنين)(?=\s|[\/:\-]|$)/g, rep: '\nس2 / ' },
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+الثالث|سؤال\s+الثالث|سؤال\s+رقم\s*[3٣]|سؤال\s+ثلاثة)(?=\s|[\/:\-]|$)/g, rep: '\nس3 / ' },
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+الرابع|سؤال\s+الرابع|سؤال\s+رقم\s*[4٤]|سؤال\s+أربعة|سؤال\s+اربعة)(?=\s|[\/:\-]|$)/g, rep: '\nس4 / ' },
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+الخامس|سؤال\s+الخامس|سؤال\s+رقم\s*[5٥]|سؤال\s+خمسة)(?=\s|[\/:\-]|$)/g, rep: '\nس5 / ' },
+      { rx: /(?:^|\n|\s+)(?:السؤال\s+السادس|سؤال\s+السادس|سؤال\s+رقم\s*[6٦]|سؤال\s+ستة)(?=\s|[\/:\-]|$)/g, rep: '\nس6 / ' }
+    ];
+    spokenQMap.forEach(item => { text = text.replace(item.rx, item.rep); });
+
+    // فصل (س1 / س2 / ...) إذا جاءت في وسط السطر
+    text = text.replace(/([^\n])\s+(س\s*[٠-٩1-9]\s*[\/:\-])/g, '$1\n$2');
+
+    // 3. تحويل الفروع المنطوقة أو المدمجة (فرع ألف، فرع باء، افتح فرع جديد...) إلى سطر فرع مستقل
+    text = text
+      .replace(/(?:^|\n|\s+)(?:افتح\s+فرع\s+جديد|فرع\s+جديد)\s*[\/:\-]?\s*/g, '\nفرع جديد / ')
+      .replace(/(?:^|\n|\s+)(?:الفرع\s+الأول|الفرع\s+الاول|فرع\s+الأول|فرع\s+الاول|فرع\s+ألف|فرع\s+الف|الفرع\s+ألف)(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/g, '\nفرع أ / ')
+      .replace(/(?:^|\n|\s+)(?:الفرع\s+الثاني|فرع\s+الثاني|فرع\s+باء|الفرع\s+باء)(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/g, '\nفرع ب / ')
+      .replace(/(?:^|\n|\s+)(?:الفرع\s+الثالث|فرع\s+الثالث|فرع\s+جيم|الفرع\s+جيم)(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/g, '\nفرع ج / ')
+      .replace(/(?:^|\n|\s+)(?:الفرع\s+الرابع|فرع\s+الرابع|فرع\s+دال|الفرع\s+دال)(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/g, '\nفرع د / ')
+      .replace(/([^\n])\s+((?:الفرع|فرع)\s*[\(\[]?[أابجد][\)\]]?\s*[\/:\-\)]?)/g, '$1\n$2');
+
+    // 4. تحويل الترقيم اللفظي (أولاً، ثانياً، النقطة الأولى...) إلى أسطر مرقمة
+    const spokenOrdinals = [
+      { rx: /(?:^|\n|\s+)(?:أولاً|اولا|أولا|النقطة\s+الأولى|النقطه\s+الاولى|نقطة\s+واحد|رقم\s+واحد)\s*[\/:\-\)]?\s*/g, rep: '\n1- ' },
+      { rx: /(?:^|\n|\s+)(?:ثانياً|ثانيا|النقطة\s+الثانية|النقطه\s+الثانيه|نقطة\s+اثنين|رقم\s+اثنين)\s*[\/:\-\)]?\s*/g, rep: '\n2- ' },
+      { rx: /(?:^|\n|\s+)(?:ثالثاً|ثالثا|النقطة\s+الثالثة|النقطه\s+الثالثه|نقطة\s+ثلاثة|رقم\s+ثلاثة)\s*[\/:\-\)]?\s*/g, rep: '\n3- ' },
+      { rx: /(?:^|\n|\s+)(?:رابعاً|رابعا|النقطة\s+الرابعة|نقطة\s+أربعة|رقم\s+أربعة|رقم\s+اربعة)\s*[\/:\-\)]?\s*/g, rep: '\n4- ' },
+      { rx: /(?:^|\n|\s+)(?:خامساً|خامسا|النقطة\s+الخامسة|نقطة\s+خمسة|رقم\s+خمسة)\s*[\/:\-\)]?\s*/g, rep: '\n5- ' },
+      { rx: /(?:^|\n|\s+)(?:سادساً|سادسا|النقطة\s+السادسة|نقطة\s+ستة|رقم\s+ستة)\s*[\/:\-\)]?\s*/g, rep: '\n6- ' }
+    ];
+    spokenOrdinals.forEach(item => { text = text.replace(item.rx, item.rep); });
+
+    // فصل النقاط المرقمة المتتالية في نفس السطر مثل: (1- الخلية 2- النواة 3- المايتوكوندريا)
+    text = text.replace(/([^\n])\s+([٠-٩1-9]\s*[\-\.\)]\s+)/g, '$1\n$2');
+
+    // 5. إذا انتهى مطلب في وسط السطر وبدأ مطلب جديد (مثل: ... المايتوكوندريا علل ما يأتي ...) يفصل في سطر جديد ليفتح فرعاً تلقائياً
+    text = text.replace(/([^\n\/:\(\[])\s+((?:عرف|عرّف|ما\s+المقصود\s+بـ?|علل|علّل|اذكر\s+السبب|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغات|املا\s+الفراغات|أكمل\s+الفراغات|اكمل\s+الفراغات|ضع\s+كلمة\s*\(?\s*صح|ضع\s+علامة\s*\(?\s*صح|اختر\s+الإجابة|اختر\s+الاجابة|اختر\s+من\s+بين\s+الأقواس|عدد\s+ما\s+يأتي|اذكر\s+ما\s+يأتي)\b)/g, '$1\n$2');
+
+    return text
+      .split('\n')
+      .map(l => l.trim())
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  // التحقق مما إذا كان السطر يمثل بداية مطلب/سؤال فرعي جديد (لفتح فرع جديد تلقائياً عند انتهاء المطلب السابق)
+  function isNewSectionCommandHeader(line) {
+    const t = cleanScoreTagFromLine(line || '').trim();
+    if (!t) return false;
+    return /^(?:عرف|عرّف|ما\s+المقصود|اكتب\s+تعريف|علل|علّل|اذكر\s+السبب|فسر\s+علميا|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغ|املا\s+الفراغ|أكمل\s+الفراغ|اكمل\s+الفراغ|ضع\s+كلمة\s*\(?\s*صح|ضع\s+علامة\s*\(?\s*صح|صح\s+أو\s+خطأ|اختر\s+الإجابة|اختر\s+الاجابة|اختر\s+من\s+بين|صل\s+بين|طابق\s+بين|عدد\s+|عدّد\s+|اذكر\s+|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية|ما\s+اهمية|اشرح\s+|احسب\s+|جد\s+ناتج|جد\s+مجموعة|أجب\s+عما\s+يأتي|اجب\s+عما\s+ياتي)/i.test(t);
+  }
+
+  // تقسيم مصطلحات التعاريف المتتالية في نفس السطر (سواء مفصولة بفواصل أو مسافات في الإملاء الصوتي)
+  function splitInlineDefinitionTerms(remainderStr) {
+    const clean = (remainderStr || '').trim();
+    if (!clean) return [];
+
+    // إذا كان فيها شرح طويل مع نقطتين (مثل: الخلية: هي وحدة البناء...) نعتبرها عنصراً واحداً أو نفصلها إذا تكررت
+    if (/[،,؛]|\s+-\s+/.test(clean)) {
+      return clean.split(/[،,؛]|\s+-\s+/).map(s => s.trim()).filter(Boolean);
+    }
+
+    // إذا لم يكن فيها شرح (مجرد مصطلحات متتالية مثل: الخلية النواة المايتوكوندريا أو الخلية والنواة والمايتوكوندريا)
+    if (!clean.includes(':') && clean.length < 140) {
+      if (/\s+و\s+|\s+و(?=ال)/.test(clean)) {
+        return clean.split(/\s+و\s+|\s+و(?=ال)/).map(s => s.trim()).filter(Boolean);
+      }
+      const words = clean.split(/\s+/).filter(Boolean);
+      if (words.length >= 2 && words.length <= 10) {
+        // دمج المصطلحات المركبة من كلمتين (مثل: الخلية النباتية، الغشاء البلازمي، جهاز كولجي، الجسيمات الحالة، بيوت الطاقة)
+        const compoundFirstWords = /^(?:جهاز|شبكة|الشبكة|الغشاء|الجدار|الخلية|الجسيمات|البلاستيدات|الانقسام|التنفس|ثورة|معركة|قانون|مبدأ|ظاهرة|عملية|طاقة|درجة|حركة|الحامض|النسيج)$/;
+        const terms = [];
+        let i = 0;
+        while (i < words.length) {
+          const w = words[i];
+          const nextW = words[i + 1];
+          if (nextW && (compoundFirstWords.test(w) || (w.startsWith('ال') && nextW.startsWith('ال') && /[ية]$/.test(nextW)))) {
+            terms.push(w + ' ' + nextW);
+            i += 2;
+          } else {
+            terms.push(w);
+            i += 1;
+          }
+        }
+        if (terms.length >= 2) return terms;
+      }
+    }
+
+    return [clean];
+  }
+
+  // تنسيق وترقيم سطور القسم الواحد تلقائياً (تعاريف، تعاليل، فراغات، صح وخطأ، تعداد، إلخ)
+  function autoFormatAndNumberSectionLines(rawLines) {
+    const cleanLines = (rawLines || []).map(l => l.trim()).filter(Boolean);
+    if (cleanLines.length === 0) return [];
+
+    // مطابقة سطر الأمر الرئيسي مع أي عناصر مكتوبة معه في نفس السطر
+    const promptExtractRegex = /^((?:عرف|عرّف|ما\s+المقصود(?:\s+بـ?)?|علل|علّل|اذكر\s+السبب|فسر\s+علميا|املأ\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|املا\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|أكمل\s+الفراغات(?:\s+الآتية)?|اكمل\s+الفراغات(?:\s+الآتية)?|ضع\s+كلمة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|ضع\s+علامة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|اختر\s+الإجابة\s+الصحيحة(?:\s+مما\s+بين\s+الأقواس)?|اختر\s+من\s+بين\s+الأقواس|عدد|عدّد|اذكر|أجب\s+عما\s+يأتي|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?\s*[:\/\-]?\s*)(.*)$/i;
+
+    const firstLine = cleanLines[0];
+    // لا نقسم سؤال المقارنة المباشر مثل (قارن بين الخلية النباتية والخلية الحيوانية) إلى نقاط إلا إذا تبعته سطور
+    const isDirectComparison = /^(?:قارن\s+بين|ما\s+الفرق\s+بين)/i.test(firstLine);
+
+    let headerPrompt = '';
+    let rawItemLines = [];
+
+    if (!isDirectComparison) {
+      const m = firstLine.match(promptExtractRegex);
+      if (m) {
+        let pHead = (m[1] || '').trim().replace(/[\/\-]+$/, '').trim();
+        if (pHead && !pHead.endsWith(':')) pHead += ':';
+        headerPrompt = pHead;
+
+        const inlineRemainder = cleanScoreTagFromLine(m[2] || '').trim();
+        if (inlineRemainder) {
+          if (/^(?:عرف|عرّف|ما\s+المقصود)/i.test(headerPrompt)) {
+            rawItemLines.push(...splitInlineDefinitionTerms(inlineRemainder));
+          } else if (/[،؛]|\s+-\s+/.test(inlineRemainder)) {
+            rawItemLines.push(...inlineRemainder.split(/[،؛]|\s+-\s+/).map(s => s.trim()).filter(Boolean));
+          } else {
+            rawItemLines.push(inlineRemainder);
+          }
+        }
+        rawItemLines.push(...cleanLines.slice(1));
+      } else {
+        rawItemLines = cleanLines.slice();
+      }
+    } else {
+      headerPrompt = firstLine;
+      rawItemLines = cleanLines.slice(1);
+    }
+
+    if (rawItemLines.length === 0) {
+      return headerPrompt ? [headerPrompt] : cleanLines;
+    }
+
+    // تفكيك أي سطر فرعي يحتوي على عدة مصطلحات تعاريف مفصولة بفواصل أو عدة تعاليل مفصولة بفاصلة منقوطة
+    const expandedItems = [];
+    const isDefSection = /^(?:عرف|عرّف|ما\s+المقصود)/i.test(headerPrompt);
+
+    rawItemLines.forEach((itemLine) => {
+      // إزالة أي ترقيم سابق في بداية السطر لمنع تكرار الترقيم (مثل 1- 1-)
+      const stripped = itemLine
+        .replace(/^(?:[٠-٩\d]+\s*[\-\.\)\/_:]\s*|(?:أولاً|اولا|ثانياً|ثانيا|ثالثاً|ثالثا|رابعاً|رابعا|خامساً|خامسا|سادساً|سادسا)\s*[\-\.\)\/:]?\s*|[\*\•\-\–]\s*)/i, '')
+        .trim();
+      if (!stripped) return;
+
+      if (isDefSection && !stripped.includes(':') && /[،,؛]/.test(stripped)) {
+        const parts = stripped.split(/[،,؛]/).map(s => s.trim()).filter(Boolean);
+        expandedItems.push(...parts);
+      } else if (!isDefSection && /؛/.test(stripped)) {
+        const parts = stripped.split(/؛/).map(s => s.trim()).filter(Boolean);
+        expandedItems.push(...parts);
+      } else {
+        expandedItems.push(stripped);
+      }
+    });
+
+    // إضافة الترقيم التلقائي (1- ، 2- ، 3- ...) لكل النقاط (تعاريف، تعاليل، فراغات، صح وخطأ، إلخ)
+    const shouldNumberItems = Boolean(headerPrompt) || expandedItems.length >= 2;
+    const numberedItems = expandedItems.map((it, idx) =>
+      shouldNumberItems ? `${idx + 1}- ${it}` : it
+    );
+
+    return headerPrompt ? [headerPrompt, ...numberedItems] : numberedItems;
+  }
+
+  function parseRawPaperTextToQuestions(rawText, subjectMode = 'arabic') {
+    const preprocessed = preprocessPaperAndVoiceText(rawText);
+    if (!preprocessed) return [];
+
+    const lines = preprocessed.split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) return [];
 
     const mainQRegex = /^(?:س\s*[٠-٩\d]+\s*[\/:\-\)]?|السؤال\s+(?:الأول|الاول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|[٠-٩\d]+)\s*[\/:\-\)]?|Q\.?\s*\d+\s*[\/:\-\)]?|Question\s+\d+\s*[\/:\-\)]?)\s*(.*)$/i;
-    const branchRegex = /^(?:الفرع|فرع)\s*[\(\[]?([أابجدA-D])[\)\]]?\s*[\/:\-\)]?\s*(.*)$|^[\(\[]?([أبج])[\)\]]\s*[\/:\-]\s*(.*)$/i;
+    const branchRegex = /^(?:الفرع|فرع)\s*(?:جديد|\(?([أابجدA-D])\)?)\s*[\/:\-\)]?\s*(.*)$|^[\(\[]?([أبجد])[\)\]]\s*[\/:\-\)]\s*(.*)$/i;
+    const branchLettersOrder = ['أ', 'ب', 'ج', 'د', 'هـ'];
 
     const rawBlocks = [];
     let currentBlock = null;
@@ -2042,52 +2336,114 @@
       const detectedScore = extractScoreFromLine(combinedFirst, 20);
       const firstLineText = cleanScoreTagFromLine(block.remainderFirstLine || '');
 
-      const branches = [];
-      const mainBodyLines = [];
-      if (firstLineText) {
-        const firstBranchMatch = firstLineText.match(branchRegex);
-        if (firstBranchMatch) {
-          const bLetter = firstBranchMatch[1] || firstBranchMatch[3] || 'أ';
-          const bRest = firstBranchMatch[2] || firstBranchMatch[4] || '';
-          branches.push({
-            letter: bLetter,
-            title: `الفرع (${bLetter})`,
-            score: extractScoreFromLine(bRest, 10),
-            lines: [cleanScoreTagFromLine(bRest)].filter(Boolean)
-          });
-        } else {
-          mainBodyLines.push(firstLineText);
-        }
-      }
+      const allQuestionLines = [];
+      if (firstLineText) allQuestionLines.push(firstLineText);
+      block.subLines.forEach(s => {
+        if (s && s.trim()) allQuestionLines.push(s.trim());
+      });
 
-      block.subLines.forEach((sLine) => {
-        const bMatch = sLine.match(branchRegex);
+      // تقسيم محتوى السؤال الواحد إلى أقسام/فروع:
+      // يفتح فرعاً جديداً تلقائياً إذا كتب المعلم (فرع أ / ب) أو إذا أكمل مطلباً (مثل التعاريف) وبدأ مطلباً جديداً (مثل علل أو قارن أو فراغات) داخل نفس السؤال!
+      const sections = [];
+      let generalIntroLines = [];
+      let currentSec = null;
+
+      allQuestionLines.forEach((lineStr) => {
+        const bMatch = lineStr.match(branchRegex);
         if (bMatch) {
-          const bLetter = bMatch[1] || bMatch[3] || (branches.length === 0 ? 'أ' : 'ب');
+          const explicitLetter = bMatch[1] || bMatch[3] || '';
           const bRest = bMatch[2] || bMatch[4] || '';
-          branches.push({
-            letter: bLetter,
-            title: `الفرع (${bLetter})`,
-            score: extractScoreFromLine(sLine, 10),
+          const nextLetter = explicitLetter || branchLettersOrder[sections.length] || 'أ';
+          currentSec = {
+            explicitBranch: true,
+            letter: nextLetter,
+            score: extractScoreFromLine(lineStr, 0),
             lines: [cleanScoreTagFromLine(bRest)].filter(Boolean)
-          });
-        } else if (branches.length > 0) {
-          branches[branches.length - 1].lines.push(sLine);
+          };
+          sections.push(currentSec);
+          return;
+        }
+
+        // هل السطر يمثل بداية مطلب جديد (مثلاً: علل ما يأتي / قارن بين / املأ الفراغات) بعد أن بدأ مطلب سابق في نفس السؤال؟
+        const isCmdStart = isNewSectionCommandHeader(lineStr);
+        if (isCmdStart) {
+          if (!currentSec) {
+            currentSec = {
+              explicitBranch: false,
+              letter: branchLettersOrder[sections.length] || 'أ',
+              score: extractScoreFromLine(lineStr, 0),
+              lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
+            };
+            sections.push(currentSec);
+            return;
+          } else if (currentSec.lines.length >= 1) {
+            // إذا كان القسم الحالي يحتوي بالفعل على مطلب وعناصره (إما في سطر واحد أو عدة سطور)، نفتح فرعاً جديداً تلقائياً للمطلب الجديد!
+            const prevFormatted = autoFormatAndNumberSectionLines(currentSec.lines);
+            const prevHasCompletedContent = prevFormatted.length >= 2 || /^(?:قارن\s+بين|ما\s+الفرق\s+بين|اشرح|وضح)/i.test(currentSec.lines[0]);
+            if (prevHasCompletedContent) {
+              currentSec = {
+                explicitBranch: true,
+                letter: branchLettersOrder[sections.length] || 'ب',
+                score: extractScoreFromLine(lineStr, 0),
+                lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
+              };
+              sections.push(currentSec);
+              return;
+            }
+          }
+        }
+
+        // سطر عادي (نقطة تعريف أو تعليل أو تكملة)
+        if (!currentSec) {
+          // إذا كان السطر جملة تمهيدية مثل (أجب عن فرعين مما يأتي: / أجب عن الفروع الآتية:) نحتفظ به كعنوان عام للسؤال
+          if (/(?:أجب\s+عن\s+فرعين|اجب\s+عن\s+فرعين|أجب\s+عن\s+الفرعين|أجب\s+عن\s+أحد\s+الفرعين|أجب\s+عن\s+الفروع|اجب\s+عن\s+الفروع)/i.test(lineStr)) {
+            generalIntroLines.push(cleanScoreTagFromLine(lineStr));
+          } else {
+            currentSec = {
+              explicitBranch: false,
+              letter: 'أ',
+              score: 0,
+              lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
+            };
+            sections.push(currentSec);
+          }
         } else {
-          mainBodyLines.push(sLine);
+          currentSec.lines.push(cleanScoreTagFromLine(lineStr));
         }
       });
 
-      const fullQuestionText = mainBodyLines.join('\n').trim();
-      const allTextForDetection = fullQuestionText + '\n' + branches.map(b => b.lines.join('\n')).join('\n');
-      const qType = detectQuestionTypeFromText(allTextForDetection);
+      const hasMultipleBranches = sections.length > 1 || (sections.length === 1 && sections[0].explicitBranch);
+      let formattedBranches = [];
+      let fullQuestionText = '';
 
-      const formattedBranches = branches.map(b => ({
-        title: b.title,
-        text: b.lines.join('\n').trim(),
-        score: b.score || Math.round(detectedScore / Math.max(1, branches.length)),
-        modelAnswer: ''
-      }));
+      if (hasMultipleBranches) {
+        const defaultBranchScore = Math.max(5, Math.round(detectedScore / Math.max(1, sections.length)));
+        formattedBranches = sections.map((sec, sIdx) => {
+          const bLetter = sec.letter || branchLettersOrder[sIdx] || String(sIdx + 1);
+          const numberedLines = autoFormatAndNumberSectionLines(sec.lines);
+          return {
+            title: `الفرع (${bLetter})`,
+            text: numberedLines.join('\n').trim(),
+            score: sec.score > 0 ? sec.score : defaultBranchScore,
+            modelAnswer: ''
+          };
+        });
+        fullQuestionText = generalIntroLines.length > 0
+          ? generalIntroLines.join('\n').trim()
+          : 'أجب عن الفروع الآتية:';
+      } else if (sections.length === 1) {
+        const numberedLines = autoFormatAndNumberSectionLines(sections[0].lines);
+        fullQuestionText = numberedLines.join('\n').trim();
+      } else {
+        fullQuestionText = generalIntroLines.join('\n').trim();
+      }
+
+      const allTextForDetection = fullQuestionText + '\n' + formattedBranches.map(b => b.text).join('\n');
+      // إذا كان السؤال مقسماً إلى عدة فروع، نجعل نوعه الأساسي مقالياً/متعدد الفروع حتى لا يرسم جدول مقارنة مكرر أسفل الفروع
+      let qType = detectQuestionTypeFromText(allTextForDetection);
+      if (formattedBranches.length > 0 && qType === 'comparisons') {
+        qType = 'essay';
+      }
 
       const questionObj = {
         id: 'scan_q_' + Date.now() + '_' + idx,
@@ -2130,13 +2486,16 @@
       const ordinalTitle = activeSubject === 'english'
         ? `Question ${idx + 1}`
         : `السؤال ${ARABIC_ORDINALS[idx] || (idx + 1)}`;
-      const qType = QUESTION_TYPE_LABELS[item.type] ? item.type : detectQuestionTypeFromText(item.text || '');
+      const formattedMainText = autoFormatAndNumberSectionLines(
+        String(item.text || '').split('\n')
+      ).join('\n').trim();
+      const qType = QUESTION_TYPE_LABELS[item.type] ? item.type : detectQuestionTypeFromText(formattedMainText);
       return {
         id: 'scan_ai_' + Date.now() + '_' + idx,
         type: qType,
         title: '',
         displayTitle: ordinalTitle,
-        text: item.text || '',
+        text: formattedMainText,
         score: Number(item.score) || 20,
         difficulty: 'متوسط',
         bloom: 'فهم',
@@ -2145,7 +2504,7 @@
         linesCount: 3,
         branches: Array.isArray(item.branches) ? item.branches.map((b, bi) => ({
           title: b.title || `الفرع (${bi === 0 ? 'أ' : 'ب'})`,
-          text: b.text || '',
+          text: autoFormatAndNumberSectionLines(String(b.text || '').split('\n')).join('\n').trim(),
           score: Number(b.score) || 10,
           modelAnswer: b.modelAnswer || ''
         })) : [],
@@ -2164,10 +2523,22 @@
 
   function formatQuestionsBackToRawText(questions) {
     return questions.map((q, i) => {
-      let block = `س${i + 1} / ${q.text || ''} (${q.score || 20} درجة)`;
+      const qLines = String(q.text || '').split('\n').filter(Boolean);
+      const firstQLine = qLines[0] || '';
+      const restQLines = qLines.slice(1);
+      let block = `س${i + 1} / ${firstQLine} (${q.score || 20} درجة)`;
+      if (restQLines.length > 0) {
+        block += '\n' + restQLines.join('\n');
+      }
       if (Array.isArray(q.branches) && q.branches.length > 0) {
         q.branches.forEach(b => {
-          block += `\n${b.title}: ${b.text} (${b.score || 10} درجات)`;
+          const bLines = String(b.text || '').split('\n').filter(Boolean);
+          const firstBLine = bLines[0] || '';
+          const restBLines = bLines.slice(1);
+          block += `\n${b.title} / ${firstBLine} (${b.score || 10} درجات)`;
+          if (restBLines.length > 0) {
+            block += '\n' + restBLines.join('\n');
+          }
         });
       }
       return block;
@@ -2215,8 +2586,8 @@
       const branchesHtml = (Array.isArray(q.branches) && q.branches.length > 0)
         ? `<div class="scanned-q-branches" style="margin-top: 0.55rem; display: flex; flex-direction: column; gap: 0.5rem;">
             ${q.branches.map((b, bIdx) => {
-              const bRows = Math.max(2, (b.text || '').split('\n').length);
-              return `
+          const bRows = Math.max(2, (b.text || '').split('\n').length);
+          return `
               <div class="scanned-q-branch-item" style="background: rgba(16, 185, 129, 0.04); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 0.55rem;">
                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.35rem;">
                   <div style="display: flex; align-items: center; gap: 0.35rem;">
@@ -2242,7 +2613,7 @@
                   style="width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>
               </div>
             `;
-            }).join('')}
+        }).join('')}
           </div>`
         : '';
 

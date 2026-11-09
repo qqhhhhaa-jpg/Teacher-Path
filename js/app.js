@@ -8911,8 +8911,8 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
   const questionPromptHTML = isAnswerKey
     ? ''
     : ((q.title && q.text && q.text !== q.title)
-      ? `<div class="paper-q-body-text" style="margin-top: 4px; font-weight: normal; line-height: 1.5;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
-      : (!q.title ? formatMathText(q.text || '') : ''));
+      ? `<div class="paper-q-body-text" style="margin-top: 4px; font-weight: normal; line-height: 1.65;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
+      : (!q.title ? `<span class="paper-q-inline-multiline" style="line-height: 1.65;">${formatMathText((q.text || '').replace(/\n/g, '<br/>'))}</span>` : ''));
 
   return `
     <div class="paper-question" id="paperQ_${q.id}">
@@ -8961,7 +8961,7 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
     return `
             <div class="paper-q-branch">
               <div class="paper-branch-header">
-                <span><strong>${formatMathText(branchTitle)}:</strong> ${isAnswerKey ? '' : formatMathText(b.text || '')}</span>
+                <span style="line-height: 1.65;"><strong>${formatMathText(branchTitle)}:</strong> ${isAnswerKey ? '' : formatMathText((b.text || '').replace(/\n/g, '<br/>'))}</span>
                 ${branchScoreText ? `<span class="paper-branch-grade">${branchScoreText}</span>` : ''}
               </div>
               ${isAnswerKey ? `
@@ -9285,7 +9285,7 @@ function renderPaperQuestionBody(q, isAnswerKey) {
     `;
   }
 
-  if (q.type === 'definitions' && q.terms) {
+  if (q.type === 'definitions' && Array.isArray(q.terms) && q.terms.length > 0) {
     if (isAnswerKey) {
       return `
         <div class="paper-model-answer highlighted-model-answer" style="margin-top: 4px;">
