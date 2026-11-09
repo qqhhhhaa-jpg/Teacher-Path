@@ -2290,6 +2290,54 @@
     return headerPrompt ? [headerPrompt, ...numberedItems] : numberedItems;
   }
 
+  // فصل السطور المنسقة إلى: (1) عنوان/منطوق السؤال أو الفرع (title) و (2) نص ونقاط السؤال أو الفرع (body)
+  function splitSectionIntoTitleAndBody(numberedLines) {
+    const lines = (numberedLines || []).map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      return { title: '', body: '' };
+    }
+
+    // إذا كان هناك سطران أو أكثر: السطر الأول هو عنوان السؤال/الفرع (مثل: عرف ما يأتي:) وبقية السطور هي نص ونقاط السؤال/الفرع (1- ... 2- ...)
+    if (lines.length >= 2) {
+      return {
+        title: lines[0],
+        body: lines.slice(1).join('\n')
+      };
+    }
+
+    // إذا كان سطراً واحداً فقط (مثلاً: قارن بين الخلية النباتية والخلية الحيوانية / ما وظيفة المايتوكوندريا)
+    const single = lines[0];
+    const cmdSplitMatch = single.match(/^((?:عرف|عرّف|ما\s+المقصود(?:\s+بـ?)?|علل|علّل|اذكر\s+السبب|فسر\s+علميا|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغات(?:\s+الآتية)?|املا\s+الفراغات(?:\s+الآتية)?|أكمل\s+الفراغات|ضع\s+كلمة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|اختر\s+الإجابة\s+الصحيحة|عدد|عدّد|اذكر|اشرح|وضّح|وضح|بيّن|بين|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية|ما\s+اهمية|احسب|جد\s+ناتج|جد\s+مجموعة\s+الحل|حل\s+المعادلة|أجب\s+عما\s+يأتي)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?)\s*[:\/\-]?\s+(.+)$/i);
+    if (cmdSplitMatch) {
+      let extractedTitle = cmdSplitMatch[1].trim();
+      if (!extractedTitle.endsWith(':')) extractedTitle += ':';
+      return {
+        title: extractedTitle,
+        body: cmdSplitMatch[2].trim()
+      };
+    }
+
+    const colonIdx = single.indexOf(':');
+    if (colonIdx > 2 && colonIdx < single.length - 2) {
+      return {
+        title: single.slice(0, colonIdx + 1).trim(),
+        body: single.slice(colonIdx + 1).trim()
+      };
+    }
+
+    if (isNewSectionCommandHeader(single)) {
+      return {
+        title: single.endsWith(':') ? single : (single + ':'),
+        body: ''
+      };
+    }
+
+    return {
+      title: 'أجب عما يأتي:',
+      body: single
+    };
+  }
+
   function parseRawPaperTextToQuestions(rawText, subjectMode = 'arabic') {
     const preprocessed = preprocessPaperAndVoiceText(rawText);
     if (!preprocessed) return [];
@@ -2412,35 +2460,69 @@
         }
       });
 
-      const hasMultipleBranches = sections.length > 1 || (sections.length === 1 && sections[0].explicitBranch);
-      let formattedBranches = [];
+      // التمييز الدقيق بين (1) عنوان السؤال، (2) نص السؤال، (3) فرع السؤال:
+      let questionTitle = '';
       let fullQuestionText = '';
+      let formattedBranches = [];
 
-      if (hasMultipleBranches) {
+      if (sections.length > 0 && !sections[0].explicitBranch) {
+        // القسم الأول جاء مباشرة تحت السؤال (بدون كتابة "فرع أ" صراحةً):
+        // إذن القسم الأول يمثل (عنوان السؤال + نص السؤال)، وأي مطلب إضافي بعده يفتح (فرع السؤال) تلقائياً!
+        const mainNumbered = autoFormatAndNumberSectionLines(sections[0].lines);
+        const mainSplit = splitSectionIntoTitleAndBody(mainNumbered);
+        questionTitle = mainSplit.title || (generalIntroLines[0] || '');
+        fullQuestionText = mainSplit.body || '';
+
+        if (sections.length > 1) {
+          const extraSecs = sections.slice(1);
+          const defaultBranchScore = Math.max(5, Math.round(detectedScore / (extraSecs.length + 1)));
+          formattedBranches = extraSecs.map((sec, sIdx) => {
+            const bLetter = sec.explicitBranch && sec.letter ? sec.letter : (branchLettersOrder[sIdx] || String(sIdx + 1));
+            const bNumbered = autoFormatAndNumberSectionLines(sec.lines);
+            const bSplit = splitSectionIntoTitleAndBody(bNumbered);
+            return {
+              title: `الفرع (${bLetter})`,
+              prompt: bSplit.title || '',
+              text: bSplit.body || '',
+              score: sec.score > 0 ? sec.score : defaultBranchScore,
+              modelAnswer: ''
+            };
+          });
+        }
+      } else if (sections.length > 0 && sections[0].explicitBranch) {
+        // السؤال بدأ مباشرة بـ (فرع أ / ...):
+        // عنوان السؤال يكون العبارة التمهيدية (أجب عن الفروع الآتية:) والفروع في قائمة الفروع
+        questionTitle = generalIntroLines[0] || 'أجب عن الفروع الآتية:';
+        fullQuestionText = generalIntroLines.slice(1).join('\n').trim();
         const defaultBranchScore = Math.max(5, Math.round(detectedScore / Math.max(1, sections.length)));
         formattedBranches = sections.map((sec, sIdx) => {
           const bLetter = sec.letter || branchLettersOrder[sIdx] || String(sIdx + 1);
-          const numberedLines = autoFormatAndNumberSectionLines(sec.lines);
+          const bNumbered = autoFormatAndNumberSectionLines(sec.lines);
+          const bSplit = splitSectionIntoTitleAndBody(bNumbered);
           return {
             title: `الفرع (${bLetter})`,
-            text: numberedLines.join('\n').trim(),
+            prompt: bSplit.title || '',
+            text: bSplit.body || '',
             score: sec.score > 0 ? sec.score : defaultBranchScore,
             modelAnswer: ''
           };
         });
-        fullQuestionText = generalIntroLines.length > 0
-          ? generalIntroLines.join('\n').trim()
-          : 'أجب عن الفروع الآتية:';
-      } else if (sections.length === 1) {
-        const numberedLines = autoFormatAndNumberSectionLines(sections[0].lines);
-        fullQuestionText = numberedLines.join('\n').trim();
       } else {
-        fullQuestionText = generalIntroLines.join('\n').trim();
+        questionTitle = generalIntroLines[0] || '';
+        fullQuestionText = generalIntroLines.slice(1).join('\n').trim();
       }
 
-      const allTextForDetection = fullQuestionText + '\n' + formattedBranches.map(b => b.text).join('\n');
+      const allTextForDetection = [
+        questionTitle,
+        fullQuestionText,
+        ...formattedBranches.map(b => (b.prompt || '') + '\n' + (b.text || ''))
+      ].join('\n');
+
       // إذا كان السؤال مقسماً إلى عدة فروع، نجعل نوعه الأساسي مقالياً/متعدد الفروع حتى لا يرسم جدول مقارنة مكرر أسفل الفروع
-      let qType = detectQuestionTypeFromText(allTextForDetection);
+      let qType = detectQuestionTypeFromText(questionTitle + '\n' + fullQuestionText);
+      if (qType === 'essay' && formattedBranches.length === 0) {
+        qType = detectQuestionTypeFromText(allTextForDetection);
+      }
       if (formattedBranches.length > 0 && qType === 'comparisons') {
         qType = 'essay';
       }
@@ -2448,9 +2530,9 @@
       const questionObj = {
         id: 'scan_q_' + Date.now() + '_' + idx,
         type: qType,
-        title: '',
+        title: questionTitle,
         displayTitle: ordinalTitle,
-        text: fullQuestionText || (formattedBranches.length > 0 ? 'أجب عن الفروع الآتية:' : ''),
+        text: fullQuestionText,
         score: detectedScore,
         difficulty: 'متوسط',
         bloom: 'فهم',
@@ -2469,7 +2551,7 @@
       };
 
       if (qType === 'comparisons') {
-        const compMatch = allTextForDetection.match(/(?:قارن\s+بين|ما\s+الفرق\s+بين)\s+(.+?)\s+و\s*(.+?)(?:[\.\n\?؟]|$)/);
+        const compMatch = allTextForDetection.match(/(?:قارن\s+بين(?:\s*:)?|ما\s+الفرق\s+بين(?:\s*:)?)\s+(.+?)\s+و\s*(.+?)(?:[\.\n\?؟]|$)/);
         if (compMatch) {
           questionObj.item1 = compMatch[1].trim();
           questionObj.item2 = compMatch[2].trim();
@@ -2486,28 +2568,34 @@
       const ordinalTitle = activeSubject === 'english'
         ? `Question ${idx + 1}`
         : `السؤال ${ARABIC_ORDINALS[idx] || (idx + 1)}`;
-      const formattedMainText = autoFormatAndNumberSectionLines(
-        String(item.text || '').split('\n')
-      ).join('\n').trim();
-      const qType = QUESTION_TYPE_LABELS[item.type] ? item.type : detectQuestionTypeFromText(formattedMainText);
+      const mainNumbered = autoFormatAndNumberSectionLines(String(item.text || '').split('\n'));
+      const mainSplit = splitSectionIntoTitleAndBody(mainNumbered);
+      const qTitle = (item.prompt || mainSplit.title || '').trim();
+      const qBody = mainSplit.body || '';
+      const qType = QUESTION_TYPE_LABELS[item.type] ? item.type : detectQuestionTypeFromText(qTitle + '\n' + qBody);
       return {
         id: 'scan_ai_' + Date.now() + '_' + idx,
         type: qType,
-        title: '',
+        title: qTitle,
         displayTitle: ordinalTitle,
-        text: formattedMainText,
+        text: qBody,
         score: Number(item.score) || 20,
         difficulty: 'متوسط',
         bloom: 'فهم',
         subject: activeSubject,
         showAnswerLines: false,
         linesCount: 3,
-        branches: Array.isArray(item.branches) ? item.branches.map((b, bi) => ({
-          title: b.title || `الفرع (${bi === 0 ? 'أ' : 'ب'})`,
-          text: autoFormatAndNumberSectionLines(String(b.text || '').split('\n')).join('\n').trim(),
-          score: Number(b.score) || 10,
-          modelAnswer: b.modelAnswer || ''
-        })) : [],
+        branches: Array.isArray(item.branches) ? item.branches.map((b, bi) => {
+          const bNumbered = autoFormatAndNumberSectionLines(String(b.text || '').split('\n'));
+          const bSplit = splitSectionIntoTitleAndBody(bNumbered);
+          return {
+            title: b.title || `الفرع (${bi === 0 ? 'أ' : 'ب'})`,
+            prompt: b.prompt || bSplit.title || '',
+            text: bSplit.body || '',
+            score: Number(b.score) || 10,
+            modelAnswer: b.modelAnswer || ''
+          };
+        }) : [],
         options: Array.isArray(item.options) ? item.options.map((opt, oi) => ({
           id: 'opt_' + (oi + 1),
           text: typeof opt === 'string' ? opt : (opt.text || ''),
@@ -2523,21 +2611,20 @@
 
   function formatQuestionsBackToRawText(questions) {
     return questions.map((q, i) => {
-      const qLines = String(q.text || '').split('\n').filter(Boolean);
-      const firstQLine = qLines[0] || '';
-      const restQLines = qLines.slice(1);
-      let block = `س${i + 1} / ${firstQLine} (${q.score || 20} درجة)`;
-      if (restQLines.length > 0) {
-        block += '\n' + restQLines.join('\n');
+      const qTitle = (q.title || '').trim();
+      const qBody = (q.text || '').trim();
+      let block = `س${i + 1} / ${qTitle} (${q.score || 20} درجة)`;
+      if (qBody) {
+        block += `\n${qBody}`;
       }
       if (Array.isArray(q.branches) && q.branches.length > 0) {
         q.branches.forEach(b => {
-          const bLines = String(b.text || '').split('\n').filter(Boolean);
-          const firstBLine = bLines[0] || '';
-          const restBLines = bLines.slice(1);
-          block += `\n${b.title} / ${firstBLine} (${b.score || 10} درجات)`;
-          if (restBLines.length > 0) {
-            block += '\n' + restBLines.join('\n');
+          const bTitle = (b.title || 'الفرع (أ)').trim();
+          const bPrompt = (b.prompt || '').trim();
+          const bBody = (b.text || '').trim();
+          block += `\n${bTitle} / ${bPrompt} (${b.score || 10} درجات)`;
+          if (bBody) {
+            block += `\n${bBody}`;
           }
         });
       }
@@ -2583,15 +2670,16 @@
         `<option value="${k}" ${q.type === k ? 'selected' : ''}>${label}</option>`
       ).join('');
 
-      const branchesHtml = (Array.isArray(q.branches) && q.branches.length > 0)
-        ? `<div class="scanned-q-branches" style="margin-top: 0.55rem; display: flex; flex-direction: column; gap: 0.5rem;">
+      const branchesCount = Array.isArray(q.branches) ? q.branches.length : 0;
+      const branchesHtml = branchesCount > 0
+        ? `<div class="scanned-q-branches" style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.55rem;">
             ${q.branches.map((b, bIdx) => {
           const bRows = Math.max(2, (b.text || '').split('\n').length);
           return `
-              <div class="scanned-q-branch-item" style="background: rgba(16, 185, 129, 0.04); border: 1px dashed rgba(16, 185, 129, 0.35); border-radius: 10px; padding: 0.55rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.35rem;">
+              <div class="scanned-q-branch-item" style="background: rgba(139, 92, 246, 0.04); border: 1.5px dashed rgba(139, 92, 246, 0.38); border-radius: 10px; padding: 0.6rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem;">
                   <div style="display: flex; align-items: center; gap: 0.35rem;">
-                    <span class="branch-pill" style="padding: 2px 8px; font-size: 0.75rem;">فرع</span>
+                    <span class="branch-pill" style="padding: 2px 8px; font-size: 0.74rem; background: rgba(139, 92, 246, 0.15); color: #6d28d9; border-radius: 6px; font-weight: 800;">🌿 فرع السؤال</span>
                     <input type="text" value="${escapeHtml(b.title || '')}"
                       oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'title', this.value)"
                       style="width: 95px; padding: 2px 6px; font-size: 0.78rem; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
@@ -2607,17 +2695,28 @@
                     </button>
                   </div>
                 </div>
-                <textarea class="form-control scanned-q-branch-textarea" rows="${bRows}"
-                  placeholder="اكتب أو عدّل نص الفرع هنا..."
-                  oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
-                  style="width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>
+                <div style="margin-bottom: 0.38rem;">
+                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #6d28d9; margin-bottom: 2px;">📌 عنوان الفرع (منطوق الفرع):</label>
+                  <input type="text" class="form-control scanned-q-branch-prompt-input"
+                    value="${escapeHtml(b.prompt || '')}"
+                    placeholder="عنوان الفرع (مثال: علل ما يأتي: / قارن بين: / عرف ما يأتي:)"
+                    oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'prompt', this.value)"
+                    style="width: 100%; font-size: 0.84rem; font-weight: 800; padding: 0.35rem 0.55rem; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 7px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #047857; margin-bottom: 2px;">📝 نص الفرع (النقاط / الفقرات):</label>
+                  <textarea class="form-control scanned-q-branch-textarea" rows="${bRows}"
+                    placeholder="اكتب أو عدّل نص ونقاط هذا الفرع هنا (1- ... 2- ...)..."
+                    oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
+                    style="width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>
+                </div>
               </div>
             `;
         }).join('')}
           </div>`
         : '';
 
-      const displayTitle = q.displayTitle || q.title || ('السؤال ' + (ARABIC_ORDINALS[idx] || (idx + 1)));
+      const displayTitle = q.displayTitle || ('السؤال ' + (ARABIC_ORDINALS[idx] || (idx + 1)));
       const qRows = Math.max(2, (q.text || '').split('\n').length);
 
       return `
@@ -2627,7 +2726,7 @@
               <span class="scanned-q-num-badge">س${idx + 1}</span>
               <input type="text" value="${escapeHtml(displayTitle)}"
                 oninput="window.updateScannedQuestionLive(${idx}, 'displayTitle', this.value)"
-                title="اضغط لتعديل عنوان السؤال"
+                title="اضغط لتعديل رقم/تسمية السؤال"
                 style="font-weight: 900; font-size: 0.9rem; color: var(--text-main, #0f172a); background: transparent; border: 1px dashed transparent; border-radius: 6px; padding: 2px 6px; width: 135px; transition: border-color 0.2s;"
                 onfocus="this.style.borderColor='#10b981'; this.style.background='rgba(16,185,129,0.05)';"
                 onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
@@ -2645,20 +2744,39 @@
               </button>
             </div>
           </div>
-          <div class="scanned-q-card-body" style="padding-top: 0.45rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.3rem;">
-              <span style="font-size: 0.74rem; color: #059669; font-weight: 800;">
-                <i class="fa-solid fa-pen-clip"></i> يمكنك التعديل على منطوق ونقاط هذا السؤال مباشرة:
-              </span>
-              <button type="button" onclick="window.addBranchToScannedQuestion(${idx})"
-                style="background: rgba(37, 99, 235, 0.08); color: #2563eb; border: 1px solid rgba(37, 99, 235, 0.22); border-radius: 6px; padding: 2px 8px; font-size: 0.73rem; font-weight: 800; cursor: pointer;">
-                <i class="fa-solid fa-code-branch"></i> + إضافة فرع
-              </button>
+          <div class="scanned-q-card-body" style="padding-top: 0.5rem;">
+            <!-- 1. عنوان السؤال (منطوق السؤال الرئيسي) -->
+            <div style="margin-bottom: 0.5rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="background: rgba(37, 99, 235, 0.1); color: #1d4ed8; padding: 2px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 800;">
+                  <i class="fa-solid fa-heading"></i> 1. عنوان السؤال (منطوق السؤال الرئيسي):
+                </span>
+                <button type="button" onclick="window.addBranchToScannedQuestion(${idx})"
+                  style="background: rgba(139, 92, 246, 0.1); color: #6d28d9; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; padding: 2px 8px; font-size: 0.73rem; font-weight: 800; cursor: pointer;">
+                  <i class="fa-solid fa-code-branch"></i> + إضافة فرع للسؤال (${branchesCount})
+                </button>
+              </div>
+              <input type="text" class="form-control scanned-q-title-input"
+                value="${escapeHtml(q.title || '')}"
+                placeholder="عنوان السؤال (مثال: عرف أربعة مما يأتي: / علل ما يأتي: / أجب عن الفروع الآتية:)"
+                oninput="window.updateScannedQuestionLive(${idx}, 'title', this.value)"
+                style="width: 100%; font-size: 0.9rem; font-weight: 800; padding: 0.42rem 0.65rem; border: 1.5px solid rgba(37, 99, 235, 0.35); border-radius: 8px; background: rgba(37, 99, 235, 0.03); color: var(--text-main, #0f172a);">
             </div>
-            <textarea class="form-control scanned-q-edit-textarea" rows="${qRows}"
-              placeholder="اكتب أو عدّل نص السؤال والنقاط هنا مباشرة..."
-              oninput="window.updateScannedQuestionLive(${idx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
-              style="width: 100%; font-size: 0.9rem; font-weight: 700; line-height: 1.65; padding: 0.55rem 0.7rem; border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 10px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">${escapeHtml(q.text || '')}</textarea>
+
+            <!-- 2. نص السؤال (النقاط / الفقرات) -->
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+                <span style="background: rgba(16, 185, 129, 0.12); color: #047857; padding: 2px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 800;">
+                  <i class="fa-solid fa-list-ol"></i> 2. نص السؤال (النقاط والفقرات التابعة للسؤال):
+                </span>
+              </div>
+              <textarea class="form-control scanned-q-edit-textarea" rows="${qRows}"
+                placeholder="نص ونقاط السؤال الرئيسي (1- ... 2- ...)..."
+                oninput="window.updateScannedQuestionLive(${idx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
+                style="width: 100%; font-size: 0.88rem; font-weight: 700; line-height: 1.65; padding: 0.5rem 0.65rem; border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 10px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">${escapeHtml(q.text || '')}</textarea>
+            </div>
+
+            <!-- 3. فروع السؤال (الفرع أ / الفرع ب) -->
             ${branchesHtml}
           </div>
         </div>
@@ -2683,11 +2801,13 @@
       updateTotalScoreBadgeOnly();
     } else if (field === 'displayTitle') {
       q.displayTitle = value;
+      q.customLabel = value;
+    } else if (field === 'title') {
       q.title = value;
     } else if (field === 'text') {
       q.text = value;
       if (q.type === 'comparisons') {
-        const compMatch = value.match(/(?:قارن\s+بين|ما\s+الفرق\s+بين)\s+(.+?)\s+و\s*(.+?)(?:[\.\n\?؟]|$)/);
+        const compMatch = ((q.title || '') + ' ' + value).match(/(?:قارن\s+بين(?:\s*:)?|ما\s+الفرق\s+بين(?:\s*:)?)\s+(.+?)\s+و\s*(.+?)(?:[\.\n\?؟]|$)/);
         if (compMatch) {
           q.item1 = compMatch[1].trim();
           q.item2 = compMatch[2].trim();
@@ -2703,6 +2823,8 @@
       q.branches[bIdx].score = Math.max(1, parseInt(value, 10) || 5);
     } else if (field === 'title') {
       q.branches[bIdx].title = value;
+    } else if (field === 'prompt') {
+      q.branches[bIdx].prompt = value;
     } else if (field === 'text') {
       q.branches[bIdx].text = value;
     }
@@ -2716,6 +2838,7 @@
     const letter = branchLetters[q.branches.length] || (q.branches.length + 1);
     q.branches.push({
       title: `الفرع (${letter})`,
+      prompt: '',
       text: '',
       score: 10,
       modelAnswer: ''

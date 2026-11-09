@@ -5982,8 +5982,8 @@ function renderBuilderList() {
         </div>
 
         <div class="q-body-preview">
-          ${q.title ? `<div class="q-title-badge" style="font-weight: 800; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; font-size: 0.88rem;"><i class="fa-solid fa-bookmark" style="font-size: 0.76rem;"></i> <span>${formatMathText(q.title)}</span></div>` : ''}
-          <div class="q-text-content" style="color: var(--text-main); line-height: 1.45; font-size: 0.88rem;">${formatMathText(q.text || (!q.title ? '(لا يوجد نص للسؤال)' : ''))}</div>
+          ${q.title ? `<div class="q-title-badge" style="font-weight: 800; color: var(--primary); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; font-size: 0.88rem;"><i class="fa-solid fa-bookmark" style="font-size: 0.76rem;"></i> <span>عنوان السؤال: ${formatMathText(q.title)}</span></div>` : ''}
+          ${(q.text && q.text.trim()) ? `<div class="q-text-content" style="color: var(--text-main); line-height: 1.55; font-size: 0.88rem;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>` : (!q.title ? `<div class="q-text-content" style="color: var(--text-muted); font-size: 0.85rem;">(لا يوجد نص للسؤال)</div>` : '')}
         </div>
 
         <!-- Question Sub-Branches Controls (إضافة فروع للسؤال نفسه أ، ب...) -->
@@ -6009,7 +6009,8 @@ function renderBuilderList() {
                     <i class="fa-solid fa-xmark" style="font-size: 0.7rem;"></i>
                   </button>
                 </div>
-                <input type="text" class="form-control" style="padding: 0.25rem 0.5rem; font-size: 0.8rem;" value="${b.text || ''}" placeholder="نص وصيغة الفرع..." onchange="updateQuestionBranch('${q.id}', ${bIdx}, 'text', this.value)">
+                <input type="text" class="form-control" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; font-weight: 700; margin-bottom: 0.3rem;" value="${b.prompt || ''}" placeholder="عنوان/منطوق الفرع (مثل: عرف ما يأتي: / علل ما يأتي:)..." onchange="updateQuestionBranch('${q.id}', ${bIdx}, 'prompt', this.value)">
+                <textarea class="form-control" rows="${Math.max(2, (b.text || '').split('\n').length)}" style="padding: 0.3rem 0.5rem; font-size: 0.8rem; line-height: 1.5; margin-bottom: 0.3rem;" placeholder="نص ونقاط الفرع (1- ... 2- ...)..." onchange="updateQuestionBranch('${q.id}', ${bIdx}, 'text', this.value)">${b.text || ''}</textarea>
                 <input type="text" class="form-control" style="padding: 0.2rem 0.5rem; font-size: 0.75rem; border-color: rgba(16, 185, 129, 0.3);" value="${b.modelAnswer || ''}" placeholder="نموذج الحل للفرع (اختياري)..." onchange="updateQuestionBranch('${q.id}', ${bIdx}, 'modelAnswer', this.value)">
               </div>
             `).join('')}
@@ -8908,11 +8909,12 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
   const isManualBreak = !!q.pageBreakBefore;
 
   // في نسخة الأجوبة النموذجية: إظهار رقم السؤال أو عنوانه فقط بدون تكرار نص السؤال الكامل!
+  const hasDistinctQuestionBody = Boolean(q.text && q.text.trim() && q.text.trim() !== (q.title || '').trim());
   const questionPromptHTML = isAnswerKey
     ? ''
-    : ((q.title && q.text && q.text !== q.title)
-      ? `<div class="paper-q-body-text" style="margin-top: 4px; font-weight: normal; line-height: 1.65;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
-      : (!q.title ? `<span class="paper-q-inline-multiline" style="line-height: 1.65;">${formatMathText((q.text || '').replace(/\n/g, '<br/>'))}</span>` : ''));
+    : (hasDistinctQuestionBody
+      ? `<div class="paper-q-body-text" style="margin-top: 5px; font-weight: normal; line-height: 1.65; padding-right: 4px;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
+      : '');
 
   return `
     <div class="paper-question" id="paperQ_${q.id}">
@@ -8958,12 +8960,33 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
     const defaultBranchTitle = isLtr ? `Branch (${String.fromCharCode(65 + bIdx)})` : `الفرع (${String.fromCharCode(1571 + bIdx)})`;
     const branchTitle = b.title || defaultBranchTitle;
     const branchScoreText = b.score ? (isLtr ? `(${b.score} ${b.score === 1 ? 'Mark' : 'Marks'})` : `(${b.score} ${b.score > 2 && b.score < 11 ? 'درجات' : 'درجة'})`) : '';
+
+    let branchPrompt = (b.prompt || '').trim();
+    let branchBody = (b.text || '').trim();
+    if (!branchPrompt && branchBody.includes('\n')) {
+      const bLines = branchBody.split('\n').map(l => l.trim()).filter(Boolean);
+      if (bLines.length >= 2) {
+        branchPrompt = bLines[0];
+        branchBody = bLines.slice(1).join('\n');
+      }
+    }
+
     return `
             <div class="paper-q-branch">
               <div class="paper-branch-header">
-                <span style="line-height: 1.65;"><strong>${formatMathText(branchTitle)}:</strong> ${isAnswerKey ? '' : formatMathText((b.text || '').replace(/\n/g, '<br/>'))}</span>
+                <span style="line-height: 1.65;">
+                  <strong>${formatMathText(branchTitle)}:</strong>
+                  ${branchPrompt
+                    ? `<strong class="paper-branch-prompt" style="margin-right: 4px;">${formatMathText(branchPrompt)}</strong>`
+                    : (isAnswerKey ? '' : `<span style="font-weight: normal;">${formatMathText(branchBody.replace(/\n/g, '<br/>'))}</span>`)}
+                </span>
                 ${branchScoreText ? `<span class="paper-branch-grade">${branchScoreText}</span>` : ''}
               </div>
+              ${(!isAnswerKey && branchPrompt && branchBody) ? `
+                <div class="paper-branch-body" style="margin-top: 3px; padding-right: 12px; font-weight: normal; line-height: 1.65;">
+                  ${formatMathText(branchBody.replace(/\n/g, '<br/>'))}
+                </div>
+              ` : ''}
               ${isAnswerKey ? `
                 <div class="paper-model-answer highlighted-model-answer" style="margin-top: 4px; padding: 4px 8px; font-size: 0.9em;">
                   <strong>${isLtr ? '[ Model Answer ]:' : '[ حل الفرع النموذجي ]: '}</strong> ${b.modelAnswer ? formatMathText(b.modelAnswer) : (isLtr ? '(Approved model answer)' : '(راجع نموذج الإجابة المعتمد)')}
