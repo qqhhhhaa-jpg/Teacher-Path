@@ -12,6 +12,45 @@ body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   text-rendering: optimizeSpeed;
+  scroll-behavior: smooth;
+}
+
+/* =========================================================
+   Hardware Acceleration & Zero-Lag Mouse/Scroll Performance
+   ========================================================= */
+.apps-hub-container,
+.app-workstation,
+.main-container,
+.builder-body-scrollable,
+.preview-pane,
+.side-qtype-bar,
+.custom-hero-banner,
+.apps-catalog-grid,
+.app-hub-card {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* GPU Rendering for Interactive Cards without Mouse Lag */
+.app-hub-card {
+  will-change: transform;
+  contain: content;
+}
+
+.aurora-fluid-orb,
+.floating-academic-symbol,
+.banner-bg-wave {
+  contain: strict;
+  will-change: transform;
+  pointer-events: none !important;
+}
+
+/* Limit heavy blur filters during scrolling to avoid GPU choking */
+.is-scrolling * {
+  pointer-events: none !important;
 }
 
 button,

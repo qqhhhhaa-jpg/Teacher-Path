@@ -4933,7 +4933,7 @@ function initEventListeners() {
         }
         showToast(roleMsg, isSubscribed ? 'success' : 'info');
 
-        // Defer heavy workspace initialization to next animation frame so the portal vanishes instantly
+        // Ultra-Fast Zero-Lag Login: Instantly unlock and dismiss the portal (0ms visual delay)
         requestAnimationFrame(() => {
           loadSavedState();
           syncHeaderInputs();
@@ -4941,23 +4941,28 @@ function initEventListeners() {
           updateUserAuthUI();
           updatePrivacySettingsUI();
           updateArchiveBadge();
-          renderAll();
-
-          if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
-            window.reloadStudentGradesForCurrentUser();
-          }
-          if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
-            window.reloadStudentBehaviorForCurrentUser();
-          }
-
-          if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
-          if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
           if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
+          if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
 
-          // Restore cloud questions & exams across devices from server backend in background
-          if (typeof window.restoreUserDataFromServer === 'function') {
-            window.restoreUserDataFromServer(found);
+          // Only render builder if questions tab is visible
+          const curTab = document.querySelector('.tab-content[style*="display: block"]');
+          if (curTab && curTab.id === 'tab-questions') {
+            renderAll();
           }
+
+          // Background deferred load for non-essential studios (Zero Main-Thread Blocking)
+          setTimeout(() => {
+            if (typeof window.reloadStudentGradesForCurrentUser === 'function') {
+              window.reloadStudentGradesForCurrentUser();
+            }
+            if (typeof window.reloadStudentBehaviorForCurrentUser === 'function') {
+              window.reloadStudentBehaviorForCurrentUser();
+            }
+            if (typeof updateDailyReportMetrics === 'function') updateDailyReportMetrics();
+            if (typeof window.restoreUserDataFromServer === 'function') {
+              window.restoreUserDataFromServer(found);
+            }
+          }, 120);
         });
       } else {
         // WRONG PASSWORD / CREDENTIALS ERROR!
@@ -13815,10 +13820,13 @@ window.performGoogleLoginSuccess = async function (account) {
   updateUserAuthUI();
   if (typeof window.updateVipUIStatus === 'function') window.updateVipUIStatus();
 
-  // Load state and render workstation
+  // Load state and render workstation with zero delay
   if (typeof loadSavedState === 'function') loadSavedState();
   if (typeof updateArchiveBadge === 'function') updateArchiveBadge();
-  if (typeof renderAll === 'function') renderAll();
+  const curTab = document.querySelector('.tab-content[style*="display: block"]');
+  if (curTab && curTab.id === 'tab-questions' && typeof renderAll === 'function') {
+    renderAll();
+  }
 
   // Close modals
   window.closeGoogleAccountModal();
