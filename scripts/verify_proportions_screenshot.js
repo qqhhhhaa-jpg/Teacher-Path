@@ -1,4 +1,7 @@
-const { chromium } = require('playwright');
+sk - proj - O9 - mY2AOT - tMBGHYBrI3PzcIj9DuW25HRe3NkZh3g - Xqg6NkXhdom7qmu4iigxIIqzJWvdokYpT3BlbkFJ - h0deYOc - XZpScjMY2b6j2LuJPUpgg0Vj34jBF - JbA7nowfoV5dfAlDezzbkLFiophhyKuG1EA
+
+هذا apl ما جات جبتي  
+اربطه بالمشروع اليه بمكان كلاودconst { chromium } = require('playwright');
 const path = require('path');
 
 (async () => {

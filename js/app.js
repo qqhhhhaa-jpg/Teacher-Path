@@ -6367,11 +6367,17 @@ function formatMathText(rawText) {
   if (!rawText || typeof rawText !== 'string') return rawText || '';
 
   // Quick check: if string has no math/chem indicators, return as-is
-  if (!rawText.includes('$') && !rawText.includes('\\') && !rawText.includes('^') && !rawText.includes('_')) {
+  if (!rawText.includes('$') && !rawText.includes('\\') && !rawText.includes('^') && !rawText.includes('_') && !rawText.includes('√')) {
     return rawText;
   }
 
   let result = rawText;
+
+  // Normalize bare exponents like x^2 or (x+1)^2 into x^{2} and √(x+1) into \sqrt{x+1}
+  result = result
+    .replace(/([a-zA-Z0-9\)\u0621-\u064A])\^([0-9a-zA-Z\+\-]+)(?!\})/g, '$1^{$2}')
+    .replace(/√\(([^()]+)\)/g, '\\sqrt{$1}')
+    .replace(/√([a-zA-Z0-9]+)/g, '\\sqrt{$1}');
 
   // 1. Process block display math $$...$$
   result = result.replace(/\$\$([\s\S]+?)\$\$/g, (m, formula) => renderLatexBlock(formula, true));
@@ -6380,10 +6386,10 @@ function formatMathText(rawText) {
   result = result.replace(/\$([^\$\n]+?)\$/g, (m, formula) => renderLatexBlock(formula, false));
 
   // 3. Process direct common LaTeX / Chemistry commands written without dollar signs
-  if (/\\(frac|sqrt|lim|int|sum|sin|cos|tan|log|ln|bmatrix|vmatrix|pm|times|div|neq|le|ge|rightleftharpoons|rightarrow|uparrow|downarrow|Delta)|(\b[a-zA-Z0-9\)]+[\^_][0-9a-zA-Z{}]+)/.test(result)) {
+  if (/\\(frac|sqrt|lim|int|sum|sin|cos|tan|log|ln|bmatrix|vmatrix|pm|times|div|neq|le|ge|rightleftharpoons|rightarrow|uparrow|downarrow|Delta)|([a-zA-Z0-9\)\u0621-\u064A]+[\^_][0-9a-zA-Z\{\}\+\-]+)/.test(result)) {
     result = result.replace(/\\frac\{[^{}]+\}\{[^{}]+\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\\sqrt(\[[^{}]+\])?\{[^{}]+\}/g, (m) => renderLatexBlock(m, false));
-    result = result.replace(/\b([a-zA-Z0-9\)]+)\^\{([^{}]+)\}/g, (m) => renderLatexBlock(m, false));
+    result = result.replace(/([a-zA-Z0-9\)\u0621-\u064A]+)\^\{([^{}]+)\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\b([a-zA-Z0-9\)]+)_\{([^{}]+)\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\\begin\{bmatrix\}[\s\S]+?\\end\{bmatrix\}/g, (m) => renderLatexBlock(m, false));
     result = result.replace(/\\begin\{vmatrix\}[\s\S]+?\\end\{vmatrix\}/g, (m) => renderLatexBlock(m, false));
@@ -8894,11 +8900,12 @@ function getPaperSeparatorHTML(nextPageNum, totalPages) {
 }
 
 function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
+  const effectiveLtr = Boolean(isLtr || q.subject === 'english');
   const qNum = idx + 1;
   const score = q.score || 20;
-  const defaultPrefix = isLtr ? `Question (${qNum}):` : `السؤال (${qNum}):`;
+  const defaultPrefix = effectiveLtr ? `Question (${qNum}):` : `السؤال (${qNum}):`;
   const qNumPrefix = (q.customLabel && q.customLabel.trim()) ? q.customLabel.trim() : defaultPrefix;
-  const scoreText = isLtr
+  const scoreText = effectiveLtr
     ? `(${score} ${score === 1 ? 'Mark' : 'Marks'})`
     : `(${score} ${score > 2 && score < 11 ? 'درجات' : 'درجة'})`;
 
@@ -8907,18 +8914,19 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
     : '';
 
   const isManualBreak = !!q.pageBreakBefore;
+  const qDirAttr = effectiveLtr ? 'dir="ltr" style="direction: ltr; text-align: left;"' : '';
 
   // في نسخة الأجوبة النموذجية: إظهار رقم السؤال أو عنوانه فقط بدون تكرار نص السؤال الكامل!
   const hasDistinctQuestionBody = Boolean(q.text && q.text.trim() && q.text.trim() !== (q.title || '').trim());
   const questionPromptHTML = isAnswerKey
     ? ''
     : (hasDistinctQuestionBody
-      ? `<div class="paper-q-body-text" style="margin-top: 5px; font-weight: normal; line-height: 1.65; padding-right: 4px;">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
+      ? `<div class="paper-q-body-text" style="margin-top: 5px; font-weight: normal; line-height: 1.65; ${effectiveLtr ? 'padding-left: 4px;' : 'padding-right: 4px;'}">${formatMathText(q.text.replace(/\n/g, '<br/>'))}</div>`
       : '');
 
   return `
-    <div class="paper-question" id="paperQ_${q.id}">
-      <div class="paper-q-header">
+    <div class="paper-question ${effectiveLtr ? 'paper-q-ltr' : ''}" id="paperQ_${q.id}" ${qDirAttr}>
+      <div class="paper-q-header" ${effectiveLtr ? 'style="flex-direction: row;"' : ''}>
         <div class="paper-q-text" ${fontStyle}>
           <span class="paper-q-num" title="تسمية وترقيم السؤال (انقر لتعديل التسمية فورياً)" onclick="window.quickEditQuestionLabel('${q.id}')">${qNumPrefix}</span> ${q.title ? `<strong class="paper-q-title-inline">${formatMathText(q.title)}</strong>` : ''}
           ${questionPromptHTML}
@@ -8957,9 +8965,9 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
       ${(q.branches && q.branches.length > 0) ? `
         <div class="paper-q-branches">
           ${q.branches.map((b, bIdx) => {
-    const defaultBranchTitle = isLtr ? `Branch (${String.fromCharCode(65 + bIdx)})` : `الفرع (${String.fromCharCode(1571 + bIdx)})`;
+    const defaultBranchTitle = effectiveLtr ? `Branch (${String.fromCharCode(65 + bIdx)})` : `الفرع (${String.fromCharCode(1571 + bIdx)})`;
     const branchTitle = b.title || defaultBranchTitle;
-    const branchScoreText = b.score ? (isLtr ? `(${b.score} ${b.score === 1 ? 'Mark' : 'Marks'})` : `(${b.score} ${b.score > 2 && b.score < 11 ? 'درجات' : 'درجة'})`) : '';
+    const branchScoreText = b.score ? (effectiveLtr ? `(${b.score} ${b.score === 1 ? 'Mark' : 'Marks'})` : `(${b.score} ${b.score > 2 && b.score < 11 ? 'درجات' : 'درجة'})`) : '';
 
     let branchPrompt = (b.prompt || '').trim();
     let branchBody = (b.text || '').trim();
@@ -8973,23 +8981,23 @@ function renderSingleQuestionHTML(q, idx, totalQuestions, isAnswerKey, isLtr) {
 
     return `
             <div class="paper-q-branch">
-              <div class="paper-branch-header">
+              <div class="paper-branch-header" ${effectiveLtr ? 'style="flex-direction: row; justify-content: space-between;"' : ''}>
                 <span style="line-height: 1.65;">
                   <strong>${formatMathText(branchTitle)}:</strong>
                   ${branchPrompt
-                    ? `<strong class="paper-branch-prompt" style="margin-right: 4px;">${formatMathText(branchPrompt)}</strong>`
+                    ? `<strong class="paper-branch-prompt" style="${effectiveLtr ? 'margin-left: 4px;' : 'margin-right: 4px;'}">${formatMathText(branchPrompt)}</strong>`
                     : (isAnswerKey ? '' : `<span style="font-weight: normal;">${formatMathText(branchBody.replace(/\n/g, '<br/>'))}</span>`)}
                 </span>
                 ${branchScoreText ? `<span class="paper-branch-grade">${branchScoreText}</span>` : ''}
               </div>
               ${(!isAnswerKey && branchPrompt && branchBody) ? `
-                <div class="paper-branch-body" style="margin-top: 3px; padding-right: 12px; font-weight: normal; line-height: 1.65;">
+                <div class="paper-branch-body" style="margin-top: 3px; ${effectiveLtr ? 'padding-left: 12px;' : 'padding-right: 12px;'} font-weight: normal; line-height: 1.65;">
                   ${formatMathText(branchBody.replace(/\n/g, '<br/>'))}
                 </div>
               ` : ''}
               ${isAnswerKey ? `
                 <div class="paper-model-answer highlighted-model-answer" style="margin-top: 4px; padding: 4px 8px; font-size: 0.9em;">
-                  <strong>${isLtr ? '[ Model Answer ]:' : '[ حل الفرع النموذجي ]: '}</strong> ${b.modelAnswer ? formatMathText(b.modelAnswer) : (isLtr ? '(Approved model answer)' : '(راجع نموذج الإجابة المعتمد)')}
+                  <strong>${effectiveLtr ? '[ Model Answer ]:' : '[ حل الفرع النموذجي ]: '}</strong> ${b.modelAnswer ? formatMathText(b.modelAnswer) : (effectiveLtr ? '(Approved model answer)' : '(راجع نموذج الإجابة المعتمد)')}
                 </div>
               ` : ''}
             </div>

@@ -47,7 +47,12 @@
     }
   }
 
+  let activeScannerSubjectOverride = null;
+
   function getActiveSubjectMode() {
+    if (activeScannerSubjectOverride) {
+      return activeScannerSubjectOverride;
+    }
     const activeBtn = document.querySelector('#sideSubjectSwitcher .side-sub-btn.active');
     if (activeBtn && activeBtn.dataset.subMode) {
       return activeBtn.dataset.subMode;
@@ -216,6 +221,31 @@
             <div class="scanner-step-pill" id="scannerStep3Indicator">
               <span class="step-num">3</span>
               <span>اعتمادها في ورقة الامتحان A4</span>
+            </div>
+          </div>
+
+          <!-- شريط اختيار تخصص الورقة الذكي (عربي | English | الرياضيات) -->
+          <div id="scannerSubjectModeStrip" style="display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; flex-wrap: wrap; background: linear-gradient(135deg, rgba(15, 23, 42, 0.04), rgba(37, 99, 235, 0.05)); border: 1.5px solid rgba(37, 99, 235, 0.2); border-radius: 14px; padding: 0.55rem 0.85rem; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.45rem;">
+              <i class="fa-solid fa-layer-group" style="color: #2563eb; font-size: 1rem;"></i>
+              <strong style="font-size: 0.85rem; color: var(--text-main, #0f172a);">نظام قراءة وتقسيم الورقة والإملاء حسب المادة:</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+              <button type="button" id="scannerSubBtn_arabic" class="scanner-sub-mode-btn active" onclick="window.setScannerSubjectMode('arabic')"
+                style="padding: 0.42rem 0.9rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; border: 1.5px solid #10b981; background: linear-gradient(135deg, #059669, #10b981); color: #fff; box-shadow: 0 3px 10px rgba(16, 185, 129, 0.25); transition: all 0.2s;">
+                <i class="fa-solid fa-feather-pointed"></i>
+                <span>📗 اللغة العربية والمواد العامة</span>
+              </button>
+              <button type="button" id="scannerSubBtn_english" class="scanner-sub-mode-btn" onclick="window.setScannerSubjectMode('english')"
+                style="padding: 0.42rem 0.9rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; border: 1.5px solid rgba(37, 99, 235, 0.35); background: var(--bg-card, #fff); color: #1d4ed8; transition: all 0.2s;">
+                <i class="fa-solid fa-earth-americas"></i>
+                <span>📘 English Language (LTR)</span>
+              </button>
+              <button type="button" id="scannerSubBtn_math" class="scanner-sub-mode-btn" onclick="window.setScannerSubjectMode('math')"
+                style="padding: 0.42rem 0.9rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; border: 1.5px solid rgba(139, 92, 246, 0.35); background: var(--bg-card, #fff); color: #6d28d9; transition: all 0.2s;">
+                <i class="fa-solid fa-square-root-variable"></i>
+                <span>📐 الرياضيات والمعادلات (Math)</span>
+              </button>
             </div>
           </div>
 
@@ -466,16 +496,10 @@
                   <div id="scannerVoiceInterimText" style="font-size: 0.82rem; font-weight: 700; color: #047857; background: rgba(255,255,255,0.75); border-radius: 8px; padding: 0.35rem 0.6rem; min-height: 28px; margin-bottom: 0.45rem; border: 1px dashed rgba(16, 185, 129, 0.35);">
                     💡 قل مثلاً: "السؤال الأول عرف ما يأتي الخلية النواة المايتوكوندريا علل ما يأتي تمتاز الخلية النباتية بوجود شكل ثابت لها..."
                   </div>
-                  <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-                    <span style="font-size: 0.72rem; font-weight: 800; color: #065f46;">إدراج فوري أثناء الإملاء:</span>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_question')" style="font-size: 0.72rem; padding: 2px 8px;">+ سؤال جديد</button>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_branch')" style="font-size: 0.72rem; padding: 2px 8px; background: rgba(16,185,129,0.15); color: #065f46;">+ فتح فرع جديد (أ/ب)</button>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('definitions')" style="font-size: 0.72rem; padding: 2px 8px;">+ عرف ما يأتي</button>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('reasoning')" style="font-size: 0.72rem; padding: 2px 8px;">+ علل ما يأتي</button>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('fill_blanks')" style="font-size: 0.72rem; padding: 2px 8px;">+ املأ الفراغات</button>
-                    <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('comparisons')" style="font-size: 0.72rem; padding: 2px 8px;">+ قارن بين</button>
-                  </div>
                 </div>
+
+                <!-- شريط الأدوات الذكي حسب المادة (عربي / English / الرياضيات + رموز ومعادلات) -->
+                <div id="scannerQuickSubjectToolbar" style="margin: 0 0 0.65rem 0; padding: 0.55rem 0.7rem; border-radius: 10px; background: rgba(37, 99, 235, 0.04); border: 1px solid rgba(37, 99, 235, 0.2);"></div>
 
                 <!-- مربع النص المقروء (يمكن للمعلم مراجعته أو الكتابة/الإملاء فيه مباشرة) -->
                 <div class="scanner-raw-text-wrap">
@@ -604,6 +628,9 @@
     if (modal) {
       modal.classList.add('open');
       modal.style.setProperty('display', 'flex', 'important');
+    }
+    if (typeof window.setScannerSubjectMode === 'function') {
+      window.setScannerSubjectMode(getActiveSubjectMode(), true);
     }
     if (openQrPanelImmediately) {
       window.toggleScannerQrBridgePanel(true);
@@ -1450,7 +1477,7 @@
     });
   }
 
-  async function callCloudHandwritingEngine3(compressedDataUrl, engineNum = '3') {
+  async function callCloudHandwritingEngine3(compressedDataUrl, engineNum = '3', subjectMode = 'arabic') {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 16000);
     try {
@@ -1458,6 +1485,9 @@
       form.append('apikey', 'helloworld');
       form.append('base64Image', compressedDataUrl);
       form.append('OCREngine', String(engineNum));
+      if (subjectMode === 'english' && String(engineNum) !== '3') {
+        form.append('language', 'eng');
+      }
       form.append('scale', 'true');
       form.append('isTable', 'false');
 
@@ -1482,37 +1512,40 @@
 
   async function recognizeWithArabicVisionAI(imageDataUrl) {
     if (!imageDataUrl) return '';
+    const subjectMode = getActiveSubjectMode();
 
     // ضغط الصورة بذكاء لتكون أقل من 450KB لضمان سرعة فائقة وعدم رفض الصور الكبيرة من كاميرا الموبايل
     const compressedUrl = await compressImageForVisionApi(imageDataUrl, 1350, 0.78);
 
-    // 1. المحرك الأساسي الأول: Cloud Handwriting Vision Engine 3 (قارئ خط اليد العربي السحابي السريع)
+    // 1. المحرك الأساسي الأول: Cloud Handwriting Vision Engine 3 (يدعم العربية، الإنجليزية، والرياضيات والمعادلات)
     showScannerProgress(true, 'جاري قراءة خط اليد البشري عبر محرك الرؤية السحابي (Cloud Handwriting Vision)...', 50);
-    let text = await callCloudHandwritingEngine3(compressedUrl, '3');
+    let text = await callCloudHandwritingEngine3(compressedUrl, '3', subjectMode);
     if (text && text.trim().length > 4) {
       return text;
     }
 
     // 2. المحرك الثاني: Qari OCR 0.2.2.1 (نموذج رؤية بصري متخصص بالخط العربي واليدوي)
-    const fileObj = {
-      path: null,
-      url: compressedUrl,
-      size: null,
-      orig_name: 'handwritten_exam_paper.jpg',
-      mime_type: 'image/jpeg',
-      is_stream: false,
-      meta: { _type: 'gradio.FileData' }
-    };
-    showScannerProgress(true, 'جاري فحص تفاصيل الخط اليدوي عبر محرك الرؤية البصري (Qari Vision AI)...', 62);
-    const qariHost = 'https://oddadmix-arabic-ocr-models-demos.hf.space';
-    text = await callGradioVisionSpace(qariHost, 'perform_ocr', [fileObj, 'Qari OCR 0.2.2.1'], 12000);
-    if (text && text.trim().length > 4) {
-      return text;
+    if (subjectMode !== 'english') {
+      const fileObj = {
+        path: null,
+        url: compressedUrl,
+        size: null,
+        orig_name: 'handwritten_exam_paper.jpg',
+        mime_type: 'image/jpeg',
+        is_stream: false,
+        meta: { _type: 'gradio.FileData' }
+      };
+      showScannerProgress(true, 'جاري فحص تفاصيل الخط اليدوي عبر محرك الرؤية البصري (Qari Vision AI)...', 62);
+      const qariHost = 'https://oddadmix-arabic-ocr-models-demos.hf.space';
+      text = await callGradioVisionSpace(qariHost, 'perform_ocr', [fileObj, 'Qari OCR 0.2.2.1'], 12000);
+      if (text && text.trim().length > 4) {
+        return text;
+      }
     }
 
     // 3. المحرك الثالث: Cloud Vision Engine 2 المساند
     showScannerProgress(true, 'جاري قراءة الورقة عبر محرك الرؤية المساند...', 72);
-    text = await callCloudHandwritingEngine3(compressedUrl, '2');
+    text = await callCloudHandwritingEngine3(compressedUrl, '2', subjectMode);
     if (text && text.trim().length > 4) {
       return text;
     }
@@ -1521,7 +1554,7 @@
   }
 
   /**
-   * تنقية مخرجات القراءة الضوئية والبصرية من أي حروف إنجليزية عشوائية أو رموز مشوهة
+   * تنقية مخرجات القراءة الضوئية والبصرية حسب تخصص المادة (عربي | English | الرياضيات)
    * وفصل الأسئلة والفروع والنقاط تلقائياً في أسطر مستقلة
    */
   function cleanArabicOcrText(rawText, subjectMode = 'arabic') {
@@ -1531,18 +1564,31 @@
       .replace(/<br\s*\/?>/gi, '\n')
       .replace(/<\/p>|<\/div>|<\/li>/gi, '\n')
       .replace(/<[^>]+>/g, ' ')
-      .replace(/\r\n/g, '\n')
-      .replace(/[|¦~^°¬§¤£¥€«»_—–=+#*<>[\]{}\\]+/g, ' ');
+      .replace(/\r\n/g, '\n');
 
-    if (subjectMode !== 'english') {
-      // حذف أي كلمات أو حروف إنجليزية/لاتينية عشوائية ناتجة عن التباس نقاط الخط العربي
-      txt = txt.replace(/[A-Za-z]+/g, ' ');
-      // فصل الأسئلة والفروع والنقاط إذا قرأها محرك الرؤية في سطر واحد متصل
+    if (subjectMode === 'english') {
+      // تنقية خاصة بمادة اللغة الإنجليزية (LTR) مع الحفاظ على الأقواس والفراغات وعلامات الترقيم
       txt = txt
+        .replace(/[|¦~°¬§¤£¥€«»]+/g, ' ')
+        .replace(/([^\n])\s+((?:Q\.?\s*[1-9]|Question\s*(?:[1-9]|One|Two|Three|Four|Five|Six))\s*[\/:\-\)])/gi, '$1\n$2')
+        .replace(/([^\n])\s+((?:Branch|Section)\s*[\(\[]?\s*[A-D]\s*[\)\]]?\s*[\/:\-\)]?)/gi, '$1\n$2')
+        .replace(/([:.?])\s+([1-9]\s*[\-\.\)])/g, '$1\n$2');
+    } else if (subjectMode === 'math') {
+      // تنقية خاصة بمادة الرياضيات: الحفاظ الكامل على المتغيرات (x, y, z, sin, cos, lim) والعمليات (+, -, =, ^, √, /, \frac, \sqrt)
+      txt = txt
+        .replace(/[|¦~°¬§¤£¥€«»]+/g, ' ')
+        .replace(/([^\n])\s+((?:[سصش]\s*[1-9١-٩]|السؤال\s+(?:الأول|الاول|الثاني|الثالث|الرابع|الخامس|السادس)|Q\.?\s*[1-9])\s*[\/:\-\)])/gi, '$1\n$2')
+        .replace(/([^\n])\s+((?:الفرع|فرع|Branch)\s*[\(\[]?\s*[أابجدهـA-D]\s*[\)\]]?\s*[\/:\-\)]?)/gi, '$1\n$2')
+        .replace(/(?:^|\n)\s*[سصش]\s*([1-9١-٩]|[1١][0٠])\s*[:/\-ـ]*/g, '\nس$1/ ')
+        .replace(/(?:^|\n)\s*فرع\s*[\(\[]?\s*([أابجدهـ])\s*[\)\]]?/g, '\nفرع ($1): ');
+    } else {
+      // الوضع العربي العام: حذف أي كلمات أو حروف إنجليزية/لاتينية عشوائية ناتجة عن التباس نقاط الخط العربي
+      txt = txt
+        .replace(/[|¦~^°¬§¤£¥€«»_—–=+#*<>[\]{}\\]+/g, ' ')
+        .replace(/[A-Za-z]+/g, ' ')
         .replace(/([^\n])\s+((?:[سصش]\s*[1-9١-٩]|السؤال\s+(?:الأول|الاول|الثاني|الثالث|الرابع|الخامس|السادس))\s*[\/:\-\)])/g, '$1\n$2')
         .replace(/([^\n])\s+((?:الفرع|فرع)\s*[\(\[]?\s*[أابجدهـ]\s*[\)\]]?\s*[\/:\-\)]?)/g, '$1\n$2')
         .replace(/([:.\)؟])\s+([1-9١-٩]\s*[\-\)])/g, '$1\n$2')
-        // تصحيح الالتباسات الشائعة في قراءة أرقام الأسئلة المكتوبة بخط اليد وفصل حروف الجر الملتصقة
         .replace(/(?:^|\n)\s*[سصش]\s*([1-9١-٩]|[1١][0٠])\s*[:/\-ـ]*/g, '\nس$1/ ')
         .replace(/(?:^|\n)\s*فرع\s*[\(\[]?\s*([أابجدهـ])\s*[\)\]]?/g, '\nفرع ($1): ')
         .replace(/(^|\s)(في|من|على|إلى|عن)(ال[\u0600-\u06FF]{2,})/g, '$1$2 $3');
@@ -1554,7 +1600,7 @@
       .map(line => line.replace(/\s{2,}/g, ' ').trim())
       .filter(line => {
         if (!line) return false;
-        if (subjectMode !== 'english') {
+        if (subjectMode === 'arabic') {
           const arabicOrDigits = (line.match(/[\u0600-\u06FF0-9٠-٩]/g) || []).length;
           return arabicOrDigits >= 2;
         }
@@ -1819,25 +1865,81 @@
     if (!rawTextarea) return;
 
     const cur = rawTextarea.value.trim();
+    const mode = getActiveSubjectMode();
     let snippet = '';
-    if (cmdType === 'new_question') {
-      const qCount = (cur.match(/(?:^|\n)\s*س\s*[٠-٩\d]+/g) || []).length + 1;
-      snippet = `\nس${qCount} / (20 درجة)\n`;
-    } else if (cmdType === 'new_branch') {
-      snippet = `\nفرع جديد / `;
-    } else if (cmdType === 'definitions') {
-      snippet = `\nعرف ما يأتي:\n`;
-    } else if (cmdType === 'reasoning') {
-      snippet = `\nعلل ما يأتي:\n`;
-    } else if (cmdType === 'fill_blanks') {
-      snippet = `\nاملأ الفراغات الآتية بما يناسبها:\n`;
-    } else if (cmdType === 'comparisons') {
-      snippet = `\nقارن بين `;
+
+    if (mode === 'english') {
+      if (cmdType === 'new_question') {
+        const qCount = (cur.match(/(?:^|\n)\s*(?:Q\.?\s*\d+|Question\s+\d+)/gi) || []).length + 1;
+        snippet = `\nQ${qCount}/ (20 Marks)\n`;
+      } else if (cmdType === 'new_branch') {
+        snippet = `\nBranch (B)/ `;
+      } else if (cmdType === 'reading_passage') {
+        snippet = `\nRead the following passage carefully, then answer the questions:\n`;
+      } else if (cmdType === 'grammar') {
+        snippet = `\nDo as required between brackets:\n`;
+      } else if (cmdType === 'definitions') {
+        snippet = `\nDefine the following words:\n`;
+      } else if (cmdType === 'mcq') {
+        snippet = `\nChoose the correct word between brackets:\n`;
+      } else if (cmdType === 'fill_blanks') {
+        snippet = `\nFill in the blanks with the suitable words:\n`;
+      } else if (cmdType === 'true_false') {
+        snippet = `\nWrite True or False for the following sentences:\n`;
+      } else if (cmdType === 'matching') {
+        snippet = `\nMatch the words in List (A) with their meanings in List (B):\n`;
+      }
+    } else if (mode === 'math') {
+      if (cmdType === 'new_question') {
+        const qCount = (cur.match(/(?:^|\n)\s*س\s*[٠-٩\d]+/g) || []).length + 1;
+        snippet = `\nس${qCount} / (20 درجة)\n`;
+      } else if (cmdType === 'new_branch') {
+        snippet = `\nالفرع (ب) / `;
+      } else if (cmdType === 'solve_set') {
+        snippet = `\nجد مجموعة الحل للمعادلات الآتية:\n`;
+      } else if (cmdType === 'simplify') {
+        snippet = `\nجد ناتج ما يأتي بأبسط صورة:\n`;
+      } else if (cmdType === 'factor') {
+        snippet = `\nحلل المقادير الجبرية الآتية:\n`;
+      } else if (cmdType === 'find_x') {
+        snippet = `\nجد قيمة x في المعادلات الآتية:\n`;
+      } else if (cmdType === 'prove') {
+        snippet = `\nأثبت صحة المتطابقة الآتية:\n`;
+      }
+    } else {
+      if (cmdType === 'new_question') {
+        const qCount = (cur.match(/(?:^|\n)\s*س\s*[٠-٩\d]+/g) || []).length + 1;
+        snippet = `\nس${qCount} / (20 درجة)\n`;
+      } else if (cmdType === 'new_branch') {
+        snippet = `\nفرع جديد / `;
+      } else if (cmdType === 'definitions') {
+        snippet = `\nعرف ما يأتي:\n`;
+      } else if (cmdType === 'reasoning') {
+        snippet = `\nعلل ما يأتي:\n`;
+      } else if (cmdType === 'fill_blanks') {
+        snippet = `\nاملأ الفراغات الآتية بما يناسبها:\n`;
+      } else if (cmdType === 'comparisons') {
+        snippet = `\nقارن بين `;
+      } else if (cmdType === 'true_false') {
+        snippet = `\nضع كلمة (صح) أو (خطأ) أمام العبارات الآتية:\n`;
+      }
     }
 
     rawTextarea.value = (cur ? cur + snippet : snippet.trimStart());
     window.parseTextFromScannerBox(true);
     rawTextarea.focus();
+  };
+
+  window.insertScannerMathToken = function (token) {
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    if (!rawTextarea) return;
+    const start = rawTextarea.selectionStart || rawTextarea.value.length;
+    const end = rawTextarea.selectionEnd || rawTextarea.value.length;
+    const text = rawTextarea.value;
+    rawTextarea.value = text.substring(0, start) + token + text.substring(end);
+    rawTextarea.selectionStart = rawTextarea.selectionEnd = start + token.length;
+    rawTextarea.focus();
+    window.parseTextFromScannerBox(true);
   };
 
   window.autoStructureAndNumberRawBox = function () {
@@ -1947,35 +2049,271 @@
     speechRecognitionInstance.start();
   };
 
-  window.loadSampleHandwrittenPaper = function () {
-    const sampleLines = [
-      'س1 / عرف أربعة مما يأتي: (20 درجة)',
-      '1- الخلية : هي وحدة البناء والوظيفة في جسم الكائن الحي.',
-      '2- النواة : عضية كروية الشكل تنظم كافة الفعاليات الحيوية في الخلية.',
-      '3- المايتوكوندريا : بيوت الطاقة في الخلية المسؤولة عن التنفس الخلوي.',
-      '4- التناضح : حركة جزيئات الماء خلال غشاء اختياري النفوذية.',
-      '',
-      'س2 / (20 درجة)',
-      'فرع أ / علل اثنين مما يأتي: (10 درجات)',
-      '1- تمتاز الخلية النباتية بوجود شكل ثابت ومحدد لها.',
-      '2- تسمى الجسيمات الحالة بوحدات التنظيف في السايتوبلازم.',
-      '3- وجود الأعراف في الطبقة الداخلية للمايتوكوندريا.',
-      'فرع ب / قارن بين الخلية النباتية والخلية الحيوانية. (10 درجات)',
-      '',
-      'س3 / املأ الفراغات الآتية بما يناسبها: (20 درجة)',
-      '1- يتألف الجدار الخلوي في الخلية النباتية من ثلاث طبقات هي الصفيحة الوسطى و ........ و ........',
-      '2- العالم الذي اكتشف نواة الخلية هو العالم ........',
-      '3- يطلق على جهاز كولجي في الخلايا النباتية اسم ........',
-      '',
-      'س4 / ضع كلمة (صح) أمام العبارة الصحيحة وكلمة (خطأ) أمام العبارة غير الصحيحة: (20 درجة)',
-      '1- الغشاء البلازمي غشاء اختياري النفوذية يحيط بالخلية النباتية والحيوانية.',
-      '2- البلاستيدات الخضراء توجد في الخلايا الحيوانية والنباتية معاً.',
-      '3- الرايبوسومات هي مراكز بناء البروتين في الخلية.'
-    ];
+  window.setScannerSubjectMode = function (mode, silent = false) {
+    if (!['arabic', 'english', 'math'].includes(mode)) mode = 'arabic';
+    activeScannerSubjectOverride = mode;
+
+    // تحديث أزرار الشريط
+    const btnAr = document.getElementById('scannerSubBtn_arabic');
+    const btnEn = document.getElementById('scannerSubBtn_english');
+    const btnMa = document.getElementById('scannerSubBtn_math');
+
+    const resetBtnStyle = (btn, colorHex) => {
+      if (!btn) return;
+      btn.classList.remove('active');
+      btn.style.background = 'var(--bg-card, #fff)';
+      btn.style.color = colorHex;
+      btn.style.boxShadow = 'none';
+    };
+
+    resetBtnStyle(btnAr, '#059669');
+    resetBtnStyle(btnEn, '#1d4ed8');
+    resetBtnStyle(btnMa, '#6d28d9');
+
+    if (mode === 'english' && btnEn) {
+      btnEn.classList.add('active');
+      btnEn.style.background = 'linear-gradient(135deg, #1d4ed8, #3b82f6)';
+      btnEn.style.color = '#fff';
+      btnEn.style.boxShadow = '0 3px 10px rgba(37, 99, 235, 0.28)';
+    } else if (mode === 'math' && btnMa) {
+      btnMa.classList.add('active');
+      btnMa.style.background = 'linear-gradient(135deg, #6d28d9, #8b5cf6)';
+      btnMa.style.color = '#fff';
+      btnMa.style.boxShadow = '0 3px 10px rgba(139, 92, 246, 0.28)';
+    } else if (btnAr) {
+      btnAr.classList.add('active');
+      btnAr.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+      btnAr.style.color = '#fff';
+      btnAr.style.boxShadow = '0 3px 10px rgba(16, 185, 129, 0.28)';
+    }
+
+    // اتجاه مربع النص والأمثلة
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+    const interimEl = document.getElementById('scannerVoiceInterimText');
+
+    if (rawTextarea) {
+      if (mode === 'english') {
+        rawTextarea.dir = 'ltr';
+        rawTextarea.style.textAlign = 'left';
+        rawTextarea.placeholder = 'Paste or type handwritten English exam text here...\nExample:\nQ1/ Read the passage and answer: (20 Marks)\nBranch (B)/ Do as required between brackets:\n1- Ali lives in Baghdad. (Make question)\n2- If she studies hard, she ........ the exam. (pass)';
+      } else if (mode === 'math') {
+        rawTextarea.dir = 'rtl';
+        rawTextarea.style.textAlign = 'right';
+        rawTextarea.placeholder = 'الصق أو اكتب نص أسئلة الرياضيات والمعادلات هنا...\nمثال:\nس1 / جد مجموعة الحل للمعادلات الآتية: (20 درجة)\n1- x^2 - 5x + 6 = 0\n2- 2x + y = 7\nالفرع (ب) / حلل المقادير الجبرية الآتية: (10 درجات)\n1- x^2 - 9\n2- x^3 + 8';
+      } else {
+        rawTextarea.dir = 'rtl';
+        rawTextarea.style.textAlign = 'right';
+        rawTextarea.placeholder = 'الصق أو اكتب نص أسئلة الورقة هنا...\nمثال:\nس1 / عرف أربعة مما يأتي: (20 درجة)\n1- الخلية\n2- النواة\nالفرع (ب) / علل ما يأتي:\n1- تمتاز الخلية النباتية بوجود شكل ثابت لها.';
+      }
+    }
+
+    if (interimEl) {
+      if (mode === 'english') {
+        interimEl.textContent = '💡 Try saying: "Question 1 Read the passage... Branch B Do as required... Number 1... Number 2..."';
+      } else if (mode === 'math') {
+        interimEl.textContent = '💡 قل مثلاً: "السؤال الأول جد مجموعة الحل للمعادلات الآتية واحد إكس تربيع ناقص خمسة إكس زائد ستة يساوي صفر فرع باء حلل المقادير..."';
+      } else {
+        interimEl.textContent = '💡 قل مثلاً: "السؤال الأول عرف ما يأتي الخلية النواة المايتوكوندريا علل ما يأتي تمتاز الخلية النباتية بوجود شكل ثابت لها..."';
+      }
+    }
+
+    renderScannerSubjectToolbar(mode);
+
+    if (!silent) {
+      const modeNames = { arabic: 'اللغة العربية والمواد العامة', english: 'اللغة الإنجليزية (English LTR)', math: 'الرياضيات والمعادلات الرياضية' };
+      notify(`تم تفعيل تخصص: ${modeNames[mode]} لقراءة الورقة والإملاء الذكي! ✨`, 'info');
+      if (rawTextarea && rawTextarea.value.trim()) {
+        window.parseTextFromScannerBox(true);
+      }
+    }
+  };
+
+  function renderScannerSubjectToolbar(mode) {
+    const bar = document.getElementById('scannerQuickSubjectToolbar');
+    if (!bar) return;
+
+    if (mode === 'english') {
+      bar.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #1e40af;">English Smart Controls:</span>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_question')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800;">+ New Question (Q)</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_branch')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800; color: #6d28d9;">+ Branch (A/B)</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('reading_passage')" style="font-size: 0.72rem; padding: 2px 8px;">+ Reading Passage</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('grammar')" style="font-size: 0.72rem; padding: 2px 8px;">+ Do as required</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('definitions')" style="font-size: 0.72rem; padding: 2px 8px;">+ Define words</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('mcq')" style="font-size: 0.72rem; padding: 2px 8px;">+ Choose correct</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('fill_blanks')" style="font-size: 0.72rem; padding: 2px 8px;">+ Fill blanks</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('true_false')" style="font-size: 0.72rem; padding: 2px 8px;">+ True or False</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('matching')" style="font-size: 0.72rem; padding: 2px 8px;">+ Match List A/B</button>
+          </div>
+          <button type="button" class="btn-panel-mini-tool" onclick="window.loadSampleHandwrittenPaper('english')" style="font-size: 0.72rem; padding: 2px 9px; font-weight: 800; background: rgba(37,99,235,0.12); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.3);">
+            <i class="fa-solid fa-file-lines"></i>
+            <span>Load English Exam Paper</span>
+          </button>
+        </div>
+      `;
+    } else if (mode === 'math') {
+      bar.innerHTML = `
+        <div style="display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.35rem;">
+          <!-- سطر 1: أوامر أسئلة وفروع الرياضيات الوزارية -->
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.35rem; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+              <span style="font-size: 0.72rem; font-weight: 800; color: #6d28d9;">أوامر الرياضيات الوزارية:</span>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_question')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800;">+ سؤال جديد</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_branch')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800; color: #6d28d9;">+ فرع (أ/ب)</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('solve_set')" style="font-size: 0.72rem; padding: 2px 8px;">+ جد مجموعة الحل</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('simplify')" style="font-size: 0.72rem; padding: 2px 8px;">+ بسّط المقدار</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('factor')" style="font-size: 0.72rem; padding: 2px 8px;">+ حلل المقادير</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('find_x')" style="font-size: 0.72rem; padding: 2px 8px;">+ جد قيمة x</button>
+              <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('prove')" style="font-size: 0.72rem; padding: 2px 8px;">+ أثبت أن</button>
+            </div>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.loadSampleHandwrittenPaper('math')" style="font-size: 0.72rem; padding: 2px 9px; font-weight: 800; background: rgba(139,92,246,0.12); color: #6d28d9; border: 1px solid rgba(139,92,246,0.3);">
+              <i class="fa-solid fa-square-root-variable"></i>
+              <span>تجربة ورقة رياضيات</span>
+            </button>
+          </div>
+          <!-- سطر 2: لوحة رموز ومعادلات الرياضيات بنقرة واحدة -->
+          <div style="display: flex; align-items: center; gap: 0.3rem; flex-wrap: wrap; background: rgba(139, 92, 246, 0.05); padding: 0.25rem 0.5rem; border-radius: 8px; border: 1px dashed rgba(139, 92, 246, 0.25);">
+            <span style="font-size: 0.7rem; font-weight: 800; color: #5b21b6;">إدراج رموز سريعة:</span>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' \\\\frac{x}{y} ')" title="كسر اعتيادي" style="font-size: 0.72rem; padding: 1px 7px; font-family: monospace;">\\frac{x}{y}</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' \\\\sqrt{x} ')" title="جذر تربيعي" style="font-size: 0.72rem; padding: 1px 7px; font-family: monospace;">\\sqrt{x}</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken('x^{2}')" title="إكس تربيع" style="font-size: 0.72rem; padding: 1px 7px; font-family: monospace;">x²</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken('x^{3}')" title="إكس تكعيب" style="font-size: 0.72rem; padding: 1px 7px; font-family: monospace;">x³</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ± ')" style="font-size: 0.74rem; padding: 1px 6px;">±</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' × ')" style="font-size: 0.74rem; padding: 1px 6px;">×</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ÷ ')" style="font-size: 0.74rem; padding: 1px 6px;">÷</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ≤ ')" style="font-size: 0.74rem; padding: 1px 6px;">≤</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ≥ ')" style="font-size: 0.74rem; padding: 1px 6px;">≥</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ≠ ')" style="font-size: 0.74rem; padding: 1px 6px;">≠</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ∈ ')" style="font-size: 0.74rem; padding: 1px 6px;">∈</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' ∞ ')" style="font-size: 0.74rem; padding: 1px 6px;">∞</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' π ')" style="font-size: 0.74rem; padding: 1px 6px;">π</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' θ ')" style="font-size: 0.74rem; padding: 1px 6px;">θ</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' \\\\int x \\\\, dx ')" style="font-size: 0.7rem; padding: 1px 6px; font-family: monospace;">∫ تكامل</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertScannerMathToken(' \\\\lim_{x \\\\to 0} ')" style="font-size: 0.7rem; padding: 1px 6px; font-family: monospace;">lim غاية</button>
+          </div>
+        </div>
+      `;
+    } else {
+      bar.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+          <div style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: #065f46;">إدراج سريع بنقرة واحدة:</span>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_question')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800;">+ سؤال جديد</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('new_branch')" style="font-size: 0.72rem; padding: 2px 8px; font-weight: 800; color: #6d28d9;">+ فتح فرع (أ/ب)</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('definitions')" style="font-size: 0.72rem; padding: 2px 8px;">+ عرف ما يأتي:</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('reasoning')" style="font-size: 0.72rem; padding: 2px 8px;">+ علل ما يأتي:</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('fill_blanks')" style="font-size: 0.72rem; padding: 2px 8px;">+ املأ الفراغات:</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('comparisons')" style="font-size: 0.72rem; padding: 2px 8px;">+ قارن بين:</button>
+            <button type="button" class="btn-panel-mini-tool" onclick="window.insertVoiceQuickCommand('true_false')" style="font-size: 0.72rem; padding: 2px 8px;">+ صح أو خطأ:</button>
+          </div>
+          <button type="button" class="btn-panel-mini-tool" onclick="window.loadSampleHandwrittenPaper('arabic')" style="font-size: 0.72rem; padding: 2px 9px; font-weight: 800; background: rgba(16,185,129,0.12); color: #059669; border: 1px solid rgba(16,185,129,0.3);">
+            <i class="fa-solid fa-file-pen"></i>
+            <span>✨ تجربة ورقة عربي بخط اليد</span>
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  window.loadSampleHandwrittenPaper = function (forceMode) {
+    const mode = forceMode || getActiveSubjectMode();
+    if (forceMode && forceMode !== getActiveSubjectMode()) {
+      window.setScannerSubjectMode(forceMode, true);
+    }
+
+    let sampleLines = [];
+    let titleText = '';
+    let textColor = '#1e3a8a';
+    let isLtr = false;
+
+    if (mode === 'english') {
+      isLtr = true;
+      titleText = 'Third Intermediate English Exam - Handwritten Draft';
+      textColor = '#1d4ed8';
+      sampleLines = [
+        'Q1/ Read the following passage carefully, then answer (5) of the questions: (20 Marks)',
+        '1- Where does Mr. Smith live?',
+        '2- Why did he travel to London last summer?',
+        '3- Was the hotel comfortable and clean?',
+        '4- How did he lose his passport?',
+        '5- Who helped Mr. Smith at the police station?',
+        '6- Mr. Smith returned home by train. (True / False)',
+        '',
+        'Branch (B)/ Do as required between brackets: (10 Marks)',
+        '1- Ali plays football very well. (Change into negative)',
+        '2- If she studies hard, she ........ the final exam. (pass / will pass)',
+        '3- They have lived in Baghdad ........ 2015. (since / for)',
+        '4- Huda is more beautiful than Sara. (Sara is not as ........ as Huda)',
+        '5- She bought a (nice / black / French) bag. (Re-arrange adjectives)',
+        '',
+        'Q2/ (20 Marks)',
+        'Branch (A)/ Define (3) of the following words: (10 Marks)',
+        '1- Architect : A person who designs buildings.',
+        '2- Pilot : Someone who flies a plane.',
+        '3- Author : A person who writes books or stories.',
+        '4- Vet : Someone who takes care of sick animals.',
+        '',
+        'Branch (B)/ Choose the correct word between brackets: (10 Marks)',
+        '1- How (many / much) books did you buy yesterday?',
+        '2- That is the engineer (who / which) built the bridge.',
+        '3- We should drive (careful / carefully) on wet roads.',
+        '4- The car was (too / very) fast.'
+      ];
+    } else if (mode === 'math') {
+      titleText = 'مسودة أسئلة امتحان الرياضيات الوزاري — بخط اليد';
+      textColor = '#6d28d9';
+      sampleLines = [
+        'س1 / (20 درجة)',
+        'الفرع (أ) / جد مجموعة الحل للنظام الآتي بطريقة الحذف أو التعويض: (10 درجات)',
+        '1- 2x + y = 7',
+        '2- x - y = 2',
+        'الفرع (ب) / حلل اثنين من المقادير الجبرية الآتية إلى أبسط صورة: (10 درجات)',
+        '1- x^{2} - 9',
+        '2- 2x^{2} + 5x + 3',
+        '3- x^{3} + 8',
+        '',
+        'س2 / (20 درجة)',
+        'الفرع (أ) / جد ناتج ما يأتي بأبسط صورة: (10 درجات)',
+        '1- \\frac{x+2}{x-3} \\times \\frac{x^{2}-9}{x+2}',
+        '2- \\sqrt{12} - \\sqrt{3} + 2\\sqrt{27}',
+        'الفرع (ب) / جد قيمة x التي تحقق المعادلة الآتية: (10 درجات)',
+        '1- x^{2} - 5x + 6 = 0',
+        '2- \\sqrt{2x+1} = 5'
+      ];
+    } else {
+      titleText = 'مسودة أسئلة امتحان الأحياء والعلوم — مكتوبة بخط اليد';
+      textColor = '#1e3a8a';
+      sampleLines = [
+        'س1 / عرف أربعة مما يأتي: (20 درجة)',
+        '1- الخلية : هي وحدة البناء والوظيفة في جسم الكائن الحي.',
+        '2- النواة : عضية كروية الشكل تنظم كافة الفعاليات الحيوية في الخلية.',
+        '3- المايتوكوندريا : بيوت الطاقة في الخلية المسؤولة عن التنفس الخلوي.',
+        '4- التناضح : حركة جزيئات الماء خلال غشاء اختياري النفوذية.',
+        '',
+        'س2 / (20 درجة)',
+        'فرع أ / علل اثنين مما يأتي: (10 درجات)',
+        '1- تمتاز الخلية النباتية بوجود شكل ثابت ومحدد لها.',
+        '2- تسمى الجسيمات الحالة بوحدات التنظيف في السايتوبلازم.',
+        '3- وجود الأعراف في الطبقة الداخلية للمايتوكوندريا.',
+        'فرع ب / قارن بين الخلية النباتية والخلية الحيوانية. (10 درجات)',
+        '',
+        'س3 / املأ الفراغات الآتية بما يناسبها: (20 درجة)',
+        '1- يتألف الجدار الخلوي في الخلية النباتية من ثلاث طبقات هي الصفيحة الوسطى و ........ و ........',
+        '2- العالم الذي اكتشف نواة الخلية هو العالم ........',
+        '3- يطلق على جهاز كولجي في الخلايا النباتية اسم ........',
+        '',
+        'س4 / ضع كلمة (صح) أمام العبارة الصحيحة وكلمة (خطأ) أمام العبارة غير الصحيحة: (20 درجة)',
+        '1- الغشاء البلازمي غشاء اختياري النفوذية يحيط بالخلية النباتية والحيوانية.',
+        '2- البلاستيدات الخضراء توجد في الخلايا الحيوانية والنباتية معاً.',
+        '3- الرايبوسومات هي مراكز بناء البروتين في الخلية.'
+      ];
+    }
 
     const canvas = document.createElement('canvas');
-    canvas.width = 780;
-    canvas.height = 560;
+    canvas.width = 820;
+    canvas.height = 620;
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = '#fffef7';
@@ -1993,30 +2331,31 @@
     ctx.strokeStyle = '#fca5a5';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.moveTo(canvas.width - 55, 0);
-    ctx.lineTo(canvas.width - 55, canvas.height);
+    const marginX = isLtr ? 55 : canvas.width - 55;
+    ctx.moveTo(marginX, 0);
+    ctx.lineTo(marginX, canvas.height);
     ctx.stroke();
 
-    ctx.direction = 'rtl';
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#1e3a8a';
-    ctx.font = 'bold 18px Amiri, Cairo, sans-serif';
-    ctx.fillText('مسودة أسئلة امتحان الشهر الأول — مكتوبة بخط اليد', canvas.width - 70, 34);
+    ctx.direction = isLtr ? 'ltr' : 'rtl';
+    ctx.textAlign = isLtr ? 'left' : 'right';
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 18px Arial, Cairo, sans-serif';
+    ctx.fillText(titleText, isLtr ? 70 : canvas.width - 70, 34);
 
     let yPos = 66;
     sampleLines.forEach((line) => {
       if (!line) {
-        yPos += 10;
+        yPos += 12;
         return;
       }
-      if (line.startsWith('س') || line.startsWith('فرع')) {
+      if (/^(?:س|Q|فرع|Branch)/i.test(line)) {
         ctx.fillStyle = '#0f172a';
-        ctx.font = 'bold 16px Amiri, Cairo, sans-serif';
+        ctx.font = 'bold 15px Arial, Cairo, sans-serif';
       } else {
-        ctx.fillStyle = '#1d4ed8';
-        ctx.font = '15px Amiri, Cairo, sans-serif';
+        ctx.fillStyle = textColor;
+        ctx.font = '14px Arial, Cairo, sans-serif';
       }
-      ctx.fillText(line, canvas.width - 70, yPos);
+      ctx.fillText(line, isLtr ? 70 : canvas.width - 70, yPos);
       yPos += 24;
     });
 
@@ -2024,7 +2363,7 @@
     currentUploadedImages = [{
       dataUrl: sampleDataUrl,
       enhancedDataUrl: sampleDataUrl,
-      name: 'handwritten_exam_sample.jpg',
+      name: `handwritten_${mode}_paper.jpg`,
       mimeType: 'image/jpeg'
     }];
     isUsingEnhancedImage = false;
@@ -2036,7 +2375,7 @@
     }
     window.parseTextFromScannerBox(false);
     setActiveScannerStep(3);
-    notify('تم تحميل وقراءة نموذج الورقة المكتوبة بخط اليد وتقسيمها إلى 4 أسئلة وزارية! ✨', 'success');
+    notify(`تم تحميل وقراءة نموذج ورقة (${mode === 'english' ? 'اللغة الإنجليزية' : mode === 'math' ? 'الرياضيات والمعادلات' : 'اللغة العربية'}) وتقسيمها لأسئلة وفروع بنجاح! ✨`, 'success');
   };
 
   // ==========================================================================
@@ -2109,19 +2448,108 @@
     return 'essay';
   }
 
+  // تحويل النص المنطوق أو المكتوب رياضياً إلى رموز ومعادلات قياسية
+  function convertSpokenMathToSymbols(rawText) {
+    if (!rawText) return '';
+    let t = String(rawText);
+
+    // 1. الكسور المنطوقة: "كسر البسط x زائد 2 والمقام x ناقص 3"
+    t = t.replace(/(?:كسر|الكسر)\s*(?:البسط|بسطه)?\s*(.+?)\s*(?:والمقام|على\s+المقام|مقامه|المقام)\s*(.+?)(?=\s+(?:يساوي|زائد|ناقص|في|ضرب|الفرع|س\d|$))/gi, '\\frac{$1}{$2}');
+    t = t.replace(/(?:كسر\s+اعتيادي|كسر)\s*([a-zA-Z0-9\+\-]+)\s*(?:على|تقسيم)\s*([a-zA-Z0-9\+\-]+)/gi, '\\frac{$1}{$2}');
+
+    // 2. الجذور: "جذر التربيعي لـ x" أو "جذر x زائد 1"
+    t = t.replace(/(?:الجذر\s+التربيعي\s+لـ?|جذر\s+تربيعي\s+لـ?|جذر)\s*\((.+?)\)/gi, '\\sqrt{$1}');
+    t = t.replace(/(?:الجذر\s+التربيعي\s+لـ?|جذر\s+تربيعي\s+لـ?|جذر)\s*([a-zA-Z0-9]+)/gi, '\\sqrt{$1}');
+
+    // 3. الأسس والتربيع والتكعيب: "إكس تربيع" / "س تربيع" / "إكس تكعيب"
+    t = t.replace(/(?:إكس|اكس|سين|س)\s*تربيع/gi, 'x^{2}');
+    t = t.replace(/(?:واي|صاد|ص)\s*تربيع/gi, 'y^{2}');
+    t = t.replace(/(?:إكس|اكس|سين|س)\s*تكعيب/gi, 'x^{3}');
+    t = t.replace(/(?:واي|صاد|ص)\s*تكعيب/gi, 'y^{3}');
+    t = t.replace(/(?:إكس|اكس|سين|س)\s*(?:أس|قوة|اس)\s*([0-9]+)/gi, 'x^{$1}');
+    t = t.replace(/([a-zA-Z0-9])\s*تربيع/gi, '$1^{2}');
+    t = t.replace(/([a-zA-Z0-9])\s*تكعيب/gi, '$1^{3}');
+
+    // 4. العمليات والمقارنات المنطوقة
+    t = t
+      .replace(/(?:زائد\s+أو\s+ناقص|موجب\s+سالب|سالب\s+موجب)/g, ' ± ')
+      .replace(/(?:أكبر\s+من\s+أو\s+يساوي|اكبر\s+او\s+يساوي)/g, ' ≥ ')
+      .replace(/(?:أصغر\s+من\s+أو\s+يساوي|اصغر\s+او\s+يساوي)/g, ' ≤ ')
+      .replace(/(?:لا\s+يساوي)/g, ' ≠ ')
+      .replace(/(?:ينتمي\s+إلى|ينتمي\s+الي)/g, ' ∈ ')
+      .replace(/(?:ما\s+لا\s+نهاية|مالانهاية)/g, ' ∞ ')
+      .replace(/(?:باي|النسبة\s+التقريبية)/g, ' π ')
+      .replace(/(?:ثيتا)/g, ' θ ')
+      .replace(/(?:تكامل)/g, ' \\int ')
+      .replace(/(?:غاية\s+إكس\s+تقترب\s+من\s+صفر|الغاية)/g, ' \\lim_{x \\to 0} ')
+      .replace(/(?:يساوي)\s*/g, ' = ')
+      .replace(/(?:زائد)\s*/g, ' + ')
+      .replace(/(?:ناقص)\s*/g, ' - ')
+      .replace(/(?:ضرب|في)\s*(?=[a-zA-Z0-9\\])/g, ' × ')
+      .replace(/(?:تقسيم)\s*/g, ' ÷ ');
+
+    return t;
+  }
+
   // تحويل النص الصوتي أو المكتوب بخط اليد إلى سطور منظمة (أسئلة + فروع + أوامر فرعية + أرقام)
-  function preprocessPaperAndVoiceText(rawText) {
+  function preprocessPaperAndVoiceText(rawText, subjectMode = 'arabic') {
     if (!rawText) return '';
     let text = String(rawText).replace(/\r\n/g, '\n');
 
-    // 1. تحويل الدرجات المنطوقة صوتياً إلى صيغة رقمية قياسية
-    text = text
-      .replace(/(?:عشرون|عشرين)\s+درج[ةه]/g, '(20 درجة)')
-      .replace(/(?:خمسة\s+عشر|خمسطعش)\s+درج[ةه]/g, '(15 درجة)')
-      .replace(/(?:عشر\s+درجات|عشرة\s+درجة|عشره\s+درجه)/g, '(10 درجات)')
-      .replace(/(?:خمس\s+درجات|خمسة\s+درجة|خمسه\s+درجه)/g, '(5 درجات)');
+    if (subjectMode === 'math') {
+      text = convertSpokenMathToSymbols(text);
+    }
 
-    // 2. فصل عناوين الأسئلة المنطوقة أو المدمجة في وسط السطر إلى سطر جديد مستقل
+    // 1. تحويل الدرجات المنطوقة صوتياً إلى صيغة رقمية قياسية (عربي + إنجليزي)
+    text = text
+      .replace(/(?:عشرون|عشرين)\s+درج[ةه]|(?:twenty|20)\s+marks?/gi, '(20 درجة)')
+      .replace(/(?:خمسة\s+عشر|خمسطعش)\s+درج[ةه]|(?:fifteen|15)\s+marks?/gi, '(15 درجة)')
+      .replace(/(?:عشر\s+درجات|عشرة\s+درجة|عشره\s+درجه)|(?:ten|10)\s+marks?/gi, '(10 درجات)')
+      .replace(/(?:خمس\s+درجات|خمسة\s+درجة|خمسه\s+درجه)|(?:five|5)\s+marks?/gi, '(5 درجات)');
+
+    if (subjectMode === 'english') {
+      // تعديل صيغ الدرجات لتصبح Marks في الإنجليزية
+      text = text
+        .replace(/\(20\s+درجة\)/g, '(20 Marks)')
+        .replace(/\(15\s+درجة\)/g, '(15 Marks)')
+        .replace(/\(10\s+درجات?\)/g, '(10 Marks)')
+        .replace(/\(5\s+درجات?\)/g, '(5 Marks)');
+
+      // 2. فصل عناوين الأسئلة الإنجليزية (Q1 / Question 1 / Question one)
+      const spokenQMapEn = [
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:One|1)|Q\.?\s*1|First\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ1/ ' },
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:Two|2)|Q\.?\s*2|Second\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ2/ ' },
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:Three|3)|Q\.?\s*3|Third\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ3/ ' },
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:Four|4)|Q\.?\s*4|Fourth\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ4/ ' },
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:Five|5)|Q\.?\s*5|Fifth\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ5/ ' },
+        { rx: /(?:^|\n|\s+)(?:Question\s*(?:Six|6)|Q\.?\s*6|Sixth\s+question)(?=\s|[\/:\-]|$)/gi, rep: '\nQ6/ ' }
+      ];
+      spokenQMapEn.forEach(item => { text = text.replace(item.rx, item.rep); });
+
+      // فصل الفروع الإنجليزية المنطوقة (Branch A / Section B / New branch)
+      text = text
+        .replace(/(?:^|\n|\s+)(?:New\s+branch|Open\s+new\s+branch)\s*[\/:\-]?\s*/gi, '\nBranch (B)/ ')
+        .replace(/(?:^|\n|\s+)(?:Branch\s*(?:A|One)|Section\s*(?:A|One))(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/gi, '\nBranch (A)/ ')
+        .replace(/(?:^|\n|\s+)(?:Branch\s*(?:B|Two)|Section\s*(?:B|Two))(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/gi, '\nBranch (B)/ ')
+        .replace(/(?:^|\n|\s+)(?:Branch\s*(?:C|Three)|Section\s*(?:C|Three))(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/gi, '\nBranch (C)/ ')
+        .replace(/(?:^|\n|\s+)(?:Branch\s*(?:D|Four)|Section\s*(?:D|Four))(?=\s|[\/:\-\)]|$)\s*[\/:\-\)]?\s*/gi, '\nBranch (D)/ ');
+
+      // ترقيم النقاط المنطوقة في الإنجليزية (Number one, Point two, First...)
+      const spokenOrdinalsEn = [
+        { rx: /(?:^|\n|\s+)(?:Number\s+one|Point\s+one|First)\s*[\/:\-\)]?\s*/gi, rep: '\n1- ' },
+        { rx: /(?:^|\n|\s+)(?:Number\s+two|Point\s+two|Second)\s*[\/:\-\)]?\s*/gi, rep: '\n2- ' },
+        { rx: /(?:^|\n|\s+)(?:Number\s+three|Point\s+three|Third)\s*[\/:\-\)]?\s*/gi, rep: '\n3- ' },
+        { rx: /(?:^|\n|\s+)(?:Number\s+four|Point\s+four|Fourth)\s*[\/:\-\)]?\s*/gi, rep: '\n4- ' },
+        { rx: /(?:^|\n|\s+)(?:Number\s+five|Point\s+five|Fifth)\s*[\/:\-\)]?\s*/gi, rep: '\n5- ' },
+        { rx: /(?:^|\n|\s+)(?:Number\s+six|Point\s+six|Sixth)\s*[\/:\-\)]?\s*/gi, rep: '\n6- ' }
+      ];
+      spokenOrdinalsEn.forEach(item => { text = text.replace(item.rx, item.rep); });
+
+      // فصل الأوامر الإنجليزية الجديدة في وسط السطر
+      text = text.replace(/([^\n\/:\(\[])\s+((?:Read\s+the\s+following|Do\s+as\s+required|Define\s+(?:the\s+following|\d)|Choose\s+the\s+correct|Fill\s+in\s+the\s+blanks|Write\s+True\s+or\s+False|Match\s+(?:the|List)|Complete\s+the\s+following|Re-write\s+the\s+following|Punctuate)\b)/gi, '$1\n$2');
+    }
+
+    // 2. فصل عناوين الأسئلة العربية والرياضية
     const spokenQMap = [
       { rx: /(?:^|\n|\s+)(?:السؤال\s+الأول|السؤال\s+الاول|سؤال\s+الأول|سؤال\s+الاول|سؤال\s+رقم\s*[1١]|سؤال\s+واحد)(?=\s|[\/:\-]|$)/g, rep: '\nس1 / ' },
       { rx: /(?:^|\n|\s+)(?:السؤال\s+الثاني|سؤال\s+الثاني|سؤال\s+رقم\s*[2٢]|سؤال\s+اثنين)(?=\s|[\/:\-]|$)/g, rep: '\nس2 / ' },
@@ -2155,11 +2583,11 @@
     ];
     spokenOrdinals.forEach(item => { text = text.replace(item.rx, item.rep); });
 
-    // فصل النقاط المرقمة المتتالية في نفس السطر مثل: (1- الخلية 2- النواة 3- المايتوكوندريا)
+    // فصل النقاط المرقمة المتتالية في نفس السطر مثل: (1- ... 2- ...)
     text = text.replace(/([^\n])\s+([٠-٩1-9]\s*[\-\.\)]\s+)/g, '$1\n$2');
 
-    // 5. إذا انتهى مطلب في وسط السطر وبدأ مطلب جديد (مثل: ... المايتوكوندريا علل ما يأتي ...) يفصل في سطر جديد ليفتح فرعاً تلقائياً
-    text = text.replace(/([^\n\/:\(\[])\s+((?:عرف|عرّف|ما\s+المقصود\s+بـ?|علل|علّل|اذكر\s+السبب|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغات|املا\s+الفراغات|أكمل\s+الفراغات|اكمل\s+الفراغات|ضع\s+كلمة\s*\(?\s*صح|ضع\s+علامة\s*\(?\s*صح|اختر\s+الإجابة|اختر\s+الاجابة|اختر\s+من\s+بين\s+الأقواس|عدد\s+ما\s+يأتي|اذكر\s+ما\s+يأتي)\b)/g, '$1\n$2');
+    // 5. أوامر الفروع والمطالب الرياضية والعامة: إذا انتهى مطلب وبدأ مطلب جديد يفصل في سطر جديد ليفتح فرعاً تلقائياً
+    text = text.replace(/([^\n\/:\(\[])\s+((?:عرف|عرّف|ما\s+المقصود\s+بـ?|علل|علّل|اذكر\s+السبب|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغات|املا\s+الفراغات|أكمل\s+الفراغات|ضع\s+كلمة\s*\(?\s*صح|ضع\s+علامة\s*\(?\s*صح|اختر\s+الإجابة|اختر\s+من\s+بين|عدد\s+ما\s+يأتي|اذكر\s+ما\s+يأتي|جد\s+مجموعة\s+الحل|جد\s+ناتج|حل\s+المعادلات?|بسط\s+المقدار|حلل\s+المقادير|جد\s+قيمة|أثبت\s+أن|برهن\s+أن|جد\s+معادلة|جد\s+التكامل|جد\s+المشتقة)\b)/g, '$1\n$2');
 
     return text
       .split('\n')
@@ -2169,9 +2597,18 @@
   }
 
   // التحقق مما إذا كان السطر يمثل بداية مطلب/سؤال فرعي جديد (لفتح فرع جديد تلقائياً عند انتهاء المطلب السابق)
-  function isNewSectionCommandHeader(line) {
+  function isNewSectionCommandHeader(line, subjectMode = 'arabic') {
     const t = cleanScoreTagFromLine(line || '').trim();
     if (!t) return false;
+
+    if (subjectMode === 'english') {
+      return /^(?:Read\s+the\s+following|Do\s+as\s+required|Define\s+(?:the\s+following|\d)|Choose\s+the\s+correct|Fill\s+in\s+the\s+blanks|Write\s+True\s+or\s+False|Match\s+(?:the|List)|Complete\s+the\s+following|Re-write\s+the\s+following|Punctuate|Answer\s+(?:the\s+following|\d)|Write\s+a\s+short\s+paragraph)/i.test(t);
+    }
+
+    if (subjectMode === 'math') {
+      return /^(?:جد\s+مجموعة\s+الحل|حل\s+المعادلات?|حل\s+النظام|جد\s+ناتج|بسط\s+المقدار|بسط\s+المقادير|حلل\s+المقدار|حلل\s+المقادير|حلل\s+ما\s+يأتي|جد\s+قيمة|احسب\s+قيمة|أثبت\s+أن|اثبت\s+ان|برهن\s+أن|برهن\s+ان|جد\s+معادلة|جد\s+التكامل|جد\s+المشتقة|جد\s+الغاية|إذا\s+كانت\s+f\(x\)|أجب\s+عما\s+يأتي)/i.test(t);
+    }
+
     return /^(?:عرف|عرّف|ما\s+المقصود|اكتب\s+تعريف|علل|علّل|اذكر\s+السبب|فسر\s+علميا|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغ|املا\s+الفراغ|أكمل\s+الفراغ|اكمل\s+الفراغ|ضع\s+كلمة\s*\(?\s*صح|ضع\s+علامة\s*\(?\s*صح|صح\s+أو\s+خطأ|اختر\s+الإجابة|اختر\s+الاجابة|اختر\s+من\s+بين|صل\s+بين|طابق\s+بين|عدد\s+|عدّد\s+|اذكر\s+|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية|ما\s+اهمية|اشرح\s+|احسب\s+|جد\s+ناتج|جد\s+مجموعة|أجب\s+عما\s+يأتي|اجب\s+عما\s+ياتي)/i.test(t);
   }
 
@@ -2214,34 +2651,46 @@
     return [clean];
   }
 
-  // تنسيق وترقيم سطور القسم الواحد تلقائياً (تعاريف، تعاليل، فراغات، صح وخطأ، تعداد، إلخ)
-  function autoFormatAndNumberSectionLines(rawLines) {
+  // تنسيق وترقيم سطور القسم الواحد تلقائياً (تعاريف، تعاليل، فراغات، صح وخطأ، تعداد، رياضيات، إنجليزي، إلخ)
+  function autoFormatAndNumberSectionLines(rawLines, subjectMode = 'arabic') {
     const cleanLines = (rawLines || []).map(l => l.trim()).filter(Boolean);
     if (cleanLines.length === 0) return [];
-
-    // مطابقة سطر الأمر الرئيسي مع أي عناصر مكتوبة معه في نفس السطر
-    const promptExtractRegex = /^((?:عرف|عرّف|ما\s+المقصود(?:\s+بـ?)?|علل|علّل|اذكر\s+السبب|فسر\s+علميا|املأ\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|املا\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|أكمل\s+الفراغات(?:\s+الآتية)?|اكمل\s+الفراغات(?:\s+الآتية)?|ضع\s+كلمة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|ضع\s+علامة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|اختر\s+الإجابة\s+الصحيحة(?:\s+مما\s+بين\s+الأقواس)?|اختر\s+من\s+بين\s+الأقواس|عدد|عدّد|اذكر|أجب\s+عما\s+يأتي|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?\s*[:\/\-]?\s*)(.*)$/i;
-
-    const firstLine = cleanLines[0];
-    // لا نقسم سؤال المقارنة المباشر مثل (قارن بين الخلية النباتية والخلية الحيوانية) إلى نقاط إلا إذا تبعته سطور
-    const isDirectComparison = /^(?:قارن\s+بين|ما\s+الفرق\s+بين)/i.test(firstLine);
 
     let headerPrompt = '';
     let rawItemLines = [];
 
-    if (!isDirectComparison) {
-      const m = firstLine.match(promptExtractRegex);
+    if (subjectMode === 'english') {
+      const promptEnRegex = /^((?:Read\s+the\s+following(?:\s+passage)?|Do\s+as\s+required(?:\s+between\s+brackets)?|Define\s+(?:\(?\d+\)?\s+of\s+the\s+following|the\s+following)?|Choose\s+the\s+correct(?:\s+word|\s+answer)?(?:\s+between\s+brackets)?|Fill\s+in\s+the\s+blanks(?:\s+with\s+the\s+suitable\s+words)?|Write\s+True\s+or\s+False|Match\s+(?:the\s+words\s+in\s+List\s*\(?A\)?|List\s*\(?A\)?|the\s+following)|Complete\s+the\s+following|Re-write\s+the\s+following|Punctuate|Answer\s+(?:\(?\d+\)?\s+of\s+the\s+following|the\s+following))(?:\s+(?:only|carefully))?\s*[:\/\-]?\s*)(.*)$/i;
+      const firstLine = cleanLines[0];
+      const m = firstLine.match(promptEnRegex);
       if (m) {
         let pHead = (m[1] || '').trim().replace(/[\/\-]+$/, '').trim();
         if (pHead && !pHead.endsWith(':')) pHead += ':';
         headerPrompt = pHead;
-
         const inlineRemainder = cleanScoreTagFromLine(m[2] || '').trim();
         if (inlineRemainder) {
-          if (/^(?:عرف|عرّف|ما\s+المقصود)/i.test(headerPrompt)) {
-            rawItemLines.push(...splitInlineDefinitionTerms(inlineRemainder));
-          } else if (/[،؛]|\s+-\s+/.test(inlineRemainder)) {
-            rawItemLines.push(...inlineRemainder.split(/[،؛]|\s+-\s+/).map(s => s.trim()).filter(Boolean));
+          if (/[،,;]|\s+-\s+/.test(inlineRemainder)) {
+            rawItemLines.push(...inlineRemainder.split(/[،,;]|\s+-\s+/).map(s => s.trim()).filter(Boolean));
+          } else {
+            rawItemLines.push(inlineRemainder);
+          }
+        }
+        rawItemLines.push(...cleanLines.slice(1));
+      } else {
+        rawItemLines = cleanLines.slice();
+      }
+    } else if (subjectMode === 'math') {
+      const promptMathRegex = /^((?:جد\s+مجموعة\s+الحل(?:\s+للنظام|\s+للمعادلات|\s+للمعادلة)?|حل\s+المعادلات?|حل\s+النظام|جد\s+ناتج(?:\s+ما\s+يأتي)?(?:\s+بأبسط\s+صورة)?|بسط\s+المقدار|بسط\s+المقادير|حلل\s+(?:اثنين\s+من\s+)?المقادير(?:\s+الجبرية)?(?:\s+الآتية)?|حلل\s+ما\s+يأتي|جد\s+قيمة\s+x|احسب\s+قيمة|أثبت\s+أن|اثبت\s+ان|برهن\s+أن|برهن\s+ان|جد\s+معادلة|جد\s+التكامل|جد\s+المشتقة|جد\s+الغاية)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?\s*[:\/\-]?\s*)(.*)$/i;
+      const firstLine = cleanLines[0];
+      const m = firstLine.match(promptMathRegex);
+      if (m) {
+        let pHead = (m[1] || '').trim().replace(/[\/\-]+$/, '').trim();
+        if (pHead && !pHead.endsWith(':')) pHead += ':';
+        headerPrompt = pHead;
+        const inlineRemainder = cleanScoreTagFromLine(m[2] || '').trim();
+        if (inlineRemainder) {
+          if (/[،؛]/.test(inlineRemainder)) {
+            rawItemLines.push(...inlineRemainder.split(/[،؛]/).map(s => s.trim()).filter(Boolean));
           } else {
             rawItemLines.push(inlineRemainder);
           }
@@ -2251,17 +2700,46 @@
         rawItemLines = cleanLines.slice();
       }
     } else {
-      headerPrompt = firstLine;
-      rawItemLines = cleanLines.slice(1);
+      // مطابقة سطر الأمر الرئيسي العربي مع أي عناصر مكتوبة معه في نفس السطر
+      const promptExtractRegex = /^((?:عرف|عرّف|ما\s+المقصود(?:\s+بـ?)?|علل|علّل|اذكر\s+السبب|فسر\s+علميا|املأ\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|املا\s+الفراغات(?:\s+الآتية|\s+الاتية)?(?:\s+بما\s+يناسبها)?|أكمل\s+الفراغات(?:\s+الآتية)?|اكمل\s+الفراغات(?:\s+الآتية)?|ضع\s+كلمة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|ضع\s+علامة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|اختر\s+الإجابة\s+الصحيحة(?:\s+مما\s+بين\s+الأقواس)?|اختر\s+من\s+بين\s+الأقواس|عدد|عدّد|اذكر|أجب\s+عما\s+يأتي|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?\s*[:\/\-]?\s*)(.*)$/i;
+
+      const firstLine = cleanLines[0];
+      const isDirectComparison = /^(?:قارن\s+بين|ما\s+الفرق\s+بين)/i.test(firstLine);
+
+      if (!isDirectComparison) {
+        const m = firstLine.match(promptExtractRegex);
+        if (m) {
+          let pHead = (m[1] || '').trim().replace(/[\/\-]+$/, '').trim();
+          if (pHead && !pHead.endsWith(':')) pHead += ':';
+          headerPrompt = pHead;
+
+          const inlineRemainder = cleanScoreTagFromLine(m[2] || '').trim();
+          if (inlineRemainder) {
+            if (/^(?:عرف|عرّف|ما\s+المقصود)/i.test(headerPrompt)) {
+              rawItemLines.push(...splitInlineDefinitionTerms(inlineRemainder));
+            } else if (/[،؛]|\s+-\s+/.test(inlineRemainder)) {
+              rawItemLines.push(...inlineRemainder.split(/[،؛]|\s+-\s+/).map(s => s.trim()).filter(Boolean));
+            } else {
+              rawItemLines.push(inlineRemainder);
+            }
+          }
+          rawItemLines.push(...cleanLines.slice(1));
+        } else {
+          rawItemLines = cleanLines.slice();
+        }
+      } else {
+        headerPrompt = firstLine;
+        rawItemLines = cleanLines.slice(1);
+      }
     }
 
     if (rawItemLines.length === 0) {
       return headerPrompt ? [headerPrompt] : cleanLines;
     }
 
-    // تفكيك أي سطر فرعي يحتوي على عدة مصطلحات تعاريف مفصولة بفواصل أو عدة تعاليل مفصولة بفاصلة منقوطة
+    // تفكيك أي سطر فرعي يحتوي على عدة نقاط
     const expandedItems = [];
-    const isDefSection = /^(?:عرف|عرّف|ما\s+المقصود)/i.test(headerPrompt);
+    const isDefSection = /^(?:عرف|عرّف|ما\s+المقصود|Define\b)/i.test(headerPrompt);
 
     rawItemLines.forEach((itemLine) => {
       // إزالة أي ترقيم سابق في بداية السطر لمنع تكرار الترقيم (مثل 1- 1-)
@@ -2273,7 +2751,7 @@
       if (isDefSection && !stripped.includes(':') && /[،,؛]/.test(stripped)) {
         const parts = stripped.split(/[،,؛]/).map(s => s.trim()).filter(Boolean);
         expandedItems.push(...parts);
-      } else if (!isDefSection && /؛/.test(stripped)) {
+      } else if (!isDefSection && /؛/.test(stripped) && subjectMode !== 'math') {
         const parts = stripped.split(/؛/).map(s => s.trim()).filter(Boolean);
         expandedItems.push(...parts);
       } else {
@@ -2281,7 +2759,7 @@
       }
     });
 
-    // إضافة الترقيم التلقائي (1- ، 2- ، 3- ...) لكل النقاط (تعاريف، تعاليل، فراغات، صح وخطأ، إلخ)
+    // إضافة الترقيم التلقائي (1- ، 2- ، 3- ...) لكل النقاط (تعاريف، تعاليل، معادلات، نقاط grammar، إلخ)
     const shouldNumberItems = Boolean(headerPrompt) || expandedItems.length >= 2;
     const numberedItems = expandedItems.map((it, idx) =>
       shouldNumberItems ? `${idx + 1}- ${it}` : it
@@ -2291,13 +2769,13 @@
   }
 
   // فصل السطور المنسقة إلى: (1) عنوان/منطوق السؤال أو الفرع (title) و (2) نص ونقاط السؤال أو الفرع (body)
-  function splitSectionIntoTitleAndBody(numberedLines) {
+  function splitSectionIntoTitleAndBody(numberedLines, subjectMode = 'arabic') {
     const lines = (numberedLines || []).map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) {
       return { title: '', body: '' };
     }
 
-    // إذا كان هناك سطران أو أكثر: السطر الأول هو عنوان السؤال/الفرع (مثل: عرف ما يأتي:) وبقية السطور هي نص ونقاط السؤال/الفرع (1- ... 2- ...)
+    // إذا كان هناك سطران أو أكثر: السطر الأول هو عنوان السؤال/الفرع وبقية السطور هي نص ونقاط السؤال/الفرع
     if (lines.length >= 2) {
       return {
         title: lines[0],
@@ -2305,8 +2783,31 @@
       };
     }
 
-    // إذا كان سطراً واحداً فقط (مثلاً: قارن بين الخلية النباتية والخلية الحيوانية / ما وظيفة المايتوكوندريا)
+    // إذا كان سطراً واحداً فقط
     const single = lines[0];
+
+    if (subjectMode === 'english') {
+      const enMatch = single.match(/^((?:Read\s+the\s+following|Do\s+as\s+required|Define\s+(?:the\s+following|\d)|Choose\s+the\s+correct|Fill\s+in\s+the\s+blanks|Write\s+True\s+or\s+False|Match\s+(?:the|List)|Complete\s+the\s+following|Re-write\s+the\s+following|Punctuate|Answer\s+(?:the\s+following|\d))\b.*?)\s*[:\/\-]?\s+(.+)$/i);
+      if (enMatch) {
+        let extractedTitle = enMatch[1].trim();
+        if (!extractedTitle.endsWith(':')) extractedTitle += ':';
+        return {
+          title: extractedTitle,
+          body: enMatch[2].trim()
+        };
+      }
+    } else if (subjectMode === 'math') {
+      const mathMatch = single.match(/^((?:جد\s+مجموعة\s+الحل|حل\s+المعادلات?|حل\s+النظام|جد\s+ناتج|بسط\s+المقدار|بسط\s+المقادير|حلل\s+المقادير|حلل\s+ما\s+يأتي|جد\s+قيمة\s+x|احسب\s+قيمة|أثبت\s+أن|برهن\s+أن|جد\s+معادلة|جد\s+التكامل|جد\s+المشتقة)\b.*?)\s*[:\/\-]?\s+(.+)$/i);
+      if (mathMatch) {
+        let extractedTitle = mathMatch[1].trim();
+        if (!extractedTitle.endsWith(':')) extractedTitle += ':';
+        return {
+          title: extractedTitle,
+          body: mathMatch[2].trim()
+        };
+      }
+    }
+
     const cmdSplitMatch = single.match(/^((?:عرف|عرّف|ما\s+المقصود(?:\s+بـ?)?|علل|علّل|اذكر\s+السبب|فسر\s+علميا|قارن\s+بين|ما\s+الفرق\s+بين|املأ\s+الفراغات(?:\s+الآتية)?|املا\s+الفراغات(?:\s+الآتية)?|أكمل\s+الفراغات|ضع\s+كلمة\s*\(?\s*صح\s*\)?.*?(?:خطأ|غير\s+الصحيحة)\s*\)?|اختر\s+الإجابة\s+الصحيحة|عدد|عدّد|اذكر|اشرح|وضّح|وضح|بيّن|بين|ما\s+وظيفة|ما\s+موقع|ما\s+أهمية|ما\s+اهمية|احسب|جد\s+ناتج|جد\s+مجموعة\s+الحل|حل\s+المعادلة|أجب\s+عما\s+يأتي)(?:\s+(?:أربعة|اربعة|ثلاثة|ثلاثه|اثنين|خمسة|خمسه|واحد|كل))?(?:\s+(?:مما\s+يأتي|ما\s+يأتي|مما\s+يلي|ما\s+يلي|فقط))?)\s*[:\/\-]?\s+(.+)$/i);
     if (cmdSplitMatch) {
       let extractedTitle = cmdSplitMatch[1].trim();
@@ -2325,7 +2826,7 @@
       };
     }
 
-    if (isNewSectionCommandHeader(single)) {
+    if (isNewSectionCommandHeader(single, subjectMode)) {
       return {
         title: single.endsWith(':') ? single : (single + ':'),
         body: ''
@@ -2333,21 +2834,21 @@
     }
 
     return {
-      title: 'أجب عما يأتي:',
+      title: subjectMode === 'english' ? 'Answer the following:' : 'أجب عما يأتي:',
       body: single
     };
   }
 
   function parseRawPaperTextToQuestions(rawText, subjectMode = 'arabic') {
-    const preprocessed = preprocessPaperAndVoiceText(rawText);
+    const preprocessed = preprocessPaperAndVoiceText(rawText, subjectMode);
     if (!preprocessed) return [];
 
     const lines = preprocessed.split('\n').map(l => l.trim()).filter(Boolean);
     if (lines.length === 0) return [];
 
     const mainQRegex = /^(?:س\s*[٠-٩\d]+\s*[\/:\-\)]?|السؤال\s+(?:الأول|الاول|الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|[٠-٩\d]+)\s*[\/:\-\)]?|Q\.?\s*\d+\s*[\/:\-\)]?|Question\s+\d+\s*[\/:\-\)]?)\s*(.*)$/i;
-    const branchRegex = /^(?:الفرع|فرع)\s*(?:جديد|\(?([أابجدA-D])\)?)\s*[\/:\-\)]?\s*(.*)$|^[\(\[]?([أبجد])[\)\]]\s*[\/:\-\)]\s*(.*)$/i;
-    const branchLettersOrder = ['أ', 'ب', 'ج', 'د', 'هـ'];
+    const branchRegex = /^(?:الفرع|فرع|Branch|Section)\s*(?:جديد|\(?([أابجدA-D])\)?)\s*[\/:\-\)]?\s*(.*)$|^[\(\[]?([أبجدA-D])[\)\]]\s*[\/:\-\)]\s*(.*)$/i;
+    const branchLettersOrder = subjectMode === 'english' ? ['A', 'B', 'C', 'D', 'E'] : ['أ', 'ب', 'ج', 'د', 'هـ'];
 
     const rawBlocks = [];
     let currentBlock = null;
@@ -2390,8 +2891,7 @@
         if (s && s.trim()) allQuestionLines.push(s.trim());
       });
 
-      // تقسيم محتوى السؤال الواحد إلى أقسام/فروع:
-      // يفتح فرعاً جديداً تلقائياً إذا كتب المعلم (فرع أ / ب) أو إذا أكمل مطلباً (مثل التعاريف) وبدأ مطلباً جديداً (مثل علل أو قارن أو فراغات) داخل نفس السؤال!
+      // تقسيم محتوى السؤال الواحد إلى أقسام/فروع
       const sections = [];
       let generalIntroLines = [];
       let currentSec = null;
@@ -2401,7 +2901,7 @@
         if (bMatch) {
           const explicitLetter = bMatch[1] || bMatch[3] || '';
           const bRest = bMatch[2] || bMatch[4] || '';
-          const nextLetter = explicitLetter || branchLettersOrder[sections.length] || 'أ';
+          const nextLetter = explicitLetter || branchLettersOrder[sections.length] || (subjectMode === 'english' ? 'A' : 'أ');
           currentSec = {
             explicitBranch: true,
             letter: nextLetter,
@@ -2412,26 +2912,25 @@
           return;
         }
 
-        // هل السطر يمثل بداية مطلب جديد (مثلاً: علل ما يأتي / قارن بين / املأ الفراغات) بعد أن بدأ مطلب سابق في نفس السؤال؟
-        const isCmdStart = isNewSectionCommandHeader(lineStr);
+        // هل السطر يمثل بداية مطلب جديد؟
+        const isCmdStart = isNewSectionCommandHeader(lineStr, subjectMode);
         if (isCmdStart) {
           if (!currentSec) {
             currentSec = {
               explicitBranch: false,
-              letter: branchLettersOrder[sections.length] || 'أ',
+              letter: branchLettersOrder[sections.length] || (subjectMode === 'english' ? 'A' : 'أ'),
               score: extractScoreFromLine(lineStr, 0),
               lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
             };
             sections.push(currentSec);
             return;
           } else if (currentSec.lines.length >= 1) {
-            // إذا كان القسم الحالي يحتوي بالفعل على مطلب وعناصره (إما في سطر واحد أو عدة سطور)، نفتح فرعاً جديداً تلقائياً للمطلب الجديد!
-            const prevFormatted = autoFormatAndNumberSectionLines(currentSec.lines);
-            const prevHasCompletedContent = prevFormatted.length >= 2 || /^(?:قارن\s+بين|ما\s+الفرق\s+بين|اشرح|وضح)/i.test(currentSec.lines[0]);
+            const prevFormatted = autoFormatAndNumberSectionLines(currentSec.lines, subjectMode);
+            const prevHasCompletedContent = prevFormatted.length >= 2 || /^(?:قارن\s+بين|ما\s+الفرق\s+بين|اشرح|وضح|Read\s+the|Do\s+as)/i.test(currentSec.lines[0]);
             if (prevHasCompletedContent) {
               currentSec = {
                 explicitBranch: true,
-                letter: branchLettersOrder[sections.length] || 'ب',
+                letter: branchLettersOrder[sections.length] || (subjectMode === 'english' ? 'B' : 'ب'),
                 score: extractScoreFromLine(lineStr, 0),
                 lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
               };
@@ -2441,15 +2940,14 @@
           }
         }
 
-        // سطر عادي (نقطة تعريف أو تعليل أو تكملة)
+        // سطر عادي
         if (!currentSec) {
-          // إذا كان السطر جملة تمهيدية مثل (أجب عن فرعين مما يأتي: / أجب عن الفروع الآتية:) نحتفظ به كعنوان عام للسؤال
-          if (/(?:أجب\s+عن\s+فرعين|اجب\s+عن\s+فرعين|أجب\s+عن\s+الفرعين|أجب\s+عن\s+أحد\s+الفرعين|أجب\s+عن\s+الفروع|اجب\s+عن\s+الفروع)/i.test(lineStr)) {
+          if (/(?:أجب\s+عن\s+فرعين|اجب\s+عن\s+فرعين|أجب\s+عن\s+الفرعين|أجب\s+عن\s+أحد\s+الفرعين|أجب\s+عن\s+الفروع|Answer\s+(?:any\s+two|all\s+branches))/i.test(lineStr)) {
             generalIntroLines.push(cleanScoreTagFromLine(lineStr));
           } else {
             currentSec = {
               explicitBranch: false,
-              letter: 'أ',
+              letter: subjectMode === 'english' ? 'A' : 'أ',
               score: 0,
               lines: [cleanScoreTagFromLine(lineStr)].filter(Boolean)
             };
@@ -2460,16 +2958,14 @@
         }
       });
 
-      // التمييز الدقيق بين (1) عنوان السؤال، (2) نص السؤال، (3) فرع السؤال:
+      // التمييز الدقيق بين (1) عنوان السؤال، (2) نص السؤال، (3) فرع السؤال
       let questionTitle = '';
       let fullQuestionText = '';
       let formattedBranches = [];
 
       if (sections.length > 0 && !sections[0].explicitBranch) {
-        // القسم الأول جاء مباشرة تحت السؤال (بدون كتابة "فرع أ" صراحةً):
-        // إذن القسم الأول يمثل (عنوان السؤال + نص السؤال)، وأي مطلب إضافي بعده يفتح (فرع السؤال) تلقائياً!
-        const mainNumbered = autoFormatAndNumberSectionLines(sections[0].lines);
-        const mainSplit = splitSectionIntoTitleAndBody(mainNumbered);
+        const mainNumbered = autoFormatAndNumberSectionLines(sections[0].lines, subjectMode);
+        const mainSplit = splitSectionIntoTitleAndBody(mainNumbered, subjectMode);
         questionTitle = mainSplit.title || (generalIntroLines[0] || '');
         fullQuestionText = mainSplit.body || '';
 
@@ -2478,10 +2974,11 @@
           const defaultBranchScore = Math.max(5, Math.round(detectedScore / (extraSecs.length + 1)));
           formattedBranches = extraSecs.map((sec, sIdx) => {
             const bLetter = sec.explicitBranch && sec.letter ? sec.letter : (branchLettersOrder[sIdx] || String(sIdx + 1));
-            const bNumbered = autoFormatAndNumberSectionLines(sec.lines);
-            const bSplit = splitSectionIntoTitleAndBody(bNumbered);
+            const bNumbered = autoFormatAndNumberSectionLines(sec.lines, subjectMode);
+            const bSplit = splitSectionIntoTitleAndBody(bNumbered, subjectMode);
+            const branchLabel = subjectMode === 'english' ? `Branch (${bLetter})` : `الفرع (${bLetter})`;
             return {
-              title: `الفرع (${bLetter})`,
+              title: branchLabel,
               prompt: bSplit.title || '',
               text: bSplit.body || '',
               score: sec.score > 0 ? sec.score : defaultBranchScore,
@@ -2490,17 +2987,16 @@
           });
         }
       } else if (sections.length > 0 && sections[0].explicitBranch) {
-        // السؤال بدأ مباشرة بـ (فرع أ / ...):
-        // عنوان السؤال يكون العبارة التمهيدية (أجب عن الفروع الآتية:) والفروع في قائمة الفروع
-        questionTitle = generalIntroLines[0] || 'أجب عن الفروع الآتية:';
+        questionTitle = generalIntroLines[0] || (subjectMode === 'english' ? 'Answer all branches:' : 'أجب عن الفروع الآتية:');
         fullQuestionText = generalIntroLines.slice(1).join('\n').trim();
         const defaultBranchScore = Math.max(5, Math.round(detectedScore / Math.max(1, sections.length)));
         formattedBranches = sections.map((sec, sIdx) => {
           const bLetter = sec.letter || branchLettersOrder[sIdx] || String(sIdx + 1);
-          const bNumbered = autoFormatAndNumberSectionLines(sec.lines);
-          const bSplit = splitSectionIntoTitleAndBody(bNumbered);
+          const bNumbered = autoFormatAndNumberSectionLines(sec.lines, subjectMode);
+          const bSplit = splitSectionIntoTitleAndBody(bNumbered, subjectMode);
+          const branchLabel = subjectMode === 'english' ? `Branch (${bLetter})` : `الفرع (${bLetter})`;
           return {
-            title: `الفرع (${bLetter})`,
+            title: branchLabel,
             prompt: bSplit.title || '',
             text: bSplit.body || '',
             score: sec.score > 0 ? sec.score : defaultBranchScore,
@@ -2610,19 +3106,25 @@
   }
 
   function formatQuestionsBackToRawText(questions) {
+    const activeSubject = getActiveSubjectMode();
+    const isEnglish = activeSubject === 'english';
     return questions.map((q, i) => {
       const qTitle = (q.title || '').trim();
       const qBody = (q.text || '').trim();
-      let block = `س${i + 1} / ${qTitle} (${q.score || 20} درجة)`;
+      const qPrefix = isEnglish ? `Q${i + 1}/` : `س${i + 1} /`;
+      const scoreTag = isEnglish ? `(${q.score || 20} Marks)` : `(${q.score || 20} درجة)`;
+      let block = `${qPrefix} ${qTitle} ${scoreTag}`;
       if (qBody) {
         block += `\n${qBody}`;
       }
       if (Array.isArray(q.branches) && q.branches.length > 0) {
-        q.branches.forEach(b => {
-          const bTitle = (b.title || 'الفرع (أ)').trim();
+        q.branches.forEach((b, bi) => {
+          const defaultBranchTitle = isEnglish ? `Branch (${String.fromCharCode(65 + bi)})` : `الفرع (${String.fromCharCode(1571 + bi)})`;
+          const bTitle = (b.title || defaultBranchTitle).trim();
           const bPrompt = (b.prompt || '').trim();
           const bBody = (b.text || '').trim();
-          block += `\n${bTitle} / ${bPrompt} (${b.score || 10} درجات)`;
+          const bScoreTag = isEnglish ? `(${b.score || 10} Marks)` : `(${b.score || 10} درجات)`;
+          block += `\n${bTitle}/ ${bPrompt} ${bScoreTag}`;
           if (bBody) {
             block += `\n${bBody}`;
           }
@@ -2665,7 +3167,13 @@
       return;
     }
 
+    const activeSubject = getActiveSubjectMode();
+
     listEl.innerHTML = currentParsedQuestions.map((q, idx) => {
+      const qSubject = q.subject || activeSubject;
+      const isEnglish = qSubject === 'english';
+      const isMath = qSubject === 'math';
+
       const typeOptionsHtml = Object.entries(QUESTION_TYPE_LABELS).map(([k, label]) =>
         `<option value="${k}" ${q.type === k ? 'selected' : ''}>${label}</option>`
       ).join('');
@@ -2675,20 +3183,21 @@
         ? `<div class="scanned-q-branches" style="margin-top: 0.65rem; display: flex; flex-direction: column; gap: 0.55rem;">
             ${q.branches.map((b, bIdx) => {
           const bRows = Math.max(2, (b.text || '').split('\n').length);
+          const bDirAttr = isEnglish ? 'dir="ltr" style="direction: ltr; text-align: left;' : 'dir="rtl" style="direction: rtl; text-align: right;';
           return `
               <div class="scanned-q-branch-item" style="background: rgba(139, 92, 246, 0.04); border: 1.5px dashed rgba(139, 92, 246, 0.38); border-radius: 10px; padding: 0.6rem;">
-                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; margin-bottom: 0.4rem; ${isEnglish ? 'flex-direction: row-reverse;' : ''}">
                   <div style="display: flex; align-items: center; gap: 0.35rem;">
-                    <span class="branch-pill" style="padding: 2px 8px; font-size: 0.74rem; background: rgba(139, 92, 246, 0.15); color: #6d28d9; border-radius: 6px; font-weight: 800;">🌿 فرع السؤال</span>
+                    <span class="branch-pill" style="padding: 2px 8px; font-size: 0.74rem; background: rgba(139, 92, 246, 0.15); color: #6d28d9; border-radius: 6px; font-weight: 800;">${isEnglish ? 'Branch' : '🌿 فرع السؤال'}</span>
                     <input type="text" value="${escapeHtml(b.title || '')}"
                       oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'title', this.value)"
-                      style="width: 95px; padding: 2px 6px; font-size: 0.78rem; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
+                      style="width: 105px; padding: 2px 6px; font-size: 0.78rem; font-weight: 800; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); ${isEnglish ? 'text-align: left;' : ''}">
                   </div>
                   <div style="display: flex; align-items: center; gap: 0.35rem;">
                     <input type="number" min="1" max="100" value="${b.score || 10}"
                       oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'score', this.value)"
                       style="width: 52px; padding: 2px 4px; font-size: 0.78rem; font-weight: 800; text-align: center; border: 1px solid #cbd5e1; border-radius: 6px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
-                    <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">درجة</span>
+                    <span style="font-size: 0.74rem; font-weight: 700; color: #64748b;">${isEnglish ? 'Marks' : 'درجة'}</span>
                     <button type="button" onclick="window.removeScannedBranch(${idx}, ${bIdx})" title="حذف هذا الفرع"
                       style="background: rgba(239, 68, 68, 0.1); color: #dc2626; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
                       <i class="fa-solid fa-xmark" style="font-size: 0.75rem;"></i>
@@ -2696,19 +3205,19 @@
                   </div>
                 </div>
                 <div style="margin-bottom: 0.38rem;">
-                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #6d28d9; margin-bottom: 2px;">📌 عنوان الفرع (منطوق الفرع):</label>
+                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #6d28d9; margin-bottom: 2px;">${isEnglish ? '📌 Branch Prompt (Header):' : '📌 عنوان الفرع (منطوق الفرع):'}</label>
                   <input type="text" class="form-control scanned-q-branch-prompt-input"
                     value="${escapeHtml(b.prompt || '')}"
-                    placeholder="عنوان الفرع (مثال: علل ما يأتي: / قارن بين: / عرف ما يأتي:)"
+                    placeholder="${isEnglish ? 'Branch Prompt (e.g. Do as required: / Define words:)' : 'عنوان الفرع (مثال: علل ما يأتي: / قارن بين: / جد قيمة x:)'}"
                     oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'prompt', this.value)"
-                    style="width: 100%; font-size: 0.84rem; font-weight: 800; padding: 0.35rem 0.55rem; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 7px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">
+                    ${bDirAttr} width: 100%; font-size: 0.84rem; font-weight: 800; padding: 0.35rem 0.55rem; border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 7px; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">"
                 </div>
                 <div>
-                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #047857; margin-bottom: 2px;">📝 نص الفرع (النقاط / الفقرات):</label>
+                  <label style="display: block; font-size: 0.72rem; font-weight: 800; color: #047857; margin-bottom: 2px;">${isEnglish ? '📝 Branch Body (Points / Items):' : '📝 نص الفرع (النقاط / المعادلات):'}</label>
                   <textarea class="form-control scanned-q-branch-textarea" rows="${bRows}"
-                    placeholder="اكتب أو عدّل نص ونقاط هذا الفرع هنا (1- ... 2- ...)..."
+                    placeholder="${isEnglish ? 'Write or edit branch items (1- ... 2- ...)...' : 'اكتب أو عدّل نص ونقاط هذا الفرع هنا (1- ... 2- ...)...'}"
                     oninput="window.updateScannedBranchLive(${idx}, ${bIdx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
-                    style="width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>
+                    ${bDirAttr} width: 100%; font-size: 0.86rem; font-weight: 700; line-height: 1.6; padding: 0.45rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 8px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a);">${escapeHtml(b.text || '')}</textarea>"
                 </div>
               </div>
             `;
@@ -2716,18 +3225,27 @@
           </div>`
         : '';
 
-      const displayTitle = q.displayTitle || ('السؤال ' + (ARABIC_ORDINALS[idx] || (idx + 1)));
+      const defaultDisplayTitle = isEnglish ? `Question ${idx + 1}` : ('السؤال ' + (ARABIC_ORDINALS[idx] || (idx + 1)));
+      const displayTitle = q.displayTitle || defaultDisplayTitle;
       const qRows = Math.max(2, (q.text || '').split('\n').length);
+      const qDirAttr = isEnglish ? 'dir="ltr" style="direction: ltr; text-align: left;' : 'dir="rtl" style="direction: rtl; text-align: right;';
+
+      const mathPreviewStrip = isMath && (q.text || q.title)
+        ? `<div style="margin-top: 0.45rem; background: rgba(139, 92, 246, 0.06); border: 1px dashed rgba(139, 92, 246, 0.3); border-radius: 8px; padding: 0.35rem 0.6rem; font-size: 0.8rem; color: #5b21b6;">
+            <span style="font-weight: 800;">📐 معاينة المعادلات الحية: </span>
+            <span>${(typeof window.formatMathText === 'function') ? window.formatMathText((q.title ? q.title + ' ' : '') + (q.text || '')) : escapeHtml(q.text || '')}</span>
+          </div>`
+        : '';
 
       return `
-        <div class="scanned-q-card">
-          <div class="scanned-q-card-header">
-            <div class="scanned-q-title-wrap" style="flex: 1; min-width: 140px;">
-              <span class="scanned-q-num-badge">س${idx + 1}</span>
+        <div class="scanned-q-card ${isEnglish ? 'is-english-card' : ''}">
+          <div class="scanned-q-card-header" ${isEnglish ? 'style="flex-direction: row-reverse;"' : ''}>
+            <div class="scanned-q-title-wrap" style="flex: 1; min-width: 140px; ${isEnglish ? 'display: flex; flex-direction: row-reverse; justify-content: flex-end;' : ''}">
+              <span class="scanned-q-num-badge">${isEnglish ? `Q${idx + 1}` : `س${idx + 1}`}</span>
               <input type="text" value="${escapeHtml(displayTitle)}"
                 oninput="window.updateScannedQuestionLive(${idx}, 'displayTitle', this.value)"
                 title="اضغط لتعديل رقم/تسمية السؤال"
-                style="font-weight: 900; font-size: 0.9rem; color: var(--text-main, #0f172a); background: transparent; border: 1px dashed transparent; border-radius: 6px; padding: 2px 6px; width: 135px; transition: border-color 0.2s;"
+                style="font-weight: 900; font-size: 0.9rem; color: var(--text-main, #0f172a); background: transparent; border: 1px dashed transparent; border-radius: 6px; padding: 2px 6px; width: 145px; transition: border-color 0.2s; ${isEnglish ? 'text-align: left;' : ''}"
                 onfocus="this.style.borderColor='#10b981'; this.style.background='rgba(16,185,129,0.05)';"
                 onblur="this.style.borderColor='transparent'; this.style.background='transparent';">
             </div>
@@ -2737,7 +3255,7 @@
               </select>
               <div class="scanned-q-score-box" title="درجة السؤال">
                 <input type="number" min="1" max="100" value="${q.score}" oninput="window.updateScannedQuestionLive(${idx}, 'score', this.value)">
-                <span>درجة</span>
+                <span>${isEnglish ? 'Marks' : 'درجة'}</span>
               </div>
               <button type="button" class="scanned-q-delete-btn" onclick="window.removeScannedQuestion(${idx})" title="حذف هذا السؤال">
                 <i class="fa-solid fa-trash-can"></i>
@@ -2747,34 +3265,37 @@
           <div class="scanned-q-card-body" style="padding-top: 0.5rem;">
             <!-- 1. عنوان السؤال (منطوق السؤال الرئيسي) -->
             <div style="margin-bottom: 0.5rem;">
-              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem; ${isEnglish ? 'flex-direction: row-reverse;' : ''}">
                 <span style="background: rgba(37, 99, 235, 0.1); color: #1d4ed8; padding: 2px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 800;">
-                  <i class="fa-solid fa-heading"></i> 1. عنوان السؤال (منطوق السؤال الرئيسي):
+                  <i class="fa-solid fa-heading"></i> ${isEnglish ? '1. Question Title (Prompt):' : '1. عنوان السؤال (منطوق السؤال الرئيسي):'}
                 </span>
                 <button type="button" onclick="window.addBranchToScannedQuestion(${idx})"
                   style="background: rgba(139, 92, 246, 0.1); color: #6d28d9; border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; padding: 2px 8px; font-size: 0.73rem; font-weight: 800; cursor: pointer;">
-                  <i class="fa-solid fa-code-branch"></i> + إضافة فرع للسؤال (${branchesCount})
+                  <i class="fa-solid fa-code-branch"></i> ${isEnglish ? `+ Add Branch (${branchesCount})` : `+ إضافة فرع للسؤال (${branchesCount})`}
                 </button>
               </div>
               <input type="text" class="form-control scanned-q-title-input"
                 value="${escapeHtml(q.title || '')}"
-                placeholder="عنوان السؤال (مثال: عرف أربعة مما يأتي: / علل ما يأتي: / أجب عن الفروع الآتية:)"
+                placeholder="${isEnglish ? 'Question Title (e.g. Read the passage: / Answer all branches:)' : 'عنوان السؤال (مثال: عرف ما يأتي: / جد مجموعة الحل: / أجب عن الفروع الآتية:)'}"
                 oninput="window.updateScannedQuestionLive(${idx}, 'title', this.value)"
-                style="width: 100%; font-size: 0.9rem; font-weight: 800; padding: 0.42rem 0.65rem; border: 1.5px solid rgba(37, 99, 235, 0.35); border-radius: 8px; background: rgba(37, 99, 235, 0.03); color: var(--text-main, #0f172a);">
+                ${qDirAttr} width: 100%; font-size: 0.9rem; font-weight: 800; padding: 0.42rem 0.65rem; border: 1.5px solid rgba(37, 99, 235, 0.35); border-radius: 8px; background: rgba(37, 99, 235, 0.03); color: var(--text-main, #0f172a);">"
             </div>
 
             <!-- 2. نص السؤال (النقاط / الفقرات) -->
             <div>
               <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.25rem;">
                 <span style="background: rgba(16, 185, 129, 0.12); color: #047857; padding: 2px 8px; border-radius: 6px; font-size: 0.74rem; font-weight: 800;">
-                  <i class="fa-solid fa-list-ol"></i> 2. نص السؤال (النقاط والفقرات التابعة للسؤال):
+                  <i class="fa-solid fa-list-ol"></i> ${isEnglish ? '2. Question Body (Items / Sentences):' : '2. نص السؤال (النقاط والفقرات التابعة للسؤال):'}
                 </span>
               </div>
               <textarea class="form-control scanned-q-edit-textarea" rows="${qRows}"
-                placeholder="نص ونقاط السؤال الرئيسي (1- ... 2- ...)..."
+                placeholder="${isEnglish ? 'Question body points (1- ... 2- ...)...' : 'نص ونقاط السؤال الرئيسي (1- ... 2- ...)...'}"
                 oninput="window.updateScannedQuestionLive(${idx}, 'text', this.value); this.style.height='auto'; this.style.height=(this.scrollHeight)+'px';"
-                style="width: 100%; font-size: 0.88rem; font-weight: 700; line-height: 1.65; padding: 0.5rem 0.65rem; border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 10px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">${escapeHtml(q.text || '')}</textarea>
+                ${qDirAttr} width: 100%; font-size: 0.88rem; font-weight: 700; line-height: 1.65; padding: 0.5rem 0.65rem; border: 1.5px solid rgba(16, 185, 129, 0.35); border-radius: 10px; resize: vertical; background: var(--bg-card, #fff); color: var(--text-main, #0f172a); box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);">${escapeHtml(q.text || '')}</textarea>"
             </div>
+
+            <!-- معاينة الرياضيات إن وجدت -->
+            ${mathPreviewStrip}
 
             <!-- 3. فروع السؤال (الفرع أ / الفرع ب) -->
             ${branchesHtml}
