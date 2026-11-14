@@ -264,6 +264,14 @@ window.checkSectionPlanAccess = function (targetId) {
 window.switchToTab = function (targetId) {
   if (!targetId) return;
 
+  // Locked Section: Exam Cards Studio is Coming Soon (قريباً)
+  if (targetId === 'tab-exam-cards') {
+    if (typeof showToast === 'function') {
+      showToast('🔒 قسم إصدار البطاقات الامتحانية وباجات الاختبار قيد التجهيز وسيتاح قريباً بإذن الله ⏳', 'info');
+    }
+    return;
+  }
+
   // Programmatic access gatekeeper for Plan 1 (Starter Plan)
   if (typeof window.checkSectionPlanAccess === 'function' && !window.checkSectionPlanAccess(targetId)) {
     return;

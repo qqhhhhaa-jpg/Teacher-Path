@@ -1348,9 +1348,11 @@
                       </div>
                     </div>
 
-                    <!-- App 10: Exam Admission Card Studio (استوديو البطاقة الامتحانية وباجة الاختبارات) -->
-                    <div class="app-hub-card app-card-indigo" onclick="window.switchToTab('tab-exam-cards')"
-                      role="button" tabindex="0" title="فتح استوديو البطاقة الامتحانية وباجات دخول الاختبارات">
+                    <!-- App 10: Exam Admission Card Studio (استوديو البطاقة الامتحانية وباجة الاختبارات - مغلق قريباً) -->
+                    <div class="app-hub-card app-card-indigo card-locked-soon"
+                      onclick="if(typeof showToast === 'function') { showToast('🔒 قسم إصدار البطاقات الامتحانية وباجات الاختبار قيد التجهيز وسيتاح قريباً بإذن الله ⏳', 'info'); } return false;"
+                      role="button" tabindex="0" title="قريباً بإذن الله — استوديو البطاقة الامتحانية وباجات دخول الاختبارات"
+                      style="cursor: not-allowed; position: relative; opacity: 0.88;">
                       <div class="app-card-thematic-bg app-bg-indigo" aria-hidden="true">
                         <svg class="thematic-bg-svg" viewBox="0 0 360 380" preserveAspectRatio="none" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
@@ -1379,22 +1381,29 @@
                           <i class="fa-solid fa-address-card"></i>
                           <span>باجات وهوية A4</span>
                         </div>
-                        <div class="app-num-badge" style="color: #4f46e5; background: rgba(79, 70, 229, 0.1);">10</div>
+                        <div style="display: flex; align-items: center; gap: 0.45rem;">
+                          <span style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); font-weight: 850; font-size: 0.72rem; padding: 0.2rem 0.65rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.3rem;">
+                            <i class="fa-solid fa-lock"></i> قريباً ⏳
+                          </span>
+                          <div class="app-num-badge" style="color: #4f46e5; background: rgba(79, 70, 229, 0.1);">10</div>
+                        </div>
                       </div>
                       <div class="app-card-illustration">
                         <img src="assets/app_exam_cards.svg" alt="البطاقة الامتحانية الرسمية وباجات الطلاب"
-                          class="app-3d-img" loading="lazy" />
+                          class="app-3d-img" loading="lazy" style="filter: grayscale(18%);" />
                       </div>
                       <div class="app-card-body">
                         <h3 class="app-card-title">البطاقة الامتحانية (باجة الامتحان)</h3>
                         <p class="app-card-desc">إصدار وتصميم بطاقات دخول الامتحانات وباجات الطلاب الرسمية (A4: الاسم،
                           الرقم الامتحاني، اسم المدرسة، الصف، القاعة، جدول المواد، باركود QR، والصورة الشخصية).</p>
                       </div>
-                      <div class="app-card-footer">
-                        <span class="app-action-text">دخول التطبيق</span>
-                        <button type="button" class="app-circle-action-btn" aria-label="فتح التطبيق"
-                          style="background: linear-gradient(135deg, #4f46e5, #3730a3);">
-                          <i class="fa-solid fa-arrow-left"></i>
+                      <div class="app-card-footer" style="background: rgba(245, 158, 11, 0.05); border-radius: 12px; padding: 0.55rem 0.85rem; border: 1px dashed rgba(245, 158, 11, 0.3);">
+                        <span class="app-action-text" style="color: #d97706; font-weight: 800; display: inline-flex; align-items: center; gap: 0.4rem;">
+                          <i class="fa-solid fa-clock-rotate-left"></i> قيد التجهيز — قريباً
+                        </span>
+                        <button type="button" class="app-circle-action-btn" aria-label="مغلق حالياً"
+                          style="background: #94a3b8; cursor: not-allowed; box-shadow: none;">
+                          <i class="fa-solid fa-lock"></i>
                         </button>
                       </div>
                     </div>
@@ -4218,6 +4227,22 @@
 
           <!-- Tab 10: Exam Admission Cards Studio (استوديو البطاقة الامتحانية الرسمية وباجات الطلاب A4) -->
           <div class="tab-content" id="tab-exam-cards" style="display: none;">
+            <!-- Coming Soon Notice Banner -->
+            <div class="no-print" style="margin-bottom: 1.1rem; background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(217, 119, 6, 0.12)); border: 1.5px solid rgba(245, 158, 11, 0.4); border-radius: 16px; padding: 1.1rem 1.6rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+              <div style="display: flex; align-items: center; gap: 0.95rem;">
+                <div style="width: 46px; height: 46px; border-radius: 13px; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25); flex-shrink: 0;">
+                  <i class="fa-solid fa-lock"></i>
+                </div>
+                <div>
+                  <h4 style="margin: 0 0 0.25rem 0; font-size: 1.1rem; font-weight: 900; color: #92400e;">هذا القسم قيد التجهيز والتطوير (قريباً بإذن الله ⏳)</h4>
+                  <p style="margin: 0; font-size: 0.9rem; color: #78350f; font-weight: 700; line-height: 1.5;">يتم حالياً تطوير وتجهيز استوديو إصدار البطاقات الامتحانية وباجات الطلاب الرسمية وسيتاح قريباً.</p>
+                </div>
+              </div>
+              <button type="button" class="btn" onclick="window.switchToTab('tab-apps')" style="background: #d97706; color: #fff; border: none; font-weight: 800; border-radius: 10px; padding: 0.5rem 1.1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.45rem;">
+                <i class="fa-solid fa-arrow-right"></i> الرجوع للتطبيقات
+              </button>
+            </div>
+
             <div class="section-return-bar no-print">
               <div class="return-bar-start">
                 <button type="button" class="btn-return-hub" onclick="window.switchToTab('tab-apps')"
