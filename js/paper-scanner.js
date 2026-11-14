@@ -105,66 +105,15 @@
   }
 
   function injectScannerButtonsInQuestionBuilder() {
-    // إزالة أي زر قديم داخل صف الفلاتر لمنع التفاف السطر
+    // إزالة أي أشرطة أو أزرار للماسح من مساحة العمل اليدوية لضمان نقاء كل تطبيق بحسب اختصاصه
     const oldTopBtn = document.getElementById('btnOpenPaperScannerTop');
     if (oldTopBtn) oldTopBtn.remove();
 
-    // 1. شريط ذكي مدمج وأنيق أسفل شريط اختيار المادة ونوع السؤال مباشرة (.qbuilder-paper-scanner-bar)
-    const addStripRow = document.querySelector('#tab-questions .qbuilder-add-strip-row');
-    if (addStripRow && addStripRow.parentNode && !document.getElementById('qbuilderPaperScannerBar')) {
-      const scannerBar = document.createElement('div');
-      scannerBar.id = 'qbuilderPaperScannerBar';
-      scannerBar.className = 'qbuilder-paper-scanner-bar';
-      scannerBar.innerHTML = `
-        <div class="scanner-bar-right">
-          <div class="scanner-bar-icon-badge">
-            <i class="fa-solid fa-camera-retro"></i>
-          </div>
-          <div class="scanner-bar-text">
-            <div class="scanner-bar-title-row">
-              <strong>قارئ الورقة المكتوبة بخط اليد</strong>
-              <span class="scanner-bar-pill-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> تحويل فوري للأسئلة</span>
-            </div>
-            <p>اكتب الأسئلة على أي ورقة وصوّرها بالموبايل أو ارفعها لتتحول تلقائياً إلى أسئلة وزارية منسقة</p>
-          </div>
-        </div>
-        <div class="scanner-bar-actions">
-          <button type="button" class="btn-scanner-bar-primary" id="btnOpenPaperScannerMain" onclick="window.openHandwrittenPaperScanner(false)">
-            <i class="fa-solid fa-camera"></i>
-            <span>تصوير أو رفع ورقة مكتوبة</span>
-          </button>
-          <button type="button" class="btn-scanner-bar-voice" id="btnOpenPaperScannerVoice" onclick="window.openHandwrittenPaperScannerInVoiceMode()" title="إملاء الأسئلة بالصوت مع فتح الفروع وترقيم التعاريف والتعاليل تلقائياً" style="background: linear-gradient(135deg, #059669, #10b981); color: #fff; border: none; border-radius: 10px; padding: 0.52rem 0.95rem; font-size: 0.82rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.45rem; cursor: pointer; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
-            <i class="fa-solid fa-microphone-lines"></i>
-            <span>إملاء صوتي ذكي 🎙️</span>
-          </button>
-          <button type="button" class="btn-scanner-bar-qr" id="btnOpenPaperScannerQr" onclick="window.openHandwrittenPaperScanner(true)" title="اربط كاميرا تليفونك بالحاسبة عبر رمز QR لتصوير الورقة وإرسالها فوراً">
-            <i class="fa-solid fa-qrcode"></i>
-            <span>ربط كاميرا الموبايل (QR)</span>
-          </button>
-        </div>
-      `;
-      addStripRow.parentNode.insertBefore(scannerBar, addStripRow.nextSibling);
-    }
+    const scannerBar = document.getElementById('qbuilderPaperScannerBar');
+    if (scannerBar) scannerBar.remove();
 
-    // 2. زر متناسق وأنيق داخل هيدر "أسئلة الاختبار الحالية" بجانب زر تصفير الورقة
-    const resetBtn = document.getElementById('resetExamSheetBtn');
-    if (resetBtn && resetBtn.parentNode) {
-      let cardBtn = document.getElementById('btnOpenPaperScannerCard');
-      if (!cardBtn) {
-        cardBtn = document.createElement('button');
-        cardBtn.type = 'button';
-        cardBtn.id = 'btnOpenPaperScannerCard';
-        resetBtn.parentNode.insertBefore(cardBtn, resetBtn);
-      }
-      cardBtn.className = 'btn btn-paper-scanner-inline';
-      cardBtn.onclick = function () {
-        window.openHandwrittenPaperScanner(false);
-      };
-      cardBtn.innerHTML = `
-        <i class="fa-solid fa-camera-retro"></i>
-        <span>قراءة ورقة بخط اليد / QR</span>
-      `;
-    }
+    const cardBtn = document.getElementById('btnOpenPaperScannerCard');
+    if (cardBtn) cardBtn.remove();
   }
 
   // ==========================================================================
@@ -295,27 +244,18 @@
               <span class="giant-card-cta">اختيار صورة <i class="fa-solid fa-upload"></i></span>
             </button>
 
-            <!-- الخيار 4: الإملاء الصوتي أو تجربة ورقة جاهزة -->
-            <div class="scanner-giant-card card-voice-demo">
-              <div class="giant-card-top-badge">صوت وتجربة 🎙️</div>
+            <!-- الخيار 4: تجربة ورقة مكتوبة بخط اليد -->
+            <button type="button" class="scanner-giant-card card-demo" onclick="window.loadSampleHandwrittenPaper()" style="cursor: pointer;">
+              <div class="giant-card-top-badge">نموذج جاهز 🪄</div>
               <div class="giant-card-icon">
-                <i class="fa-solid fa-microphone-lines"></i>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
               </div>
               <div class="giant-card-info">
-                <h4>قراءة صوتية أو تجربة</h4>
-                <p>اقرأ الأسئلة بصوتك مباشرة، أو جرّب نموذج ورقة مكتوبة بخط اليد</p>
+                <h4>تجربة ورقة جاهزة</h4>
+                <p>جرّب قراءة نموذج امتحان حقيقي مكتوب بخط اليد فوراً بنقرة واحدة</p>
               </div>
-              <div class="giant-card-sub-btns">
-                <button type="button" class="btn-scanner-sub-action btn-voice" id="btnScannerVoiceDictate" onclick="window.toggleScannerVoiceDictation()">
-                  <i class="fa-solid fa-microphone"></i>
-                  <span>إملاء صوتي</span>
-                </button>
-                <button type="button" class="btn-scanner-sub-action btn-demo" onclick="window.loadSampleHandwrittenPaper()">
-                  <i class="fa-solid fa-wand-magic-sparkles"></i>
-                  <span>تجربة ورقة</span>
-                </button>
-              </div>
-            </div>
+              <span class="giant-card-cta">تجربة الورقة الآن <i class="fa-solid fa-bolt"></i></span>
+            </button>
 
           </div>
 
@@ -432,6 +372,32 @@
                   <i class="fa-solid fa-check"></i>
                   <span>حفظ</span>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- مركز الإملاء الصوتي المخصص الفائق النقاء (يظهر حصرياً في نمط الصوت) -->
+          <div id="dedicatedVoiceHeroBox" class="dedicated-voice-hero-box" style="display: none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.12) 100%); border: 2px solid rgba(16, 185, 129, 0.35); border-radius: 18px; padding: 1.4rem 1.6rem; margin-bottom: 1.1rem; text-align: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem;">
+              <button type="button" id="btnDedicatedVoiceRecord" onclick="window.toggleScannerVoiceDictation()"
+                style="width: 82px; height: 82px; border-radius: 50%; border: none; background: linear-gradient(135deg, #059669, #10b981); color: #fff; font-size: 2.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); transition: all 0.25s ease;"
+                onmouseenter="this.style.transform='scale(1.08)'" onmouseleave="this.style.transform='none'">
+                <i class="fa-solid fa-microphone" id="dedicatedVoiceMicIcon"></i>
+              </button>
+              <div>
+                <h3 id="dedicatedVoiceStatusHeading" style="margin: 0 0 0.3rem 0; font-size: 1.25rem; font-weight: 900; color: #065f46;">
+                  اضغط على المايك وابدأ بالتحدث بالأسئلة مباشرة
+                </h3>
+                <p id="dedicatedVoiceStatusSub" style="margin: 0; font-size: 0.9rem; font-weight: 700; color: #047857;">
+                  تحدث بصوتك الطبيعي وسيقوم الذكاء الاصطناعي بكتابة الأسئلة وتقسيم الفروع وترقيمها تلقائياً
+                </p>
+              </div>
+              <div id="dedicatedVoiceWaveAnim" style="display: none; align-items: center; gap: 5px; height: 26px;">
+                <span style="width: 4px; height: 12px; background: #10b981; border-radius: 99px;"></span>
+                <span style="width: 4px; height: 24px; background: #059669; border-radius: 99px;"></span>
+                <span style="width: 4px; height: 18px; background: #10b981; border-radius: 99px;"></span>
+                <span style="width: 4px; height: 26px; background: #047857; border-radius: 99px;"></span>
+                <span style="width: 4px; height: 14px; background: #10b981; border-radius: 99px;"></span>
               </div>
             </div>
           </div>
@@ -620,10 +586,96 @@
   }
 
   // ==========================================================================
-  // 3. فتح وإغلاق النافذة وإدارة المؤشرات
+  // 3. فتح وإغلاق النافذة وإدارة المؤشرات وتخصيص الأنماط (صوت فقط vs صورة فقط)
   // ==========================================================================
-  window.openHandwrittenPaperScanner = function (openQrPanelImmediately = false) {
+  window.setScannerUIMode = function (mode) {
     injectScannerModal();
+    const modal = document.getElementById('handwrittenPaperScannerModal');
+    if (!modal) return;
+
+    const brandIcon = modal.querySelector('.paper-scanner-header-icon');
+    const titleEl = modal.querySelector('.header-title-row h3');
+    const proPill = modal.querySelector('.header-pro-pill');
+    const subtitleEl = modal.querySelector('.paper-scanner-header-titles p');
+    const step1El = document.getElementById('scannerStep1Indicator');
+    const step2El = document.getElementById('scannerStep2Indicator');
+    const step3El = document.getElementById('scannerStep3Indicator');
+
+    const sourceTitle = modal.querySelector('.scanner-col-source .panel-header-title strong');
+    const questionsTitle = modal.querySelector('.scanner-col-questions .panel-header-title strong');
+    const rawTextarea = document.getElementById('scannerExtractedTextarea');
+
+    if (mode === 'voice') {
+      modal.classList.add('mode-voice');
+      modal.classList.remove('mode-scanner');
+
+      if (brandIcon) brandIcon.innerHTML = '<i class="fa-solid fa-microphone-lines" style="color: #10b981;"></i>';
+      if (titleEl) titleEl.textContent = 'استوديو الإملاء الصوتي الذكي — تحويل الصوت لأسئلة وزارية';
+      if (proPill) proPill.textContent = 'صوت فقط 🎙️';
+      if (subtitleEl) subtitleEl.textContent = 'تحدث بحرية واقرأ الأسئلة بصوتك ليتم كتابتها وتقسيم فروعها وترقيم التعاريف والتعاليل تلقائياً';
+
+      if (step1El && step1El.querySelector('span:last-child')) step1El.querySelector('span:last-child').textContent = 'تحدث بصوتك وسجّل الأسئلة';
+      if (step2El && step2El.querySelector('span:last-child')) step2El.querySelector('span:last-child').textContent = 'ترقيم وتقسيم الفروع تلقائياً';
+      if (step3El && step3El.querySelector('span:last-child')) step3El.querySelector('span:last-child').textContent = 'اعتماد الأسئلة في الامتحان A4';
+
+      if (sourceTitle) sourceTitle.textContent = 'تسجيل الصوت والنص المفرغ المباشر';
+      if (questionsTitle) questionsTitle.textContent = 'الأسئلة المتولدة من الصوت الجاهزة للاعتماد';
+      if (rawTextarea) rawTextarea.placeholder = '🎙️ تحدث بصوتك مباشرة ليتم تفريغ الكلام هنا فوراً وترقيم الأسئلة والفروع تلقائياً، أو استخدم أزرار الإدراج السريع...';
+
+      const voiceHero = document.getElementById('dedicatedVoiceHeroBox');
+      if (voiceHero) voiceHero.style.display = 'block';
+
+      const voiceBanner = document.getElementById('scannerVoiceLiveBanner');
+      if (voiceBanner) voiceBanner.style.display = 'block';
+
+      const rawLabel = modal.querySelector('.raw-text-label-row label');
+      if (rawLabel) {
+        rawLabel.innerHTML = '<i class="fa-solid fa-microphone text-success"></i> <span>النص المفرغ من صوتك (يمكنك التعديل عليه أو إضافة نصوص):</span>';
+      }
+    } else {
+      modal.classList.add('mode-scanner');
+      modal.classList.remove('mode-voice');
+
+      if (brandIcon) brandIcon.innerHTML = '<i class="fa-solid fa-camera-retro" style="color: #6366f1;"></i>';
+      if (titleEl) titleEl.textContent = 'قارئ وتصوير الورقة الذكي — تحويل خط اليد إلى أسئلة';
+      if (proPill) proPill.textContent = 'صورة فقط 📸';
+      if (subtitleEl) subtitleEl.textContent = 'صوّر مسودة أسئلتك المكتوبة بخط اليد بالكاميرا أو ارفع صورتها ليتم تحويلها تلقائياً لأسئلة مطبوعة';
+
+      if (step1El && step1El.querySelector('span:last-child')) step1El.querySelector('span:last-child').textContent = 'صوّر الورقة أو اربط الموبايل بـ QR';
+      if (step2El && step2El.querySelector('span:last-child')) step2El.querySelector('span:last-child').textContent = 'قراءة خط اليد وتوزيع الفروع';
+      if (step3El && step3El.querySelector('span:last-child')) step3El.querySelector('span:last-child').textContent = 'اعتماد الأسئلة في الامتحان A4';
+
+      if (sourceTitle) sourceTitle.textContent = 'صورة الورقة ونص الأسئلة المقروء';
+      if (questionsTitle) questionsTitle.textContent = 'الأسئلة المستخرجة من الورقة الجاهزة للاعتماد';
+      if (rawTextarea) rawTextarea.placeholder = '📄 يظهر هنا النص المقروء من صورة الورقة تلقائياً بعد التصوير أو الرفع، ويمكنك التعديل عليه في أي وقت...';
+
+      const voiceHero = document.getElementById('dedicatedVoiceHeroBox');
+      if (voiceHero) voiceHero.style.display = 'none';
+
+      const voiceBanner = document.getElementById('scannerVoiceLiveBanner');
+      if (voiceBanner) voiceBanner.style.display = 'none';
+
+      const rawLabel = modal.querySelector('.raw-text-label-row label');
+      if (rawLabel) {
+        rawLabel.innerHTML = '<i class="fa-solid fa-file-pen text-primary"></i> <span>النص المستخرج من صورة الورقة بالذكاء الاصطناعي:</span>';
+      }
+    }
+  };
+
+  window.openDedicatedVoiceStudio = function () {
+    window.setScannerUIMode('voice');
+    const modal = document.getElementById('handwrittenPaperScannerModal');
+    if (modal) {
+      modal.classList.add('open');
+      modal.style.setProperty('display', 'flex', 'important');
+    }
+    if (typeof window.setScannerSubjectMode === 'function') {
+      window.setScannerSubjectMode(getActiveSubjectMode(), true);
+    }
+  };
+
+  window.openDedicatedPaperScanner = function (openQrPanelImmediately = false) {
+    window.setScannerUIMode('scanner');
     const modal = document.getElementById('handwrittenPaperScannerModal');
     if (modal) {
       modal.classList.add('open');
@@ -635,6 +687,10 @@
     if (openQrPanelImmediately) {
       window.toggleScannerQrBridgePanel(true);
     }
+  };
+
+  window.openHandwrittenPaperScanner = function (openQrPanelImmediately = false) {
+    window.openDedicatedPaperScanner(openQrPanelImmediately);
   };
 
   window.closeHandwrittenPaperScanner = function () {
@@ -1850,14 +1906,12 @@
   // 8. الإملاء الصوتي الذكي المباشر + تجربة ورقة مكتوبة بخط اليد بنقرة واحدة
   // ==========================================================================
   window.openHandwrittenPaperScannerInVoiceMode = function () {
-    window.openHandwrittenPaperScanner(false);
+    window.openDedicatedVoiceStudio();
     setTimeout(() => {
-      const banner = document.getElementById('scannerVoiceLiveBanner');
-      if (banner) banner.style.display = 'block';
       if (!isRecordingVoice) {
         window.toggleScannerVoiceDictation();
       }
-    }, 180);
+    }, 200);
   };
 
   window.insertVoiceQuickCommand = function (cmdType) {
@@ -1956,6 +2010,34 @@
     notify('تم تقسيم الفروع وترقيم التعاريف والتعاليل والنقاط تلقائياً! ✨', 'success');
   };
 
+  function updateDedicatedVoiceHero(recording) {
+    const heroBtn = document.getElementById('btnDedicatedVoiceRecord');
+    const micIcon = document.getElementById('dedicatedVoiceMicIcon');
+    const heading = document.getElementById('dedicatedVoiceStatusHeading');
+    const sub = document.getElementById('dedicatedVoiceStatusSub');
+    const wave = document.getElementById('dedicatedVoiceWaveAnim');
+
+    if (recording) {
+      if (heroBtn) {
+        heroBtn.style.background = 'linear-gradient(135deg, #dc2626, #ef4444)';
+        heroBtn.style.boxShadow = '0 8px 25px rgba(220, 38, 38, 0.45)';
+      }
+      if (micIcon) micIcon.className = 'fa-solid fa-circle-stop';
+      if (heading) heading.textContent = 'جاري الاستماع الآن... تحدث بالأسئلة مباشرة 🔴';
+      if (sub) sub.textContent = 'اضغط على الزر لإيقاف التسجيل، أو قل (سؤال جديد / فرع جديد / تعاريف)';
+      if (wave) wave.style.display = 'flex';
+    } else {
+      if (heroBtn) {
+        heroBtn.style.background = 'linear-gradient(135deg, #059669, #10b981)';
+        heroBtn.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
+      }
+      if (micIcon) micIcon.className = 'fa-solid fa-microphone';
+      if (heading) heading.textContent = 'اضغط على المايك وابدأ بالتحدث بالأسئلة مباشرة';
+      if (sub) sub.textContent = 'تحدث بصوتك الطبيعي وسيقوم الذكاء الاصطناعي بكتابة الأسئلة وتقسيم الفروع وترقيمها تلقائياً';
+      if (wave) wave.style.display = 'none';
+    }
+  }
+
   window.toggleScannerVoiceDictation = function () {
     const voiceBtn = document.getElementById('btnScannerVoiceDictate');
     const rawTextarea = document.getElementById('scannerExtractedTextarea');
@@ -1975,6 +2057,7 @@
     if (isRecordingVoice && speechRecognitionInstance) {
       isRecordingVoice = false;
       try { speechRecognitionInstance.stop(); } catch (e) { }
+      updateDedicatedVoiceHero(false);
       if (voiceBtn) {
         voiceBtn.classList.remove('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i><span>إملاء صوتي</span>';
@@ -1992,6 +2075,7 @@
 
     speechRecognitionInstance.onstart = () => {
       isRecordingVoice = true;
+      updateDedicatedVoiceHero(true);
       if (voiceBtn) {
         voiceBtn.classList.add('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-circle-stop"></i><span>إيقاف الإملاء</span>';
@@ -2032,6 +2116,7 @@
 
     speechRecognitionInstance.onerror = () => {
       isRecordingVoice = false;
+      updateDedicatedVoiceHero(false);
       if (voiceBtn) {
         voiceBtn.classList.remove('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i><span>إملاء صوتي</span>';
@@ -2040,6 +2125,7 @@
 
     speechRecognitionInstance.onend = () => {
       isRecordingVoice = false;
+      updateDedicatedVoiceHero(false);
       if (voiceBtn) {
         voiceBtn.classList.remove('recording');
         voiceBtn.innerHTML = '<i class="fa-solid fa-microphone"></i><span>إملاء صوتي</span>';
@@ -3455,6 +3541,9 @@
 
     window.closeHandwrittenPaperScanner();
 
+    if (typeof window.activateQBuilderWorkspace === 'function') {
+      window.activateQBuilderWorkspace();
+    }
     if (typeof window.switchToTab === 'function') {
       window.switchToTab('tab-questions');
     }

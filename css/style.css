@@ -43834,3 +43834,75 @@ button[data-pdf-export],
   }
 }
 
+/* ==========================================================================
+   Question Builder Modes Strict Specialization (فصل الأنماط بحسب الاختصاص)
+   ========================================================================== */
+
+/* 1. مساحة العمل اليدوية (كتابة الأسئلة يدوياً): إخفاء أي أشرطة أو أزرار للماسح الضوئي */
+#qbuilderPaperScannerBar,
+#btnOpenPaperScannerCard {
+  display: none !important;
+}
+
+/* 2. استوديو الإملاء الصوتي المخصص (صوت فقط): إخفاء الكاميرا ورفع الصور والـ QR وبطاقات الماسح */
+#handwrittenPaperScannerModal.mode-voice .scanner-giant-actions-grid,
+#handwrittenPaperScannerModal.mode-voice #scannerImagePreviewBox,
+#handwrittenPaperScannerModal.mode-voice #scannerQrBridgePanel,
+#handwrittenPaperScannerModal.mode-voice #scannerLiveCameraBox,
+#handwrittenPaperScannerModal.mode-voice .scanner-ai-config-strip,
+#handwrittenPaperScannerModal.mode-voice #btnEnhancePaperContrast,
+#handwrittenPaperScannerModal.mode-voice #btnRescanPaperImage,
+#handwrittenPaperScannerModal.mode-voice #btnClearPaperImage {
+  display: none !important;
+}
+
+#handwrittenPaperScannerModal.mode-voice #dedicatedVoiceHeroBox {
+  display: block !important;
+}
+
+#handwrittenPaperScannerModal.mode-voice #scannerVoiceLiveBanner {
+  display: block !important;
+}
+
+#handwrittenPaperScannerModal.mode-voice #scannerExtractedTextarea {
+  min-height: 250px !important;
+  font-size: 1rem !important;
+  line-height: 1.8 !important;
+}
+
+/* 3. استوديو تصوير وقراءة الورقة المكتوبة بخط اليد (صورة فقط): إخفاء المايكروفون وبنر الصوت */
+#handwrittenPaperScannerModal.mode-scanner #dedicatedVoiceHeroBox,
+#handwrittenPaperScannerModal.mode-scanner #scannerVoiceLiveBanner {
+  display: none !important;
+}
+
+#handwrittenPaperScannerModal.mode-scanner .scanner-giant-actions-grid {
+  display: grid !important;
+}
+
+#handwrittenPaperScannerModal.mode-scanner #scannerImagePreviewBox {
+  display: block !important;
+}
+
+/* بطاقة تجربة ورقة مكتوبة بخط اليد في شبكة الخيارات الأربعة */
+.scanner-giant-card.card-demo {
+  border-color: rgba(245, 158, 11, 0.45);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.02) 100%);
+  cursor: pointer;
+  text-align: right;
+}
+
+.scanner-giant-card.card-demo .giant-card-icon {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  box-shadow: 0 5px 14px rgba(245, 158, 11, 0.32);
+}
+
+.scanner-giant-card.card-demo .giant-card-cta {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+[data-theme="dark"] .scanner-giant-card.card-demo .giant-card-cta {
+  color: #fde68a;
+}
+

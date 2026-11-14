@@ -9815,28 +9815,23 @@ window.triggerModeManualQuestion = function () {
 };
 
 window.triggerModeVoiceDictation = function () {
-  window.activateQBuilderWorkspace();
-  // 2. فتح وضع الإملاء الصوتي المباشر في الماسح الذكي
-  if (typeof window.openHandwrittenPaperScannerInVoiceMode === 'function') {
+  // 2. فتح استوديو الإملاء الصوتي المخصص النقي (صوت فقط)
+  if (typeof window.openDedicatedVoiceStudio === 'function') {
+    window.openDedicatedVoiceStudio();
+  } else if (typeof window.openHandwrittenPaperScannerInVoiceMode === 'function') {
     window.openHandwrittenPaperScannerInVoiceMode();
-  } else if (typeof window.openHandwrittenPaperScanner === 'function') {
-    window.openHandwrittenPaperScanner(false);
-    setTimeout(() => {
-      if (typeof window.toggleScannerVoiceDictation === 'function') {
-        window.toggleScannerVoiceDictation();
-      }
-    }, 250);
   }
-  showToast('🎙️ التطبيق الثاني: تحدث واقرأ الأسئلة بصوتك ليتم كتابتها وتقسيم فروعها تلقائياً', 'success');
+  showToast('🎙️ استوديو الإملاء الصوتي: تحدث واقرأ الأسئلة بصوتك ليتم كتابتها وتقسيم فروعها تلقائياً', 'success');
 };
 
 window.triggerModePaperScanner = function () {
-  window.activateQBuilderWorkspace();
-  // 3. فتح ماسح الأوراق المكتوبة بخط اليد الذكي للتصوير أو الرفع
-  if (typeof window.openHandwrittenPaperScanner === 'function') {
+  // 3. فتح استوديو تصوير وقراءة الورقة المكتوبة بخط اليد النقي (صورة فقط)
+  if (typeof window.openDedicatedPaperScanner === 'function') {
+    window.openDedicatedPaperScanner(false);
+  } else if (typeof window.openHandwrittenPaperScanner === 'function') {
     window.openHandwrittenPaperScanner(false);
   }
-  showToast('📸 التطبيق الثالث: صوّر الورقة المكتوبة بخط اليد ليتم تحويلها لأسئلة مطبوعة فوراً', 'info');
+  showToast('📸 قارئ وتصوير الورقة: صوّر مسودة أسئلتك المكتوبة بخط اليد ليتم تحويلها لأسئلة مطبوعة فوراً', 'info');
 };
 
 /**
