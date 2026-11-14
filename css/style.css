@@ -28203,9 +28203,29 @@ button:not(:disabled),
 
 /* Questions workspace full width */
 .questions-workspace-layout {
-  display: block !important;
+  display: block;
   width: 100% !important;
   margin: 0 !important;
+}
+
+/* Question Builder 3-Modes Landing vs Workspace State Guard */
+#tab-questions:not(.workspace-active) #qbuilderActiveHeaderBar,
+#tab-questions:not(.workspace-active) #qbuilderPaperScannerBar,
+#tab-questions:not(.workspace-active) #qbuilderQuestionsWorkspace {
+  display: none !important;
+}
+
+#tab-questions.workspace-active #qbuilderWelcomeHub,
+#tab-questions.workspace-active #qbuilderLandingTopReturn {
+  display: none !important;
+}
+
+#tab-questions.workspace-active #qbuilderActiveHeaderBar {
+  display: flex !important;
+}
+
+#tab-questions.workspace-active #qbuilderQuestionsWorkspace {
+  display: block !important;
 }
 
 .questions-main-content {

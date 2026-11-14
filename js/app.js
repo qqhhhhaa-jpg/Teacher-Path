@@ -85,6 +85,29 @@ var checkMandatoryTeacherProfileOnStartup = window.checkMandatoryTeacherProfileO
 window.EXAM_BUILDER_TABS = ['tab-questions', 'tab-header', 'tab-settings'];
 
 window.updatePreviewVisibilityForTab = function (tabId) {
+  // If in Questions tab and currently in Clean Modes Hub mode (NOT workspace mode):
+  // User explicitly requested: ONLY banner and 3 modes should appear, no side preview pane, no print button.
+  if (tabId === 'tab-questions' && !window.isQBuilderInWorkspaceMode) {
+    const prevBtn = document.getElementById('togglePreviewBtn');
+    const printBtn = document.getElementById('printExamBtn');
+    const mainCont = document.querySelector('.main-container');
+    const mobileTabs = document.getElementById('mobileViewTabs');
+    const floatBtn = document.getElementById('mobileFloatPreviewBtn');
+    const floatCta = document.querySelector('.mobile-floating-preview-cta');
+
+    if (prevBtn) prevBtn.style.setProperty('display', 'none', 'important');
+    if (printBtn) printBtn.style.setProperty('display', 'none', 'important');
+    if (mobileTabs) mobileTabs.style.setProperty('display', 'none', 'important');
+    if (floatBtn) floatBtn.style.setProperty('display', 'none', 'important');
+    if (floatCta) floatCta.style.setProperty('display', 'none', 'important');
+
+    if (mainCont) {
+      mainCont.classList.add('wide-mode');
+      mainCont.classList.add('preview-hidden');
+    }
+    return;
+  }
+
   const isExamTab = window.EXAM_BUILDER_TABS.includes(tabId);
   const prevBtn = document.getElementById('togglePreviewBtn');
   const printBtn = document.getElementById('printExamBtn');
@@ -255,6 +278,12 @@ window.switchToTab = function (targetId) {
   });
 
   window.updatePreviewVisibilityForTab(targetId);
+
+  if (targetId === 'tab-questions') {
+    if (!window.isQBuilderInWorkspaceMode && typeof window.returnToQBuilderModesHub === 'function') {
+      window.returnToQBuilderModesHub();
+    }
+  }
 
   if (targetId === 'tab-apps') {
     if (typeof window.updateAppsHubStats === 'function') window.updateAppsHubStats();
@@ -9690,9 +9719,82 @@ function showToast(message, type = 'info') {
 }
 
 // ==========================================================================
-// 3 Dedicated Creation Modes Handlers (التطبيقات الثلاثة لبناء الأسئلة)
+// 3 Dedicated Creation Modes Handlers & Workspace Switcher (التطبيقات الثلاثة لبناء الأسئلة)
 // ==========================================================================
+window.isQBuilderInWorkspaceMode = false;
+
+window.activateQBuilderWorkspace = function () {
+  window.isQBuilderInWorkspaceMode = true;
+  const qTab = document.getElementById('tab-questions');
+  if (qTab) qTab.classList.add('workspace-active');
+
+  const hub = document.getElementById('qbuilderWelcomeHub');
+  const landBar = document.getElementById('qbuilderLandingTopReturn');
+  const actBar = document.getElementById('qbuilderActiveHeaderBar');
+  const ws = document.getElementById('qbuilderQuestionsWorkspace');
+  const scannerBar = document.getElementById('qbuilderPaperScannerBar');
+
+  if (hub) hub.style.display = 'none';
+  if (landBar) landBar.style.display = 'none';
+  if (actBar) actBar.style.display = 'flex';
+  if (ws) ws.style.display = 'block';
+  if (scannerBar) scannerBar.style.removeProperty('display');
+
+  if (typeof window.updatePreviewVisibilityForTab === 'function') {
+    window.updatePreviewVisibilityForTab('tab-questions');
+  }
+
+  if (typeof renderAll === 'function') {
+    renderAll();
+  }
+};
+
+window.returnToQBuilderModesHub = function () {
+  window.isQBuilderInWorkspaceMode = false;
+  const qTab = document.getElementById('tab-questions');
+  if (qTab) qTab.classList.remove('workspace-active');
+
+  const hub = document.getElementById('qbuilderWelcomeHub');
+  const landBar = document.getElementById('qbuilderLandingTopReturn');
+  const actBar = document.getElementById('qbuilderActiveHeaderBar');
+  const ws = document.getElementById('qbuilderQuestionsWorkspace');
+  const scannerBar = document.getElementById('qbuilderPaperScannerBar');
+
+  if (hub) hub.style.display = 'block';
+  if (landBar) landBar.style.display = 'block';
+  if (actBar) actBar.style.display = 'none';
+  if (ws) ws.style.display = 'none';
+  if (scannerBar) scannerBar.style.display = 'none';
+
+  // Check if we have active questions to show resume button
+  const resumeBtn = document.getElementById('qbuilderResumeWorkspaceBtn');
+  if (resumeBtn) {
+    const count = (typeof appState !== 'undefined' && appState.questions) ? appState.questions.length : 0;
+    if (count > 0) {
+      resumeBtn.style.display = 'inline-flex';
+      const countEl = document.getElementById('qbuilderResumeQCount');
+      if (countEl) countEl.textContent = count;
+    } else {
+      resumeBtn.style.display = 'none';
+    }
+  }
+
+  if (typeof window.updatePreviewVisibilityForTab === 'function') {
+    window.updatePreviewVisibilityForTab('tab-questions');
+  }
+
+  const scrollPane = document.querySelector('.builder-body-scrollable');
+  if (scrollPane) scrollPane.scrollTo({ top: 0, behavior: 'smooth' });
+  else window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+window.openQuestionBuilderHub = function () {
+  window.returnToQBuilderModesHub();
+  window.switchToTab('tab-questions');
+};
+
 window.triggerModeManualQuestion = function () {
+  window.activateQBuilderWorkspace();
   // 1. فتح قائمة خيارات نوع السؤال أو فتح نافذة كتابة سؤال جديد مباشرة
   const dropdown = document.getElementById('qbuilderCustomDropdown');
   if (dropdown && typeof window.toggleQTypeDropdown === 'function') {
@@ -9701,10 +9803,11 @@ window.triggerModeManualQuestion = function () {
   } else if (typeof window.openQuestionModal === 'function') {
     window.openQuestionModal(null, 'mcq');
   }
-  showToast('✏️ التطبيق الأول: اختر نوع السؤال للبدء بكتابته وصياغته يدوياً', 'info');
+  showToast('✏️ التطبيق الأول: تم فتح لوحة الأسئلة، اختر نوع السؤال للبدء بكتابته وصياغته يدوياً', 'info');
 };
 
 window.triggerModeVoiceDictation = function () {
+  window.activateQBuilderWorkspace();
   // 2. فتح وضع الإملاء الصوتي المباشر في الماسح الذكي
   if (typeof window.openHandwrittenPaperScannerInVoiceMode === 'function') {
     window.openHandwrittenPaperScannerInVoiceMode();
@@ -9720,6 +9823,7 @@ window.triggerModeVoiceDictation = function () {
 };
 
 window.triggerModePaperScanner = function () {
+  window.activateQBuilderWorkspace();
   // 3. فتح ماسح الأوراق المكتوبة بخط اليد الذكي للتصوير أو الرفع
   if (typeof window.openHandwrittenPaperScanner === 'function') {
     window.openHandwrittenPaperScanner(false);

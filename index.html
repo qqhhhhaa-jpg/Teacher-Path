@@ -706,7 +706,7 @@
                   <div class="apps-cards-grid">
 
                     <!-- App 01: Questions & Exam Creation -->
-                    <div class="app-hub-card app-card-purple" onclick="window.switchToTab('tab-questions')"
+                    <div class="app-hub-card app-card-purple" onclick="window.openQuestionBuilderHub ? window.openQuestionBuilderHub() : window.switchToTab('tab-questions')"
                       role="button" tabindex="0" title="فتح إنشاء وبناء الأسئلة">
                       <!-- Thematic Background Ornaments & Watermarks (Mathematics & Questions) -->
                       <div class="app-card-thematic-bg app-bg-purple" aria-hidden="true">
@@ -1554,16 +1554,32 @@
           <!-- Tab 1: Questions Management -->
           <div class="tab-content" id="tab-questions" style="display: none;">
 
-            <!-- Unified Compact Sticky Header Bar (شريط علوي مدمج واحد وصغير ومضغوط يحتوي العودة والمواد والإجراءات وإضافة الأسئلة) -->
-            <div class="section-return-bar qbuilder-unified-topbar no-print" style="overflow: visible !important;">
+            <!-- Standalone Simple Topbar for Clean Mode Landing -->
+            <div id="qbuilderLandingTopReturn" class="section-return-bar no-print" style="margin-bottom: 1.25rem;">
+              <div class="return-bar-start">
+                <button type="button" class="btn-return-hub" onclick="window.switchToTab('tab-apps')"
+                  title="الرجوع إلى التطبيقات الرئيسية">
+                  <i class="fa-solid fa-arrow-right"></i>
+                  <span>الرئيسية (التطبيقات)</span>
+                </button>
+                <div class="return-bar-divider"></div>
+                <div class="return-bar-info">
+                  <span class="return-app-pill"><i class="fa-solid fa-pen-nib"></i> تطبيق 01</span>
+                  <span class="return-app-title">إنشاء وبناء الأسئلة</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Unified Compact Sticky Header Bar (شريط الأدوات الكامل يظهر فقط بعد اختيار الأستاذ لأحد التطبيقات) -->
+            <div id="qbuilderActiveHeaderBar" class="section-return-bar qbuilder-unified-topbar no-print" style="overflow: visible !important; display: none;">
 
               <!-- Row 1: Return & Title (Right) + Core Actions (Left: المعاينة، الطباعة، الحفظ، PDF) -->
               <div class="qbuilder-topbar-main-row">
                 <div class="return-bar-start">
-                  <button type="button" class="btn-return-hub" onclick="window.switchToTab('tab-apps')"
-                    title="الرجوع إلى التطبيقات الرئيسية">
+                  <button type="button" class="btn-return-hub" onclick="window.returnToQBuilderModesHub()"
+                    title="الرجوع إلى اختيار طريقة بناء الأسئلة">
                     <i class="fa-solid fa-arrow-right"></i>
-                    <span>الرئيسية</span>
+                    <span>طرق البناء</span>
                   </button>
                   <div class="return-bar-divider"></div>
                   <div class="return-bar-info">
@@ -1877,119 +1893,126 @@
 
             </div>
 
-            <div class="questions-workspace-layout">
-
-              <!-- Motivational Teacher Greeting Banner & 3 Creation Modes Hub (بوابة طرق إنشاء وبناء الأسئلة الثلاثة) -->
-              <div class="qbuilder-welcome-hub" style="margin-bottom: 1.25rem;">
-                <!-- Motivational Teacher Greeting Card (عبارة تحفيز الأستاذ الكبيرة والواضحة) -->
-                <div class="qbuilder-motivational-banner" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.12) 50%, rgba(16, 185, 129, 0.08) 100%); border: 1.5px solid rgba(139, 92, 246, 0.28); border-radius: 20px; padding: 1.4rem 1.8rem; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap;">
-                  <div style="display: flex; align-items: center; gap: 1.2rem;">
-                    <div style="width: 58px; height: 58px; border-radius: 16px; background: linear-gradient(135deg, #2563eb, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.8rem; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35); flex-shrink: 0;">
-                      <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <div>
-                      <h2 style="margin: 0 0 0.35rem 0; font-size: 1.45rem; font-weight: 900; color: var(--text-main, #0f172a); font-family: 'Alexandria', 'Cairo', sans-serif; letter-spacing: -0.3px;">
-                        أهلاً بك يا صانع الأجيال! اختباراتك تصنع تميّز طلابك 🌟
-                      </h2>
-                      <p style="margin: 0; font-size: 0.95rem; font-weight: 700; color: #64748b; line-height: 1.6;">
-                        اختر الطريقة الأنسب والأسرع لك لصياغة وإعداد ورقة الامتحان الوزارية بأعلى درجات الإتقان:
-                      </p>
-                    </div>
+            <!-- Motivational Teacher Greeting Banner & 3 Creation Modes Hub (الواجهة الأساسية النظيفة عند الدخول) -->
+            <div id="qbuilderWelcomeHub" class="qbuilder-welcome-hub" style="margin-bottom: 1.25rem;">
+              <!-- Motivational Teacher Greeting Card (عبارة تحفيز الأستاذ الكبيرة والواضحة) -->
+              <div class="qbuilder-motivational-banner" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.12) 50%, rgba(16, 185, 129, 0.08) 100%); border: 1.5px solid rgba(139, 92, 246, 0.28); border-radius: 20px; padding: 1.8rem 2.2rem; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.08); display: flex; align-items: center; justify-content: space-between; gap: 1.25rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 1.35rem;">
+                  <div style="width: 68px; height: 68px; border-radius: 18px; background: linear-gradient(135deg, #2563eb, #8b5cf6); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 2.1rem; box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35); flex-shrink: 0;">
+                    <i class="fa-solid fa-graduation-cap"></i>
                   </div>
-                  <div style="display: flex; align-items: center; gap: 0.55rem; background: var(--bg-card, #fff); padding: 0.45rem 1rem; border-radius: 999px; border: 1px solid rgba(139, 92, 246, 0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                    <i class="fa-solid fa-sparkles" style="color: #8b5cf6;"></i>
-                    <span style="font-size: 0.85rem; font-weight: 800; color: #7c3aed;">3 طرق ذكية ومباشرة لبناء الاختبار</span>
+                  <div>
+                    <h2 style="margin: 0 0 0.4rem 0; font-size: 1.65rem; font-weight: 900; color: var(--text-main, #0f172a); font-family: 'Alexandria', 'Cairo', sans-serif; letter-spacing: -0.3px;">
+                      أهلاً بك يا صانع الأجيال! اختباراتك تصنع تميّز طلابك 🌟
+                    </h2>
+                    <p style="margin: 0; font-size: 1.05rem; font-weight: 700; color: #64748b; line-height: 1.6;">
+                      اختر الطريقة الأنسب والأسرع لك لصياغة وإعداد ورقة الامتحان الوزارية بأعلى درجات الإتقان:
+                    </p>
                   </div>
                 </div>
-
-                <!-- 3 Distinct Creation Mode Apps (التطبيقات الثلاثة لبناء الأسئلة) -->
-                <div class="qbuilder-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                  
-                  <!-- التطبيق 1: كتابة الأسئلة يدوياً -->
-                  <div class="qbuilder-mode-card mode-manual" onclick="window.triggerModeManualQuestion()" role="button" tabindex="0" title="كتابة وإدخال الأسئلة يدوياً واختيار نوع السؤال"
-                    style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(37, 99, 235, 0.22); border-radius: 18px; padding: 1.25rem 1.35rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);"
-                    onmouseenter="this.style.transform='translateY(-4px)'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 12px 28px rgba(37, 99, 235, 0.16)';"
-                    onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(37, 99, 235, 0.22)'; this.style.boxShadow='0 4px 15px rgba(37, 99, 235, 0.05)';">
-                    <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem;">
-                      <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.2)); color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                      </div>
-                      <div>
-                        <div style="font-size: 0.74rem; font-weight: 800; color: #2563eb; text-transform: uppercase; margin-bottom: 2px;">التطبيق الأول • نمط احترافي</div>
-                        <h3 style="margin: 0 0 0.3rem 0; font-size: 1.15rem; font-weight: 900; color: var(--text-main, #0f172a);">كتابة الأسئلة يدوياً</h3>
-                        <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: #64748b; line-height: 1.55;">
-                          إدخال وصياغة الأسئلة مباشرة مع اختيار نوع السؤال (اختيار متعدد، تعاريف، فراغات، مقارنات، مسائل).
-                        </p>
-                      </div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px dashed rgba(37, 99, 235, 0.2);">
-                      <span style="font-size: 0.82rem; font-weight: 800; color: #2563eb; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-plus-circle"></i> بدء الكتابة اليدوية
-                      </span>
-                      <span style="width: 30px; height: 30px; border-radius: 8px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                        <i class="fa-solid fa-arrow-left"></i>
-                      </span>
-                    </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <button type="button" id="qbuilderResumeWorkspaceBtn" onclick="window.activateQBuilderWorkspace()"
+                    style="display: none; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; border: none; padding: 0.55rem 1.25rem; border-radius: 999px; font-weight: 800; font-size: 0.88rem; cursor: pointer; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); transition: transform 0.15s ease;"
+                    onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform='none'">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>متابعة ورقة الاختبار (<span id="qbuilderResumeQCount">0</span> أسئلة)</span>
+                    <i class="fa-solid fa-arrow-left"></i>
+                  </button>
+                  <div style="display: flex; align-items: center; gap: 0.55rem; background: var(--bg-card, #fff); padding: 0.55rem 1.25rem; border-radius: 999px; border: 1px solid rgba(139, 92, 246, 0.25); box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                    <i class="fa-solid fa-sparkles" style="color: #8b5cf6;"></i>
+                    <span style="font-size: 0.92rem; font-weight: 800; color: #7c3aed;">3 طرق ذكية ومباشرة لبناء الاختبار</span>
                   </div>
-
-                  <!-- التطبيق 2: كتابة الأسئلة بالإملاء الصوتي -->
-                  <div class="qbuilder-mode-card mode-voice" onclick="window.triggerModeVoiceDictation()" role="button" tabindex="0" title="إملاء الأسئلة بالصوت مع ترقيم وتقسيم الفروع التلقائي"
-                    style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 18px; padding: 1.25rem 1.35rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.05);"
-                    onmouseenter="this.style.transform='translateY(-4px)'; this.style.borderColor='#10b981'; this.style.boxShadow='0 12px 28px rgba(16, 185, 129, 0.16)';"
-                    onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(16, 185, 129, 0.25)'; this.style.boxShadow='0 4px 15px rgba(16, 185, 129, 0.05)';">
-                    <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem;">
-                      <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.22)); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-microphone-lines"></i>
-                      </div>
-                      <div>
-                        <div style="font-size: 0.74rem; font-weight: 800; color: #059669; text-transform: uppercase; margin-bottom: 2px;">التطبيق الثاني • ذكاء صوتي</div>
-                        <h3 style="margin: 0 0 0.3rem 0; font-size: 1.15rem; font-weight: 900; color: var(--text-main, #0f172a);">كتابة الأسئلة بالإملاء الصوتي</h3>
-                        <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: #64748b; line-height: 1.55;">
-                          تحدث بحرية واقرأ الأسئلة بصوتك ليتم تحويلها وكتابتها وترقيمها وتقسيم فروعها تلقائياً بالذكاء الاصطناعي.
-                        </p>
-                      </div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px dashed rgba(16, 185, 129, 0.25);">
-                      <span style="font-size: 0.82rem; font-weight: 800; color: #059669; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-microphone"></i> بدء الإملاء الصوتي المباشر
-                      </span>
-                      <span style="width: 30px; height: 30px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                        <i class="fa-solid fa-arrow-left"></i>
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- التطبيق 3: تصوير الورقة المكتوبة بخط اليد -->
-                  <div class="qbuilder-mode-card mode-scanner" onclick="window.triggerModePaperScanner()" role="button" tabindex="0" title="تصوير أو رفع ورقة الامتحان المكتوبة بخط اليد لقراءتها فوراً"
-                    style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(139, 92, 246, 0.25); border-radius: 18px; padding: 1.25rem 1.35rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.05);"
-                    onmouseenter="this.style.transform='translateY(-4px)'; this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 12px 28px rgba(139, 92, 246, 0.16)';"
-                    onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(139, 92, 246, 0.25)'; this.style.boxShadow='0 4px 15px rgba(139, 92, 246, 0.05)';">
-                    <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.85rem;">
-                      <div style="width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(139, 92, 246, 0.25)); color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; flex-shrink: 0;">
-                        <i class="fa-solid fa-camera-viewfinder"></i>
-                      </div>
-                      <div>
-                        <div style="font-size: 0.74rem; font-weight: 800; color: #7c3aed; text-transform: uppercase; margin-bottom: 2px;">التطبيق الثالث • مسح وتصوير</div>
-                        <h3 style="margin: 0 0 0.3rem 0; font-size: 1.15rem; font-weight: 900; color: var(--text-main, #0f172a);">عن طريق تصوير الورقة</h3>
-                        <p style="margin: 0; font-size: 0.85rem; font-weight: 700; color: #64748b; line-height: 1.55;">
-                          صوّر مسودة أسئلتك المكتوبة بخط اليد بكاميرا الموبايل أو ارفع صورتها ليحولها النظام فوراً لامتحان مطبوع.
-                        </p>
-                      </div>
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.75rem; border-top: 1px dashed rgba(139, 92, 246, 0.25);">
-                      <span style="font-size: 0.82rem; font-weight: 800; color: #7c3aed; display: inline-flex; align-items: center; gap: 0.4rem;">
-                        <i class="fa-solid fa-camera"></i> تصوير الورقة بالماسح الذكي
-                      </span>
-                      <span style="width: 30px; height: 30px; border-radius: 8px; background: rgba(139, 92, 246, 0.1); color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;">
-                        <i class="fa-solid fa-arrow-left"></i>
-                      </span>
-                    </div>
-                  </div>
-
                 </div>
               </div>
 
-              <!-- Main Questions List Area (بجانب الشريط بجهة اليسار) -->
+              <!-- 3 Distinct Creation Mode Apps (التطبيقات الثلاثة لبناء الأسئلة) -->
+              <div class="qbuilder-modes-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.25rem; margin-top: 1.25rem;">
+                
+                <!-- التطبيق 1: كتابة الأسئلة يدوياً -->
+                <div class="qbuilder-mode-card mode-manual" onclick="window.triggerModeManualQuestion()" role="button" tabindex="0" title="كتابة وإدخال الأسئلة يدوياً واختيار نوع السؤال"
+                  style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(37, 99, 235, 0.22); border-radius: 20px; padding: 1.45rem 1.5rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 6px 20px rgba(37, 99, 235, 0.06);"
+                  onmouseenter="this.style.transform='translateY(-5px)'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 14px 32px rgba(37, 99, 235, 0.18)';"
+                  onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(37, 99, 235, 0.22)'; this.style.boxShadow='0 6px 20px rgba(37, 99, 235, 0.06)';">
+                  <div style="display: flex; align-items: flex-start; gap: 1.1rem; margin-bottom: 1rem;">
+                    <div style="width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(37, 99, 235, 0.25)); color: #1d4ed8; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+                      <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.76rem; font-weight: 800; color: #2563eb; text-transform: uppercase; margin-bottom: 3px;">التطبيق الأول • نمط احترافي</div>
+                      <h3 style="margin: 0 0 0.35rem 0; font-size: 1.25rem; font-weight: 900; color: var(--text-main, #0f172a);">كتابة الأسئلة يدوياً</h3>
+                      <p style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #64748b; line-height: 1.6;">
+                        إدخال وصياغة الأسئلة مباشرة واختيار أنواع الأسئلة (اختيار متعدد، تعاريف، فراغات، مقارنات، مسائل).
+                      </p>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.85rem; border-top: 1px dashed rgba(37, 99, 235, 0.2);">
+                    <span style="font-size: 0.86rem; font-weight: 800; color: #2563eb; display: inline-flex; align-items: center; gap: 0.4rem;">
+                      <i class="fa-solid fa-plus-circle"></i> بدء الكتابة والتحرير
+                    </span>
+                    <span style="width: 32px; height: 32px; border-radius: 9px; background: rgba(37, 99, 235, 0.1); color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                      <i class="fa-solid fa-arrow-left"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- التطبيق 2: كتابة الأسئلة بالإملاء الصوتي -->
+                <div class="qbuilder-mode-card mode-voice" onclick="window.triggerModeVoiceDictation()" role="button" tabindex="0" title="إملاء الأسئلة بالصوت مع ترقيم وتقسيم الفروع التلقائي"
+                  style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(16, 185, 129, 0.25); border-radius: 20px; padding: 1.45rem 1.5rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.06);"
+                  onmouseenter="this.style.transform='translateY(-5px)'; this.style.borderColor='#10b981'; this.style.boxShadow='0 14px 32px rgba(16, 185, 129, 0.18)';"
+                  onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(16, 185, 129, 0.25)'; this.style.boxShadow='0 6px 20px rgba(16, 185, 129, 0.06)';">
+                  <div style="display: flex; align-items: flex-start; gap: 1.1rem; margin-bottom: 1rem;">
+                    <div style="width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.25)); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+                      <i class="fa-solid fa-microphone-lines"></i>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.76rem; font-weight: 800; color: #059669; text-transform: uppercase; margin-bottom: 3px;">التطبيق الثاني • ذكاء صوتي</div>
+                      <h3 style="margin: 0 0 0.35rem 0; font-size: 1.25rem; font-weight: 900; color: var(--text-main, #0f172a);">كتابة الأسئلة بالإملاء الصوتي</h3>
+                      <p style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #64748b; line-height: 1.6;">
+                        تحدث بحرية واقرأ الأسئلة بصوتك ليتم تحويلها وكتابتها وترقيمها وتقسيم فروعها تلقائياً بالذكاء الاصطناعي.
+                      </p>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.85rem; border-top: 1px dashed rgba(16, 185, 129, 0.25);">
+                    <span style="font-size: 0.86rem; font-weight: 800; color: #059669; display: inline-flex; align-items: center; gap: 0.4rem;">
+                      <i class="fa-solid fa-microphone"></i> بدء الإملاء الصوتي المباشر
+                    </span>
+                    <span style="width: 32px; height: 32px; border-radius: 9px; background: rgba(16, 185, 129, 0.1); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                      <i class="fa-solid fa-arrow-left"></i>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- التطبيق 3: تصوير الورقة المكتوبة بخط اليد -->
+                <div class="qbuilder-mode-card mode-scanner" onclick="window.triggerModePaperScanner()" role="button" tabindex="0" title="تصوير أو رفع ورقة الامتحان المكتوبة بخط اليد لقراءتها فوراً"
+                  style="position: relative; background: var(--bg-card, #fff); border: 2px solid rgba(139, 92, 246, 0.25); border-radius: 20px; padding: 1.45rem 1.5rem; cursor: pointer; transition: all 0.22s ease; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.06);"
+                  onmouseenter="this.style.transform='translateY(-5px)'; this.style.borderColor='#8b5cf6'; this.style.boxShadow='0 14px 32px rgba(139, 92, 246, 0.18)';"
+                  onmouseleave="this.style.transform='none'; this.style.borderColor='rgba(139, 92, 246, 0.25)'; this.style.boxShadow='0 6px 20px rgba(139, 92, 246, 0.06)';">
+                  <div style="display: flex; align-items: flex-start; gap: 1.1rem; margin-bottom: 1rem;">
+                    <div style="width: 54px; height: 54px; border-radius: 16px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(139, 92, 246, 0.25)); color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0;">
+                      <i class="fa-solid fa-camera-viewfinder"></i>
+                    </div>
+                    <div>
+                      <div style="font-size: 0.76rem; font-weight: 800; color: #7c3aed; text-transform: uppercase; margin-bottom: 3px;">التطبيق الثالث • مسح وتصوير</div>
+                      <h3 style="margin: 0 0 0.35rem 0; font-size: 1.25rem; font-weight: 900; color: var(--text-main, #0f172a);">عن طريق تصوير الورقة</h3>
+                      <p style="margin: 0; font-size: 0.88rem; font-weight: 700; color: #64748b; line-height: 1.6;">
+                        صوّر مسودة أسئلتك المكتوبة بخط اليد بكاميرا الموبايل أو ارفع صورتها ليحولها النظام فوراً لامتحان مطبوع.
+                      </p>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 0.85rem; border-top: 1px dashed rgba(139, 92, 246, 0.25);">
+                    <span style="font-size: 0.86rem; font-weight: 800; color: #7c3aed; display: inline-flex; align-items: center; gap: 0.4rem;">
+                      <i class="fa-solid fa-camera"></i> تصوير الورقة بالماسح الذكي
+                    </span>
+                    <span style="width: 32px; height: 32px; border-radius: 9px; background: rgba(139, 92, 246, 0.1); color: #7c3aed; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                      <i class="fa-solid fa-arrow-left"></i>
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <div id="qbuilderQuestionsWorkspace" class="questions-workspace-layout" style="display: none;">
               <div class="questions-main-content">
                 <div class="card-box" style="margin-top: 0;">
                   <div class="card-header">
