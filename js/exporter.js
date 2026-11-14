@@ -158,19 +158,12 @@ const ExamExporter = {
     const studentHTML = this.generatePaperCopyHTML('student');
     const committeeHTML = this.generatePaperCopyHTML('answer_key');
 
-    const studentBadge = isLtr
-      ? 'Official Examination Paper ── [ Student Copy ]'
-      : 'جمهورية العراق ــ وزارة التربية | ورقة الأسئلة الامتحانية ــ [ نسخة الطالب ]';
-
     const committeeBadge = isLtr
       ? '★ Examination Committee & Evaluation Center Copy (Approved Model Answers & Score Rubric) ★'
       : '★ نسخة اللجنة الامتحانية ومركز الفحص (الأجوبة النموذجية المعتمدة وسلّم توزيع الدرجات) ★';
 
     dualPrint.innerHTML = `
       <div class="dual-copy-section student-copy ${ltrClass}" ${dirAttr}>
-        <div class="print-copy-badge student-badge" style="border: 1.5px solid #000; text-align: center; padding: 4px 12px; margin-bottom: 8px; font-weight: 800; font-size: 10pt; background: #fff;">
-          ${studentBadge}
-        </div>
         ${studentHTML}
       </div>
       <div class="print-page-break" style="page-break-before: always !important; break-before: page !important; height: 0 !important; margin: 0 !important; border: none !important;"></div>
@@ -204,15 +197,9 @@ const ExamExporter = {
     const state = this.getState() || {};
     const isLtr = (state.settings && state.settings.direction === 'ltr');
     const studentHTML = this.generatePaperCopyHTML('student');
-    const badge = isLtr
-      ? 'Official Examination Paper ── [ Student Copy ]'
-      : 'جمهورية العراق ــ وزارة التربية | ورقة الأسئلة الامتحانية ــ [ نسخة الطالب ]';
 
     const fullContent = `
       <div class="exam-print-single-copy ${isLtr ? 'paper-ltr' : ''}" ${isLtr ? 'dir="ltr"' : 'dir="rtl"'}>
-        <div class="print-copy-badge student-badge" style="border: 1.5px solid #000; text-align: center; padding: 4px 12px; margin-bottom: 8px; font-weight: 800; font-size: 10pt; background: #fff;">
-          ${badge}
-        </div>
         ${studentHTML}
       </div>
     `;

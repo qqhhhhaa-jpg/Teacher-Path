@@ -49,6 +49,8 @@
   .paper-page-separator,
   .paper-pages-ctrl,
   .btn-paper-break-ctrl,
+  .print-copy-badge.student-badge,
+  .student-badge,
   .no-print {
     display: none !important;
     visibility: hidden !important;
