@@ -9689,6 +9689,44 @@ function showToast(message, type = 'info') {
   }, 3200);
 }
 
+// ==========================================================================
+// 3 Dedicated Creation Modes Handlers (التطبيقات الثلاثة لبناء الأسئلة)
+// ==========================================================================
+window.triggerModeManualQuestion = function () {
+  // 1. فتح قائمة خيارات نوع السؤال أو فتح نافذة كتابة سؤال جديد مباشرة
+  const dropdown = document.getElementById('qbuilderCustomDropdown');
+  if (dropdown && typeof window.toggleQTypeDropdown === 'function') {
+    window.toggleQTypeDropdown();
+    dropdown.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else if (typeof window.openQuestionModal === 'function') {
+    window.openQuestionModal(null, 'mcq');
+  }
+  showToast('✏️ التطبيق الأول: اختر نوع السؤال للبدء بكتابته وصياغته يدوياً', 'info');
+};
+
+window.triggerModeVoiceDictation = function () {
+  // 2. فتح وضع الإملاء الصوتي المباشر في الماسح الذكي
+  if (typeof window.openHandwrittenPaperScannerInVoiceMode === 'function') {
+    window.openHandwrittenPaperScannerInVoiceMode();
+  } else if (typeof window.openHandwrittenPaperScanner === 'function') {
+    window.openHandwrittenPaperScanner(false);
+    setTimeout(() => {
+      if (typeof window.toggleScannerVoiceDictation === 'function') {
+        window.toggleScannerVoiceDictation();
+      }
+    }, 250);
+  }
+  showToast('🎙️ التطبيق الثاني: تحدث واقرأ الأسئلة بصوتك ليتم كتابتها وتقسيم فروعها تلقائياً', 'success');
+};
+
+window.triggerModePaperScanner = function () {
+  // 3. فتح ماسح الأوراق المكتوبة بخط اليد الذكي للتصوير أو الرفع
+  if (typeof window.openHandwrittenPaperScanner === 'function') {
+    window.openHandwrittenPaperScanner(false);
+  }
+  showToast('📸 التطبيق الثالث: صوّر الورقة المكتوبة بخط اليد ليتم تحويلها لأسئلة مطبوعة فوراً', 'info');
+};
+
 /**
  * Initialize Movable / Floating Side Question Type Bar (شريط إضافة الأسئلة المتحرك صعوداً ونزولاً)
  */
