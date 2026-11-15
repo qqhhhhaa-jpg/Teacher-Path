@@ -761,6 +761,7 @@ window.getBackendApiUrl = getBackendApiUrl;
 // Auto-detect Worldwide Cloudflare Tunnel URL from Server (Safe & Fast with 800ms timeout)
 (async function initServerTunnelDetection() {
   try {
+    if (typeof window !== 'undefined' && window.location && window.location.protocol === 'file:') return;
     if (isBackendCircuitBroken()) return;
     const isLocalHost = typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
     const candidateUrls = isLocalHost ? ['http://localhost:8080/api/public_url', '/api/public_url'] : ['/api/public_url'];
@@ -1708,21 +1709,27 @@ function loadTeacherProfile() {
       }
     }
 
-    // تفعيل الفترة التجريبية المجانية الشاملة لمدة 7 أيام لجميع المستخدمين غير المفعلين
+    // تفعيل الاشتراك السنوي المجاني الكامل (سنة كاملة 🎁) لجميع المعلمين المسجلين حتى شراء السيرفر
     if (!current.isAdmin && current.role !== 'admin' && current.id !== 'usr_guest') {
-      const isPaid = (current.role === 'teacher_vip') ||
-        (current.subscriptionDuration && !String(current.subscriptionDuration).startsWith('free_trial'));
+      const isPaid = (current.role === 'teacher_vip' && !current.isTrial) ||
+        (current.subscriptionDuration && current.subscriptionDuration === '1_year' && !current.isTrial);
       if (!isPaid) {
-        current.isTrial = true;
-        current.trialDurationHours = 168;
-        current.subscriptionType = 'free_trial_7d';
-        current.subscriptionPlanName = 'فترة تجريبية مجانية (7 أيام)';
+        const now = new Date();
+        const oneYearLater = new Date(now);
+        oneYearLater.setFullYear(now.getFullYear() + 1);
+        const expiryDateStr = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
+        current.isTrial = false;
+        current.role = 'teacher_vip';
+        current.subscriptionType = 'annual_free_grant';
+        current.subscriptionDuration = '1_year';
+        current.subscriptionPlanName = 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)';
         current.isSubscribed = true;
         current.isVip = true;
-        if (!current.subscriptionExpiresAt) {
-          const startMs = current.trialStartedAt ? new Date(current.trialStartedAt).getTime() : Date.now();
-          current.subscriptionExpiresAt = new Date(startMs + 7 * 24 * 60 * 60 * 1000).toISOString();
-        }
+        current.subscriptionStartDate = now.toISOString();
+        current.subscriptionExpiresAt = oneYearLater.toISOString();
+        current.subscriptionExpiryFormatted = expiryDateStr;
+        localStorage.setItem(`moallem_vip_subscription_${current.id}`, 'true');
+        localStorage.setItem(`moallem_vip_subscription_exp_${current.id}`, oneYearLater.toISOString());
       }
     }
     localStorage.setItem('moallem_current_user', JSON.stringify(current));
@@ -5307,10 +5314,10 @@ function initEventListeners() {
       }
 
       const nowReg = new Date();
-      const trialDurationMs = 7 * 24 * 60 * 60 * 1000; // 7 days (168 hours free trial)
-      const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
+      const oneYearLater = new Date(nowReg);
+      oneYearLater.setFullYear(nowReg.getFullYear() + 1);
       const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth() + 1).padStart(2, '0')}-${String(nowReg.getDate()).padStart(2, '0')}`;
-      const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+      const expiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
 
       const newAccount = {
         id: 'usr_' + Date.now(),
@@ -5323,16 +5330,15 @@ function initEventListeners() {
         password: pass,
         contact: '',
         isVerified: true,
-        role: 'teacher',
+        role: 'teacher_vip',
         isSubscribed: true,
         isVip: true,
-        isTrial: true,
-        trialDurationHours: 168,
-        trialStartedAt: nowReg.toISOString(),
-        subscriptionType: 'free_trial_7d',
-        subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+        isTrial: false,
+        subscriptionDuration: '1_year',
+        subscriptionType: 'annual_free_grant',
+        subscriptionPlanName: 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)',
         subscriptionStartDate: nowReg.toISOString(),
-        subscriptionExpiresAt: trialExpiry.toISOString(),
+        subscriptionExpiresAt: oneYearLater.toISOString(),
         subscriptionExpiryFormatted: expiryFormatted,
         registeredAt: nowReg.toISOString(),
         registeredDateFormatted: dateFormatted
@@ -5340,8 +5346,8 @@ function initEventListeners() {
 
       accounts.push(newAccount);
       saveAuthAccounts(accounts);
-      localStorage.removeItem(`moallem_vip_subscription_${newAccount.id}`);
-      localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, trialExpiry.toISOString());
+      localStorage.setItem(`moallem_vip_subscription_${newAccount.id}`, 'true');
+      localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, oneYearLater.toISOString());
 
       // Immediately register on server for cross-device support
       try {
@@ -5406,7 +5412,7 @@ function initEventListeners() {
       if (portal) portal.classList.add('portal-hidden');
       if (workstation) workstation.classList.remove('portal-locked');
 
-      showToast(`مرحباً بك أستاذ ${name}! تم منحك اشتراكاً تجريبياً مجانياً لمدة 7 أيام لتجربة كافة إمكانيات المنصة بحرية كاملة 🎁✨`, 'success');
+      showToast(`مرحباً بك أستاذ ${name}! تم إنشاء حسابك وتفعيل اشتراك مجاني كامل لمدة سنة (365 يوماً) بنجاح 🎁👑`, 'success');
     });
   }
 
@@ -13341,12 +13347,12 @@ window.submitSingleStepTeacherRegistration = async function () {
     return;
   }
 
-  // Create clean account object
+  // Create clean account object with Full 1-Year Free Subscription
   const now = new Date();
-  const trialDurationMs = 7 * 24 * 60 * 60 * 1000;
-  const trialExpiry = new Date(now.getTime() + trialDurationMs);
+  const oneYearLater = new Date(now);
+  oneYearLater.setFullYear(now.getFullYear() + 1);
   const dateFormatted = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+  const expiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
 
   const newAccount = {
     id: 'usr_teacher_' + Date.now(),
@@ -13360,17 +13366,16 @@ window.submitSingleStepTeacherRegistration = async function () {
     school: school,
     governorate: governorate,
     rights: rights,
-    role: 'teacher',
+    role: 'teacher_vip',
     status: 'active',
     isSubscribed: true,
     isVip: true,
-    isTrial: true,
-    trialDurationHours: 168,
-    trialStartedAt: now.toISOString(),
-    subscriptionType: 'free_trial_7d',
-    subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+    isTrial: false,
+    subscriptionDuration: '1_year',
+    subscriptionType: 'annual_free_grant',
+    subscriptionPlanName: 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)',
     subscriptionStartDate: now.toISOString(),
-    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiresAt: oneYearLater.toISOString(),
     subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: now.toISOString(),
     registeredDateFormatted: dateFormatted
@@ -13390,7 +13395,8 @@ window.submitSingleStepTeacherRegistration = async function () {
 
   // Save isolated profile for this account
   try {
-    localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, trialExpiry.toISOString());
+    localStorage.setItem(`moallem_vip_subscription_${newAccount.id}`, 'true');
+    localStorage.setItem(`moallem_vip_subscription_exp_${newAccount.id}`, oneYearLater.toISOString());
     localStorage.setItem(`moallem_teacher_profile_${newAccount.id}`, JSON.stringify(newAccount));
   } catch (_) {}
 
@@ -13398,7 +13404,7 @@ window.submitSingleStepTeacherRegistration = async function () {
 
   // Perform Instant Login
   await window.performGoogleLoginSuccess(newAccount);
-  showToast(`أهلاً وسهلاً بك يا أستاذ ${name} 🚀 تم إنشاء حسابك وتفعيل مساحة العمل بنجاح!`, 'success');
+  showToast(`أهلاً وسهلاً بك يا أستاذ ${name} 🚀 تم إنشاء حسابك وتفعيل اشتراك مجاني كامل لمدة سنة (365 يوماً) بنجاح! 🎁👑`, 'success');
 };
 
 // Deprecated legacy Google opener:
@@ -13504,14 +13510,14 @@ window.autoCreateAndLoginGoogleTeacher = async function (name, email, picture, g
     return existing;
   }
 
-  // 2. New Account -> Auto-create complete profile with VIP trial and log in immediately!
+  // 2. New Account -> Auto-create complete profile with 1-Year Free Subscription and log in immediately!
   const rawPrefix = (cleanEmail.split('@')[0] || 'teacher').replace(/[^a-zA-Z0-9_]/g, '_').toLowerCase();
   const displayName = name || ('أستاذ ' + rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1));
   const nowReg = new Date();
-  const trialDurationMs = 7 * 24 * 60 * 60 * 1000;
-  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
+  const oneYearLater = new Date(nowReg);
+  oneYearLater.setFullYear(nowReg.getFullYear() + 1);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth() + 1).padStart(2, '0')}-${String(nowReg.getDate()).padStart(2, '0')}`;
-  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+  const expiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
 
   const newAcc = {
     id: 'usr_google_' + Date.now(),
@@ -13528,17 +13534,16 @@ window.autoCreateAndLoginGoogleTeacher = async function (name, email, picture, g
     contact: cleanEmail,
     isGoogleUser: true,
     isVerified: true,
-    role: 'teacher',
+    role: 'teacher_vip',
     status: 'active',
     isSubscribed: true,
     isVip: true,
-    isTrial: true,
-    trialDurationHours: 168,
-    trialStartedAt: nowReg.toISOString(),
-    subscriptionType: 'free_trial_7d',
-    subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+    isTrial: false,
+    subscriptionDuration: '1_year',
+    subscriptionType: 'annual_free_grant',
+    subscriptionPlanName: 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)',
     subscriptionStartDate: nowReg.toISOString(),
-    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiresAt: oneYearLater.toISOString(),
     subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
@@ -13547,7 +13552,8 @@ window.autoCreateAndLoginGoogleTeacher = async function (name, email, picture, g
   accounts.push(newAcc);
   saveAuthAccounts(accounts);
   try {
-    localStorage.setItem(`moallem_vip_subscription_exp_${newAcc.id}`, trialExpiry.toISOString());
+    localStorage.setItem(`moallem_vip_subscription_${newAcc.id}`, 'true');
+    localStorage.setItem(`moallem_vip_subscription_exp_${newAcc.id}`, oneYearLater.toISOString());
     localStorage.setItem(`moallem_teacher_profile_${newAcc.id}`, JSON.stringify(newAcc));
   } catch (_) {}
 
@@ -13557,7 +13563,7 @@ window.autoCreateAndLoginGoogleTeacher = async function (name, email, picture, g
   
   await window.performGoogleLoginSuccess(newAcc);
   if (typeof showToast === 'function') {
-    showToast(`أهلاً وسهلاً بك يا ${displayName} 🚀 تم تفعيل حسابك ودخول المنصة فوراً بنجاح!`, 'success');
+    showToast(`أهلاً وسهلاً بك يا ${displayName} 🚀 تم تفعيل حسابك واشتراكك السنوي المجاني لمدة سنة كاملة بنجاح! 🎁👑`, 'success');
   }
   return newAcc;
 };
@@ -13880,10 +13886,10 @@ window.completeGoogleLoginWithProfile = function () {
   }
 
   const nowReg = new Date();
-  const trialDurationMs = 7 * 24 * 60 * 60 * 1000; // 7 days (168 hours free trial)
-  const trialExpiry = new Date(nowReg.getTime() + trialDurationMs);
+  const oneYearLater = new Date(nowReg);
+  oneYearLater.setFullYear(nowReg.getFullYear() + 1);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth() + 1).padStart(2, '0')}-${String(nowReg.getDate()).padStart(2, '0')}`;
-  const expiryFormatted = trialExpiry.toLocaleString('ar-IQ', { dateStyle: 'full', timeStyle: 'short' });
+  const expiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
 
   const finalGoogleAccount = {
     id: 'usr_google_' + Date.now(),
@@ -13900,16 +13906,15 @@ window.completeGoogleLoginWithProfile = function () {
     contact: contact,
     isGoogleUser: true,
     isVerified: true,
-    role: 'teacher',
+    role: 'teacher_vip',
     isSubscribed: true,
     isVip: true,
-    isTrial: true,
-    trialDurationHours: 168,
-    trialStartedAt: nowReg.toISOString(),
-    subscriptionType: 'free_trial_7d',
-    subscriptionPlanName: 'فترة تجريبية مجانية (7 أيام)',
+    isTrial: false,
+    subscriptionDuration: '1_year',
+    subscriptionType: 'annual_free_grant',
+    subscriptionPlanName: 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)',
     subscriptionStartDate: nowReg.toISOString(),
-    subscriptionExpiresAt: trialExpiry.toISOString(),
+    subscriptionExpiresAt: oneYearLater.toISOString(),
     subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
@@ -13917,8 +13922,8 @@ window.completeGoogleLoginWithProfile = function () {
 
   accounts.push(finalGoogleAccount);
   saveAuthAccounts(accounts);
-  localStorage.removeItem(`moallem_vip_subscription_${finalGoogleAccount.id}`);
-  localStorage.setItem(`moallem_vip_subscription_exp_${finalGoogleAccount.id}`, trialExpiry.toISOString());
+  localStorage.setItem(`moallem_vip_subscription_${finalGoogleAccount.id}`, 'true');
+  localStorage.setItem(`moallem_vip_subscription_exp_${finalGoogleAccount.id}`, oneYearLater.toISOString());
 
   // Save isolated profile for this account immediately
   try {
@@ -13935,7 +13940,7 @@ window.completeGoogleLoginWithProfile = function () {
 
   window.performGoogleLoginSuccess(finalGoogleAccount);
 
-  showToast(`تم حفظ وتأكيد بيانات حسابك أستاذ ${name} بنجاح! تم تفعيل اشتراك تجريبي مجاني لمدة 7 أيام لتجربة كافة إمكانيات المنصة 🎁✨`, 'success');
+  showToast(`تم حفظ وتأكيد بيانات حسابك أستاذ ${name} بنجاح! تم تفعيل اشتراك سنوي مجاني شامل لمدة سنة كاملة (365 يوماً) 🎁👑`, 'success');
 };
 
 window.loginWithSelectedGoogleAccount = async function (name, email) {
@@ -15299,7 +15304,9 @@ window.closeSubscriptionModal = function () {
 // Initial background sync from server if connected
 (async function syncPricingFromServer() {
   try {
-    const serverUrl = (window.MOALLEM_PUBLIC_SERVER_URL || (window.location && window.location.origin ? window.location.origin : 'http://localhost:8080')).replace(/\/+$/, '');
+    if (typeof window !== 'undefined' && window.location && (window.location.protocol === 'file:' || !window.location.origin || window.location.origin === 'null')) return;
+    const serverUrl = (window.MOALLEM_PUBLIC_SERVER_URL || (window.location && window.location.origin ? window.location.origin : '')).replace(/\/+$/, '');
+    if (!serverUrl || serverUrl.startsWith('file:')) return;
     const res = await fetch(`${serverUrl}/api/pricing`);
     if (res.ok) {
       const data = await res.json();
@@ -17640,7 +17647,10 @@ window.adminPromptAddTeacher = function () {
   }
 
   const nowReg = new Date();
+  const oneYearLater = new Date(nowReg);
+  oneYearLater.setFullYear(nowReg.getFullYear() + 1);
   const dateFormatted = `${nowReg.getFullYear()}-${String(nowReg.getMonth() + 1).padStart(2, '0')}-${String(nowReg.getDate()).padStart(2, '0')}`;
+  const expiryFormatted = `${oneYearLater.getFullYear()}-${String(oneYearLater.getMonth() + 1).padStart(2, '0')}-${String(oneYearLater.getDate()).padStart(2, '0')}`;
   const newAcc = {
     id: 'usr_' + Date.now(),
     name: name.trim(),
@@ -17651,19 +17661,31 @@ window.adminPromptAddTeacher = function () {
     school: 'مدرسة معتمدة',
     governorate: 'بغداد',
     isVerified: true,
-    isSubscribed: false,
-    isVip: false,
+    isSubscribed: true,
+    isVip: true,
+    isTrial: false,
+    role: 'teacher_vip',
+    subscriptionDuration: '1_year',
+    subscriptionType: 'annual_free_grant',
+    subscriptionPlanName: 'اشتراك سنوي مجاني شامل (سنة كاملة 🎁)',
+    subscriptionStartDate: nowReg.toISOString(),
+    subscriptionExpiresAt: oneYearLater.toISOString(),
+    subscriptionExpiryFormatted: expiryFormatted,
     registeredAt: nowReg.toISOString(),
     registeredDateFormatted: dateFormatted
   }
 
   accounts.push(newAcc);
   saveAuthAccounts(accounts);
+  try {
+    localStorage.setItem(`moallem_vip_subscription_${newAcc.id}`, 'true');
+    localStorage.setItem(`moallem_vip_subscription_exp_${newAcc.id}`, oneYearLater.toISOString());
+  } catch (_) {}
   window.renderAdminAccountsTable();
   if (typeof window.renderSubscribersManagementUI === 'function') {
     window.renderSubscribersManagementUI();
   }
-  showToast(`تم إنشاء حساب الأستاذ ${name} بنجاح!`, 'success');
+  showToast(`تم إنشاء حساب الأستاذ ${name} وتفعيل اشتراك مجاني لسنة كاملة بنجاح! 🎁👑`, 'success');
 };
 
 window.adminExportAllSystemData = function () {
